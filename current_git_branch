@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Add pwd to prompt and add current branch in Git
+function find_git_branch {
+
+local dir=. head
+until [ "$dir" -ef / ]; do
+    if [ -f "$dir/.git/HEAD" ]; then
+        head=$(< "$dir/.git/HEAD")
+        if [[ $head == ref:\ refs/heads/* ]]; then
+            echo "${head#*/*/}"
+        elif [[ $head != '' ]]; then
+            echo '(detached)'
+        else
+            echo '(unknown)'
+        fi
+
+    fi
+    dir="../$dir"
+done
+}
+
+find_git_branch

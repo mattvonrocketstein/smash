@@ -1,0 +1,67 @@
+# bash/python chimera mode set to "on"
+include ipythonrc-pysh
+
+# uses emacs daemon to open files for objects as if by magic
+# try it out.. "%edit SomeModelClass" opens the file!
+editor emacsclient
+
+# don't bug me with questions when I hit control-D
+confirm_exit 0
+
+# 'complete' only completes as much as possible while
+# 'menu-complete'  cycles through all possible completions.
+# readline_parse_and_bind tab: menu-complete
+readline_parse_and_bind tab: complete
+readline_parse_and_bind "\C-l": clear-screen      # control+L
+readline_parse_and_bind "\b": backward-kill-word  # control+delete
+
+# readline_omit__names 1: omit showing any names starting with two __
+# readline_omit__names 2: completion will omit all names beginning with _
+# Regardless, typing a _ after the period and hitting <tab>: 'name._<tab>'
+# will always complete attribute names starting with '_'.
+readline_omit__names 1
+
+prompt_in1 \C_LightGreen\# \C_Red${os.popen("current_git_branch").read().strip()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>
+
+# py-sh changes this from the default.. no sir, i don't like it
+prompt_out ' Out[\#]:'
+
+## general shell aliases
+################################################################################
+alias dhclient sudo dhclient
+alias dad django-admin.py
+alias ls ls --color=auto
+
+## git aliases
+################################################################################
+alias grc git rebase --continue
+alias rebase git rebase -i
+alias st git status
+alias gd git diff --color
+alias gc git commit
+
+## load external macros
+################################################################################
+# this rc-format is restrictive with all the 'execute' lines
+# more complex namespace manipulations/etc are done in a real language
+execute import msh_support
+import_some msh_support activate_venv
+execute msh_support.clean_namespace()
+
+# inject some justice into the namespace
+import_module os
+import_some inspect getfile
+
+## ipython extensions
+################################################################################
+#
+# see ...
+import_mod jobctrl
+
+# because some_dictionary | idump is a bit nicer than pprint.
+# see http://wiki.ipython.org/Using_ipipe for more info.
+import_some ipipe idump
+
+# wtf?  doesn't seem to work.
+# this should enable pasting of lines lines with prefixed ">>>"
+doctest_mode on
