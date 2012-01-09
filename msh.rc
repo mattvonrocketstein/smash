@@ -44,9 +44,8 @@ alias gc git commit
 ################################################################################
 # this rc-format is restrictive with all the 'execute' lines
 # more complex namespace manipulations/etc are done in a real language
-execute import msh_support
-import_some msh_support activate_venv
-execute msh_support.clean_namespace()
+execute print "executing msh.rc"
+execute import ipy_profile_msh
 
 # inject some justice into the namespace
 import_module os
