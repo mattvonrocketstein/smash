@@ -4,7 +4,7 @@
  """
 import os
 import sys
-
+from collections import defaultdict
 get_path = lambda: os.environ['PATH']
 to_vbin = lambda venv: os.path.join(venv, 'bin')
 
@@ -17,17 +17,28 @@ class Project(object):
     """
     dir = None
 
+    def ipy_install(self,name='proj'):
+        """ binds self into interactive shell namespace """
+        __IPYTHON__.shell.user_ns[name] = self
+
+    def pre_activate(self, name, f):
+        self._pre_invokage[name] += [f]
+
     def __init__(self,name):
         self.name = name
+        self._pre_invokage  = defaultdict(lambda: [])
+        self._post_invokage = defaultdict(lambda: [])
 
     @classmethod
     def bind(kls, name, dir):
         """ named alias for changing directory to "dir". """
+        p = Project(name)
+        p.dir = dir
         @property
         def tmp(self):
-            __IPYTHON__.ipmagic('cd '+dir)
-            p = Project(name)
-            p.dir = dir
+            [ f() for f in self._pre_invokage[name] ]
+            __IPYTHON__.ipmagic('cd ' + p.dir)
+            [ f() for f in self._post_invokage[name] ]
             return p
         setattr(kls, name, tmp)
 
@@ -36,13 +47,14 @@ class Project(object):
         """ """
         print 'project-manager: binding', dir
         for name in os.listdir(dir):
-            kls.bind(name,os.path.join(dir,name))
+            kls.bind(name, os.path.join(dir,name))
 
     def __repr__(self):
         return 'project: ' + self.name
 
     @classmethod
     def deactivate(self):
+        """ TODO: move this to ipy_venv_support """
         try:
             venv = os.environ['VIRTUAL_ENV']
         except KeyError:
@@ -71,6 +83,11 @@ class Project(object):
 
     @classmethod
     def activate(self, obj):
+        """ TODO: move/combine this to ipy_venv_support
+
+            activating a project is different than activating
+            a venv (but it might include activating a venv)
+        """
         self.deactivate()
         if isinstance(obj, str):
             if is_venv(obj):

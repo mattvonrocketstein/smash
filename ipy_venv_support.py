@@ -1,4 +1,4 @@
-""" ipy_venv_support.py
+""" ipython_hacks/ipy_venv_support
 
     This file mainly exists to make virtual-env's work better with
     the pysh profile.  To use, first move this file into ~/.ipython.
@@ -15,6 +15,9 @@
 
       2) as a magic command (not finished yet)
 
+        ...
+        ...
+        ...
 """
 import os
 
@@ -34,8 +37,8 @@ def activate_venv(path):
     def choose_dir(path):
         if 'activate_this.py' in os.listdir(path):
             return path
-        node_bin   = os.path.join(path,'node','bin','activate_this.py')
-        simple_bin = os.path.join(path,'bin','activate_this.py')
+        node_bin   = os.path.join(path, 'node', 'bin', 'activate_this.py')
+        simple_bin = os.path.join(path, 'bin', 'activate_this.py')
         if os.path.exists(node_bin):
             return node_bin
         if os.path.exists(simple_bin):
