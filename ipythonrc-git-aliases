@@ -1,0 +1,9 @@
+# ipython_hacks/ipythonrc-git-aliases
+
+## git aliases
+################################################################################
+alias grc git rebase --continue
+alias rebase git rebase -i
+alias st git status
+alias gd git diff --color
+alias gc git commit

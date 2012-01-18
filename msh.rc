@@ -1,5 +1,7 @@
 # bash/python chimera mode set to "on"
 include ipythonrc-pysh
+include ipythonrc-git-aliases
+include ipythonrc-bash-aliases
 
 # uses emacs daemon to open files for objects as if by magic
 # try it out.. "%edit SomeModelClass" opens the file!
@@ -31,14 +33,6 @@ prompt_out ' Out[\#]:'
 alias dhclient sudo dhclient
 alias dad django-admin.py
 alias ls ls --color=auto
-
-## git aliases
-################################################################################
-alias grc git rebase --continue
-alias rebase git rebase -i
-alias st git status
-alias gd git diff --color
-alias gc git commit
 
 ## load external macros
 ################################################################################
