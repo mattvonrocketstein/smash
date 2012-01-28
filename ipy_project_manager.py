@@ -5,8 +5,12 @@
 import os
 import sys
 from collections import defaultdict
+
+from ipy_profile_msh import colorize
+
 get_path = lambda: os.environ['PATH']
 to_vbin = lambda venv: os.path.join(venv, 'bin')
+
 
 class Project(object):
     """ class for holding Project abstractions.
@@ -24,7 +28,7 @@ class Project(object):
     def pre_activate(self, name, f):
         self._pre_invokage[name] += [f]
 
-    def __init__(self,name):
+    def __init__(self, name):
         self.name = name
         self._pre_invokage  = defaultdict(lambda: [])
         self._post_invokage = defaultdict(lambda: [])
@@ -36,24 +40,35 @@ class Project(object):
         p.dir = dir
         @property
         def tmp(self):
+            """ """
             [ f() for f in self._pre_invokage[name] ]
             __IPYTHON__.ipmagic('cd ' + p.dir)
             [ f() for f in self._post_invokage[name] ]
             return p
+
         setattr(kls, name, tmp)
 
     @classmethod
     def report(kls, *args):
-        print 'project-manager: ',args
+        """ """
+        if len(args)>1:
+            print colorize('{red}project-manager:{normal}'),args
+        else:
+            print colorize('{red}project-manager:{normal} ') + args[0]
 
     @classmethod
-    def bind_all(kls, dir):
-        """ """
-        kls.report('binding', dir)
-        for name in os.listdir(dir):
-            kls.bind(name, os.path.join(dir,name))
+    def bind_all(kls, _dir):
+        """ binds every directory in _dir as a project """
+        N=0
+        for name in os.listdir(_dir):
+            tmp = os.path.join(_dir,name)
+            if os.path.isdir(tmp):
+                N += 1
+                kls.bind(name, tmp)
+        kls.report('binding ' + _dir + ' (' + str(N) + ' projects found)')
 
     def __repr__(self):
+        """ """
         return 'project: ' + self.name
 
     @classmethod
@@ -62,7 +77,7 @@ class Project(object):
         try:
             venv = os.environ['VIRTUAL_ENV']
         except KeyError:
-            return
+            return False
         else:
             assert os.path.exists(venv), 'wont deactivate a relocated venv'
             path = get_path()
@@ -84,6 +99,7 @@ class Project(object):
                 if entry and not entry.startswith(venv):
                     nn.append(entry)
             sys.path = nn
+            return True
 
     @classmethod
     def activate(self, obj):
@@ -99,19 +115,22 @@ class Project(object):
                 path = get_path().split(':')
                 os.environ['PATH'] = ':'.join([vbin] + path)
                 self.report('adding %s to PATH and rehashing aliases' % vbin)
-                __IPYTHON__.ipmagic('rehash')
                 sandbox = dict(__file__ = os.path.join(vbin, 'activate_this.py'))
                 execfile(os.path.join(vbin,'activate_this.py'),sandbox)
+                __IPYTHON__.ipmagic('rehashx')
             else:
-                self.report('not a venv..', obj)
+                self.report('  not a venv..' + obj)
                 searchsub = 'venv node'.split()
+                searchsub = [ os.path.join(obj,name) for name in searchsub ]
+                searchsub = [ name for name in searchsub if os.path.exists(name) ]
                 for name in searchsub:
-                    try:
-                        tmp = self.activate(os.path.join(obj, name))
-                        if tmp:
-                            return tmp
-                    except OSError:
-                        pass
+                    self.report('    trying "'+name+'"')
+                    if is_venv(name):
+                            tmp = self.activate(name)
+                            if tmp:
+                                return tmp
+                    else:
+                            self.report('fail')
 
 
         else:

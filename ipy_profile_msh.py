@@ -2,13 +2,17 @@
 
 """
 import os
-from IPython.macro import Macro
 
-from ipy_venv_support import activate_venv
+#from ipy_venv_support import activate_venv
 from ipy_bonus_yeti import clean_namespace
 
-print 'importing ipy_profile_msh'
-HOME = os.environ['HOME']
+from IPython import ColorANSI
+from IPython.genutils import Term
+tc = ColorANSI.TermColors()
+def colorize(msg):
+    """ """
+    return msg.format(red=tc.Red,normal=tc.Normal)
+print colorize('{red}msh{normal}: importing ipy_profile_msh')
 
 # removes various namespace collisions between
 # common py-modules and common unix shell commands
@@ -20,10 +24,10 @@ ipy_bonus_yeti.clean_namespace()
 # directory.  you can add activation hooks for things like
 # "start venv if present" or "show fab commands if present"
 from ipy_project_manager import Project
-project_manager = Project('__main__')
-project_manager.bind_all(os.path.join(os.environ['HOME'], 'code'))
-project_manager.pre_activate('robotninja',
-                             lambda: project_manager.activate(project_manager.hammock))
-project_manager.ipy_install()
+manager = Project('__main__')
+manager.bind_all(os.path.expanduser('~/code'))
 
-# project.robotninja.pre_activate_hook(lambda: project.activate(project.hammock))
+# robotninja requires hammock's activation first, so register that
+manager.pre_activate('robotninja',
+                     lambda: manager.activate(manager.hammock))
+manager.ipy_install()
