@@ -21,6 +21,6 @@ def clean_namespace():
         if name in __IPYTHON__.shell.user_ns:
             del __IPYTHON__.shell.user_ns[name]
 
-    names = 'gc git time pwd pip pyflakes easy_install virtualenv py'
+    names = 'curl gc git time pwd pip pyflakes easy_install virtualenv py'
 
     [ wipe(x) for x in names.split() ]
