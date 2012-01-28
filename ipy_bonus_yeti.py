@@ -11,7 +11,7 @@ def post_hook_for_magic(original_magic_name, new_func):
         out = old_magic(parameter_s=parameter_s)
         new_func()
         return out
-    new_magic._wrapped=old_magic
+    new_magic._wrapped = old_magic
     IPython.ipapi.get().expose_magic(original_magic_name,new_magic)
 
 def clean_namespace():

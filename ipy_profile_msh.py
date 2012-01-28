@@ -2,6 +2,7 @@
 
 """
 import os
+expanduser = os.path.expanduser
 
 #from ipy_venv_support import activate_venv
 from ipy_bonus_yeti import clean_namespace
@@ -25,9 +26,10 @@ ipy_bonus_yeti.clean_namespace()
 # "start venv if present" or "show fab commands if present"
 from ipy_project_manager import Project
 manager = Project('__main__')
-manager.bind_all(os.path.expanduser('~/code'))
+manager.bind_all(expanduser('~/code'))
 
 # robotninja requires hammock's activation first, so register that
 manager.pre_activate('robotninja',
                      lambda: manager.activate(manager.hammock))
-manager.ipy_install()
+manager.bind(expanduser('~/jellydoughnut'))
+manager._ipy_install()
