@@ -43,9 +43,13 @@ class Project(object):
         setattr(kls, name, tmp)
 
     @classmethod
+    def report(kls, *args):
+        print 'project-manager: ',args
+
+    @classmethod
     def bind_all(kls, dir):
         """ """
-        print 'project-manager: binding', dir
+        kls.report('binding', dir)
         for name in os.listdir(dir):
             kls.bind(name, os.path.join(dir,name))
 
@@ -68,13 +72,13 @@ class Project(object):
             # TODO: also rehash
             vbin = to_vbin(venv)
             if vbin in path:
-                print 'venv-manager: removing old venv bin from PATH', vbin
+                self.report('removing old venv bin from PATH', vbin)
                 path.remove(vbin)
                 os.environ['PATH'] = ':'.join(path)
 
             # clean sys.path according to python..
             # stupid, but this seems to work
-            print 'venv-manager: cleaning sys.path'
+            self.report('cleaning sys.path')
             nn = []
             for entry in sys.path:
                 if entry and not entry.startswith(venv):
@@ -94,12 +98,12 @@ class Project(object):
                 vbin = to_vbin(obj)
                 path = get_path().split(':')
                 os.environ['PATH'] = ':'.join([vbin] + path)
-                print 'venv-manager: adding %s to PATH and rehashing aliases' % vbin
+                self.report('adding %s to PATH and rehashing aliases' % vbin)
                 __IPYTHON__.ipmagic('rehash')
                 sandbox = dict(__file__ = os.path.join(vbin, 'activate_this.py'))
                 execfile(os.path.join(vbin,'activate_this.py'),sandbox)
             else:
-                print 'venv-manager: not a venv..', obj
+                self.report('not a venv..', obj)
                 searchsub = 'venv node'.split()
                 for name in searchsub:
                     try:
