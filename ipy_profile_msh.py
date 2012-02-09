@@ -20,6 +20,11 @@ print colorize('{red}msh{normal}: importing ipy_profile_msh')
 import ipy_bonus_yeti
 ipy_bonus_yeti.clean_namespace()
 
+
+print colorize('{red}msh{normal}: installing fabric support')
+from ipy_fabric_support import magic_fabric
+magic_fabric.install_into_ipython()
+
 # consider every directory in ~/code to be a "project"
 # by default project.<dir-name> simply changes into that
 # directory.  you can add activation hooks for things like
@@ -27,6 +32,7 @@ ipy_bonus_yeti.clean_namespace()
 from ipy_project_manager import Project
 manager = Project('__main__')
 manager.bind_all(expanduser('~/code'))
+manager.bind_all(expanduser('~/devel'))
 
 # robotninja requires hammock's activation first, so register that
 manager.pre_activate('robotninja',
