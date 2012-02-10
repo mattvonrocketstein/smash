@@ -24,3 +24,18 @@ def clean_namespace():
     names = 'curl gc git time pwd pip pyflakes easy_install virtualenv py'
 
     [ wipe(x) for x in names.split() ]
+
+from IPython import ColorANSI
+from IPython.genutils import Term
+tc = ColorANSI.TermColors()
+def colorize(msg):
+    """ """
+    return msg.format(red=tc.Red,normal=tc.Normal)
+
+class Reporter(object):
+    """ syntactic sugar for reporting """
+    def __getattr__(self,label):
+        def tmp(msg):
+            print colorize('{red}' + label + '{normal}: ' + msg)
+        return tmp
+report = Reporter()
