@@ -1,27 +1,22 @@
 """ ipython_hacks/ipy_profile_msh
 
+    TODO: replace unix 'which' with a macro that first tries unix-which,
+          then, if it fails, tries py.which (from pycmd library)
 """
 import os
 expanduser = os.path.expanduser
 
 #from ipy_venv_support import activate_venv
-from ipy_bonus_yeti import clean_namespace
-
-from IPython import ColorANSI
-from IPython.genutils import Term
-tc = ColorANSI.TermColors()
-def colorize(msg):
-    """ """
-    return msg.format(red=tc.Red,normal=tc.Normal)
-print colorize('{red}msh{normal}: importing ipy_profile_msh')
+from ipy_bonus_yeti import clean_namespace, report
+report.msh('importing ipy_profile_msh')
 
 # removes various namespace collisions between
 # common py-modules and common unix shell commands
-import ipy_bonus_yeti
-ipy_bonus_yeti.clean_namespace()
+clean_namespace()
 
-
-print colorize('{red}msh{normal}: installing fabric support')
+# detects and gives relevant advice when we change
+# dirs into a place where a fabric command is present
+report.msh('installing fabric support')
 from ipy_fabric_support import magic_fabric
 magic_fabric.install_into_ipython()
 
@@ -29,13 +24,25 @@ magic_fabric.install_into_ipython()
 # by default project.<dir-name> simply changes into that
 # directory.  you can add activation hooks for things like
 # "start venv if present" or "show fab commands if present"
+from medley_ipy import load_medley_customizations
 from ipy_project_manager import Project
 manager = Project('__main__')
-manager.bind_all(expanduser('~/code'))
-manager.bind_all(expanduser('~/devel'))
 
-# robotninja requires hammock's activation first, so register that
+# for my personal projects and their customizations.
+# ( robotninja requires hammock's activation first )
+manager.bind_all(expanduser('~/code'))
 manager.pre_activate('robotninja',
                      lambda: manager.activate(manager.hammock))
+
+# Medley specific things
 manager.bind(expanduser('~/jellydoughnut'))
+manager.bind_all(expanduser('~/devel'),
+                 post_activate=[load_medley_customizations],)
+
+# we're finished with setup now, but this call is still
+# necessary to actually cause ipython to use the manager
 manager._ipy_install()
+
+# and here is some extra support for git
+from ipy_git_completers import install_git_aliases
+install_git_aliases()
