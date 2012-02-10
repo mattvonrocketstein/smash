@@ -6,8 +6,7 @@ import os
 import sys
 from collections import defaultdict
 
-from ipy_profile_msh import colorize
-from ipy_bonus_yeti import post_hook_for_magic
+from ipy_bonus_yeti import post_hook_for_magic, report
 
 get_path = lambda: os.environ['PATH']
 get_venv = lambda: os.environ['VIRTUAL_ENV']
@@ -66,6 +65,7 @@ class VenvMixin(object):
             vbin = to_vbin(obj)
             path = get_path().split(':')
             os.environ['PATH'] = ':'.join([vbin] + path)
+            os.environ['VIRTUAL_ENV'] = obj
             self.report('      adding "%s" to PATH; rehashing aliases' % vbin)
             sandbox = dict(__file__ = os.path.join(vbin, 'activate_this.py'))
             execfile(os.path.join(vbin,'activate_this.py'),sandbox)
@@ -81,7 +81,10 @@ class VenvMixin(object):
         """ placeholder for when projects support
             post-venv-activation hooks
         """
-        return self._activate_str(obj.dir)
+        [ f() for f in self._pre_invokage[obj.name] ]
+        result = self._activate_str(obj.dir)
+        [ f() for f in self._post_invokage[obj.name] ]
+        return result
 
     @classmethod
     def activate(self, obj):
@@ -129,7 +132,7 @@ class Project(VenvMixin):
             self.report(m1); self.report(m2)
 
 
-    def _ipy_install(self,name='proj'):
+    def _ipy_install(self, name='proj'):
         """ binds self into interactive shell namespace """
         __IPYTHON__.shell.user_ns[name] = self
         post_hook_for_magic('cd', self._announce_if_project)
@@ -138,35 +141,43 @@ class Project(VenvMixin):
         """ """
         self._pre_invokage[name] += [f]
 
+    _pre_invokage  = defaultdict(lambda: [])
+    _post_invokage = defaultdict(lambda: [])
+
     def __init__(self, name):
         """ """
         self.name = name
-        self._pre_invokage  = defaultdict(lambda: [])
-        self._post_invokage = defaultdict(lambda: [])
+
+    @staticmethod
+    def naked_cd(d):
+        # grabs a magic "cd" function from ipython, but try to bypass
+        # the now redundant _announce_if_project wrapper we installed
+        # earlier
+        cd_func = __IPYTHON__.magic_cd
+        cd_func = getattr(cd_func, '_wrapped', cd_func)
+        cd_func(d)
 
     @classmethod
-    def bind(kls, _dir, name=None):
+    def bind(kls, _dir, name=None,
+             pre_activate=[],
+             post_activate=[],
+             **kargs):
         """ named alias for changing directory to "_dir". """
         if name is None:
             name=os.path.split(_dir)[1]
         p = Project(name)
         p.dir = _dir
         kls._paths += [_dir]
+
+        kls._post_invokage[name] += post_activate
+        kls._pre_invokage[name] += pre_activate
+
         @property
         def tmp(self):
             """ yeah this is a pretty awful hack..
                 TODO: refactor it later
             """
-            [ f() for f in self._pre_invokage[name] ]
-
-            # grabs a magic "cd" function from ipython, but try to bypass
-            # the now redundant _announce_if_project wrapper we installed
-            # earlier
-            cd_func = __IPYTHON__.magic_cd
-            cd_func = getattr(cd_func, '_wrapped', cd_func)
-            cd_func(p.dir)
-
-            [ f() for f in self._post_invokage[name] ]
+            self.naked_cd(p.dir)
             return p
 
         setattr(kls, name, tmp)
@@ -175,19 +186,19 @@ class Project(VenvMixin):
     def report(kls, *args):
         """ """
         if len(args)>1:
-            print colorize('{red}project-manager:{normal}'),args
+            report.project_manager(str(args))
         else:
-            print colorize('{red}project-manager:{normal} ') + args[0]
+            report.project_manager(args[0])
 
     @classmethod
-    def bind_all(kls, _dir):
+    def bind_all(kls, _dir, **kargs):
         """ binds every directory in _dir as a project """
         N=0
         for name in os.listdir(_dir):
             tmp = os.path.join(_dir,name)
             if os.path.isdir(tmp):
                 N += 1
-                kls.bind(tmp, name)
+                kls.bind(tmp, name, **kargs)
         kls.report('binding ' + _dir + ' (' + str(N) + ' projects found)')
 
     def __repr__(self):
