@@ -9,7 +9,7 @@ class magic_fabric(object):
     def __init__(self, lazy=True):
         if not lazy:
             def thinkaboutit():
-                tmp = {}
+                tmp = dict(__file__= 'fabfile.py')
                 execfile('fabfile.py', tmp)
                 z = self.__published_methods
                 tmp = [ [k, tmp[k]] for k in tmp if k in z ]
