@@ -61,6 +61,7 @@ class VenvMixin(object):
 
     @classmethod
     def _activate_str(self, obj):
+        """ """
         if is_venv(obj):
             vbin = to_vbin(obj)
             path = get_path().split(':')
@@ -78,9 +79,7 @@ class VenvMixin(object):
 
     @classmethod
     def _activate_project(self,obj):
-        """ placeholder for when projects support
-            post-venv-activation hooks
-        """
+        """ """
         result = self._activate_str(obj.dir)
         [ f() for f in self._post_activate[obj.name] ]
 
@@ -114,7 +113,7 @@ class Project(VenvMixin):
     """
 
     dir = None
-    _paths = []
+    _paths = {}
 
     def _announce_if_project(self):
         """ post-hook for ipython's magic "cd"
@@ -158,7 +157,7 @@ class Project(VenvMixin):
         kls._post_activate[name] += post_activate
         p = Project(name)
         p.dir = _dir
-        kls._paths += [_dir]
+        kls._paths[name] = _dir
 
         @property
         def invoke(self):

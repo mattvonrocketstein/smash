@@ -34,9 +34,9 @@ class git(object):
         return subs
 git = git()
 
-set_complete(lambda self, event: git.subcommands, 'git')
+set_complete(lambda self, event: git.subcommands, 'git $')
 set_complete(lambda self, event: git.local_branches, 'git checkout')
-set_complete(filesystem_completer, 'git add')
+set_complete(filesystem_completer, 'git add .*')
 set_complete(filesystem_completer, 'git mv')
 
 def install_git_aliases():
