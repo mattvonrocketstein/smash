@@ -6,8 +6,7 @@ import os
 import sys
 from collections import defaultdict
 
-from ipy_profile_msh import colorize
-from ipy_bonus_yeti import post_hook_for_magic
+from ipy_bonus_yeti import colorize, post_hook_for_magic
 
 get_path = lambda: os.environ['PATH']
 get_venv = lambda: os.environ['VIRTUAL_ENV']
@@ -66,6 +65,7 @@ class VenvMixin(object):
             vbin = to_vbin(obj)
             path = get_path().split(':')
             os.environ['PATH'] = ':'.join([vbin] + path)
+            os.environ['VIRTUAL_ENV'] = obj
             self.report('      adding "%s" to PATH; rehashing aliases' % vbin)
             sandbox = dict(__file__ = os.path.join(vbin, 'activate_this.py'))
             execfile(os.path.join(vbin,'activate_this.py'),sandbox)
@@ -81,7 +81,8 @@ class VenvMixin(object):
         """ placeholder for when projects support
             post-venv-activation hooks
         """
-        return self._activate_str(obj.dir)
+        result = self._activate_str(obj.dir)
+        [ f() for f in self._post_activate[obj.name] ]
 
     @classmethod
     def activate(self, obj):
@@ -143,17 +144,24 @@ class Project(VenvMixin):
         self.name = name
         self._pre_invokage  = defaultdict(lambda: [])
         self._post_invokage = defaultdict(lambda: [])
+    _post_activate = defaultdict(lambda: [])
 
     @classmethod
-    def bind(kls, _dir, name=None):
+    def bind(kls, _dir, name=None, post_activate=[], post_invoke=[]):
         """ named alias for changing directory to "_dir". """
         if name is None:
             name=os.path.split(_dir)[1]
+        if not isinstance(post_invoke, list):
+            post_invoke=[post_invoke]
+        if not isinstance(post_activate, list):
+            post_activate=[post_activate]
+        kls._post_activate[name] += post_activate
         p = Project(name)
         p.dir = _dir
         kls._paths += [_dir]
+
         @property
-        def tmp(self):
+        def invoke(self):
             """ yeah this is a pretty awful hack..
                 TODO: refactor it later
             """
@@ -166,10 +174,10 @@ class Project(VenvMixin):
             cd_func = getattr(cd_func, '_wrapped', cd_func)
             cd_func(p.dir)
 
-            [ f() for f in self._post_invokage[name] ]
+            [ f() for f in self._post_invokage[name] + post_invoke ]
             return p
 
-        setattr(kls, name, tmp)
+        setattr(kls, name, invoke)
 
     @classmethod
     def report(kls, *args):
@@ -180,14 +188,14 @@ class Project(VenvMixin):
             print colorize('{red}project-manager:{normal} ') + args[0]
 
     @classmethod
-    def bind_all(kls, _dir):
+    def bind_all(kls, _dir, **kargs):
         """ binds every directory in _dir as a project """
         N=0
         for name in os.listdir(_dir):
             tmp = os.path.join(_dir,name)
             if os.path.isdir(tmp):
                 N += 1
-                kls.bind(tmp, name)
+                kls.bind(tmp, name, **kargs)
         kls.report('binding ' + _dir + ' (' + str(N) + ' projects found)')
 
     def __repr__(self):

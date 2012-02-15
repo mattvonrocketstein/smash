@@ -38,3 +38,12 @@ set_complete(lambda self, event: git.subcommands, 'git')
 set_complete(lambda self, event: git.local_branches, 'git checkout')
 set_complete(filesystem_completer, 'git add')
 set_complete(filesystem_completer, 'git mv')
+
+def install_git_aliases():
+    __IPYTHON__.magic_alias('grc git rebase --continue')
+    __IPYTHON__.magic_alias('rebase git rebase -i')
+    __IPYTHON__.magic_alias('checkout git checkout')
+    __IPYTHON__.magic_alias('co git checkout')
+    __IPYTHON__.magic_alias('st git status')
+    __IPYTHON__.magic_alias('gd git diff --color')
+    __IPYTHON__.magic_alias('gc git commit')
