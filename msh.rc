@@ -28,12 +28,6 @@ prompt_in1 \C_LightGreen\# \C_Red${os.popen("current_git_branch").read().strip()
 # py-sh changes this from the default.. no sir, i don't like it
 prompt_out ' Out[\#]:'
 
-## general shell aliases
-################################################################################
-alias dhclient sudo dhclient
-alias dad django-admin.py
-alias ls ls --color=auto
-
 ## load external macros
 ################################################################################
 # this rc-format is restrictive with all the 'execute' lines
@@ -41,15 +35,11 @@ alias ls ls --color=auto
 execute print "executing msh.rc"
 execute import ipy_profile_msh
 
-# inject some justice into the namespace
-import_module os
-import_some inspect getfile
-
 ## ipython extensions
 ################################################################################
 #
 # see ...
-import_mod jobctrl
+#import_mod jobctrl
 
 # because some_dictionary | idump is a bit nicer than pprint.
 # see http://wiki.ipython.org/Using_ipipe for more info.

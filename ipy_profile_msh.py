@@ -14,7 +14,6 @@ report.msh('importing ipy_profile_msh')
 # common py-modules and common unix shell commands
 clean_namespace()
 
-
 ## install fabric support
 ################################################################################
 # detects and gives relevant advice when we change
@@ -51,6 +50,9 @@ install_git_aliases()
 __IPYTHON__.magic_alias('dhclient sudo dhclient')
 __IPYTHON__.magic_alias('dad django-admin.py')
 __IPYTHON__.magic_alias('ls ls --color=auto')
+
+import inspect
+__IPYTHON__.user_ns.update(getfile=inspect.getfile)
 
 # Medley specific things
 manager.bind(expanduser('~/jellydoughnut'))

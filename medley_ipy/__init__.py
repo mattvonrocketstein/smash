@@ -199,6 +199,12 @@ def load_medley_customizations2():
     else:
         report.medley_customization('set CMG_DB_PORT='+port)
 
+    report.medleys_customization('faking CMG_LOCAL_VENV_VERSION')
+    report.medleys_customization('modding settings.DATABASES[default][port]]')
+    from django.conf import settings
+    settings.DATABASES['default']['PORT'] = port
+    os.environ['CMG_LOCAL_VENV_VERSION']='1'
+
 
 
 def load_medley_customizations():
