@@ -39,15 +39,6 @@ manager = Project('__main__')
 manager.bind_all(expanduser('~/code'))
 manager.pre_activate('robotninja',
                      lambda: manager.activate(manager.hammock))
-
-# Medley specific things
-manager.bind(expanduser('~/jellydoughnut'))
-manager.bind_all(expanduser('~/devel'),
-                 post_activate=load_medley_customizations2,
-                 post_invoke=load_medley_customizations,)
-
-# we're finished with setup now, but this call is still
-# necessary to actually cause ipython to use the manager
 manager._ipy_install()
 
 # and here is some extra support for git
@@ -60,3 +51,9 @@ install_git_aliases()
 __IPYTHON__.magic_alias('dhclient sudo dhclient')
 __IPYTHON__.magic_alias('dad django-admin.py')
 __IPYTHON__.magic_alias('ls ls --color=auto')
+
+# Medley specific things
+manager.bind(expanduser('~/jellydoughnut'))
+manager.bind_all(expanduser('~/devel'),
+                 post_activate=load_medley_customizations2,
+                 post_invoke=load_medley_customizations,)

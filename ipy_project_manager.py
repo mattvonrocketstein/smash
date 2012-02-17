@@ -2,8 +2,8 @@
 
     support for virtual-env management and other goodies
  """
-import os
-import sys
+import os, sys
+
 from collections import defaultdict
 
 from ipy_bonus_yeti import colorize, post_hook_for_magic
@@ -11,6 +11,16 @@ from ipy_bonus_yeti import colorize, post_hook_for_magic
 get_path = lambda: os.environ['PATH']
 get_venv = lambda: os.environ['VIRTUAL_ENV']
 to_vbin = lambda venv: os.path.join(venv, 'bin')
+
+def is_venv(dir):
+    """ naive.. seems to work
+
+        TODO: find a canonical version of this function or refine it
+    """
+    y = 'lib bin include'.split()
+    x = os.listdir(dir)
+    if all([y1 in x for y1 in y]):
+        return True
 
 class VenvMixin(object):
     @classmethod
@@ -200,15 +210,3 @@ class Project(VenvMixin):
     def __repr__(self):
         """ """
         return 'project: ' + self.name
-
-
-
-def is_venv(dir):
-    """ naive.. seems to work
-
-        TODO: find a canonical version of this function or refine it
-    """
-    y = 'lib bin include'.split()
-    x = os.listdir(dir)
-    if all([y1 in x for y1 in y]):
-        return True
