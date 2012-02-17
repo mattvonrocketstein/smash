@@ -182,9 +182,22 @@ def load_medley_customizations2():
     report.medley_customization('loading three-venv macros')
     load_three_venv_macros()
     if not os.environ.get('DJANGO_SETTINGS_MODULE'):
-        os.environ['DJANGO_SETTINGS_MODULE'] = 'storyville.conf.sites'
+        os.environ['DJANGO_SETTINGS_MODULE'] = 'storyville.conf.local'
 
+    # set the DB port.  the 'activate' file has been modified by three_venv's create_environment
+    # but activate.py was left untouched so we have to snag a value from the former file in
+    # this fashion.  doing this is critical or you'll get FATAL: authorization blah blah errors
+    # whenever you try to do anything with django.
 
+    try:
+        activate_file = os.path.join(os.environ['VIRTUAL_ENV'],'bin','activate')
+        c = open(activate_file).readlines()
+        port = [ line for line in c if 'CMG_DB_PORT' in line][0].strip().split('=')[1]
+        os.environ['CMG_DB_PORT'] = port
+    except Exception,e:
+        report.medley_customization('error setting CMG_DB_PORT from ',activate_file)
+    else:
+        report.medley_customization('set CMG_DB_PORT='+port)
 
 
 
