@@ -14,9 +14,9 @@ report.msh('importing ipy_profile_msh')
 # common py-modules and common unix shell commands
 clean_namespace()
 
+
 ## install fabric support
 ################################################################################
-
 # detects and gives relevant advice when we change
 # dirs into a place where a fabric command is present
 report.msh('installing fabric support')
@@ -25,7 +25,6 @@ magic_fabric.install_into_ipython()
 
 ## setup project manager
 ################################################################################
-
 # consider every directory in ~/code to be a "project"
 # by default project.<dir-name> simply changes into that
 # directory.  you can add activation hooks for things like
