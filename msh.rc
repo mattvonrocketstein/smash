@@ -23,7 +23,7 @@ readline_parse_and_bind "\b": backward-kill-word  # control+delete
 # will always complete attribute names starting with '_'.
 readline_omit__names 1
 
-prompt_in1 \C_LightGreen\# \C_Red${os.popen("current_git_branch").read().strip()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>
+prompt_in1 \C_Red${os.popen("current_git_branch").read().strip()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>
 
 # py-sh changes this from the default.. no sir, i don't like it
 prompt_out ' Out[\#]:'

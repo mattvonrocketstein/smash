@@ -1,0 +1,38 @@
+=====
+About
+=====
+
+Smash is the smart-shell, a python/bash hyrbid building on the pysh profile for IPython.
+
+========
+Features
+========
+
+Python/Bash chimera:
+    in general, python vs system-commands are usually treated the way
+    you would expect, using the principle of least astonishment.
+
+Git VCS Integration:
+    branch/filesystem completion for git VCS
+    default prompt includes branch-name
+
+Fabfile integration:
+    tab-completion over fabfile commands
+    programmatic access to the functions themselves
+
+Abstraction for project-management:
+    directories can be registered as projects
+    project code can be searched
+    project code does not necessarily need to be python, but
+    if the project does contain python code, then:
+        projects can be activated if they contain virtualenv
+        projects can be watched for changes, then pyflaked
+
+============
+Requirements
+============
+
+    You need IPython==0.10, because smash uses the 'pysh' IPython profile, which
+    does not seem to work in newer version of IPython. see also:
+        http://ipython.org/ipython-doc/dev/interactive/shell.html
+
