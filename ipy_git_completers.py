@@ -1,7 +1,7 @@
 """ ipy_git_completers
 
     TODO: subcommands 'mv' and 'add' should use file-system completion
-    TODO: checkout should use branch completion
+    TODO: git diff should use branch completion AND fs-completion
 """
 import os
 import IPython.ipapi

@@ -34,17 +34,3 @@ prompt_out ' Out[\#]:'
 # more complex namespace manipulations/etc are done in a real language
 execute print "executing msh.rc"
 execute import ipy_profile_msh
-
-## ipython extensions
-################################################################################
-#
-# see ...
-#import_mod jobctrl
-
-# because some_dictionary | idump is a bit nicer than pprint.
-# see http://wiki.ipython.org/Using_ipipe for more info.
-import_some ipipe idump
-
-# wtf?  doesn't seem to work.
-# this should enable pasting of lines lines with prefixed ">>>"
-doctest_mode on
