@@ -1,4 +1,4 @@
-""" ipython_hacks/ipy_profile_msh
+""" smash/ipy_profile_msh
 
     TODO: replace unix 'which' with a macro that first tries unix-which,
           then, if it fails, tries py.which (from pycmd library)
@@ -59,3 +59,51 @@ manager.bind(expanduser('~/jellydoughnut'))
 manager.bind_all(expanduser('~/devel'),
                  post_activate=load_medley_customizations2,
                  post_invoke=load_medley_customizations,)
+
+from IPython import ipapi
+ip = ipapi.get()
+ip.options.confirm_exit = 0
+
+# TODO: move prompt generation here if 0.10 supports it
+#ip.set_hook("generate_prompt", myhdl_inputprompt)
+#ip.set_hook("generate_output_prompt", myhdl_outputprompt)
+
+# 'complete' only completes as much as possible while
+# 'menu-complete'  cycles through all possible completions.
+# readline_parse_and_bind tab: menu-complete
+report.msh('setting parsebind rules')
+ip.options.readline_parse_and_bind += [
+    'tab: complete',
+    '"\C-l": clear-screen', #      # control+L
+    '"\b": backward-kill-word',  # control+delete
+    ]
+ip.options.readline_parse_and_bind = list(set(ip.options.readline_parse_and_bind))
+
+# readline_omit__names 1: omit showing any names starting with two __
+# readline_omit__names 2: completion will omit all names beginning with _
+# Regardless, typing a _ after the period and hitting <tab>: 'name._<tab>'
+# will always complete attribute names starting with '_'.
+ip.options.readline_omit__names = 1
+
+# uses emacs daemon to open files for objects as if by magic
+# try it out.. "%edit SomeModelClass" opens the file!
+ip.options.editor = 'emacsclient'
+report.msh('setting prompt')
+
+
+#ip.options.prompt_in1= '\C_Red${os.popen("current_git_branch").read().strip()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>'
+ip.options.prompt_in1= ' \C_Red${os.popen("current_git_branch").read().strip()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>'
+
+ip.options.include += [
+    'ipythonrc-pysh',
+    'ipythonrc-git-aliases',
+    'ipythonrc-bash-aliases', ]
+
+class SmashPrompt(object):
+    def update_prompt(self, ishell):
+        print 'testing', self,ishell
+        ip.options.prompt_in1 = 'testing' #
+smash_prompt = SmashPrompt()
+#ip.set_hook("pre_prompt_hook", smash_prompt.update_prompt)
+
+import sys; sys.argv=sys.argv[1:]
