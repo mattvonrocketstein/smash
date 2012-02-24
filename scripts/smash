@@ -5,4 +5,4 @@
 
 MSH_RC=~/.ipython/smash/smash.rc
 echo "bootstrapping smart-shell from $MSH_RC"
-python -c"from IPython import Shell; Shell.IPShellEmbed(argv=['-rcfile=$MSH_RC'])()"
+python -c"from IPython import Shell; Shell.IPShellEmbed(argv=['-rcfile=$MSH_RC'])()" $@

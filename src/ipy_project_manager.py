@@ -3,7 +3,6 @@
     support for virtual-env management and other goodies
  """
 import os, sys
-
 from collections import defaultdict
 
 from ipy_bonus_yeti import colorize, post_hook_for_magic
@@ -210,3 +209,26 @@ class Project(VenvMixin):
     def __repr__(self):
         """ """
         return 'project: ' + self.name
+
+    @classmethod
+    def _watch_everything(kls,_dir=None):
+        """ """
+        import pyinotify
+        import threading
+
+        class EventHandler(pyinotify.ProcessEvent):
+            def process_default(self, event):
+                print('--->', event.maskname, event.pathname)
+            def process_IN_MODIFY(self, event):
+                print 'Modify:', event.pathname
+            def process_IN_CREATE(self, event):
+                print "Creating:", event.pathname
+
+        _dir = _dir or os.getcwd()
+        mask = pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_MODIFY
+        wm = pyinotify.WatchManager()
+        wm.add_watch(_dir, mask, rec=1)
+        notifier = pyinotify.Notifier(wm, default_proc_fun=EventHandler())
+        threading.Thread(target=notifier.loop).start()
+
+    
