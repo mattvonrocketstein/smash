@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#
+# you would think that "env python" would work just as well in every case, but you'd be wrong
+#
+
+MSH_RC=~/.ipython/smash/smash.rc
+echo "bootstrapping smart-shell from $MSH_RC"
+python -c"from IPython import Shell; Shell.IPShellEmbed(argv=['-rcfile=$MSH_RC'])()"

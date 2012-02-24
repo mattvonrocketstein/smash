@@ -21,6 +21,24 @@ clean_namespace()
 report.msh('installing fabric support')
 from ipy_fabric_support import magic_fabric
 magic_fabric.install_into_ipython()
+from IPython import ipapi
+ip = ipapi.get()
+# 'complete' only completes as much as possible while
+# 'menu-complete'  cycles through all possible completions.
+# readline_parse_and_bind tab: menu-complete
+report.msh('setting parsebind rules')
+ip.options.readline_parse_and_bind += [
+    'tab: complete',
+    '"\C-l": clear-screen', #      # control+L
+    '"\b": backward-kill-word',  # control+delete
+    ]
+ip.options.readline_parse_and_bind = list(set(ip.options.readline_parse_and_bind))
+ip.options.confirm_exit = 0
+
+report.msh('setting prompt')
+__IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
+#ip.options.prompt_in1= ' \C_Red${os.popen("current_git_branch").read().strip()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>'
+ip.options.prompt_in1= ' \C_Red${__IPYTHON__._cgb()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>'
 
 ## setup project manager
 ################################################################################
@@ -60,24 +78,11 @@ manager.bind_all(expanduser('~/devel'),
                  post_activate=load_medley_customizations2,
                  post_invoke=load_medley_customizations,)
 
-from IPython import ipapi
-ip = ipapi.get()
-ip.options.confirm_exit = 0
 
 # TODO: move prompt generation here if 0.10 supports it
 #ip.set_hook("generate_prompt", myhdl_inputprompt)
 #ip.set_hook("generate_output_prompt", myhdl_outputprompt)
 
-# 'complete' only completes as much as possible while
-# 'menu-complete'  cycles through all possible completions.
-# readline_parse_and_bind tab: menu-complete
-report.msh('setting parsebind rules')
-ip.options.readline_parse_and_bind += [
-    'tab: complete',
-    '"\C-l": clear-screen', #      # control+L
-    '"\b": backward-kill-word',  # control+delete
-    ]
-ip.options.readline_parse_and_bind = list(set(ip.options.readline_parse_and_bind))
 
 # readline_omit__names 1: omit showing any names starting with two __
 # readline_omit__names 2: completion will omit all names beginning with _
@@ -88,16 +93,11 @@ ip.options.readline_omit__names = 1
 # uses emacs daemon to open files for objects as if by magic
 # try it out.. "%edit SomeModelClass" opens the file!
 ip.options.editor = 'emacsclient'
-report.msh('setting prompt')
 
-
-#ip.options.prompt_in1= '\C_Red${os.popen("current_git_branch").read().strip()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>'
-ip.options.prompt_in1= ' \C_Red${os.popen("current_git_branch").read().strip()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>'
-
-ip.options.include += [
+ip.options.include = list(set(ip.options.include + [
     'ipythonrc-pysh',
     'ipythonrc-git-aliases',
-    'ipythonrc-bash-aliases', ]
+    'ipythonrc-bash-aliases', ]))
 
 class SmashPrompt(object):
     def update_prompt(self, ishell):

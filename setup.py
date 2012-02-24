@@ -2,60 +2,89 @@
 """
 import os
 import sys
+import glob
+from os.path import expanduser
 from optparse import OptionParser
 
+ope = os.path.exists
+opj = os.path.join
+opd = os.path.dirname
+ops = os.path.split
 
+class Setup:
 
-class ops:
+    def build(self): pass
+    def install(self): pass
 
-    def compute_dest(self, f):
-        return os.path.join(self.ipy_dir, os.path.split(f)[1])
-
-    def build(self):
-        pass
-
-    def install(self):
-        pass
 
     @property
     def this_dir(self):
-        return os.path.dirname(os.path.abspath(__file__))
-    def compute_src(self,f):
-        return os.path.join(self.this_dir,'src',f)
+        return opd(os.path.abspath(__file__))
+
+    def compute_src(self,f): return opj(self.this_dir,'src',f)
+    def compute_dest(self, f): return opj(self.ipy_dir, 'smash', ops(f)[1])
+
+
+
     @property
     def filez(self):
         items = [ self.compute_src(x) for x in \
-                  os.listdir(os.path.join(self.this_dir, 'src')) ]
+                  glob.glob(opj(self.this_dir, 'src','*.py')) ]
         return items
 
     @property
     def ipy_dir(self):
         return os.path.expanduser('~/.ipython')
 
+    @property
+    def smash_dir(self):
+        return opj(self.ipy_dir,'smash')
+
     def sanity(self):
-        if not os.path.exists(self.ipy_dir):
+        if not ope(self.ipy_dir):
             err = 'you do not have a ~/.ipython directory.  whats up with that?'
             raise SystemExit(err)
 
+        if not ope(self.smash_dir):
+            print 'creating ',self.smash_dir
+            os.mkdir(self.smash_dir)
+
     def develop(self):
+        def doit(src,dest):
+            try:
+                if ope(dest): os.remove(dest)
+                os.symlink(src, dest)
+            except OSError:
+                print ('-'*80+\
+                       '\ndont you have permissions or something?\n'+\
+                       '-'*80)
+                raise
+            else:
+                print ' ', src, '--->', dest
+
         self.sanity()
         print 'symlinking'
-        msh_file = os.path.join(os.path.dirname(__file__), 'msh.rc')
-
+        msh_file = opj(opd(__file__), 'smash.rc')
         for src in self.filez:
             dest = self.compute_dest(src)
-            os.remove(dest)
-            #print src, dest
-            os.symlink(src, dest)
-            print '   ', src, '--->', dest
+            doit(src, dest)
+        dest = self.compute_dest('smash.rc')
+        src = opj(self.this_dir, msh_file)
+        doit(src, dest)
 
-        dest = self.compute_dest('msh.rc')
-        os.remove(dest)
-        src = os.path.join(os.path.abspath(os.path.dirname(__file__)), msh_file)
-        print '   ', src, '--->', dest
-        os.symlink(src, dest)
+        print '\ninstalling smash executable'
+        default_bin = opj(self.ipy_dir, 'smash')
+        home_bin = expanduser('~/bin')
+        if home_bin in os.environ['PATH'].split(':'):
+            print '  found ~/bin... will install there'
+            src = opj(self.this_dir,'scripts','smash')
+            dest = opj(home_bin, 'smash')
+            doit(src, dest)
+        else:
+            print '  not found ~/bin... will install to', default_bin
+            raise Exception,'niy'
 
-ops = ops()
+setup = Setup()
 
 if __name__=='__main__':
     parser = OptionParser()
@@ -65,7 +94,7 @@ if __name__=='__main__':
     instruction = args[0]
     if instruction not in 'build install develop'.split():
         raise SystemExit('Use one of these arguments: build, install develop"')
-    instruction = getattr(ops,instruction)
+    instruction = getattr(setup, instruction)
     instruction()
     #from IPython import Shell; Shell.IPShellEmbed(argv=['-noconfirm_exit'])()
     #develop()
