@@ -42,7 +42,8 @@ class Setup:
 
     def sanity(self):
         if not ope(self.ipy_dir):
-            err = 'you do not have a ~/.ipython directory.  whats up with that?'
+            err = '\nyou do not have a ~/.ipython directory.'
+            err+= 'whats up with that?  (i need ipython .10)'
             raise SystemExit(err)
 
         if not ope(self.smash_dir):
@@ -50,20 +51,16 @@ class Setup:
             os.mkdir(self.smash_dir)
 
     def develop(self):
-        def doit(src,dest):
+        def doit(src, dest):
             try:
                 if ope(dest): os.remove(dest)
                 os.symlink(src, dest)
             except OSError:
-                print ('-'*80+\
-                       '\ndont you have permissions or something?\n'+\
-                       '-'*80)
+                print '-'*80+'\ndont you have permissions or something?\n'+'-'*80
                 raise
-            else:
-                print ' ', src, '--->', dest
-
+            else: print ' ', src, '--->', dest
         self.sanity()
-        print 'symlinking'
+        print 'installing symlinks for support libraries'
         msh_file = opj(opd(__file__), 'smash.rc')
         for src in self.filez:
             dest = self.compute_dest(src)
@@ -75,14 +72,15 @@ class Setup:
         print '\ninstalling smash executable'
         default_bin = opj(self.ipy_dir, 'smash')
         home_bin = expanduser('~/bin')
+        src = opj(self.this_dir,'scripts','smash')
         if home_bin in os.environ['PATH'].split(':'):
             print '  found ~/bin... will install there'
-            src = opj(self.this_dir,'scripts','smash')
             dest = opj(home_bin, 'smash')
-            doit(src, dest)
         else:
             print '  not found ~/bin... will install to', default_bin
-            raise Exception,'niy'
+            print '(copy it out of there yourself if you want to)'
+            dest = opj(default_bin, 'smash')
+        doit(src, dest)
 
 setup = Setup()
 
