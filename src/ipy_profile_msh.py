@@ -18,12 +18,12 @@ from ipy_bonus_yeti import clean_namespace, report
 ip = ipapi.get()
 
 
-report.msh('importing ipy_profile_msh')
+report.smash('importing ipy_profile_msh')
 
 ## install fabric support. detects and gives relevant advice if we change into
 ## a directory where a fabric command is present.  also provides tab-completion
 ################################################################################
-report.msh('installing fabric support')
+report.smash('installing fabric support')
 magic_fabric.install_into_ipython()
 
 # git VCS: this installs git aliases.  TODO: where did i install the completers?
@@ -34,6 +34,7 @@ install_git_aliases()
 ## possible actually in pure python instead of in ipython's weird rc format file
 ################################################################################
 OVERRIDE_OPTIONS = dict(
+    autoedit_syntax=1,
     confirm_exit = 0,
     prompt_in1= ' \C_Red${__IPYTHON__._cgb()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>',
     include = list(set(ip.options.include + ['ipythonrc-pysh',
@@ -61,7 +62,7 @@ OVERRIDE_OPTIONS = dict(
 for option,val in OVERRIDE_OPTIONS.items():
     setattr(ip.options, option, val)
 
-report.msh('setting prompt')
+report.smash('setting prompt')
 __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
 
 ## general shell aliases.  this stuff is somewhat idiosyncratic, but it seems
@@ -110,3 +111,45 @@ __manager__.bind('~/jellydoughnut')
 __manager__.bind_all('~/devel',
                      post_activate=load_medley_customizations2,
                      post_invoke=load_medley_customizations,)
+
+from optparse import OptionParser
+parser = OptionParser()
+
+parser.add_option("--panic", dest="panic",
+                  default=False, action="store_true",
+                  help="kill all running instances of 'smash'", )
+def die():
+    import threading
+    threading.Thread(target=lambda: os.system('kill -KILL ' + str(os.getpid()))).start()
+try:
+    opts,args = parser.parse_args(sys.argv)
+except SystemExit, e:
+    die()
+
+    """
+    e = str(e)
+    if e=='0':
+        # this happens because --help is passed.  we do NOT want
+        # to drop to shell here.  unfortunately all the stuff you
+        # might expect to work here, like __IPYTHON__ipmagic('exit'),
+        # etc, have no effect.  sys.exit() has no effect.  all of
+        # that happens because this function is actually called from
+        # a .rc file I guess.  anyway I don't see any options left
+        # except this.. ugly but it works.
+        #__IPYTHON__.ipsystem('kill -KILL ' + str(os.getpid()))
+    else:
+        print '-> Intercepted error:', str(e)
+    """
+else:
+    report.smash('parsed opts: '+str(eval(str(opts)).items()))
+    if opts.panic:
+        print "run this:\n\t","ps aux|grep smash|grep -v grep|awk '{print $2}'|xargs kill -KILL"
+        die()
+
+
+
+shh = __IPYTHON__.hooks['shutdown_hook']
+gop = __IPYTHON__.hooks['pre_prompt_hook']
+gop.add(__manager__.check)
+print 'doonit'
+shh.add(lambda: __manager__.shutdown())
