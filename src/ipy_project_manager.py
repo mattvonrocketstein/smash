@@ -7,9 +7,10 @@ from collections import defaultdict
 
 from ipy_bonus_yeti import colorize, post_hook_for_magic
 
-get_path = lambda: os.environ['PATH']
-get_venv = lambda: os.environ['VIRTUAL_ENV']
-to_vbin = lambda venv: os.path.join(venv, 'bin')
+get_path   = lambda: os.environ['PATH']
+get_venv   = lambda: os.environ['VIRTUAL_ENV']
+to_vbin    = lambda venv: os.path.join(venv, 'bin')
+expanduser = os.path.expanduser
 
 def is_venv(dir):
     """ naive.. seems to work
@@ -157,6 +158,7 @@ class Project(VenvMixin):
     @classmethod
     def bind(kls, _dir, name=None, post_activate=[], post_invoke=[]):
         """ named alias for changing directory to "_dir". """
+        _dir = expanduser(_dir)
         if name is None:
             name=os.path.split(_dir)[1]
         if not isinstance(post_invoke, list):
@@ -199,6 +201,7 @@ class Project(VenvMixin):
     def bind_all(kls, _dir, **kargs):
         """ binds every directory in _dir as a project """
         N=0
+        _dir = expanduser(_dir)
         for name in os.listdir(_dir):
             tmp = os.path.join(_dir,name)
             if os.path.isdir(tmp):
@@ -230,5 +233,3 @@ class Project(VenvMixin):
         wm.add_watch(_dir, mask, rec=1)
         notifier = pyinotify.Notifier(wm, default_proc_fun=EventHandler())
         threading.Thread(target=notifier.loop).start()
-
-    

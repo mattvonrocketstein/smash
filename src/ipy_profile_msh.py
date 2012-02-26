@@ -16,7 +16,7 @@ from ipy_git_completers import install_git_aliases
 from ipy_bonus_yeti import clean_namespace, report
 
 ip = ipapi.get()
-expanduser = os.path.expanduser
+
 
 report.msh('importing ipy_profile_msh')
 
@@ -101,12 +101,12 @@ from medley_ipy import load_medley_customizations2
 
 # for my personal projects and their customizations.
 # ( robotninja requires hammock's activation first )
-__manager__.bind_all(expanduser('~/code'))
+__manager__.bind_all('~/code')
 __manager__.pre_activate('robotninja',
                          lambda: manager.activate(manager.hammock))
 
 # Medley specific things
-__manager__.bind(expanduser('~/jellydoughnut'))
-__manager__.bind_all(expanduser('~/devel'),
+__manager__.bind('~/jellydoughnut')
+__manager__.bind_all('~/devel',
                      post_activate=load_medley_customizations2,
                      post_invoke=load_medley_customizations,)
