@@ -67,6 +67,7 @@ __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
 
 ## general shell aliases.  this stuff is somewhat idiosyncratic, but it seems
 ## like if it's not relevant it simply won't be used.  no harm no foul.
+## TODO: these aliases do not survive a "rehash" when proj is activated. damn
 ################################################################################
 __IPYTHON__.magic_alias('dhclient sudo dhclient')
 __IPYTHON__.magic_alias('dad django-admin.py')
@@ -103,8 +104,8 @@ from medley_ipy import load_medley_customizations2
 # for my personal projects and their customizations.
 # ( robotninja requires hammock's activation first )
 __manager__.bind_all('~/code')
-__manager__.pre_activate('robotninja',
-                         lambda: manager.activate(manager.hammock))
+#__manager__.pre_activate('robotninja',
+#                         lambda: __manager__.activate(manager.hammock))
 
 # Medley specific things
 __manager__.bind('~/jellydoughnut')
