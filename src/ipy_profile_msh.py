@@ -68,6 +68,8 @@ __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
 from ipy_smash_aliases import install_aliases
 install_aliases()
 
+import ipy_ytdl
+
 ## clean and begin main loop.  this first removes various common namespace
 ## collisions between py-modules and unix shell commands. then we clean up the
 ## strangeness of the command-line arguments (which are skewed due to the odd
