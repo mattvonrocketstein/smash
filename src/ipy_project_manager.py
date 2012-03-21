@@ -82,6 +82,9 @@ class VenvMixin(object):
             sandbox = dict(__file__ = os.path.join(vbin, 'activate_this.py'))
             execfile(os.path.join(vbin,'activate_this.py'),sandbox)
             __IPYTHON__.ipmagic('rehashx')
+            from ipy_smash_aliases import install_aliases
+            install_aliases()
+
         else:
             self.report('  not a venv.. ' + obj)
             path = self._contains_venv(obj)

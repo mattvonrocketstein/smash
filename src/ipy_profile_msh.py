@@ -65,15 +65,8 @@ for option,val in OVERRIDE_OPTIONS.items():
 report.smash('setting prompt')
 __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
 
-## general shell aliases.  this stuff is somewhat idiosyncratic, but it seems
-## like if it's not relevant it simply won't be used.  no harm no foul.
-## TODO: these aliases do not survive a "rehash" when proj is activated. damn
-################################################################################
-__IPYTHON__.magic_alias('dhclient sudo dhclient')
-__IPYTHON__.magic_alias('dad django-admin.py')
-__IPYTHON__.magic_alias('ls ls --color=auto')
-__IPYTHON__.magic_alias('apt-get sudo apt-get')
-
+from ipy_smash_aliases import install_aliases
+install_aliases()
 
 ## clean and begin main loop.  this first removes various common namespace
 ## collisions between py-modules and unix shell commands. then we clean up the
