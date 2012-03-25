@@ -108,12 +108,17 @@ __manager__.bind_all('~/devel',
                      post_activate=load_medley_customizations2,
                      post_invoke=load_medley_customizations,)
 
+
 from optparse import OptionParser
 parser = OptionParser()
 
 parser.add_option("--panic", dest="panic",
                   default=False, action="store_true",
                   help="kill all running instances of 'smash'", )
+parser.add_option('-p',"--project", dest="project",
+                  default='',
+                  help="specify a project to initialize", )
+
 def die():
     import threading
     threading.Thread(target=lambda: os.system('kill -KILL ' + str(os.getpid()))).start()
@@ -121,7 +126,6 @@ try:
     opts,args = parser.parse_args(sys.argv)
 except SystemExit, e:
     die()
-
     """
     e = str(e)
     if e=='0':
@@ -138,7 +142,10 @@ except SystemExit, e:
     """
 else:
     report.smash('parsed opts: '+str(eval(str(opts)).items()))
-    if opts.panic:
+    if opts.project:
+        report.cli('parsing project option')
+        getattr(__manager__,opts.project).activate
+    elif opts.panic:
         print "run this:\n\t","ps aux|grep smash|grep -v grep|awk '{print $2}'|xargs kill -KILL"
         die()
 

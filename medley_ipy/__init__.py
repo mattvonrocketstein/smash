@@ -283,7 +283,7 @@ class Engage(object):
                 if app in admins_by_app: admins_by_app[app] += [admin]
                 else: admins_by_app[app] = [ admin ]
         self._update(dict(_admin_dct=admins_by_app))
-        print medley_admin_doc
+        #print medley_admin_doc
 
     def api(self):
         # argh, wtf! done because it prints twice! :/
