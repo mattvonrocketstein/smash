@@ -69,18 +69,21 @@ class Setup:
         src = opj(self.this_dir, msh_file)
         doit(src, dest)
 
-        print '\ninstalling smash executable'
+        print '\ninstalling smash executable and other scripts'
         default_bin = opj(self.ipy_dir, 'smash')
         home_bin = expanduser('~/bin')
-        src = opj(self.this_dir,'scripts','smash')
+        #src = opj(self.this_dir, 'scripts', 'smash')
         if home_bin in os.environ['PATH'].split(':'):
             print '  found ~/bin... will install there'
-            dest = opj(home_bin, 'smash')
+            rdest = home_bin
         else:
             print '  not found ~/bin... will install to', default_bin
             print '(copy it out of there yourself if you want to)'
-            dest = opj(default_bin, 'smash')
-        doit(src, dest)
+            dest = default_bin
+        for rsrc in os.listdir(opj(self.this_dir, 'scripts')):
+            src = opj(self.this_dir, 'scripts', rsrc)
+            dest = opj(rdest, rsrc)
+            doit(src, dest)
 
 setup = Setup()
 
