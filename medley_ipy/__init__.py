@@ -300,13 +300,14 @@ class Engage(object):
         from medley.extensions.search_indexes \
              import SolrAPICommonFieldIndex
 
-        from haystack import site
+        #from haystack import site
         from medley.medley_search.query import MedleySearchQuerySet
         from medley.medley_search.query import SearchQuerySet
-        hregistry = site._registry
-        aregistry = api._registry
+        #hregistry = site._registry
+        #aregistry = api._registry
         ctx = dict(api=api,
-                   hregistry=hregistry, aregistry=aregistry,
+                   hregistry=api.model_map,
+                   aregistry=api._registry,
                    SolrAPICommonFieldIndex=SolrAPICommonFieldIndex,
                    MedleySearchQuerySet=MedleySearchQuerySet,
                    medleysearchqueryset=MedleySearchQuerySet,
