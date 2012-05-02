@@ -286,7 +286,6 @@ class Engage(object):
         #print medley_admin_doc
 
     def api(self):
-        # argh, wtf! done because it prints twice! :/
         print api_doc
 
         # trigger some of the autodiscovery

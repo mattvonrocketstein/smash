@@ -62,7 +62,7 @@ OVERRIDE_OPTIONS = dict(
 for option,val in OVERRIDE_OPTIONS.items():
     setattr(ip.options, option, val)
 
-report.smash('setting prompt')
+report.smash('setting prompt to use git vcs')
 __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
 
 from ipy_smash_aliases import install_aliases
@@ -154,5 +154,11 @@ else:
 shh = __IPYTHON__.hooks['shutdown_hook']
 gop = __IPYTHON__.hooks['pre_prompt_hook']
 gop.add(__manager__.check)
-print 'doonit'
 shh.add(lambda: __manager__.shutdown())
+
+# patch reset to clean up the display a la bash, not reset the namespace.
+from IPython.Magic import Magic
+def reset(himself,parameter_s=''):
+    __IPYTHON__.system('reset')
+    return 'overridden'
+Magic.magic_reset = reset
