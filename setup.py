@@ -22,9 +22,8 @@ class Setup:
         return opd(os.path.abspath(__file__))
 
     def compute_src(self,f): return opj(self.this_dir,'src',f)
+
     def compute_dest(self, f): return opj(self.ipy_dir, 'smash', ops(f)[1])
-
-
 
     @property
     def filez(self):
