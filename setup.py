@@ -14,8 +14,8 @@ ops = os.path.split
 class Setup:
 
     def build(self): pass
-    def install(self): pass
 
+    def install(self): pass
 
     @property
     def this_dir(self):
