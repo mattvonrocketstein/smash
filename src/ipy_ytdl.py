@@ -1,4 +1,6 @@
-""" ipy_ytdl """
+""" ipy_ytdl
+    shortcuts for youtube download
+"""
 import os
 
 CMD = '{bin} --max-quality=18 --format=18/22/37/38/83/82/85/84 "{url}"'
