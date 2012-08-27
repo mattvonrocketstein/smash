@@ -91,14 +91,16 @@ class Setup:
                     os.remove(opj(self.smash_dir, fname))
 
         self.sanity()
+
         msg_and_banner('installing symlinks for support libraries')
-        msh_file = opj(opd(__file__), 'smash.rc')
+        smash_rc = opj(opd(__file__), 'smash.rc')
         for src in self.files:
             dest = self.compute_dest(src)
             doit(src, dest)
         dest = self.compute_dest('smash.rc')
-        src  = opj(self.this_dir, msh_file)
+        src  = opj(self.this_dir, smash_rc)
         doit(src, dest)
+
 
         msg_and_banner('installing links for smash executable and other scripts')
         dot_ipy_smash_dir = opj(self.ipy_dir, 'smash')
@@ -110,10 +112,14 @@ class Setup:
             print ('not found ~/bin... will install to {0}'
                    ' (copy it out of there yourself if you want to)').format(dot_ipy_smash_dir)
             dest = dot_ipy_smash_dir
+
         for rsrc in os.listdir(opj(self.this_dir, 'scripts')):
             src = opj(self.this_dir, 'scripts', rsrc)
             dest = opj(rdest, rsrc)
             doit(src, dest)
+
+        msg_and_banner('installing plugins.json')
+        doit(opj(self.this_dir, 'src', 'plugins.json'), opj(dot_ipy_smash_dir,'plugins.json'))
 
         check_stale_files()
 

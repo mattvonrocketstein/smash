@@ -8,7 +8,9 @@
 import os
 import sys
 import inspect
+from optparse import OptionParser
 
+import demjson
 from IPython import ipapi
 
 from ipy_fabric_support import magic_fabric
@@ -16,7 +18,6 @@ from ipy_git_completers import install_git_aliases
 from ipy_bonus_yeti import clean_namespace, report
 
 ip = ipapi.get()
-
 
 report.smash('importing ipy_profile_msh')
 
@@ -108,48 +109,67 @@ __manager__.bind_all('~/devel',
                      post_activate=load_medley_customizations2,
                      post_invoke=load_medley_customizations,)
 
-
-from optparse import OptionParser
-parser = OptionParser()
-
-parser.add_option("--panic", dest="panic",
-                  default=False, action="store_true",
-                  help="kill all running instances of 'smash'", )
-parser.add_option('-p',"--project", dest="project",
-                  default='',
-                  help="specify a project to initialize", )
+def get_parser():
+    parser = OptionParser()
+    parser.add_option("--panic", dest="panic",
+                      default=False, action="store_true",
+                      help="kill all running instances of 'smash'", )
+    parser.add_option('-p', "--project",
+                      dest="project", default='',
+                      help="specify a project to initialize", )
+    parser.add_option('-i', '--install',
+                      dest='install', default='',
+                      help='install new smash module')
+    parser.add_option('-l', '--list',
+                      action='store_true',dest='list', default=False,
+                      help='list available plugins and their status')
+    parser.add_option('--enable',
+                      dest='enable', default='',
+                      help='enable plugin by name')
+    parser.add_option('--disable',
+                      dest='disable', default='',
+                      help='disable plugin by name')
+    return parser
 
 def die():
     import threading
     threading.Thread(target=lambda: os.system('kill -KILL ' + str(os.getpid()))).start()
-try:
-    opts,args = parser.parse_args(sys.argv)
-except SystemExit, e:
-    die()
-    """
-    e = str(e)
-    if e=='0':
-        # this happens because --help is passed.  we do NOT want
-        # to drop to shell here.  unfortunately all the stuff you
-        # might expect to work here, like __IPYTHON__ipmagic('exit'),
-        # etc, have no effect.  sys.exit() has no effect.  all of
-        # that happens because this function is actually called from
-        # a .rc file I guess.  anyway I don't see any options left
-        # except this.. ugly but it works.
-        #__IPYTHON__.ipsystem('kill -KILL ' + str(os.getpid()))
-    else:
-        print '-> Intercepted error:', str(e)
-    """
+SMASH_DIR         = os.path.dirname(__file__)
+try: opts,args = get_parser().parse_args(sys.argv)
+except SystemExit, e: die()
 else:
     report.smash('parsed opts: '+str(eval(str(opts)).items()))
     if opts.project:
         report.cli('parsing project option')
-        getattr(__manager__,opts.project).activate
+        getattr(__manager__, opts.project).activate
+    elif opts.enable:
+        report.plugins('enabling {0}'.format(opts.enable))
+        die()
+    elif opts.disable:
+        report.plugins('disabling {0}'.format(opts.disable))
+        die()
+    elif opts.list:
+
+        plugins_json_file = os.path.join(SMASH_DIR, 'plugins.json')
+        plugin_data       = demjson.decode(open(plugins_json_file, 'r').read())
+        py_files          = [ fname for fname in os.listdir(SMASH_DIR) if fname.endswith('.py') ]
+
+        # reconstructed because `plugins_json_file` may not be up to date with system
+        plugins  = dict([[fname, plugin_data.get(fname, 0)] for fname in py_files])
+        enabled  = [ fname for fname in plugins if plugins[fname] == 1 ]
+        disabled = [ fname for fname in plugins if plugins[fname] == 0 ]
+        if enabled:
+            report.plugins('enabled plugins')
+            for p in enabled: print '  ',p
+            print ; print
+        if disabled:
+            report.plugins('disabled plugins:')
+            for p in disabled: print '  ',p
+
+        die()
     elif opts.panic:
         print "run this:\n\t","ps aux|grep smash|grep -v grep|awk '{print $2}'|xargs kill -KILL"
         die()
-
-
 
 shh = __IPYTHON__.hooks['shutdown_hook']
 gop = __IPYTHON__.hooks['pre_prompt_hook']
