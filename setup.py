@@ -11,24 +11,37 @@ opj = os.path.join
 opd = os.path.dirname
 ops = os.path.split
 
+def niy(*args, **kargs):
+    raise Exception, 'not implemented yet'
+
+def only_py_files(dir, rel=False):
+    result = glob.glob(opj(dir, '*.py'))
+    if rel: result = [ ops(fname)[-1] for fname in result]
+    return result
+
+def msg_and_banner(msg):
+    print '\n', msg, '\n', '='*len(msg)
+
 class Setup:
 
-    def build(self): pass
-
-    def install(self): pass
+    # only 'develop' is finished.
+    install = build = niy
 
     @property
     def this_dir(self):
         return opd(os.path.abspath(__file__))
 
-    def compute_src(self,f): return opj(self.this_dir,'src',f)
+    @property
+    def src_files_dir(self):
+        return opj(self.this_dir, 'src')
 
-    def compute_dest(self, f): return opj(self.ipy_dir, 'smash', ops(f)[1])
+    def compute_dest(self, f):
+        return opj(self.ipy_dir, 'smash', ops(f)[1])
 
     @property
-    def filez(self):
-        items = [ self.compute_src(x) for x in \
-                  glob.glob(opj(self.this_dir, 'src','*.py')) ]
+    def files(self):
+        items = [ opj(self.src_files_dir, x)
+                  for x in only_py_files(self.src_files_dir) ]
         return items
 
     @property
@@ -37,52 +50,73 @@ class Setup:
 
     @property
     def smash_dir(self):
-        return opj(self.ipy_dir,'smash')
+        return opj(self.ipy_dir, 'smash')
 
     def sanity(self):
+        """ """
         if not ope(self.ipy_dir):
-            err = '\nyou do not have a ~/.ipython directory.'
-            err+= 'whats up with that?  (i need ipython .10)'
+            err = ('\nyou do not have a ~/.ipython directory.  whats up with that?'
+                   ' (also, smash needs ipython==0.10)')
             raise SystemExit(err)
 
         if not ope(self.smash_dir):
-            print 'creating ',self.smash_dir
+            print 'creating ', self.smash_dir
             os.mkdir(self.smash_dir)
 
     def develop(self):
+        """ """
         def doit(src, dest):
+            """ self.install() would be similar, without symlinks """
             try:
                 if ope(dest): os.remove(dest)
                 os.symlink(src, dest)
             except OSError:
                 print '-'*80+'\ndont you have permissions or something?\n'+'-'*80
                 raise
-            else: print ' ', src, '--->', dest
+            else:
+                print '{0} ---> {1}'.format(src, dest)
+
+        def check_stale_files():
+            """ find/remove files that are in ~/.ipython/smash
+                but not in <InstallRoot>/src/
+            """
+            two_dirs = [ set(only_py_files(d, rel=True)) \
+                         for d in [self.smash_dir, self.src_files_dir] ]
+            new, original = two_dirs
+            diff = new - original
+            if diff:
+                msg_and_banner('detected stale files')
+                for fname in diff:
+                    print '{0} is in {1} but not {2}'.format(fname, self.smash_dir, self.src_files_dir)
+                    os.remove(opj(self.smash_dir, fname))
+
         self.sanity()
-        print 'installing symlinks for support libraries'
+        msg_and_banner('installing symlinks for support libraries')
         msh_file = opj(opd(__file__), 'smash.rc')
-        for src in self.filez:
+        for src in self.files:
             dest = self.compute_dest(src)
             doit(src, dest)
         dest = self.compute_dest('smash.rc')
-        src = opj(self.this_dir, msh_file)
+        src  = opj(self.this_dir, msh_file)
         doit(src, dest)
 
-        print '\ninstalling smash executable and other scripts'
-        default_bin = opj(self.ipy_dir, 'smash')
-        home_bin = expanduser('~/bin')
-        #src = opj(self.this_dir, 'scripts', 'smash')
+        msg_and_banner('installing links for smash executable and other scripts')
+        dot_ipy_smash_dir = opj(self.ipy_dir, 'smash')
+        home_bin          = expanduser('~/bin')
         if home_bin in os.environ['PATH'].split(':'):
             print '  found ~/bin... will install there'
             rdest = home_bin
         else:
-            print '  not found ~/bin... will install to', default_bin
-            print '(copy it out of there yourself if you want to)'
-            dest = default_bin
+            print ('not found ~/bin... will install to {0}'
+                   ' (copy it out of there yourself if you want to)').format(dot_ipy_smash_dir)
+            dest = dot_ipy_smash_dir
         for rsrc in os.listdir(opj(self.this_dir, 'scripts')):
             src = opj(self.this_dir, 'scripts', rsrc)
             dest = opj(rdest, rsrc)
             doit(src, dest)
+
+        check_stale_files()
+
 
 setup = Setup()
 
@@ -94,7 +128,6 @@ if __name__=='__main__':
     instruction = args[0]
     if instruction not in 'build install develop'.split():
         raise SystemExit('Use one of these arguments: build, install develop"')
-    instruction = getattr(setup, instruction)
-    instruction()
-    #from IPython import Shell; Shell.IPShellEmbed(argv=['-noconfirm_exit'])()
-    #develop()
+    else:
+        instruction = getattr(setup, instruction)
+        instruction()

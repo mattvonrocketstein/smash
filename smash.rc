@@ -1,6 +1,6 @@
-execute print "executing msh.rc"
-execute import sys;import os.path as _; x=_.expanduser(_.join('~','.ipython','smash')); sys.path += [x]
-execute import ipy_profile_msh
+execute print "executing smash.rc"
+execute import sys; import os.path as _; x=_.expanduser(_.join('~','.ipython','smash')); sys.path += [x]
+execute import ipy_profile_smash
 
 # bash/python chimera mode set to "on"
 include ipythonrc-pysh
