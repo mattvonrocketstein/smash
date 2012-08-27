@@ -17,6 +17,8 @@ from ipy_fabric_support import magic_fabric
 from ipy_git_completers import install_git_aliases
 from ipy_bonus_yeti import clean_namespace, report
 
+SMASH_DIR         = os.path.dirname(__file__)
+
 ip = ipapi.get()
 
 report.smash('importing ipy_profile_msh')
@@ -134,7 +136,39 @@ def get_parser():
 def die():
     import threading
     threading.Thread(target=lambda: os.system('kill -KILL ' + str(os.getpid()))).start()
-SMASH_DIR         = os.path.dirname(__file__)
+
+
+class Plugins(object):
+    plugins_json_file = os.path.join(SMASH_DIR, 'plugins.json')
+    report = staticmethod(report.plugins)
+
+    def disable(self, name):
+        self.report('disabling {0}'.format(name))
+
+    def enable(self, name):
+        self.report('enabling {0}'.format(name))
+
+    @property
+    def plugin_data(self):
+        return demjson.decode(open(self.plugins_json_file, 'r').read())
+
+    def list(self):
+        # reconstructed because `plugins_json_file` may not be up to date with system
+        plugin_data = self.plugin_data
+        py_files          = [ fname for fname in os.listdir(SMASH_DIR) if fname.endswith('.py') ]
+        plugins  = dict([[fname, plugin_data.get(fname, 0)] for fname in py_files])
+        enabled  = [ fname for fname in plugins if plugins[fname] == 1 ]
+        disabled = [ fname for fname in plugins if plugins[fname] == 0 ]
+        if enabled:
+            self.report('enabled plugins')
+            for p in enabled: print '  ',p
+            print ; print
+        if disabled:
+            self.report('disabled plugins:')
+            for p in disabled: print '  ',p
+
+
+plugins = Plugins()
 try: opts,args = get_parser().parse_args(sys.argv)
 except SystemExit, e: die()
 else:
@@ -142,31 +176,9 @@ else:
     if opts.project:
         report.cli('parsing project option')
         getattr(__manager__, opts.project).activate
-    elif opts.enable:
-        report.plugins('enabling {0}'.format(opts.enable))
-        die()
-    elif opts.disable:
-        report.plugins('disabling {0}'.format(opts.disable))
-        die()
-    elif opts.list:
-
-        plugins_json_file = os.path.join(SMASH_DIR, 'plugins.json')
-        plugin_data       = demjson.decode(open(plugins_json_file, 'r').read())
-        py_files          = [ fname for fname in os.listdir(SMASH_DIR) if fname.endswith('.py') ]
-
-        # reconstructed because `plugins_json_file` may not be up to date with system
-        plugins  = dict([[fname, plugin_data.get(fname, 0)] for fname in py_files])
-        enabled  = [ fname for fname in plugins if plugins[fname] == 1 ]
-        disabled = [ fname for fname in plugins if plugins[fname] == 0 ]
-        if enabled:
-            report.plugins('enabled plugins')
-            for p in enabled: print '  ',p
-            print ; print
-        if disabled:
-            report.plugins('disabled plugins:')
-            for p in disabled: print '  ',p
-
-        die()
+    elif opts.enable:  plugins.enable(opts.enable);   die()
+    elif opts.disable: plugins.disable(opts.disable); die()
+    elif opts.list:    plugins.list();                 die()
     elif opts.panic:
         print "run this:\n\t","ps aux|grep smash|grep -v grep|awk '{print $2}'|xargs kill -KILL"
         die()
