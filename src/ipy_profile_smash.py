@@ -13,25 +13,15 @@ from optparse import OptionParser
 import demjson
 from IPython import ipapi
 
-from ipy_fabric_support import magic_fabric
-from ipy_git_completers import install_git_aliases
+#from ipy_git_completers import install_git_aliases
 from ipy_bonus_yeti import clean_namespace, report
 
-SMASH_DIR         = os.path.dirname(__file__)
+VERBOSE      = False
+SMASH_DIR    = os.path.dirname(__file__)
 
 ip = ipapi.get()
 
-report.smash('importing ipy_profile_msh')
-
-## install fabric support. detects and gives relevant advice if we change into
-## a directory where a fabric command is present.  also provides tab-completion
-################################################################################
-report.smash('installing fabric support')
-magic_fabric.install_into_ipython()
-
-# git VCS: this installs git aliases.  TODO: where did i install the completers?
-################################################################################
-install_git_aliases()
+if VERBOSE: report.smash('importing ipy_profile_msh')
 
 ## install various overrides into ip.options. doing it here puts as much code as
 ## possible actually in pure python instead of in ipython's weird rc format file
@@ -62,16 +52,12 @@ OVERRIDE_OPTIONS = dict(
     # uses emacs daemon to open files for objects. as if by magic
     # try it out.. "%edit SomeModelClass" opens the file!
     editor = 'emacsclient')
+
 for option,val in OVERRIDE_OPTIONS.items():
     setattr(ip.options, option, val)
 
-report.smash('setting prompt to use git vcs')
-__IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
-
-from ipy_smash_aliases import install_aliases
-install_aliases()
-
-import ipy_ytdl
+#from ipy_smash_aliases import install_aliases
+#install_aliases()
 
 ## clean and begin main loop.  this first removes various common namespace
 ## collisions between py-modules and unix shell commands. then we clean up the
@@ -113,6 +99,8 @@ __manager__.bind_all('~/devel',
 
 def get_parser():
     parser = OptionParser()
+    parser.add_option("-v", dest="verbose", action="store_true",
+                      default=False, help='more verbose bootstrapping info')
     parser.add_option("--panic", dest="panic",
                       default=False, action="store_true",
                       help="kill all running instances of 'smash'", )
@@ -124,13 +112,13 @@ def get_parser():
                       help='install new smash module')
     parser.add_option('-l', '--list',
                       action='store_true',dest='list', default=False,
-                      help='list available plugins and their status')
+                      help=Plugins.list.__doc__)
     parser.add_option('--enable',
                       dest='enable', default='',
-                      help='enable plugin by name')
+                      help=Plugins.enable.__doc__)
     parser.add_option('--disable',
                       dest='disable', default='',
-                      help='disable plugin by name')
+                      help=Plugins.disable.__doc__)
     return parser
 
 def die():
@@ -142,37 +130,91 @@ class Plugins(object):
     plugins_json_file = os.path.join(SMASH_DIR, 'plugins.json')
     report = staticmethod(report.plugins)
 
+    def _set_enabled(self, name, val):
+        data = self.plugin_data
+        assert name in data,"Bad plugin?"
+        data[name] = val
+        with open(self.plugins_json_file,'w') as fhandle:
+            fhandle.write(demjson.encode(data))
+
     def disable(self, name):
+        """ disable plugin by name """
         self.report('disabling {0}'.format(name))
+        self._set_enabled(name, 0)
 
     def enable(self, name):
+        """ enable plugin by name """
         self.report('enabling {0}'.format(name))
+        self._set_enabled(name, 1)
+
 
     @property
     def plugin_data(self):
-        return demjson.decode(open(self.plugins_json_file, 'r').read())
+        with open(self.plugins_json_file, 'r') as fhandle:
+            from_file = demjson.decode(fhandle.read())
+        data = from_file.copy()
+        for fname in self.possible_plugins:
+            if fname not in data:
+                data[fname] = 0
+        return data
 
-    def list(self):
+    @property
+    def possible_plugins(self):
+        return [ fname for fname in os.listdir(SMASH_DIR) if fname.endswith('.py') ]
+
+    def install(self):
+        """ """
+        # loop thru just enabled plugins
+        for plugin_file in self._get_enabled_plugins():
+            abs_path_to_plugin = os.path.join(SMASH_DIR, plugin_file)
+            assert os.path.exists(abs_path_to_plugin)
+            try:
+                plugin_module = ''#__import__(os.path.splitext(plugin_file)[0])
+                G = globals().copy()
+                L = dict(report=self.report)
+                G.update(__name__='__smash__')
+                execfile(abs_path_to_plugin, G, L)
+            except Exception,e:
+                self.report("ERROR loading plugin @ `" + plugin_file+'`. Exception follows:')
+                self.report('Exception: '+ str([type(e),e]))
+            else:
+                self.report('installed '+plugin_file+' ok')
+                #\n{0}'.format(plugin_module.__doc__))
+
+    def _get_enabled_plugins(self):
+        plugins     = self.plugin_data
+        enabled     = [ fname for fname in plugins if plugins[fname] == 1 ]
+        return enabled
+
+    def list(self, enabled=True, disabled=True):
+        """ lists available plugins (from {0}) """.format(SMASH_DIR)
         # reconstructed because `plugins_json_file` may not be up to date with system
-        plugin_data = self.plugin_data
-        py_files          = [ fname for fname in os.listdir(SMASH_DIR) if fname.endswith('.py') ]
-        plugins  = dict([[fname, plugin_data.get(fname, 0)] for fname in py_files])
-        enabled  = [ fname for fname in plugins if plugins[fname] == 1 ]
-        disabled = [ fname for fname in plugins if plugins[fname] == 0 ]
+        plugins     = self.plugin_data
+        enabled     = self._get_enabled_plugins()
+        disabled    = disabled and [ fname for fname in plugins if plugins[fname] == 0 ]
+
         if enabled:
             self.report('enabled plugins')
             for p in enabled: print '  ',p
-            print ; print
+            print
         if disabled:
             self.report('disabled plugins:')
             for p in disabled: print '  ',p
 
+        if not (enabled or disabled):
+            self.report('no plugins at all in '+SMASH_DIR)
+
+        if enabled and not disabled: return enabled
+        if disabled and not enabled: return disabled
 
 plugins = Plugins()
+
 try: opts,args = get_parser().parse_args(sys.argv)
 except SystemExit, e: die()
 else:
-    report.smash('parsed opts: '+str(eval(str(opts)).items()))
+    VERBOSE = VERBOSE or opts.verbose
+    if VERBOSE:
+        report.smash('parsed opts: '+str(eval(str(opts)).items()))
     if opts.project:
         report.cli('parsing project option')
         getattr(__manager__, opts.project).activate
@@ -194,3 +236,5 @@ def reset(himself,parameter_s=''):
     __IPYTHON__.system('reset')
     return 'overridden'
 Magic.magic_reset = reset
+
+plugins.install()

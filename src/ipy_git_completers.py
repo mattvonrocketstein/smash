@@ -47,3 +47,9 @@ def install_git_aliases():
     __IPYTHON__.magic_alias('st git status')
     __IPYTHON__.magic_alias('gd git diff --color')
     __IPYTHON__.magic_alias('gc git commit')
+
+
+if __name__=='__smash__':
+    install_git_aliases()
+    report('setting prompt to use git vcs')
+    __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()

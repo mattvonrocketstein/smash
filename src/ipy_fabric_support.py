@@ -1,4 +1,8 @@
 """ ipy_fabric_support
+
+      install fabric support. detects and gives relevant advice if we change into
+      a directory where a fabric command is present.  also provides tab-completion
+      and direct access to the fabfile's namespace via the dynamic variable `_fabric`.
 """
 
 import os
@@ -64,3 +68,8 @@ def look_for_fabfile():
     if 'fabfile.py' in os.listdir(os.getcwd()):
         print 'Discovered fabfile.  Type "_fabric?" to list commands'
         __IPYTHON__.shell.user_ns.update(_fabric=magic_fabric(lazy=False))
+
+
+if __name__=='__smash__':
+    from ipy_fabric_support import magic_fabric
+    magic_fabric.install_into_ipython()

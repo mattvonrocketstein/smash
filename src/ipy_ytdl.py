@@ -18,4 +18,6 @@ def ytdl(url):
     cmd = CMD.format(bin=_bin, url=url)
     print '>>>',cmd
     return os.system(cmd)
-__IPYTHON__.user_ns.update(ytdl=ytdl)
+
+if __name__=='__smash__':
+    __IPYTHON__.user_ns.update(ytdl=ytdl)
