@@ -4,13 +4,12 @@
  """
 import os, sys
 from collections import defaultdict
-
-from smash.util import colorize, post_hook_for_magic
+from smash.util import colorize, post_hook_for_magic, report
 
 get_path   = lambda: os.environ['PATH']
 get_venv   = lambda: os.environ['VIRTUAL_ENV']
 to_vbin    = lambda venv: os.path.join(venv, 'bin')
-expanduser = os.path.expanduser
+os.path.expanduser = os.path.os.path.expanduser
 
 def is_venv(dir):
     """ naive.. seems to work
@@ -155,12 +154,6 @@ class Project(VenvMixin):
             m2 = m2.format(name=os.path.split(_dir)[1])
             self.report(m1); self.report(m2)
 
-
-    def _ipy_install(self,name='proj'):
-        """ binds self into interactive shell namespace """
-        __IPYTHON__.shell.user_ns[name] = self
-        post_hook_for_magic('cd', self._announce_if_project)
-
     def pre_activate(self, name, f):
         """ """
         self._pre_invokage[name] += [f]
@@ -179,7 +172,7 @@ class Project(VenvMixin):
     @classmethod
     def bind(kls, _dir, name=None, post_activate=[], post_invoke=[]):
         """ named alias for changing directory to "_dir". """
-        _dir = expanduser(_dir)
+        _dir = os.path.os.path.expanduser(_dir)
         if name is None:
             name=os.path.split(_dir)[1]
         if not isinstance(post_invoke, list):
@@ -221,7 +214,7 @@ class Project(VenvMixin):
     def bind_all(kls, _dir, **kargs):
         """ binds every directory in _dir as a project """
         N=0
-        _dir = expanduser(_dir)
+        _dir = os.path.expanduser(_dir)
         for name in os.listdir(_dir):
             tmp = os.path.join(_dir,name)
             if os.path.isdir(tmp):
@@ -369,3 +362,38 @@ def checkPath(filename):
     except IOError, msg:
         print >> sys.stderr, "%s: %s" % (filename, msg.args[1])
         return 1
+
+
+def smash_install():
+    """
+    ## idiosyncratic stuff.  TODO: CLEANR this part should not be in this file!
+    ################################################################################
+    # consider every directory in ~/code to be a "project"
+    # by default project.<dir-name> simply changes into that
+    # directory.  you can add activation hooks for things like
+    # "start venv if present" or "show fab commands if present"
+    """
+    manager = Project('__main__')
+    from smash.parser import SmashParser
+    SmashParser.defer_option(args=('-p', "--project",),
+                                   kargs=dict(
+                                       dest="project", default='',
+                                       help="specify a project to initialize", ),
+                                   handler = lambda opts: getattr(manager, opts.project).activate)
+
+    __IPYTHON__.shell.user_ns['proj'] = manager
+    post_hook_for_magic('cd', manager._announce_if_project)
+
+    from medley_ipy import load_medley_customizations
+    from medley_ipy import load_medley_customizations2
+    instructions = [ [ 'bind_all',   ('~/code',),            {}],
+                     [ 'bind',       ('~/jellydoughnut',),   {}],
+                   ]
+
+    for method_name,args,kargs in instructions:
+        getattr(manager,method_name)(*args, **kargs)
+    manager.bind_all('~/devel',
+                     post_activate=load_medley_customizations2,
+                     post_invoke=load_medley_customizations,)
+    __IPYTHON__.hooks['shutdown_hook'].add(lambda: manager.shutdown())
+    __IPYTHON__.hooks['pre_prompt_hook'].add(manager.check)
