@@ -7,7 +7,7 @@
 
 import os
 
-from ipy_bonus_yeti import post_hook_for_magic
+from smash.util import post_hook_for_magic
 
 class magic_fabric(object):
     def __init__(self, lazy=True):

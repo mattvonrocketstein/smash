@@ -1,8 +1,12 @@
-""" canonical bonus_yeti
+""" smash.util
 """
 
 import os
+
 import IPython
+
+CONFLICTING_NAMES  = 'curl gc git time pwd pip pyflakes easy_install virtualenv py'.split()
+CONFLICTING_NAMES += ['smash']
 
 def post_hook_for_magic(original_magic_name, new_func):
     """ attaches a new post-run hook for an existing magic function """
@@ -17,14 +21,12 @@ def post_hook_for_magic(original_magic_name, new_func):
 def clean_namespace():
     """ clean python namespace in a few places where it shadows unix,
         or in case it collides with the aliases we'll set up later """
+
     def wipe(name):
         if name in __IPYTHON__.shell.user_ns:
             del __IPYTHON__.shell.user_ns[name]
 
-    names = 'curl gc git time pwd pip pyflakes easy_install virtualenv py'
-
-    [ wipe(x) for x in names.split() ]
-    #
+    [ wipe(x) for x in CONFLICTING_NAMES ]
 
 from IPython import ColorANSI
 from IPython.genutils import Term
@@ -35,8 +37,12 @@ def colorize(msg):
 
 class Reporter(object):
     """ syntactic sugar for reporting """
+    def __init__(self, label=''):
+        self.label = label
+
     def __getattr__(self, label):
-        def tmp(msg):
-            print colorize('{red}' + label + '{normal}: ' + msg)
-        return tmp
+        return Reporter(label)
+
+    def __call__(self, msg):
+        print colorize('{red}' + self.label + '{normal}: ' + msg)
 report = Reporter()

@@ -5,7 +5,7 @@
 import os, sys
 from collections import defaultdict
 
-from ipy_bonus_yeti import colorize, post_hook_for_magic
+from smash.util import colorize, post_hook_for_magic
 
 get_path   = lambda: os.environ['PATH']
 get_venv   = lambda: os.environ['VIRTUAL_ENV']
