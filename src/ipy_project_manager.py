@@ -366,14 +366,27 @@ def checkPath(filename):
 
 def smash_install():
     """
-    ## idiosyncratic stuff.  TODO: CLEANR this part should not be in this file!
-    ################################################################################
-    # consider every directory in ~/code to be a "project"
-    # by default project.<dir-name> simply changes into that
-    # directory.  you can add activation hooks for things like
-    # "start venv if present" or "show fab commands if present"
+    TODO: CLEANR this part should not be in this file!
     """
+    # build the manager.
     manager = Project('__main__')
+
+    # consider every directory in ~/code to be a "project"
+    # by default proj.<dir-name> simply changes into that
+    instructions = [ [ 'bind_all',   ('~/code',),            {}],
+                     [ 'bind',       ('~/jellydoughnut',),   {}], ]
+    for method_name,args,kargs in instructions:
+        getattr(manager,method_name)(*args, **kargs)
+
+    # you can add activation hooks for things like
+    # "start venv if present" or "show fab commands if present"
+    from medley_ipy import load_medley_customizations
+    from medley_ipy import load_medley_customizations2
+    manager.bind_all('~/devel',
+                     post_activate=load_medley_customizations2,
+                     post_invoke=load_medley_customizations,)
+
+    # add option parsing for project-manager
     from smash.parser import SmashParser
     SmashParser.defer_option(args=('-p', "--project",),
                                    kargs=dict(
@@ -381,19 +394,9 @@ def smash_install():
                                        help="specify a project to initialize", ),
                                    handler = lambda opts: getattr(manager, opts.project).activate)
 
-    __IPYTHON__.shell.user_ns['proj'] = manager
+
+    # install hooks in the environment
     post_hook_for_magic('cd', manager._announce_if_project)
-
-    from medley_ipy import load_medley_customizations
-    from medley_ipy import load_medley_customizations2
-    instructions = [ [ 'bind_all',   ('~/code',),            {}],
-                     [ 'bind',       ('~/jellydoughnut',),   {}],
-                   ]
-
-    for method_name,args,kargs in instructions:
-        getattr(manager,method_name)(*args, **kargs)
-    manager.bind_all('~/devel',
-                     post_activate=load_medley_customizations2,
-                     post_invoke=load_medley_customizations,)
+    __IPYTHON__.shell.user_ns['proj'] = manager
     __IPYTHON__.hooks['shutdown_hook'].add(lambda: manager.shutdown())
     __IPYTHON__.hooks['pre_prompt_hook'].add(manager.check)
