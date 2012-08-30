@@ -61,6 +61,7 @@ def install_git_aliases():
     __IPYTHON__.magic_alias('st git status')
     __IPYTHON__.magic_alias('gd git diff --color')
     __IPYTHON__.magic_alias('gc git commit')
+    __IPYTHON__.magic_alias('grm git rebase -i origin/master')
 
 
 if __name__=='__smash__':

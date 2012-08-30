@@ -13,11 +13,6 @@
         => VIRTUAL_ENV=/home/matt/code/hammock/node
         => Rehashing shell aliases to include /home/matt/code/hammock/node/bin
 
-      2) as a magic command (not finished yet)
-
-        ...
-        ...
-        ...
 """
 import os
 

@@ -30,6 +30,16 @@ opj = os.path.join
 opd = os.path.dirname
 ops = os.path.split
 
+HOME_BIN = expanduser('~/bin')
+HOME_IPY = os.path.expanduser('~/.ipython')
+
+SMASH_INSTALLATION_HOME = opj(HOME_IPY, 'smash')
+SMASH_LIB_DST_DIR = opj(SMASH_INSTALLATION_HOME, 'smash')
+SMASH_PLUGINS_DIR = opj(SMASH_INSTALLATION_HOME, 'plugins')
+
+def niy(*args, **kargs):
+    raise Exception, 'not implemented yet'
+
 def doit(src, dest, effector=os.symlink):
     """ self.install() would be similar, without symlinks """
     try:
@@ -43,9 +53,6 @@ def doit(src, dest, effector=os.symlink):
 
     else:
         print '{0} ---> {1}'.format(src, dest)
-
-def niy(*args, **kargs):
-    raise Exception, 'not implemented yet'
 
 def only_py_files(dir, rel=False):
     result = glob.glob(opj(dir, '*.py'))
@@ -69,66 +76,56 @@ class Setup:
         return opj(self.this_dir, 'src')
 
     def dot_ipython_slash_smash(self, f):
-        return opj(self.ipy_dir, 'smash', ops(f)[1])
+        return opj(SMASH_INSTALLATION_HOME, ops(f)[1])
 
-    @property
-    def files(self):
-        items = [ opj(self.src_files_dir, x)
-                  for x in only_py_files(self.src_files_dir) ]
-        return items
 
-    @property
-    def ipy_dir(self):
-        return os.path.expanduser('~/.ipython')
-
-    @property
-    def smash_dir(self):
-        return opj(self.ipy_dir, 'smash')
+    def dot_ipython_slash_smash_plugins(self, f):
+        return opj(SMASH_PLUGINS_DIR, ops(f)[1])
 
     def sanity(self):
-        """ """
-        if not ope(self.ipy_dir):
+        """ thinking of typing 'mkdir'? do it here. """
+        if not ope(HOME_IPY):
             err = ('\nyou do not have a ~/.ipython directory.  whats up with that?'
                    ' (also, smash needs ipython==0.10)')
             raise SystemExit(err)
 
-        if not ope(self.smash_dir):
-            print 'creating ', self.smash_dir
-            os.mkdir(self.smash_dir)
+        dir2role = {
+            SMASH_INSTALLATION_HOME:'creating smash installation directory',
+            SMASH_PLUGINS_DIR:'creating plugins directory for smash installation',
+            SMASH_LIB_DST_DIR:'creating smash lib dir for smash installation',}
+
+        for d in dir2role:
+            if not ope(d):
+                print dir2role[d], d
 
     def develop(self):
         """ """
-
         def check_stale_files():
             """ find/remove files that are in ~/.ipython/smash
                 but not in <InstallRoot>/src/
             """
             two_dirs = [ set(only_py_files(d, rel=True)) \
-                         for d in [self.smash_dir, self.src_files_dir] ]
+                         for d in [SMASH_INSTALLATION_HOME, self.src_files_dir] ]
             new, original = two_dirs
             diff = new - original
             if diff:
                 msg_and_banner('detected stale files')
                 for fname in diff:
-                    print '{0} is in {1} but not {2}'.format(fname, self.smash_dir, self.src_files_dir)
-                    os.remove(opj(self.smash_dir, fname))
+                    print '{0} is in {1} but not {2}'.format(fname, SMASH_INSTALLATION_HOME, self.src_files_dir)
+                    os.remove(opj(SMASH_INSTALLATION_HOME, fname))
 
         def install_plugins():
             msg_and_banner('installing symlinks for support libraries')
-            for src in self.files:
-                dest = self.dot_ipython_slash_smash(src)
+            files = only_py_files(opj(self.src_files_dir, 'plugins'))
+            for src in files:
+                dest = self.dot_ipython_slash_smash_plugins(src)
                 doit(src, dest)
 
         def install_smash_lib():
             msg_and_banner('installing smash library')
             smash_lib_src_dir = opj(self.src_files_dir, 'smash')
-            smash_lib_dst_dir = opj(self.ipy_dir, 'smash', 'smash')
-            if not ope(smash_lib_dst_dir):
-                print 'creating ', smash_lib_dst_dir
-                os.mkdir(smash_lib_dst_dir)
-
             for fname in only_py_files(smash_lib_src_dir):
-                dest = opj(smash_lib_dst_dir, ops(fname)[1])
+                dest = opj(SMASH_LIB_DST_DIR, ops(fname)[1])
                 doit(fname, dest)
 
         def install_rc_file():
@@ -137,25 +134,23 @@ class Setup:
             smash_rc = opj(self.this_dir, 'smash.rc')
             src  = opj(self.this_dir, smash_rc)
             doit(src, dest)
-            plugins_json = opj(self.this_dir, 'src', 'plugins.json')
+            plugins_json = opj(self.src_files_dir, 'plugins.json')
             doit(plugins_json, self.dot_ipython_slash_smash(plugins_json))
 
         def install_scripts():
-            msg_and_banner('installing links for smash executable and other scripts')
-            dot_ipy_smash_dir = opj(self.ipy_dir, 'smash')
-            home_bin          = expanduser('~/bin')
-            if home_bin in os.environ['PATH'].split(':'):
-                print '  found ~/bin... will install there'
-                rdest = home_bin
-            else:
-                print ('not found ~/bin... will install to {0}'
-                       ' (copy it out of there yourself if you want to)').format(dot_ipy_smash_dir)
-                dest = dot_ipy_smash_dir
-
-            for rsrc in os.listdir(opj(self.this_dir, 'scripts')):
-                src = opj(self.this_dir, 'scripts', rsrc)
-                dest = opj(rdest, rsrc)
+            SHELL_PATH = os.environ['PATH'].split(':')
+            if HOME_BIN in SHELL_PATH: rdest = HOME_BIN
+            # FIXME: this maybe should be a fatal error or have a backup policy...
+            else: rdest = SMASH_INSTALLATION_HOME
+            msg_and_banner('installing links for smash executable and other scripts ({0})'.format(rdest))
+            for fname in os.listdir(opj(self.this_dir, 'scripts')):
+                src = opj(self.this_dir, 'scripts', fname)
+                dest = opj(rdest, fname)
                 doit(src, dest)
+            if rdest!=HOME_BIN:
+                warning=('WARNING: not found ~/bin... will install to {0}'
+                         ' (copy it out of there yourself if you want to)')
+                print warning.format(rdest)
 
         self.sanity()
         install_smash_lib()

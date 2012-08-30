@@ -1,124 +1,14 @@
 """ ipy_project_manager
 
-    support for virtual-env management and other goodies
+    abstractions for project management
  """
-import os, sys
+import demjson
 from collections import defaultdict
 from smash.util import colorize, post_hook_for_magic, report
+from smash.venv import VenvMixin
 
-get_path   = lambda: os.environ['PATH']
-get_venv   = lambda: os.environ['VIRTUAL_ENV']
-to_vbin    = lambda venv: os.path.join(venv, 'bin')
-os.path.expanduser = os.path.os.path.expanduser
+DEFAULT_CONFIG_SCHEMA = dict()
 
-def is_venv(dir):
-    """ naive.. seems to work
-
-        TODO: find a canonical version of this function or refine it
-    """
-    y = 'lib bin include'.split()
-    x = os.listdir(dir)
-    if all([y1 in x for y1 in y]):
-        return True
-
-class VenvMixin(object):
-
-    @classmethod
-    def deactivate(self):
-        """ TODO: move this to ipy_venv_support """
-        try:
-            venv = get_venv()
-        except KeyError:
-            return False
-        else:
-            assert os.path.exists(venv), 'wont deactivate a relocated venv'
-            path = get_path()
-            path = path.split(':')
-
-            # clean $PATH according to bash..
-            # TODO: also rehash?
-            vbin = to_vbin(venv)
-            if vbin in path:
-                self.report('removing old venv bin from PATH', vbin)
-                path.remove(vbin)
-                os.environ['PATH'] = ':'.join(path)
-
-            # clean sys.path according to python..
-            # stupid, but this seems to work
-            self.report('cleaning sys.path')
-            nn = []
-            for entry in sys.path:
-                if entry and not entry.startswith(venv):
-                    nn.append(entry)
-            sys.path = nn
-            return True
-
-    @classmethod
-    def _contains_venv(self, _dir):
-        """ ascertain whether _dir is, or if it contains, a venv.
-
-            returns the first matching path according to the heuritic
-        """
-        if is_venv(_dir):
-            return _dir
-        searchsub = 'venv node'.split()
-        searchsub = [ os.path.join(_dir, name) for name in searchsub ]
-        searchsub = [ name for name in searchsub if os.path.exists(name) ]
-        for name in searchsub:
-            self.report('    trying "'+name+'"')
-            if is_venv(name):
-                return name
-
-    @classmethod
-    def _activate_str(self, obj):
-        """ """
-        if is_venv(obj):
-            vbin = to_vbin(obj)
-            path = get_path().split(':')
-            os.environ['PATH'] = ':'.join([vbin] + path)
-            os.environ['VIRTUAL_ENV'] = obj
-            self.report('      adding "%s" to PATH; rehashing aliases' % vbin)
-            sandbox = dict(__file__ = os.path.join(vbin, 'activate_this.py'))
-            execfile(os.path.join(vbin,'activate_this.py'),sandbox)
-            __IPYTHON__.ipmagic('rehashx')
-            from ipy_smash_aliases import install_aliases
-            install_aliases()
-
-        else:
-            self.report('  not a venv.. ' + obj)
-            path = self._contains_venv(obj)
-            if path:
-                return self._activate(path)
-
-    @classmethod
-    def _activate_project(self,obj):
-        """ """
-        result = self._activate_str(obj.dir)
-        [ f() for f in self._post_activate[obj.name] ]
-
-    @property
-    def activate(self):
-        return self._activate(self)
-
-    @classmethod
-    def _activate(self, obj):
-        """ TODO: move/combine this to ipy_venv_support
-
-            activating a project (referred to instead as "invoking" is
-            different than activating a venv (but it might include
-            activating a venv)
-
-        """
-        self.deactivate()
-        if isinstance(obj, str):
-            return self._activate_str(obj)
-        elif isinstance(obj, Project):
-            return self._activate_project(obj)
-        else:
-            err = "Don't know how to activate an object like '" + str(type(obj)) + '"'
-            raise Exception, err
-
-#import IPython.ipapi
 
 class Project(VenvMixin):
     """ class for holding Project abstractions. in the simplest case,
@@ -128,15 +18,37 @@ class Project(VenvMixin):
         >>> proj._activate(proj.project_name)
         >>> proj.project_name.activate()
 
-        TODO: document difference between project "invokage" vs "activation"
+        TODO: document difference between project "invoking" vs "activation"
         TODO: should really rename to 'projectman' or something
     """
     msgs      = []
     watchlist = []
     dir       = None
     _paths    = {}
+    notifiers = []
+    _post_activate = defaultdict(lambda: [])
+
+    def __init__(self, name):
+        """ """
+        self.name = name
+        self._pre_invokage  = defaultdict(lambda: [])
+        self._post_invokage = defaultdict(lambda: [])
+        self.being_watched = False
+
+    def __repr__(self):
+        """ """
+        return 'project: ' + self.name
+
+    @property
+    def config(self):
+        try:
+            with open(self.config_file,'r') as fhandle:
+                return demjson.decode(fhandle.read())
+        except OSError:
+            return DEFAULT_CONFIG_SCHEMA
 
     def shutdown(self):
+        """ NB: this method will be used as an ipython hook """
         self.report('shutting down')
         [ x.stop() for x in self.watchlist ]
         #raise ipapi.TryNext()
@@ -152,22 +64,12 @@ class Project(VenvMixin):
             m2 = ('This directory is also a registered project.'
                   '  You can activate it with "proj.activate(proj.{name})"')
             m2 = m2.format(name=os.path.split(_dir)[1])
-            self.report(m1); self.report(m2)
+            #self.report(m1);
+            self.report(m2)
 
     def pre_activate(self, name, f):
         """ """
         self._pre_invokage[name] += [f]
-
-    notifiers = []
-
-    def __init__(self, name):
-        """ """
-        self.name = name
-        self._pre_invokage  = defaultdict(lambda: [])
-        self._post_invokage = defaultdict(lambda: [])
-        self.being_watched = False
-        #self.
-    _post_activate = defaultdict(lambda: [])
 
     @classmethod
     def bind(kls, _dir, name=None, post_activate=[], post_invoke=[]):
@@ -205,7 +107,7 @@ class Project(VenvMixin):
 
     @classmethod
     def report(kls, *args):
-        """ """
+        """ FIXME: use default smash report """
         if len(args)>1: print colorize('{red}project-manager:{normal}'),args
         else: print colorize('{red}project-manager:{normal} ') + args[0]
 
@@ -221,10 +123,6 @@ class Project(VenvMixin):
                 N += 1
                 kls.bind(tmp, name, **kargs)
         kls.report('binding ' + _dir + ' (' + str(N) + ' projects found)')
-
-    def __repr__(self):
-        """ """
-        return 'project: ' + self.name
 
     def check(self):
         if self.msgs:
@@ -346,7 +244,6 @@ def check(codeString, filename):
         #    print warning
         #return len(w.messages)
 
-
 def checkPath(filename):
     """
     Check the given path, printing out any warnings detected.
@@ -362,7 +259,6 @@ def checkPath(filename):
     except IOError, msg:
         print >> sys.stderr, "%s: %s" % (filename, msg.args[1])
         return 1
-
 
 def smash_install():
     """
