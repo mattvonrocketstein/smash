@@ -25,7 +25,9 @@ class Plugins(object):
     def _set_enabled(self, name, val):
         """ helper """
         data = self.plugin_data
-        assert name in data, "Bad plugin?"
+        if name not in data:
+            print "Bad plugin? {0}".format(name)
+            from IPython import Shell; Shell.IPShellEmbed(argv=['-noconfirm_exit'])()
         data[name].update(enabled=val)
         with open(self.plugins_json_file,'w') as fhandle:
             fhandle.write(demjson.encode(data))
@@ -66,7 +68,7 @@ class Plugins(object):
 
     @property
     def possible_plugins(self):
-        return [ fname for fname in os.listdir(self.SMASH_DIR) if fname.endswith('.py') ]
+        return [ fname for fname in os.listdir(os.path.join(self.SMASH_DIR, 'plugins')) if fname.endswith('.py') ]
 
     @property
     def enabled_plugins(self):

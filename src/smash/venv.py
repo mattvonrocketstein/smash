@@ -29,6 +29,7 @@ class VenvMixin(object):
             return False
         else:
             assert os.path.exists(venv), 'wont deactivate a relocated venv'
+            del os.environ['VIRTUAL_ENV']
             path = get_path()
             path = path.split(':')
 
@@ -79,7 +80,6 @@ class VenvMixin(object):
             __IPYTHON__.ipmagic('rehashx')
             from ipy_smash_aliases import install_aliases
             install_aliases()
-
         else:
             self.report('  not a venv.. ' + obj)
             path = self._contains_venv(obj)
@@ -100,7 +100,6 @@ class VenvMixin(object):
     def aliases(self):
         return self.config['aliases']
 
-
     @classmethod
     def _activate(self, obj):
         """ TODO: move/combine this to ipy_venv_support
@@ -115,7 +114,9 @@ class VenvMixin(object):
         self.deactivate()
         if isinstance(obj, str):
             return self._activate_str(obj)
-        elif isinstance(obj, Project):
+        # FIXME: isinstance here does not work here
+        # ipy_project_manager.Project vs __smash__.Project
+        elif type(obj).__name__ == Project.__name__:
             return self._activate_project(obj)
         else:
             err = "Don't know how to activate an object like '" + str(type(obj)) + '"'

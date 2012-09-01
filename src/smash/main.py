@@ -1,4 +1,4 @@
-""" smash/plugins/ipy_profile_msh
+""" smash.main
 
     TODO: install aliases from a file
     TODO: move to hook-based prompt generation if 0.10 supports it
