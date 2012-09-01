@@ -112,7 +112,7 @@ class VenvMixin(object):
         """
         from ipy_project_manager import Project
         self.deactivate()
-        if isinstance(obj, str):
+        if isinstance(obj, (str, unicode)):
             return self._activate_str(obj)
         # FIXME: isinstance here does not work here
         # ipy_project_manager.Project vs __smash__.Project

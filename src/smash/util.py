@@ -4,6 +4,10 @@
 import os
 
 import IPython
+from IPython import ColorANSI
+from IPython.genutils import Term
+
+tc = ColorANSI.TermColors()
 
 CONFLICTING_NAMES  = 'curl gc git time pwd pip pyflakes easy_install virtualenv py'.split()
 CONFLICTING_NAMES += ['smash']
@@ -28,12 +32,9 @@ def clean_namespace():
 
     [ wipe(x) for x in CONFLICTING_NAMES ]
 
-from IPython import ColorANSI
-from IPython.genutils import Term
-tc = ColorANSI.TermColors()
 def colorize(msg):
     """ """
-    return msg.format(red=tc.Red,normal=tc.Normal)
+    return msg.format(red=tc.Red, normal=tc.Normal)
 
 class Reporter(object):
     """ syntactic sugar for reporting """

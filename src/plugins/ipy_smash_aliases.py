@@ -8,14 +8,17 @@
 """
 
 
+
 def install_aliases():
     __IPYTHON__.magic_alias('dhclient sudo dhclient')
     __IPYTHON__.magic_alias('apt-get sudo apt-get')
     __IPYTHON__.magic_alias('dad django-admin.py')
     __IPYTHON__.magic_alias('ls ls --color=auto')
 
-    # avoid an unpleasant surprise: patch reset to clean up the display like bash, not reset the namespace.
+    # FIXME: can't move the import?
     from IPython.Magic import Magic
+
+    # avoid an unpleasant surprise: patch reset to clean up the display like bash, not reset the namespace.
     def reset(himself, parameter_s=''):
         __IPYTHON__.system('reset')
         return 'overridden'

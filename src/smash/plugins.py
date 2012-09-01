@@ -19,7 +19,7 @@ class Plugins(object):
     report = staticmethod(report.plugins)
 
     def __init__(self, SMASH_DIR):
-        self.SMASH_DIR=SMASH_DIR
+        self.SMASH_DIR = SMASH_DIR
         self.plugins_json_file = os.path.join(SMASH_DIR, 'plugins.json')
 
     def _set_enabled(self, name, val):
@@ -95,17 +95,22 @@ class Plugins(object):
         if not (enabled or disabled):
             self.report('no plugins at all in ' + self.SMASH_DIR)
 
+    @property
+    def PLUGINS_DIR(self):
+        return os.path.join(self.SMASH_DIR, 'plugins')
+
     def install(self):
         """ install all plugins into the running environment """
         for plugin_file in self.enabled_plugins:
-            abs_path_to_plugin = os.path.join(self.SMASH_DIR, 'plugins', plugin_file)
+            abs_path_to_plugin = os.path.join(self.PLUGINS_DIR, plugin_file)
             if not os.path.exists(abs_path_to_plugin):
                 raise ValueError,'{0} does not exist'.format(abs_path_to_plugin)
             try:
                 self.install_plugin_from_fname(abs_path_to_plugin)
             except Exception,e:
                 self.report("ERROR loading plugin @ `" + plugin_file+'`. Exception follows:')
-                self.report('Exception: '+ str([type(e),e]))
+                self.report('Exception: ')
+                print str([type(e),e])
                 raise
             else:
                 self.report('installed '+plugin_file+' ok')
