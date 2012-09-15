@@ -8,14 +8,6 @@
 """
 
 def install_aliases():
-    #from smash import aliases
-    #for x in  [ 'dhclient sudo dhclient',
-    #            'apt-get sudo apt-get',
-    #            'dad django-admin.py',
-    #            'ls ls --color=auto' ]:
-    #    aliases.add(x)
-    #aliases.install()
-
     # FIXME: can't move the import?  plus this is in the wrong file
     from IPython.Magic import Magic
     # avoid an unpleasant surprise:

@@ -12,6 +12,8 @@ from smash.reflect import namedAny
 from smash.util import colorize, post_hook_for_magic, report
 from smash.venv import VenvMixin
 
+ROOT_PROJECT_NAME = '__smash__'
+
 DEFAULT_CONFIG_SCHEMA = dict(
     # schema:
     #   { 'project_name' : ['alias_cmd real --command goes_here', .. ] }
@@ -124,10 +126,9 @@ class Project(VenvMixin, Hooks):
             p.dir = _dir
             p._config = self._config
             [ f() for f in self._pre_invokage[name] ]
-
             os.chdir(p.dir)
-
             [ f() for f in self._post_invokage[name] + post_invoke ]
+            p.aliases.install()
             return p
 
         setattr(kls, name, invoke)
@@ -211,7 +212,7 @@ def smash_install():
     else:
         config = demjson.decode(open(config_file,'r').read())
         report.project_manager(' config keys: '+str(config.keys()))
-    manager = Project('__smash__')
+    manager = Project(ROOT_PROJECT_NAME)
 
     # dont move this next line.  post_activate/post_invoke things might want the manager.
     __IPYTHON__.shell.user_ns['proj'] = manager
@@ -233,7 +234,7 @@ def smash_install():
                                                                   opts.project).activate)
 
     # per-project aliases
-    default_aliases = config.get('aliases', {}).get('__smash__',[])
+    default_aliases = config.get('aliases', {}).get(ROOT_PROJECT_NAME, [])
     from smash import aliases
     default_aliases = [ aliases.add(alias) for alias in default_aliases ]
     report.project_manager('adding aliases: ' + str(default_aliases))

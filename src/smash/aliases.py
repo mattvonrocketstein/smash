@@ -3,7 +3,7 @@
 from smash.plugins import SmashPlugin
 from collections import defaultdict, namedtuple
 
-Alias = namedtuple('Alias','alias affiliation'.split())
+Alias = namedtuple('Alias', 'alias affiliation'.split())
 
 class RegistrationList(list):
     def __repr__(self):
