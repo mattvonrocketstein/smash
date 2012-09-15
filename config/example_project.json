@@ -1,11 +1,25 @@
-{"instructions":
- [ ["bind_all", ["~/code"],          {}],
-   ["bind",     ["~/jellydoughnut"], {}],
-   ["bind_all",[ '~/devel'],         {'post_activate':'medley_ipy.load_medley_customizations2',
-                                      'post_invoke':'medley_ipy.load_medley_customizations'}]],
- "aliases":
- {"__smash__":[ 'dhclient sudo dhclient',
-                'apt-get sudo apt-get',
-                'dad django-admin.py',
-                'ls ls --color=auto' ]}
- }
+{
+//
+// "instructions" represent function-calls that will be executed when creating the
+//  project manager.  the expected format is basically ['function_name', args, kwargs ]
+//
+"instructions":
+    [ ["bind_all", ["~/code"],          {}],
+      ["bind",     ["~/jellydoughnut"], {}],
+      ["bind_all",[ '~/devel'],
+       {'post_activate':'medley_ipy.load_medley_customizations2',
+        'post_invoke':'medley_ipy.load_medley_customizations'}]],
+
+//
+// "aliases" section represents per-project alias entries.
+// the format is {"project_name": ["cmd_alias the_real --command goes_here", .. ] }
+//
+//   NOTE: __smash__ is special; these aliases will stay
+//   registered regardless of the currently active project
+//
+"aliases":
+    {"__smash__": [ 'dhclient sudo dhclient',
+                    'apt-get sudo apt-get',
+                    'dad django-admin.py',
+                    'ls ls --color=auto' ]}
+}
