@@ -6,8 +6,9 @@
     your handle functions unless you really know what you're doing.  no idea wtf
     ipython does that or how to work around it.
 
-    TODO: git diff should use branch completion AND fs-completion
-
+    TODO: 'git diff'' should use branch completion AND fs-completion
+    TODO: 'git push' should complete from the names of the remotes
+    TODO: 'git push <remote>' should complete from the names of local_branches()
 """
 import os
 import IPython.ipapi
@@ -53,16 +54,18 @@ def subcommands(*args, **kargs):
 
     return GIT_SUBCOMMANDS
 
-def install_git_aliases():
-    __IPYTHON__.magic_alias('grc git rebase --continue')
-    __IPYTHON__.magic_alias('rebase git rebase -i')
-    __IPYTHON__.magic_alias('checkout git checkout')
-    __IPYTHON__.magic_alias('co git checkout')
-    __IPYTHON__.magic_alias('st git status')
-    __IPYTHON__.magic_alias('gd git diff --color')
-    __IPYTHON__.magic_alias('gc git commit')
-    __IPYTHON__.magic_alias('grm git rebase -i origin/master')
 
+def install_git_aliases():
+    GIT_ALIASES = [ 'grm git rebase -i origin/master',
+                    'grc git rebase --continue',
+                    'checkout git checkout',
+                    'rebase git rebase -i',
+                    'gc git commit',
+                    'gd git diff --color',
+                    'st git status','co git checkout', ]
+    from smash import aliases
+    [ aliases.add(x, '__git_plugin__') for x in GIT_ALIASES ]
+    aliases.install()
 
 if __name__=='__smash__':
     install_git_aliases()

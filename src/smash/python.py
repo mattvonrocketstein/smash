@@ -5,6 +5,7 @@ import os
 import glob
 
 opj = os.path.join
+ope = os.path.exists
 ops = os.path.split
 opd = os.path.dirname
 expanduser = os.path.expanduser

@@ -10,7 +10,7 @@ from IPython.genutils import Term
 tc = ColorANSI.TermColors()
 
 CONFLICTING_NAMES  = 'curl gc git time pwd pip pyflakes easy_install virtualenv py'.split()
-CONFLICTING_NAMES += ['smash']
+CONFLICTING_NAMES += [ 'smash' ]
 
 def post_hook_for_magic(original_magic_name, new_func):
     """ attaches a new post-run hook for an existing magic function """
