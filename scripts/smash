@@ -1,8 +1,8 @@
 #!/usr/bin/python
 #
-# you would think that "env python" would work just as well in every case, but you'd be wrong
+# you would think that "env python" would work just as well every time
+# but due to interaction with sourced venv's this is a tricky business
 #
-
 import sys
 
 MSH_RC = '~/.ipython/smash/smash.rc'
@@ -15,7 +15,7 @@ if __name__=='__main__':
     try:
         from IPython import Shell
     except:
-        print 'cannot run smash: system ipython is not available'
+        print 'FATAL: cannot run smash: system ipython is not available'
         sys.exit(1)
     else:
         main()

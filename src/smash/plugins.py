@@ -118,3 +118,6 @@ class Plugins(object):
         #FIXME: cleaner way to do this back-ref
         import smash
         smash.PLUGINS = self
+
+class SmashPlugin(object):
+    """ TODO: ... """

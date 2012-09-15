@@ -1,0 +1,11 @@
+{"instructions":
+ [ ["bind_all", ["~/code"],          {}],
+   ["bind",     ["~/jellydoughnut"], {}],
+   ["bind_all",[ '~/devel'],         {'post_activate':'medley_ipy.load_medley_customizations2',
+                                      'post_invoke':'medley_ipy.load_medley_customizations'}]],
+ "aliases":
+ {"__smash__":[ 'dhclient sudo dhclient',
+                'apt-get sudo apt-get',
+                'dad django-admin.py',
+                'ls ls --color=auto' ]}
+ }

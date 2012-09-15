@@ -42,7 +42,7 @@ sys.argv = sys.argv[1:]
 plugins = Plugins(SMASH_DIR)
 plugins.install()
 
-try: opts,args = SmashParser().parse_args(sys.argv)
+try: opts, args = SmashParser().parse_args(sys.argv)
 except SystemExit, e: die()
 else:
     VERBOSE = VERBOSE or opts.verbose

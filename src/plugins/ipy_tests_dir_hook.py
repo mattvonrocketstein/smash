@@ -10,7 +10,7 @@ def look_for_tests():
     files = os.listdir(wd)
     if 'tests' in files and os.path.isdir(opj(wd, 'tests')):
         print 'Discovered test-dir.'
-        pyfiles = glob(wd, 'tests', 'test_*.py')
+        pyfiles = glob(opj(wd, 'tests', 'test_*.py'))
         print pyfiles
     if 'tests.py' in files:
         print 'Discovered test file.'

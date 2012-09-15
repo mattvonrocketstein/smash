@@ -7,18 +7,19 @@
     TODO: these aliases may not survive a "rehash" when proj is activated?
 """
 
-
-
 def install_aliases():
-    __IPYTHON__.magic_alias('dhclient sudo dhclient')
-    __IPYTHON__.magic_alias('apt-get sudo apt-get')
-    __IPYTHON__.magic_alias('dad django-admin.py')
-    __IPYTHON__.magic_alias('ls ls --color=auto')
+    #from smash import aliases
+    #for x in  [ 'dhclient sudo dhclient',
+    #            'apt-get sudo apt-get',
+    #            'dad django-admin.py',
+    #            'ls ls --color=auto' ]:
+    #    aliases.add(x)
+    #aliases.install()
 
-    # FIXME: can't move the import?
+    # FIXME: can't move the import?  plus this is in the wrong file
     from IPython.Magic import Magic
-
-    # avoid an unpleasant surprise: patch reset to clean up the display like bash, not reset the namespace.
+    # avoid an unpleasant surprise:
+    # patch reset to clean up the display like bash, not reset the namespace.
     def reset(himself, parameter_s=''):
         __IPYTHON__.system('reset')
         return 'overridden'

@@ -1,6 +1,12 @@
+""" smash.parser
+"""
+
 from optparse import OptionParser
+
 from smash import Plugins
+
 class SmashParser(OptionParser):
+
     extra_options = []
 
     @classmethod
