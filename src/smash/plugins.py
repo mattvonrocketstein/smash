@@ -121,3 +121,11 @@ class Plugins(object):
 
 class SmashPlugin(object):
     """ TODO: ... """
+    requires=[]
+
+    def verify_requirements(self):
+        report('pretending to verify requirements: {0}'.format(self.requires))
+
+    def install_into_smash(self):
+        self.verify_requirements()
+        self.install()

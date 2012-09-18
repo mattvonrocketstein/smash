@@ -9,6 +9,7 @@ ope = os.path.exists
 ops = os.path.split
 opd = os.path.dirname
 expanduser = os.path.expanduser
+getcwd = os.getcwd
 
 glob = glob.glob
 

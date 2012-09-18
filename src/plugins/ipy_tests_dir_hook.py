@@ -3,19 +3,17 @@
 import os
 
 from smash.util import report, post_hook_for_magic
-from smash.python import only_py_files, opj, ope, glob
+from smash.python import only_py_files, opj, ope, glob, getcwd
 
 
 class TestsMenu(object):
+
     @property
     def __doc__(self):
         out = repr(self)+'\n'
         for f in self.files:
             out += ' {0}: {1}\n'.format(self.files.index(f), f)
-        out+="""
-
-HINT: You can run the tests above by using commands like ",tests.run 1"
-        """
+        out += """\n\nHINT: You can run the tests above by using commands like ",tests.run 1"\n"""
         return out
 
     def __repr__(self):
@@ -31,25 +29,38 @@ HINT: You can run the tests above by using commands like ",tests.run 1"
         self.base = base
         self.files = abs_test_files
 
-def look_for_tests():
-    wd    = os.getcwd()
-    files = os.listdir(wd)
-    tdir  = opj(wd, 'tests')
-    if ope(tdir) and os.path.isdir(tdir):
-        report.tests_magic('Discovered test-dir: {red}' + tdir + '{normal}')
+class TestsHook(object):
+    """ FIXME?:  this wont trigger if you 'cd myproject/tests' """
+
+    report = report.tests_magic
+
+    def handle_python_testdir(self, tdir):
+        wd = getcwd()
         abs_test_files = glob( opj(tdir, 'test_*.py') )
+        self.report('Discovered test-dir@"{0}" -- ({1} files)'.format(tdir, len(abs_test_files)))
         rel_test_files = [ x[ len(wd) + 1 : ] for x in abs_test_files ]
-        report.tests_magic(str(rel_test_files) + '\n')
+        self.report(str(rel_test_files))
         tests = TestsMenu(tdir, abs_test_files)
         if all(['tests' in __IPYTHON__.user_ns,
                 not isinstance(__IPYTHON__.user_ns.get('tests',None), TestsMenu)]):
-            report.tests_magic('(oops, "tests" name is already taken.  erring on the side of caution)')
+            self.report('(oops, "tests" name is already taken.  erring on the side of caution)')
         else:
             __IPYTHON__.user_ns.update(tests=tests)
-            report.tests_magic('updated tests magic.  type "tests?" for help')
+            self.report('updated tests magic.  type "tests?" for help')
 
-    if 'tests.py' in files:
-        print 'Discovered test file.'
+    def handle_python_testfile(self, tfile):
+        self.report('Discovered test file.')
+
+    def __call__(self):
+
+        wd    = getcwd()
+        files = os.listdir(wd)
+        tdir  = opj(wd, 'tests')
+        if ope(tdir) and os.path.isdir(tdir):
+            self.handle_python_testdir(tdir)
+
+        elif 'tests.py' in files:
+            self.handle_python_testfile(tfile)
 
 if __name__=='__smash__':
-    post_hook_for_magic('cd', look_for_tests)
+    post_hook_for_magic('cd', TestsHook())
