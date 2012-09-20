@@ -16,20 +16,18 @@ from smash.parser import SmashParser
 from smash.data import OVERRIDE_OPTIONS
 from smash.util import clean_namespace, report
 
-VERBOSE      = False
-SMASH_DIR    = os.path.dirname(os.path.dirname(__file__))
-
-ip = ipapi.get()
+VERBOSE   = False
+SMASH_DIR = os.path.dirname(os.path.dirname(__file__))
+ip        = ipapi.get()
 
 def die():
     """
-    FIXME: this is horrible, but i remember thinking i had no choice.. document reason
+    FIXME: this is horrible, but i remember thinking i had no choice.. TODO: document reason
     """
     threading.Thread(target=lambda: os.system('kill -KILL ' + str(os.getpid()))).start()
 
 for option,val in OVERRIDE_OPTIONS.items():
     setattr(ip.options, option, val)
-
 
 # clean strangeness of the command-line arguments which
 # are skewed due to the odd way this script is invoked
@@ -50,7 +48,7 @@ else:
     elif opts.disable: plugins.disable(opts.disable); die()
     elif opts.list:    plugins.list();                die()
     elif opts.panic:
-        print "run this:\n\t","ps aux|grep smash|grep -v grep|awk '{print $2}'|xargs kill -KILL"
+        report.smash("run this:\n\t","ps aux|grep smash|grep -v grep|awk '{print $2}'|xargs kill -KILL")
         die()
     else:
         # parse any command-line options which are added by plugins

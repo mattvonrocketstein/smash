@@ -15,6 +15,7 @@ import IPython.ipapi
 from smash.util import report
 ip = IPython.ipapi.get()
 
+from smash.plugins import SmashPlugin
 
 def set_complete(func, key):
     report.git('setting hook'+str([func,ip]))
@@ -54,8 +55,7 @@ def subcommands(*args, **kargs):
 
     return GIT_SUBCOMMANDS
 
-
-def install_git_aliases():
+class Plugin(SmashPlugin):
     GIT_ALIASES = [ 'grm git rebase -i origin/master',
                     'grc git rebase --continue',
                     'checkout git checkout',
@@ -63,16 +63,12 @@ def install_git_aliases():
                     'gc git commit',
                     'gd git diff --color',
                     'st git status','co git checkout', ]
-    from smash import aliases
-    [ aliases.add(x, '__git_plugin__') for x in GIT_ALIASES ]
-    aliases.install()
 
-
-from smash.plugins import SmashPlugin
-
-class Plugin(SmashPlugin):
     def install(self):
-        install_git_aliases()
+        from smash import aliases
+        [ aliases.add(x, '__git_plugin__') for x in self.GIT_ALIASES ]
+        aliases.install()
+
         report('setting prompt to use git vcs')
         __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
         set_complete(local_branches, 'git checkout')

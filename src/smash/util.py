@@ -9,7 +9,6 @@ from IPython.genutils import Term
 
 tc = ColorANSI.TermColors()
 
-
 def post_hook_for_magic(original_magic_name, new_func):
     """ attaches a new post-run hook for an existing magic function """
     old_magic = getattr(__IPYTHON__, 'magic_' + original_magic_name)
@@ -20,6 +19,7 @@ def post_hook_for_magic(original_magic_name, new_func):
     new_magic._wrapped = old_magic
     IPython.ipapi.get().expose_magic(original_magic_name, new_magic)
 
+# NOTE: this is only needed if/when using an "import all available modules" strategy
 CONFLICTING_NAMES  = 'curl gc git time pwd pip pyflakes easy_install virtualenv py'.split()
 
 def clean_namespace():
