@@ -2,7 +2,7 @@
 
      SmaSh support for duckduckgo search engine
 """
-
+import threading
 from smash.util import report
 from smash.plugins import SmashPlugin
 
@@ -17,6 +17,24 @@ class QuackerPlugin(SmashPlugin):
     requires = [ 'duckduckgo' ]
 
     class q(object):
+        """
+
+        Simple operations:
+
+           Excuting plain duckduckgo searches is asynchronous.
+
+              q('multiple', 'words')
+              q('multiple words')
+              ,q singleWord
+
+           executive "bang" search, aka "exclusive" aka site-search.
+           if possible, these are opened in an existing webbrowser immediately.
+
+              q.wiki('world war 2')
+              ,q.wiki world war 2
+              ,q.stacktrace python quicksort
+
+        """
 
         def __getattr__(self, name):
             return lambda *x: self( *(('!'+name,) + x) )
@@ -29,33 +47,28 @@ class QuackerPlugin(SmashPlugin):
             return note
 
         def __call__(self, *search_string):
-            """
-            q('querystring')       excute plain duckduckgo search
-            q.wiki('querystring')  excute duckduck "exclusive" aka bang aka site-search
-            """
             search_string = ' '.join(search_string)
             self.last_search = search_string
             def func():
                 import webbrowser
                 import duckduckgo
                 result = duckduckgo.query(search_string)
-                note   = self.note('type={0} related={1}'.format(result.type, len(result.related)))
                 if result.type=='exclusive':
+                    note = self.note("Opening {0}".format(result.redirect.url))
                     webbrowser.open_new_tab(result.redirect.url)
-                    note.show()
                 else:
+                    note   = self.note('type={0} related={1}'.format(result.type, len(result.related)))
                     note.set_timeout(120*1000) # dont auto-hide for two minutes
                     def callback(*args, **kargs):
                         print 'args/kargs', args, kargs
                         for r in result:
                             print r.text
                     note.add_action('show results', callback)
-                    note.show()
-                __IPYTHON__.user_ns.update(result=result)
-                return result,note
-            import threading
+                note.show()
+                __IPYTHON__.user_ns.update(result = result)
+                return result, note
+
             threading.Thread(target=func).start()
-            #return func()
     q = q()
 
     def install(self):

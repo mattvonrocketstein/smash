@@ -69,12 +69,12 @@ Browser Integration:
 
 Git VCS Integration:
 --------------------
-  * if applicable, default prompt includes current branch name
-  * Tab completion including
-    * branch completion when using checkout
-    * file-system completion when mv/add
-    * smart branch/file-system when using diff
-  * various default aliases and places to put more
+  * If applicable, default prompt includes current branch name
+  * Tab completion including:
+  * - Branch completion when using checkout
+  * - File-system completion when mv/add
+  * - smart branch/file-system when using diff
+  * Various default aliases and places to put more (just means moving SmaSh config means moving git config is optional)
 
 Abstractions for project-management:
 ------------------------------------
@@ -85,10 +85,10 @@ Abstractions for project-management:
   * Projects can be watched for changes, triggers for linters can be added, etc
   * code can be searched asynchronously, results delivered in a way that doesnt clutter your screen
   * Projects can be "activated", which might mean convenient side-effects like
-    * activating a virtual environment
-    * starting a virtual machine
-    * opening a web page
-    * whatever else you want..
+  * - activating a virtual environment
+  * - starting a virtual machine
+  * - opening a web page
+  * - whatever else you want..
 
 
 
@@ -132,8 +132,7 @@ running it from one might be possible but could lead to confusion.
 One current limitation of the combination of pysh / ipython / smash is a lack of job control in the
 sense that you might be used to.  Specifically you can background tasks with an `&` as usual, but
 `fg` does not resume.  At first this seemed horrible but in practice I think this consideration is
-not very important because shells are cheap to spawn (and a workflow around `screen` works better
-anyway).
+not very important- shells are cheap to spawn and a workflow around `screen` works better anyway.
 
 
 
@@ -151,4 +150,4 @@ Related Links
 Other Shells
 ============
 
-  * xiki ("wiki shell")
+  * xiki (a wiki inspired gui shell) http://xiki.org/
