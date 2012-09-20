@@ -20,7 +20,7 @@ class Plugins(object):
 
     def __init__(self, SMASH_DIR):
         self.SMASH_DIR = SMASH_DIR
-        self.plugins_json_file = os.path.join(SMASH_DIR, 'plugins.json')
+        self.plugins_json_file = os.path.join(SMASH_DIR, 'config', 'plugins.json')
 
     def _set_enabled(self, name, val):
         """ helper """

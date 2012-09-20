@@ -33,18 +33,19 @@ opd  = os.path.dirname
 opil = os.path.islink
 ops  = os.path.split
 
-HOME_BIN = expanduser('~/bin')
-HOME_IPY = os.path.expanduser('~/.ipython')
-THIS_DIR          = ops(__file__)[:-1]
-SHELL_PATH        = os.environ['PATH'].split(':')
+HOME_BIN    = expanduser('~/bin')
+HOME_IPY    = os.path.expanduser('~/.ipython')
+THIS_DIR    = ops(__file__)[:-1]
+SHELL_PATH  = os.environ['PATH'].split(':')
 
 SMASH_INSTALLATION_HOME = opj(HOME_IPY, 'smash')
 SMASH_LIB_DST_DIR = opj(SMASH_INSTALLATION_HOME, 'smash')
 SMASH_PLUGINS_DIR = opj(SMASH_INSTALLATION_HOME, 'plugins')
+SMASH_CONFIG_DIR  = opj(SMASH_INSTALLATION_HOME, 'config')
 
 if HOME_BIN not in SHELL_PATH:
     raise SystemExit("""
-Since smaSh is beta, scripts are currently installed to ~/bin directory, and I
+Since SmaSh is beta, scripts are currently installed to ~/bin directory, and I
 notice that ~/bin is not in your $PATH.  Until system-wide installation is
 implemented, can you add it there please?  Copy-pasta below might help you:
 
@@ -54,7 +55,7 @@ $ export PATH=$PATH:~/bin
 
 class install_data(_install_data):
     def copy_file(self, rel_src, dst_dir):
-        """ """
+        """ TODO: DOX """
         if not ope(rel_src):
             err = 'ERROR:\n\t{0} does not exist.\n\ncheck that your working directory is {1}'
             err = err.format(rel_src, THIS_DIR)
@@ -89,7 +90,9 @@ def _from(*args, **kargs):
 
 LIB     = _from('src','smash')
 PLUGINS = _from('src','plugins')
-CONFIG  = ['smash.rc', 'src/plugins.json']
+CONFIG  = [ opj('config', 'smash.rc'),
+            opj('config', 'plugins.json')
+        ]
 SCRIPTS = [ opj('scripts', 'smash'),
             opj('scripts', 'current_git_branch'),] + \
           _from('scripts')
@@ -116,7 +119,7 @@ kargs = dict(
                     develop      = develop,),
     data_files = [ ( SMASH_PLUGINS_DIR,       PLUGINS ),
                    ( HOME_BIN,                SCRIPTS ),
-                   ( SMASH_INSTALLATION_HOME, CONFIG ),
-                   ( SMASH_LIB_DST_DIR,        LIB ),])
+                   ( SMASH_CONFIG_DIR,        CONFIG ),
+                   ( SMASH_LIB_DST_DIR,       LIB ),])
 kargs.update(long_description=kargs['description']+'. Read more: '+kargs['url'])
 setup(**kargs)

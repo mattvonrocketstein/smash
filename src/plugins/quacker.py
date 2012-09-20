@@ -6,15 +6,10 @@ import threading
 from smash.util import report
 from smash.plugins import SmashPlugin
 
-
-#if caps and 'actions' in caps:
-    # We support actions, so add a button.
-#notification.add_action("ignore", "Ignore", ignore_cb)
-
 class Plugin(SmashPlugin):
     """ TODO: caching, integrate with bookmarks """
 
-    requires = [ 'duckduckgo' ]
+    requires = [ 'pynotify', 'duckduckgo' ]
 
     class q(object):
         """

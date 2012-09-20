@@ -12,13 +12,14 @@
 """
 import os
 import IPython.ipapi
-from smash.util import report
-ip = IPython.ipapi.get()
 
+from smash.util import report
 from smash.plugins import SmashPlugin
 
+ip = IPython.ipapi.get()
+
 def set_complete(func, key):
-    report.git('setting hook'+str([func,ip]))
+    #report.git('setting hook'+str([func,ip]))
     ip.set_hook('complete_command', func, re_key=key)
 
 def filesystem_completer(self, event):
@@ -33,7 +34,7 @@ def filesystem_completer(self, event):
     else:
         data = data[-1]
         base = __IPYTHON__.complete(data)
-        r = [x for x in base if os.path.exists(x)]
+        r = [ x for x in base if os.path.exists(x) ]
         return r
 
 def local_branches(*args, **kargs):
@@ -48,10 +49,10 @@ def subcommands(*args, **kargs):
     # ipython is somehow, for some reason, mangling scope for the handlers
     # this is particularly nasty because it seems it fails totally silently
     GIT_SUBCOMMANDS = ['add', 'bisect', 'branch', 'checkout',
-                   'cherry-pick', 'clone', 'commit', 'diff',
-                   'fetch', 'grep', 'init', 'log', 'merge',
-                   'mv', 'pull', 'push', 'rebase',
-                   'reset', 'rm', 'show', 'status', 'tag']
+                       'cherry-pick', 'clone', 'commit', 'diff',
+                       'fetch', 'grep', 'init', 'log', 'merge',
+                       'mv', 'pull', 'push', 'rebase',
+                       'reset', 'rm', 'show', 'status', 'tag']
 
     return GIT_SUBCOMMANDS
 
