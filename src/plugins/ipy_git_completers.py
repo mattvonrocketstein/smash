@@ -67,13 +67,17 @@ def install_git_aliases():
     [ aliases.add(x, '__git_plugin__') for x in GIT_ALIASES ]
     aliases.install()
 
-if __name__=='__smash__':
-    install_git_aliases()
-    report('setting prompt to use git vcs')
-    __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
-    set_complete(local_branches, 'git checkout')
-    set_complete(subcommands, 'git [\S]*$')
 
-    #set_complete(lambda self, event: git.local_branches, 'git push')
-    set_complete(filesystem_completer, 'git add')
-    set_complete(filesystem_completer, 'git mv')
+from smash.plugins import SmashPlugin
+
+class Plugin(SmashPlugin):
+    def install(self):
+        install_git_aliases()
+        report('setting prompt to use git vcs')
+        __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
+        set_complete(local_branches, 'git checkout')
+        set_complete(subcommands, 'git [\S]*$')
+
+        #set_complete(lambda self, event: git.local_branches, 'git push')
+        set_complete(filesystem_completer, 'git add')
+        set_complete(filesystem_completer, 'git mv')

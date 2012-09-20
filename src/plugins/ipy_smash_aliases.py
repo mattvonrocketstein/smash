@@ -17,5 +17,7 @@ def install_aliases():
         return 'overridden'
     Magic.magic_reset = reset
 
-if __name__=='__smash__':
-    install_aliases()
+from smash.plugins import SmashPlugin
+class Plugin(SmashPlugin):
+    def install(self):
+        install_aliases()

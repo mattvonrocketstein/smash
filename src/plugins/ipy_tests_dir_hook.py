@@ -62,5 +62,8 @@ class TestsHook(object):
         elif 'tests.py' in files:
             self.handle_python_testfile(tfile)
 
-if __name__=='__smash__':
-    post_hook_for_magic('cd', TestsHook())
+from smash.plugins import SmashPlugin
+
+class Plugin(SmashPlugin):
+    def install(self):
+        post_hook_for_magic('cd', TestsHook())

@@ -70,6 +70,8 @@ def look_for_fabfile():
         __IPYTHON__.shell.user_ns.update(_fabric=magic_fabric(lazy=False))
 
 
-if __name__=='__smash__':
-    from ipy_fabric_support import magic_fabric
-    magic_fabric.install_into_ipython()
+from smash.plugins import SmashPlugin
+class Plugin(SmashPlugin):
+    def install(self):
+        from ipy_fabric_support import magic_fabric
+        magic_fabric.install_into_ipython()

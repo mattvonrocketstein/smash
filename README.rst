@@ -65,7 +65,7 @@ Generic Plugins for Smash
 Browser Integration:
 --------------------
   * manage/open bookmarks, links
-
+  * performs web searches with http://duckduckgo.com API
 
 Git VCS Integration:
 --------------------
@@ -142,7 +142,7 @@ Related Links
 =============
 
   * http://ipython.org/ipython-doc/dev/interactive/shell.html
-
+  * http://faculty.washington.edu/rjl/clawpack-4.x/python/ipythondir/ipythonrc-pysh
 
 
 

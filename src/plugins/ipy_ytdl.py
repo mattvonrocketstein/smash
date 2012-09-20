@@ -19,5 +19,7 @@ def ytdl(url):
     print '>>>',cmd
     return os.system(cmd)
 
-if __name__=='__smash__':
-    __IPYTHON__.user_ns.update(ytdl=ytdl)
+from smash.plugins import SmashPlugin
+class Plugin(SmashPlugin):
+    def install(self):
+        __IPYTHON__.user_ns.update(ytdl=ytdl)

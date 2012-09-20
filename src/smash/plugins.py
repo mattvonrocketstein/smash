@@ -49,7 +49,11 @@ class Plugins(object):
         execfile(abs_path_to_plugin, G, L)
         G.update(**L)
         if 'smash_install' in G :
-            G['smash_install']()
+            raise Exception,abs_path_to_plugin + ' old style.. smash_install function'
+        if 'Plugin' not in G:
+            raise Exception,abs_path_to_plugin + ' old style, no Plugin'
+        plugin = G['Plugin']()
+        plugin.install()
 
     def _get_some_plugins(self, name, val):
         plugins     = self.plugin_data

@@ -199,7 +199,7 @@ class Project(VenvMixin, Hooks):
             notifier.start()
             self.notifiers += [notifier]
 
-def smash_install():
+def _smash_install():
     """
     TODO: CLEANR this part should not be in this file!
     """
@@ -247,3 +247,8 @@ def smash_install():
 
     __IPYTHON__.hooks['shutdown_hook'].add(lambda: manager.shutdown())
     __IPYTHON__.hooks['pre_prompt_hook'].add(manager.check)
+
+from smash.plugins import SmashPlugin
+class Plugin(SmashPlugin):
+    def install(self):
+        _smash_install()

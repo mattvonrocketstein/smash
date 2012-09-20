@@ -11,7 +11,7 @@ from smash.plugins import SmashPlugin
     # We support actions, so add a button.
 #notification.add_action("ignore", "Ignore", ignore_cb)
 
-class QuackerPlugin(SmashPlugin):
+class Plugin(SmashPlugin):
     """ TODO: caching, integrate with bookmarks """
 
     requires = [ 'duckduckgo' ]
@@ -78,6 +78,3 @@ class QuackerPlugin(SmashPlugin):
             #self.q.stackoverflow = lambda *search_string: self.q('!stackoverflow',*search_string)
             __IPYTHON__.user_ns.update(q=self.q)
             report.quacker("finished installing.  type 'q?' for help with search")
-
-def smash_install():
-    QuackerPlugin().install()

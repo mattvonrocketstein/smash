@@ -86,3 +86,8 @@ def checkPath(filename):
     except IOError, msg:
         print >> sys.stderr, "%s: %s" % (filename, msg.args[1])
         return 1
+
+from smash.plugins import SmashPlugin
+class Plugin(SmashPlugin):
+    def install(self):
+        pass
