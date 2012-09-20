@@ -30,8 +30,6 @@ def die():
 for option,val in OVERRIDE_OPTIONS.items():
     setattr(ip.options, option, val)
 
-# removes various common namespace collisions between py-modules / shell commands
-clean_namespace()
 
 # clean strangeness of the command-line arguments which
 # are skewed due to the odd way this script is invoked
@@ -59,3 +57,6 @@ else:
         for args,kargs,handler in SmashParser.extra_options:
             if getattr(opts, kargs['dest']):
                 handler(opts)
+
+# removes various common namespace collisions between py-modules / shell commands
+clean_namespace()

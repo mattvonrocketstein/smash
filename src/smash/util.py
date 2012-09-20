@@ -9,8 +9,6 @@ from IPython.genutils import Term
 
 tc = ColorANSI.TermColors()
 
-CONFLICTING_NAMES  = 'curl gc git time pwd pip pyflakes easy_install virtualenv py'.split()
-CONFLICTING_NAMES += [ 'smash' ]
 
 def post_hook_for_magic(original_magic_name, new_func):
     """ attaches a new post-run hook for an existing magic function """
@@ -21,6 +19,8 @@ def post_hook_for_magic(original_magic_name, new_func):
         return out
     new_magic._wrapped = old_magic
     IPython.ipapi.get().expose_magic(original_magic_name, new_magic)
+
+CONFLICTING_NAMES  = 'curl gc git time pwd pip pyflakes easy_install virtualenv py'.split()
 
 def clean_namespace():
     """ clean python namespace in a few places where it shadows unix,

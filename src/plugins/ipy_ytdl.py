@@ -1,5 +1,6 @@
 """ ipy_ytdl
-    shortcuts for youtube download
+
+      shortcuts for youtube download
 """
 import os
 
@@ -20,6 +21,7 @@ def ytdl(url):
     return os.system(cmd)
 
 from smash.plugins import SmashPlugin
+
 class Plugin(SmashPlugin):
     def install(self):
         __IPYTHON__.user_ns.update(ytdl=ytdl)
