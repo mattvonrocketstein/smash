@@ -9,6 +9,7 @@ from smash.reflect import namedAny
 from smash.util import colorize, report
 from smash.venv import VenvMixin
 
+COMMAND_NAME = 'proj'
 ROOT_PROJECT_NAME = '__smash__'
 
 DEFAULT_CONFIG_SCHEMA = dict(
@@ -67,14 +68,20 @@ class Project(VenvMixin, Hooks):
     def __repr__(self):
         return 'project: ' + self.name
 
+    @property
+    def _active_project(self):
+        tmp = [x for x in self._paths if self._paths[x]==os.getcwd()]
+        if tmp: return tmp[0]
+
     def _announce_if_project(self):
         """ post-hook for ipython's magic "cd"
 
             this function will notice when you change directories
             into a place that is registered as a project.
         """
+        #report('yo')
         _dir = os.getcwd()
-        if _dir in self._paths:
+        if _dir in self._paths.values():
             m2 = ('This directory is also a registered project. '
                   ' You can activate it with "proj.activate(proj.{name})"')
             m2 = m2.format(name=os.path.split(_dir)[1])
@@ -82,6 +89,7 @@ class Project(VenvMixin, Hooks):
 
     @property
     def aliases(self):
+        """ """
         from smash.aliases import Aliases
         aliases = self._config.get('aliases', {})
         local_aliases = aliases.get(self.name, [])
@@ -90,19 +98,56 @@ class Project(VenvMixin, Hooks):
         return out
 
     @classmethod
+    def _add_post_activate(kls, name, something):
+        """ adds activation-action `something` for project named `name`.
+
+            `something` can be a function, a python dotpath that resolves to function,
+            or if it starts with '$' will be interpretted as shell code.
+
+        """
+        if not isinstance(something, (list, tuple) ):
+            something = [ something ]
+        for x in something:
+            if callable(x):
+                item = x
+            elif isinstance(x, basestring):
+                #kls._post_activate[name] += post_activate
+                if x.startswith('$'):
+                    def item():
+                        os.system(x[1:])
+                    item.__doc__ = 'post-activation command for {0}\n\n:{1}'.format(name,x)
+
+                # FIXME: ugly and special-cased because __IPY__.system() doesnt work
+                elif x.startswith('cd'):
+                    dname = x.split()[-1]
+                    def item():
+                        os.chdir(dname)
+                    item.__doc__ = 'post-activation command for {0}\n\n:os.chdir(\'{1}\')'.format(name, dname)
+
+                else:
+                    item = namedAny(x)
+            else:
+                raise Exception,'niy: ' + str(x)
+
+            if item not in kls._post_activate[name]:
+                kls._post_activate[name] += [item]
+
+    @classmethod
     def bind(kls, _dir, name=None, post_activate=[], post_invoke=[]):
-        """ named alias for changing directory to "_dir". """
+        """ installs a named alias for changing directory to "_dir". """
         _dir = expanduser(_dir)
         if name is None:
             name = os.path.split(_dir)[1]
-        if not isinstance(post_invoke, list):   post_invoke   = [ post_invoke ]
-        if not isinstance(post_activate, list): post_activate = [ post_activate ]
+        if not isinstance(post_invoke, list):   post_invoke   = [ post_invoke   ]
+        #if not isinstance(post_activate, list): post_activate = [ post_activate ]
 
-        tmp = []
-        for x in post_activate:
-            x = namedAny(x) if isinstance(x, (str, unicode)) else x
-            tmp.append(x)
-        post_activate = tmp
+        kls._add_post_activate(name, post_activate)
+        #tmp = []
+        #for x in post_activate:
+        #    x = namedAny(x) if isinstance(x, (str, unicode)) else x
+        #    tmp.append(x)
+        #post_activate = tmp
+        #kls._post_activate[name] += post_activate
 
         tmp = []
         for x in post_invoke:
@@ -110,7 +155,7 @@ class Project(VenvMixin, Hooks):
             tmp.append(x)
         post_invoke = tmp
 
-        kls._post_activate[name] += post_activate
+
         kls._paths[name] = _dir
 
         @property
@@ -134,7 +179,6 @@ class Project(VenvMixin, Hooks):
         if len(args)>1: print colorize('{red}project-manager:{normal}'),args
         else: print colorize('{red}project-manager:{normal} ') + args[0]
 
-
     @classmethod
     def bind_all(kls, _dir, **kargs):
         """ binds every directory in _dir as a project """
@@ -149,7 +193,8 @@ class Project(VenvMixin, Hooks):
 
     def check(self):
         if self.msgs:
-            self.report(str(self.msgs))
+            msg = self.msgs.pop()
+            self.report(msg)
         return ''
 
     def watch(self):
