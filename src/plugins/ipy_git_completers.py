@@ -63,7 +63,10 @@ class Plugin(SmashPlugin):
                     'rebase git rebase -i',
                     'gc git commit',
                     'gd git diff --color',
-                    'st git status','co git checkout', ]
+                    'st git status',
+                    'co git checkout',
+                    ('vlog git log --graph --date-order --date=relative --color'),]
+
 
     def install(self):
         from smash import aliases
