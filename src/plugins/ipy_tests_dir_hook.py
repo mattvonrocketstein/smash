@@ -10,7 +10,8 @@ class TestsMenu(object):
 
     @property
     def __doc__(self):
-        out = repr(self)+'\n'
+        # FIXME: do this with a thread so there's no waiting
+        out = repr(self) + '\n'
         for f in self.files:
             out += ' {0}: {1}\n'.format(self.files.index(f), f)
         out += """\n\nHINT: You can run the tests above by using commands like ",tests.run 1"\n"""
@@ -22,7 +23,7 @@ class TestsMenu(object):
     def run(self, i):
         i = int(i)
         f = self.files[i]
-        cmd = 'pytest -v {0}'.format(f)
+        cmd = 'pytest --capture=no -v {0}'.format(f)
         __IPYTHON__.runlines(cmd)
 
     def __init__(self, base, abs_test_files):
@@ -54,6 +55,8 @@ class TestsHook(object):
     def __call__(self):
 
         wd    = getcwd()
+        if os.path.split(wd)[-1]=='tests':
+            return self.handle_python_testdir(wd)
         files = os.listdir(wd)
         tdir  = opj(wd, 'tests')
         if ope(tdir) and os.path.isdir(tdir):
