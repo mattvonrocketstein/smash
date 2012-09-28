@@ -12,22 +12,6 @@ from smash.venv import VenvMixin
 COMMAND_NAME = 'proj'
 ROOT_PROJECT_NAME = '__smash__'
 
-DEFAULT_CONFIG_SCHEMA = dict(
-    # schema:
-    #   { 'project_name' : ['alias_cmd real --command goes_here', .. ] }
-    aliases = dict(
-
-        # __smash__ holds generic, "always-on" kinds of aliases which will
-        # take effect regardless of what project is the active one
-        __smash__ = []
-
-        ),
-
-    # FIXME: document schema based on config/example_project.json
-    instructions = [],
-
-    )
-
 class Hooks(object):
 
     def shutdown(self):
@@ -35,10 +19,6 @@ class Hooks(object):
         self.report('shutting down')
         [ x.stop() for x in self.watchlist ]
         #raise ipapi.TryNext()
-
-    def pre_activate(self, name, f):
-        """ FIXME: cumbersome """
-        self._pre_invokage[name] += [f]
 
 class Project(VenvMixin, Hooks):
     """ class for holding Project abstractions. in the simplest case,
@@ -63,7 +43,10 @@ class Project(VenvMixin, Hooks):
         self.name = name
         self._pre_invokage  = defaultdict(lambda: [])
         self._post_invokage = defaultdict(lambda: [])
-        self.being_watched  = False
+
+    @property
+    def watched(self):
+        return self._config.get('watchdog',{}).get(self.name,{})
 
     def __repr__(self):
         return 'project: ' + self.name
@@ -79,12 +62,11 @@ class Project(VenvMixin, Hooks):
             this function will notice when you change directories
             into a place that is registered as a project.
         """
-        #report('yo')
         _dir = os.getcwd()
         if _dir in self._paths.values():
-            m2 = ('This directory is also a registered project. '
-                  ' You can activate it with "proj.activate(proj.{name})"')
-            m2 = m2.format(name=os.path.split(_dir)[1])
+            m2 = ('This directory is also a project. '
+                  ' To activate it:  "{CMD}.activate(proj.{name})"')
+            m2 = m2.format(CMD=COMMAND_NAME, name=os.path.split(_dir)[1])
             self.report(m2)
 
     @property
@@ -109,45 +91,35 @@ class Project(VenvMixin, Hooks):
             something = [ something ]
         for x in something:
             if callable(x):
-                item = x
+                func = x
             elif isinstance(x, basestring):
-                #kls._post_activate[name] += post_activate
                 if x.startswith('$'):
-                    def item():
-                        os.system(x[1:])
-                    item.__doc__ = 'post-activation command for {0}\n\n:{1}'.format(name,x)
+                    func = lambda: os.system(x[1:])
+                    func.__doc__ = 'post-activation command for {0}\n\n:{1}'.format(name, x)
 
                 # FIXME: ugly and special-cased because __IPY__.system() doesnt work
                 elif x.startswith('cd'):
                     dname = x.split()[-1]
-                    def item():
-                        os.chdir(dname)
-                    item.__doc__ = 'post-activation command for {0}\n\n:os.chdir(\'{1}\')'.format(name, dname)
+                    func = lambda: os.chdir(dname)
+                    func.__doc__ = 'post-activation command for {0}\n\n:os.chdir(\'{1}\')'.format(name, dname)
 
                 else:
-                    item = namedAny(x)
+                    func = namedAny(x)
             else:
                 raise Exception,'niy: ' + str(x)
 
-            if item not in kls._post_activate[name]:
-                kls._post_activate[name] += [item]
+            if func not in kls._post_activate[name]:
+                kls._post_activate[name] += [func]
 
     @classmethod
     def bind(kls, _dir, name=None, post_activate=[], post_invoke=[]):
         """ installs a named alias for changing directory to "_dir". """
+
         _dir = expanduser(_dir)
         if name is None:
             name = os.path.split(_dir)[1]
         if not isinstance(post_invoke, list):   post_invoke   = [ post_invoke   ]
-        #if not isinstance(post_activate, list): post_activate = [ post_activate ]
-
         kls._add_post_activate(name, post_activate)
-        #tmp = []
-        #for x in post_activate:
-        #    x = namedAny(x) if isinstance(x, (str, unicode)) else x
-        #    tmp.append(x)
-        #post_activate = tmp
-        #kls._post_activate[name] += post_activate
 
         tmp = []
         for x in post_invoke:
@@ -177,7 +149,7 @@ class Project(VenvMixin, Hooks):
     def report(kls, *args):
         """ FIXME: use default smash report """
         if len(args)>1: print colorize('{red}project-manager:{normal}'),args
-        else: print colorize('{red}project-manager:{normal} ') + args[0]
+        else: report.project_manager(args[0])
 
     @classmethod
     def bind_all(kls, _dir, **kargs):
