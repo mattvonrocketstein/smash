@@ -1,11 +1,12 @@
 """ smash.plugins
 """
 import os
+import json
 import demjson
 from collections import defaultdict
-
 from IPython import ipapi
 from smash.util import report
+from smash.python import opj, ope
 
 ip = ipapi.get()
 
@@ -21,6 +22,16 @@ class Plugins(object):
     def __init__(self, SMASH_DIR):
         self.SMASH_DIR = SMASH_DIR
         self.plugins_json_file = os.path.join(SMASH_DIR, 'config', 'plugins.json')
+        if self.stale_plugins:
+            data = self.plugin_data
+            [ data.pop(fname) for fname in self.stale_plugins ]
+            self._update_file(data)
+
+    def _update_file(self, data):
+        """ json.dumps(, sort_keys=True, indent=4)
+        """
+        with open(self.plugins_json_file, 'w') as fhandle:
+            fhandle.write(json.dumps(data, sort_keys=True, indent=2))
 
     def _set_enabled(self, name, val):
         """ helper """
@@ -29,8 +40,7 @@ class Plugins(object):
             print "Bad plugin? {0}".format(name)
             from IPython import Shell; Shell.IPShellEmbed(argv=['-noconfirm_exit'])()
         data[name].update(enabled=val)
-        with open(self.plugins_json_file,'w') as fhandle:
-            fhandle.write(demjson.encode(data))
+        self._update_file(data)
 
     def disable(self, name):
         """ disable plugin by name """
@@ -72,22 +82,35 @@ class Plugins(object):
 
     @property
     def possible_plugins(self):
-        return [ fname for fname in os.listdir(os.path.join(self.SMASH_DIR, 'plugins')) if fname.endswith('.py') ]
+        return [ fname for fname in os.listdir(self.PLUGINS_DIR) if fname.endswith('.py') ]
 
     @property
     def enabled_plugins(self):
+        """ lists plugins mentioned as enabled in config """
         return self._get_some_plugins('enabled', 1)
 
     @property
     def disabled_plugins(self):
+        """ lists plugins mentioned as disabled in config """
         return self._get_some_plugins('enabled', 0)
+
+    @property
+    def stale_plugins(self):
+        """ lists plugins mentioned in config but not found on filesystem """
+        return set(self.plugin_data.keys())-set(self.possible_plugins)
+        stale = []
+        for x in self.plugin_data.keys():
+            x = opj(self.PLUGINS_DIR, x)
+            if not ope(x):
+                stale.append(x)
+        return stale
 
     def list(self):
         """ lists available plugins (from {0}) """.format(self.SMASH_DIR)
         # reconstructed because `plugins_json_file` may not be up to date with system
         plugins     = self.plugin_data
         enabled     = self.enabled_plugins
-        disabled     = self.disabled_plugins
+        disabled    = self.disabled_plugins
 
         if enabled:
             self.report('enabled plugins')
