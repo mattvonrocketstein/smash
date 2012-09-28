@@ -12,23 +12,32 @@ from smash.util import post_hook_for_magic
 class magic_fabric(object):
     def __init__(self, lazy=True):
         if not lazy:
-            fabf=os.path.join(os.getcwd(),'fabfile.py')
+            fabf = os.path.join(os.getcwd(), 'fabfile.py')
             def thinkaboutit():
+                """ this actually loads the methods found in the fabric file into
+                    the _fabric namespace (as opposed to simply populating __doc__
+                    with the names of those methods).
+
+                    we run in a thread so as not to introduce a long delay and
+                    temporarily kill ipython's responsiveness
+                """
                 tmp = dict(__file__= fabf)
                 execfile(fabf, tmp)
-                z = self.__published_methods
+                z = self._published_methods
                 tmp = [ [k, tmp[k]] for k in tmp if k in z ]
                 for k,v in tmp:
-                    setattr(self,k,v)
+                    setattr(self, k, v)
             import threading
             threading.Thread(target=thinkaboutit).start()
 
     @property
-    def __published_methods(self):
+    def _published_methods(self):
         """ seriously, it looks like fabric's API does NOT
             provide a better way to do this..
         """
-        info = [ x.strip() for x in os.popen('fab -l').readlines() ]
+        # cut off the first line,
+        # that one just says something like "Available methods:"
+        info = [ x.strip() for x in os.popen('fab -l').readlines()[1:] ]
         info = filter(None, info)
         for oline in info:
             try:
@@ -50,7 +59,7 @@ class magic_fabric(object):
             _fabric
         """
         import StringIO
-        x = self.__published_methods
+        x = self._published_methods
         o = StringIO.StringIO()
         import pprint
         pprint.pprint(x, o)
@@ -71,7 +80,22 @@ def look_for_fabfile():
 
 
 from smash.plugins import SmashPlugin
+from smash.util import set_complete
+
+def fab_completer(self, event):
+    data = event.line.split()[1:] # e.g. 'git',' mv', './<tab>'
+    names = magic_fabric()._published_methods
+    # no info: complete from all the names
+    if not data:
+        return names
+    else:
+        return [x for x in names if x.startswith(data[-1])]
+
+    #if not data:
+    #    return os.listdir(os.getcwd())
+
 class Plugin(SmashPlugin):
     def install(self):
         from ipy_fabric_support import magic_fabric
         magic_fabric.install_into_ipython()
+        set_complete(fab_completer, 'fab')
