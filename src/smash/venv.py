@@ -6,11 +6,9 @@ import sys
 get_path   = lambda: os.environ['PATH']
 get_venv   = lambda: os.environ['VIRTUAL_ENV']
 to_vbin    = lambda venv: os.path.join(venv, 'bin')
-os.path.expanduser = os.path.os.path.expanduser
 
 def is_venv(dir):
     """ naive.. seems to work
-
         TODO: find a canonical version of this function or refine it
     """
     y = 'lib bin include'.split()
@@ -59,11 +57,11 @@ class VenvMixin(object):
         """
         if is_venv(_dir):
             return _dir
-        searchsub = 'venv node'.split()
+        searchsub = 'venv node'.split() # FIXME: abstract
         searchsub = [ os.path.join(_dir, name) for name in searchsub ]
         searchsub = [ name for name in searchsub if os.path.exists(name) ]
         for name in searchsub:
-            self.report('    trying "'+name+'"')
+            self.report('    trying "' + name + '"')
             if is_venv(name):
                 return name
 
@@ -76,7 +74,7 @@ class VenvMixin(object):
             os.environ['VIRTUAL_ENV'] = obj
             self.report('      adding "%s" to PATH; rehashing aliases' % vbin)
             sandbox = dict(__file__ = os.path.join(vbin, 'activate_this.py'))
-            execfile(os.path.join(vbin,'activate_this.py'),sandbox)
+            execfile(os.path.join(vbin,'activate_this.py'), sandbox)
             __IPYTHON__.ipmagic('rehashx')
             from ipy_smash_aliases import install_aliases
             install_aliases()
@@ -87,7 +85,7 @@ class VenvMixin(object):
                 return self._activate(path)
 
     @classmethod
-    def _activate_project(self,obj):
+    def _activate_project(self, obj):
         """ """
         result = self._activate_str(obj.dir)
         [ f() for f in self._post_activate[obj.name] ]
@@ -95,10 +93,6 @@ class VenvMixin(object):
     @property
     def activate(self):
         return self._activate(self)
-
-    @property
-    def aliases(self):
-        return self.config['aliases']
 
     @classmethod
     def _activate(self, obj):
