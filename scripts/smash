@@ -5,7 +5,7 @@
 #
 import sys
 
-MSH_RC = '~/.ipython/smash/smash.rc'
+MSH_RC = '~/.ipython/smash/config/smash.rc'
 
 def main():
     print "bootstrapping smart-shell from $MSH_RC"
