@@ -36,6 +36,10 @@ def colorize(msg):
     """ """
     return msg.format(red=tc.Red, normal=tc.Normal)
 
+def set_complete(func, key):
+    ip = IPython.ipapi.get()
+    ip.set_hook('complete_command', func, re_key=key)
+
 class Reporter(object):
     """ syntactic sugar for reporting """
     def __init__(self, label=''):

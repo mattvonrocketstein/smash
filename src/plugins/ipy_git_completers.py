@@ -13,14 +13,9 @@
 import os
 import IPython.ipapi
 
-from smash.util import report
+from smash.util import report, set_complete
 from smash.plugins import SmashPlugin
 
-ip = IPython.ipapi.get()
-
-def set_complete(func, key):
-    #report.git('setting hook'+str([func,ip]))
-    ip.set_hook('complete_command', func, re_key=key)
 
 def filesystem_completer(self, event):
     """ awkward, but cannot find a better way to do this.. """
@@ -73,7 +68,7 @@ class Plugin(SmashPlugin):
         [ aliases.add(x, '__git_plugin__') for x in self.GIT_ALIASES ]
         aliases.install()
 
-        report('setting prompt to use git vcs')
+        report.git_completer('setting prompt to use git vcs')
         __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
         set_complete(local_branches, 'git checkout')
         set_complete(subcommands, 'git [\S]*$')
