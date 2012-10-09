@@ -49,21 +49,22 @@ class TestsHook(object):
             __IPYTHON__.user_ns.update(tests=tests)
             self.report('updated tests magic.  type "tests?" for help')
 
-    def handle_python_testfile(self, tfile):
-        self.report('Discovered test file.')
+    def handle_python_testfile(self, wd):
+        tfile = opj(wd, 'tests.py')
+        self.report('Discovered test file: '+tfile)
+        self.report("niy")
 
     def __call__(self):
 
         wd    = getcwd()
-        if os.path.split(wd)[-1]=='tests':
+        if os.path.split(wd)[-1] == 'tests':
             return self.handle_python_testdir(wd)
         files = os.listdir(wd)
         tdir  = opj(wd, 'tests')
         if ope(tdir) and os.path.isdir(tdir):
             self.handle_python_testdir(tdir)
-
         elif 'tests.py' in files:
-            self.handle_python_testfile(tfile)
+            self.handle_python_testfile(wd)
 
 from smash.plugins import SmashPlugin
 

@@ -7,7 +7,6 @@ import os
 import demjson
 
 from smash.util import report
-#from smash.venv import VenvMixin
 from smash.python import opd, opj
 from smash.plugins import SmashPlugin
 from smash.util import post_hook_for_magic
@@ -35,6 +34,12 @@ class Plugin(SmashPlugin):
         report.project_manager('adding aliases: ' + str(default_aliases))
         aliases.install()
 
+    def ethandler_file_post_change(self, project_name, event_config):
+        for file_extension, extension_handler_list in event_config.items():
+            assert isinstance(extension_handler_list, list),extension_handler_list
+            report.watchdog('would have built watchdog for {0}, handling {1} with {2}'.format(
+                project_name,file_extension,extension_handler_list))
+
     def install(self):
         config_file = opj(opd(opd(__file__)), CONFIG_FILE_NAME)
         Project._config_file = config_file
@@ -52,6 +57,15 @@ class Plugin(SmashPlugin):
 
         manager._config = config
         [ manager._add_post_activate(name, val) for name, val in config['post_activate'].items() ]
+
+
+        KNOWN_EVENT_TYPES = 'file-post-change'.split()
+        for project_name,watchdog_config in config['watchdog'].items():
+            assert isinstance(watchdog_config, dict), 'expected dictionary for wd-config@' + project_name
+            for event_type, event_config in watchdog_config.items():
+                assert event_type in KNOWN_EVENT_TYPES, 'unknown eventtype'
+                event_type_handler = getattr(self, 'ethandler_' + event_type.replace('-','_'))
+                event_type_handler(project_name, event_config)
 
         self.load_instructions(manager, config)
 
