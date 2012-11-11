@@ -2,7 +2,7 @@
 About
 =====
 
-Smash is the smart-shell, a python/bash hyrbid which builds on the pysh profile for IPython.  It
+Smash is the smart-shell, a python/bash hybrid which builds on the pysh profile for IPython.  It
 offers features for project management, virtual environment support, a plugin architecture, and
 simple JSON configuration files that try to be as sane as possible.
 
