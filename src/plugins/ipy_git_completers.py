@@ -17,6 +17,26 @@ from smash.util import report, set_complete
 from smash.plugins import SmashPlugin
 
 
+def uncomitted_files_completer(self, event):
+    """ awkward, but cannot find a better way to do this.. """
+    data = event.line.split()[2:] # e.g. 'git',' mv', './<tab>'
+
+    # no info: complete from the contents of the wd
+    #if not data:
+    lines = os.popen('git status|grep modified').readlines()
+    #print lines
+    sys_output = [ x.strip()[2:].split()[-1] for x in lines ]
+    #if sys_output:
+    return sys_output
+    #return os.listdir(os.getcwd())
+
+    # started typing something.. leverage ipython's completion
+    #else:
+    #    data = data[-1]
+    #    base = __IPYTHON__.complete(data)
+    #    r = [ x for x in base if os.path.exists(x) ]
+    #    return r
+
 def filesystem_completer(self, event):
     """ awkward, but cannot find a better way to do this.. """
     data = event.line.split()[2:] # e.g. 'git',' mv', './<tab>'
@@ -76,3 +96,4 @@ class Plugin(SmashPlugin):
         #set_complete(lambda self, event: git.local_branches, 'git push')
         set_complete(filesystem_completer, 'git add')
         set_complete(filesystem_completer, 'git mv')
+        set_complete(uncomitted_files_completer, 'git commit')
