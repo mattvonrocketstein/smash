@@ -1,7 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #
-# you would think that "env python" would work just as well every time
-# but due to interaction with sourced venv's this is a tricky business
+# you would think that "env python" would work everywhere, but due
+# due to interaction with sourced venv's this is actually a tricky
+# business.  is it possible for this shell to for activating multiple
+# venv's potentially using multiple python versions?
 #
 import sys
 
@@ -16,6 +18,7 @@ if __name__=='__main__':
         from IPython import Shell
     except:
         print 'FATAL: cannot run smash: system ipython is not available'
+        print
         sys.exit(1)
     else:
         main()

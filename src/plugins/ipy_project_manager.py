@@ -56,11 +56,12 @@ class Plugin(SmashPlugin):
         __IPYTHON__.shell.user_ns[COMMAND_NAME] = manager
 
         manager._config = config
-        [ manager._add_post_activate(name, val) for name, val in config['post_activate'].items() ]
+        for name, val in config.get('post_activate', {}).items():
+            manager._add_post_activate(name, val)
 
 
         KNOWN_EVENT_TYPES = 'file-post-change'.split()
-        for project_name,watchdog_config in config['watchdog'].items():
+        for project_name,watchdog_config in config.get('watchdog', {}).items():
             assert isinstance(watchdog_config, dict), 'expected dictionary for wd-config@' + project_name
             for event_type, event_config in watchdog_config.items():
                 assert event_type in KNOWN_EVENT_TYPES, 'unknown eventtype'
