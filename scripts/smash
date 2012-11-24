@@ -17,8 +17,10 @@ if __name__=='__main__':
     try:
         from IPython import Shell
     except:
-        print 'FATAL: cannot run smash: system ipython is not available'
-        print
+        print ("\nFATAL: cannot run SmaSh.\n"
+               "  IPython lib is not available.  \n"
+               "    To reproduce this error, try running:\n"
+               "      /usr/bin/env python -c\"from IPython import Shell\"\n")
         sys.exit(1)
     else:
         main()
