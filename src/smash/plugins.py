@@ -22,6 +22,7 @@ class Plugins(object):
     def __init__(self, SMASH_DIR):
         self.SMASH_DIR = SMASH_DIR
         self.plugins_json_file = os.path.join(SMASH_DIR, 'config', 'plugins.json')
+        self._plugins = []
         if self.stale_plugins:
             data = self.plugin_data
             [ data.pop(fname) for fname in self.stale_plugins ]
@@ -64,6 +65,9 @@ class Plugins(object):
             raise Exception,abs_path_to_plugin + ' old style, no Plugin'
         plugin = G['Plugin']()
         plugin.install()
+        if not getattr(plugin, 'name', None):
+            plugin.name = os.path.split(abs_path_to_plugin)[-1]
+        self._plugins.append(plugin)
 
     def _get_some_plugins(self, name, val):
         plugins     = self.plugin_data
@@ -134,7 +138,7 @@ class Plugins(object):
                 raise ValueError,'{0} does not exist'.format(abs_path_to_plugin)
             try:
                 self.install_plugin_from_fname(abs_path_to_plugin)
-            except Exception,e:
+            except Exception, e:
                 self.report("ERROR loading plugin @ `" + plugin_file+'`. Exception follows:')
                 self.report('Exception: ')
                 print str([type(e),e])
@@ -144,11 +148,15 @@ class Plugins(object):
 
         #FIXME: cleaner way to do this back-ref
         import smash
-        smash.PLUGINS = self
+        smash.PLUGINS = self._plugins
 
 class SmashPlugin(object):
     """ TODO: ... """
-    requires=[]
+    requires = []
+
+    def __repr__(self):
+        name = self.name
+        return '<SmashPlugin@"{0}">'.format(name)
 
     def verify_requirements(self):
         report('pretending to verify requirements: {0}'.format(self.requires))

@@ -38,6 +38,14 @@ class Project(VenvMixin, Hooks):
     notifiers = []
     _post_activate = defaultdict(lambda: [])
 
+    @property
+    def CURRENT_PROJECT(self):
+        """ FIXME: makes no distinction for whether it's activated, though """
+        _dir = os.getcwd()
+        for name,path in self._paths.items():
+            if path == _dir: return name
+        return None
+
     def __init__(self, name):
         """ """
         self.name = name
