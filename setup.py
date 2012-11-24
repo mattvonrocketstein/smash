@@ -92,7 +92,6 @@ def _from(*args, **kargs):
              for x in glob(opj(*(args + tuple([suffix])))) ]
 
 LIB      = _from('src','smash')
-IPY_BASE = _from('ipython_base')
 PLUGINS  = _from('src','plugins')
 CONFIG   = [ opj('config', 'smash.rc'),
              opj('config', 'plugins.json')
@@ -127,9 +126,12 @@ kargs = dict(
         ( SMASH_CONFIG_DIR,        CONFIG ),
         ( SMASH_LIB_DST_DIR,       LIB ),])
 
-# FIXME: this might overwrite existing ipython configuration,
-# but if nothing is there then smash will not be able to load
-kargs['data_files']+= [ ( SMASH_INSTALLATION_HOME, IPY_BASE), ]
+IPY_BASE = []
+for x in _from('ipython_base', suffix='*'):
+    rel = os.path.split(x)[-1]
+    if not ope(opj(expanduser('~/.ipython'), rel)):
+        IPY_BASE.append(x)
+kargs['data_files'] += [ ( HOME_IPY, IPY_BASE), ]
 
 kargs.update(long_description=kargs['description']+'. Read more: '+kargs['url'])
 setup(**kargs)
