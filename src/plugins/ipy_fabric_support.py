@@ -96,6 +96,6 @@ def fab_completer(self, event):
 
 class Plugin(SmashPlugin):
     def install(self):
-        from ipy_fabric_support import magic_fabric
+        #from ipy_fabric_support import magic_fabric
         magic_fabric.install_into_ipython()
         set_complete(fab_completer, 'fab')
