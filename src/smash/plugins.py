@@ -17,6 +17,7 @@ DEFAULT_SCHEMA = dict(
 
 class Plugins(object):
     """ smash plugins manager """
+
     report = staticmethod(report.plugins)
 
     def __init__(self, SMASH_DIR):

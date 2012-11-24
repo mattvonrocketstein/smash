@@ -12,6 +12,6 @@ aliases = Aliases()
 import os
 opd,opj = os.path.dirname, os.path.join
 config_dir = opj(opd(opd(__file__)), 'config')
-
+VERBOSE = False
 
 __all__ = [Plugins, Aliases, aliases, config_dir]
