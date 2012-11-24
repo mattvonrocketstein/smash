@@ -29,6 +29,10 @@
     "enabled": 1, 
     "requires": []
   }, 
+  "recentfiles.py": {
+    "enabled": 1, 
+    "requires": []
+  }, 
   "smash_bookmarks.py": {
     "enabled": 1, 
     "requires": []

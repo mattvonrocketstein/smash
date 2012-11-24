@@ -153,15 +153,28 @@ class Plugins(object):
 
 class SmashPlugin(object):
     """ TODO: ... """
+
     requires = []
 
     def __repr__(self):
-        name = self.name
-        return '<SmashPlugin@"{0}">'.format(name)
+        return '<SmashPlugin@"{0}">'.format(self.name)
 
     def verify_requirements(self):
         report('pretending to verify requirements: {0}'.format(self.requires))
 
     def install_into_smash(self):
+        """ install this plugin into the smash shell """
         self.verify_requirements()
         self.install()
+
+    def contribute(self,name,val):
+        """ contribute name/val to IPython shells' namespace """
+        if name in __IPYTHON__.user_ns:
+            msg = ('"{0}" variable is taken in user namespace.  '
+                   'refusing to proceed').format(name)
+            report.plugin(msg)
+        else:
+            __IPYTHON__.user_ns.update(**{name:val})
+            msg = ("finished installing.  "
+                   "type '{0}?' for help with search").format(name)
+            report.plugin(msg)
