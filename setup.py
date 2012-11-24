@@ -53,6 +53,9 @@ $ export PATH=$PATH:~/bin
 
 """)
 
+if not ope(expanduser('~/.ipython')):
+    raise SystemExit("No .ipython folder in your home directory?")
+
 class install_data(_install_data):
     def copy_file(self, rel_src, dst_dir):
         """ TODO: DOX """
@@ -88,10 +91,11 @@ def _from(*args, **kargs):
     return [ opj(*(args + tuple([ ops(x)[-1] ]))) \
              for x in glob(opj(*(args + tuple([suffix])))) ]
 
-LIB     = _from('src','smash')
-PLUGINS = _from('src','plugins')
-CONFIG  = [ opj('config', 'smash.rc'),
-            opj('config', 'plugins.json')
+LIB      = _from('src','smash')
+IPY_BASE = _from('ipython_base')
+PLUGINS  = _from('src','plugins')
+CONFIG   = [ opj('config', 'smash.rc'),
+             opj('config', 'plugins.json')
         ]
 SCRIPTS = [ opj('scripts', 'smash'),
             opj('scripts', 'current_git_branch'),] + \
@@ -100,7 +104,7 @@ SCRIPTS = [ opj('scripts', 'smash'),
 kargs = dict(
     name         = 'smash',
     author       = 'mattvonrocketstein, in the gmails',
-    version      = '0.0',
+    version      = '0.1',
     description  = 'smaSh: a smarter shell',
     url          = 'http://github.com/mattvonrocketstein/smash',
     license      = 'MIT',
@@ -117,9 +121,15 @@ kargs = dict(
     cmdclass = dict(install      = install,
                     install_data = install_data,
                     develop      = develop,),
-    data_files = [ ( SMASH_PLUGINS_DIR,       PLUGINS ),
-                   ( HOME_BIN,                SCRIPTS ),
-                   ( SMASH_CONFIG_DIR,        CONFIG ),
-                   ( SMASH_LIB_DST_DIR,       LIB ),])
+    data_files = [
+        ( SMASH_PLUGINS_DIR,       PLUGINS ),
+        ( HOME_BIN,                SCRIPTS ),
+        ( SMASH_CONFIG_DIR,        CONFIG ),
+        ( SMASH_LIB_DST_DIR,       LIB ),])
+
+# FIXME: this might overwrite existing ipython configuration,
+# but if nothing is there then smash will not be able to load
+kargs['data_files']+= [ ( SMASH_INSTALLATION_HOME, IPY_BASE), ]
+
 kargs.update(long_description=kargs['description']+'. Read more: '+kargs['url'])
 setup(**kargs)
