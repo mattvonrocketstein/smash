@@ -2,7 +2,7 @@
  bugfixes
 ----------
 
- move .ipython/smash to .smash?
+ move .smash/smash/* --> .smash/
 
  rehashx may need to reinstall aliases on a per-project basis
 
