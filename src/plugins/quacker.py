@@ -22,7 +22,7 @@ class Plugin(SmashPlugin):
               q('multiple words')
               ,q singleWord
 
-           executive "bang" search, aka "exclusive" aka site-search.
+           execute "bang" search, aka "exclusive" aka site-search.
            if possible, these are opened in an existing webbrowser immediately.
 
               q.wiki('world war 2')
