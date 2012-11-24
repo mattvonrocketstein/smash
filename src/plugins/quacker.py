@@ -1,6 +1,7 @@
-""" quacker:
+""" SmaSh plugin describing support and shortcuts
+    for the duckduckgo search engine.
 
-     SmaSh support for duckduckgo search engine
+    TODO: 'requires' is not currently enforced
 """
 import threading
 from smash.util import report
@@ -67,9 +68,12 @@ class Plugin(SmashPlugin):
     q = q()
 
     def install(self):
+        self.contribute('q', self.q)
+        """
         if 'q' in __IPYTHON__.user_ns:
             report.quacker('"q" variable is taken in user namespace.  refusing to proceed')
         else:
             #self.q.stackoverflow = lambda *search_string: self.q('!stackoverflow',*search_string)
             __IPYTHON__.user_ns.update(q=self.q)
             report.quacker("finished installing.  type 'q?' for help with search")
+            """

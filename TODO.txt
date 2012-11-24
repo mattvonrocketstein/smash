@@ -2,6 +2,8 @@
  bugfixes
 ----------
 
+ plugins somehow honor 'requires' methods
+
  move .smash/smash/* --> .smash/
 
  rehashx may need to reinstall aliases on a per-project basis
@@ -17,3 +19,5 @@
 
  multiple integrations along the lines of emacs .recentf,
  with and without project-manager
+
+ 
