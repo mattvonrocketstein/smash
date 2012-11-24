@@ -156,7 +156,13 @@ class Project(VenvMixin, Hooks):
         """ binds every directory in _dir as a project """
         N = 0
         _dir = os.path.expanduser(_dir)
-        for name in os.listdir(_dir):
+        if not os.path.exists(_dir):
+            # FIXME: make this red
+            msg = 'ERROR: cannot bind nonexistant directory @ "{0}"'
+            kls.report(msg.format(_dir))
+            return
+        listing = os.listdir(_dir)
+        for name in listing:
             tmp = os.path.join(_dir,name)
             if os.path.isdir(tmp):
                 N += 1
