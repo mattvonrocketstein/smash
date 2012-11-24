@@ -51,5 +51,7 @@ class Reporter(object):
         return Reporter(label)
 
     def __call__(self, msg):
-        print colorize('{red}' + self.label + '{normal}: ' + msg)
+        import smash
+        if smash.VERBOSE:
+            print colorize('{red}' + self.label + '{normal}: ' + msg)
 report = Reporter()

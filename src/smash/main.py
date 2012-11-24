@@ -42,6 +42,8 @@ try: opts, args = SmashParser().parse_args(sys.argv)
 except SystemExit, e: die()
 else:
     VERBOSE = VERBOSE or opts.verbose
+    import smash
+    smash.VERBOSE = VERBOSE
     if VERBOSE:
         report.smash('parsed opts: '+str(eval(str(opts)).items()))
     elif opts.enable:  plugins.enable(opts.enable);   die()
