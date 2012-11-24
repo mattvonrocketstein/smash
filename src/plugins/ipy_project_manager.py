@@ -41,7 +41,9 @@ class Plugin(SmashPlugin):
                 project_name,file_extension,extension_handler_list))
 
     def install(self):
-        config_file = opj(opd(opd(__file__)), CONFIG_FILE_NAME)
+        #config_file = opj(opd(opd(__file__)), CONFIG_FILE_NAME)
+        import smash
+        config_file = opj(smash.config_dir, CONFIG_FILE_NAME)
         Project._config_file = config_file
         report.project_manager('loading config: ' + config_file)
         if not os.path.exists(config_file):
