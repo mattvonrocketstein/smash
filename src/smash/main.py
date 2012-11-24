@@ -2,8 +2,6 @@
 
     TODO: install aliases from a file
     TODO: move to hook-based prompt generation if 0.10 supports it
-    TODO: replace unix 'which' with a macro that first tries unix-which,
-          then, if it fails, tries py.which (from pycmd library)
 """
 import os
 import sys
@@ -22,9 +20,11 @@ ip        = ipapi.get()
 
 def die():
     """
-    FIXME: this is horrible, but i remember thinking i had no choice.. TODO: document reason
+    FIXME: this is horrible, but i remember thinking i had no choice..
+    TODO: document reason
     """
-    threading.Thread(target=lambda: os.system('kill -KILL ' + str(os.getpid()))).start()
+    threading.Thread(target=lambda: \
+                     os.system('kill -KILL ' + str(os.getpid()))).start()
 
 for option,val in OVERRIDE_OPTIONS.items():
     setattr(ip.options, option, val)
@@ -48,7 +48,10 @@ else:
     elif opts.disable: plugins.disable(opts.disable); die()
     elif opts.list:    plugins.list();                die()
     elif opts.panic:
-        report.smash("run this:\n\t","ps aux|grep smash|grep -v grep|awk '{print $2}'|xargs kill -KILL")
+        #FIXME: do this for them instead of telling them how
+        report.smash("run this:\n\t",
+                     ("ps aux|grep smash|grep -v grep|"
+                      "awk '{print $2}'|xargs kill -KILL"))
         die()
     else:
         # parse any command-line options which are added by plugins
@@ -58,3 +61,14 @@ else:
 
 # removes various common namespace collisions between py-modules / shell commands
 clean_namespace()
+
+def reinstall_aliases():
+    """ this is here because 'rehash' normally kills
+        aliases. this is better than nothing, because
+        otherwise you even lose color "ls", but it still
+        doesnt quite take into per-project aliases correctly
+    """
+    from smash import aliases
+    aliases.install()
+from smash.util import post_hook_for_magic
+post_hook_for_magic('rehashx', reinstall_aliases)
