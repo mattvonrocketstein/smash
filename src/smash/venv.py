@@ -104,7 +104,7 @@ class VenvMixin(object):
 
              FIXME: get rid of Project-dep
         """
-        from ipy_project_manager import Project
+        from smash.projects import Project
         self.deactivate()
         if isinstance(obj, (str, unicode)):
             return self._activate_str(obj)
