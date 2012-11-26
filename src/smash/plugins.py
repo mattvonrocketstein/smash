@@ -20,9 +20,10 @@ class Plugins(object):
 
     report = staticmethod(report.plugins)
 
-    def __init__(self, SMASH_DIR):
-        self.SMASH_DIR = SMASH_DIR
-        self.plugins_json_file = os.path.join(SMASH_DIR, 'config', 'plugins.json')
+    def __init__(self):
+        import smash
+        self.SMASH_DIR = smash.SMASH_DIR
+        self.plugins_json_file = os.path.join(smash.SMASH_DIR, 'config', 'plugins.json')
         self._plugins = []
         if self.stale_plugins:
             data = self.plugin_data
@@ -66,8 +67,10 @@ class Plugins(object):
             raise Exception,abs_path_to_plugin + ' old style, no Plugin'
         plugin = G['Plugin']()
         plugin.install()
+        rel_fname = os.path.split(abs_path_to_plugin)[-1]
         if not getattr(plugin, 'name', None):
-            plugin.name = os.path.split(abs_path_to_plugin)[-1]
+            plugin.name = rel_fname
+        plugin.filename = rel_fname
         self._plugins.append(plugin)
 
     def _get_some_plugins(self, name, val):
@@ -88,6 +91,7 @@ class Plugins(object):
     @property
     def possible_plugins(self):
         return [ fname for fname in os.listdir(self.PLUGINS_DIR) if fname.endswith('.py') ]
+    all_plugins = possible_plugins
 
     @property
     def enabled_plugins(self):
