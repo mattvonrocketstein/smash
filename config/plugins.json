@@ -1,40 +1,41 @@
 {
-  "ipy_fabric_support.py": {
-    "enabled": 1
-  }, 
   "ipy_git_completers.py": {
     "enabled": 1
-  }, 
+  },
   "ipy_project_manager.py": {
     "enabled": 1
-  }, 
+  },
   "ipy_pyflakes_helper.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "ipy_smash_aliases.py": {
     "enabled": 1
-  }, 
+  },
   "ipy_tests_dir_hook.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "ipy_venv_support.py": {
     "enabled": 0
-  }, 
+  },
   "ipy_ytdl.py": {
     "enabled": 1
-  }, 
+  },
+  "plugin_inspector.py": {
+    "enabled": 1,
+    "requires": []
+  },
   "quacker.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "recentfiles.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "smash_bookmarks.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
   }
 }
