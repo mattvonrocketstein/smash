@@ -1,5 +1,6 @@
 """ smash.main
 
+    NOTE: uses __file__ !
     TODO: install aliases from a file
     TODO: move to hook-based prompt generation if 0.10 supports it
 """
@@ -9,7 +10,7 @@ import threading
 
 from IPython import ipapi
 
-from smash import Plugins
+import smash
 from smash.parser import SmashParser
 from smash.data import OVERRIDE_OPTIONS
 from smash.util import clean_namespace, report
@@ -35,7 +36,8 @@ sys.argv = sys.argv[1:]
 
 # Plugin installation MUST come before using/instantiating the
 # CLI parser, because plugins have the option of modifying it.
-plugins = Plugins(SMASH_DIR)
+smash.SMASH_DIR = SMASH_DIR
+plugins = smash.Plugins()
 plugins.install()
 
 try: opts, args = SmashParser().parse_args(sys.argv)
@@ -74,3 +76,6 @@ def reinstall_aliases():
     aliases.install()
 from smash.util import post_hook_for_magic
 post_hook_for_magic('rehashx', reinstall_aliases)
+
+from smash.usage import __doc__ as usage
+__IPYTHON__.usage = usage
