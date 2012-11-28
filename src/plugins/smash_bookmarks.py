@@ -18,6 +18,7 @@ class Plugin(SmashPlugin):
 
     def install(self):
         if 'bookmarks' in __IPYTHON__.user_ns:
-            self.report("bookmarks name already taken in shell namespace.  refusing to continue")
+            self.report("bookmarks name already taken in shell namespace."
+                        "  refusing to continue")
         else:
             __IPYTHON__.user_ns.update(bookmarks=Bookmarks())

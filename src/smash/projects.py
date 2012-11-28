@@ -11,7 +11,7 @@ from smash.venv import VenvMixin
 
 COMMAND_NAME = 'proj'
 ROOT_PROJECT_NAME = '__smash__'
-
+import asciitable
 class Hooks(object):
 
     def shutdown(self):
@@ -21,22 +21,31 @@ class Hooks(object):
         #raise ipapi.TryNext()
 
 class Project(VenvMixin, Hooks):
-    """ class for holding Project abstractions. in the simplest case,
-        beginning work on on a project just means changing directories.
-        you can also work with python virtual environments like this:
+    #   class for holding Project abstractions. in the simplest case,
+    #   beginning work on on a project just means changing directories.
+    #   you can also work with python virtual environments like this:
+    #
+    #   >>> proj._activate(proj.project_name)
+    #   >>> proj.project_name.activate()
+    #
+    #   TODO: document difference between project "invoking" vs "activation"
+    #   TODO: should really rename to 'projectman' or something
 
-        >>> proj._activate(proj.project_name)
-        >>> proj.project_name.activate()
-
-        TODO: document difference between project "invoking" vs "activation"
-        TODO: should really rename to 'projectman' or something
-    """
     msgs      = []
     watchlist = []
     dir       = None
     _paths    = {}
     notifiers = []
     _post_activate = defaultdict(lambda: [])
+
+    @property
+    def __doc__(self):
+        """ """
+        dat = [['PROJECT NAME', 'PATH']]
+        for x in self._paths:
+            fpath = self._paths[x].replace(os.environ['HOME'], '~')
+            dat.append([x, fpath])
+        return asciitable.write(dat, Writer=asciitable.FixedWidthNoHeader)
 
     @property
     def CURRENT_PROJECT(self):
@@ -181,7 +190,7 @@ class Project(VenvMixin, Hooks):
         if self.msgs:
             msg = self.msgs.pop()
             self.report(msg)
-        return ''
+        return None
 
     def watch(self):
         """ TODO: fix / refactor """

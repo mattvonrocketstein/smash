@@ -7,6 +7,6 @@ execute import smash.main
 # without this next line, 'smash' is a module and not a system command. moving this
 # code into smash.main or working with __IPYTHON__.user_ns.pop('smash') does not work.
 execute del smash
-
+execute import smash as smashlib
 # bash/python chimera mode set to "on"
 include ipythonrc-pysh
