@@ -9,8 +9,16 @@ from IPython.genutils import Term
 
 tc = ColorANSI.TermColors()
 
+def get_prompt_t():
+    """ get the current prompt template """
+    return __IPYTHON__.shell.outputcache.prompt1.p_template
+
+def set_prompt_t(t):
+    """ set the current prompt template """
+    __IPYTHON__.shell.outputcache.prompt1.p_template = t
+
 def post_hook_for_magic(original_magic_name, new_func):
-    """ attaches a new post-run hook for an existing magic function """
+    """ attach a new post-run hook for an existing magic function """
     old_magic = getattr(__IPYTHON__, 'magic_' + original_magic_name)
     def new_magic(self, parameter_s=''):
         out = old_magic(parameter_s=parameter_s)

@@ -10,8 +10,8 @@ from smash.aliases import Aliases
 aliases = Aliases()
 
 import os
-opd,opj = os.path.dirname, os.path.join
+opd, opj   = os.path.dirname, os.path.join
 config_dir = opj(opd(opd(__file__)), 'config')
-VERBOSE = False
+VERBOSE    = True
 
 __all__ = [Plugins, Aliases, aliases, config_dir]
