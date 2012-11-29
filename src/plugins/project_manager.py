@@ -1,4 +1,4 @@
-""" ipy_project_manager
+""" project_manager
 
     abstractions for project management
  """

@@ -1,7 +1,8 @@
-""" ipy_tests_dir_hook
+""" tests_dir_hook
 """
 import os
 
+from smash.plugins import SmashPlugin
 from smash.util import report, post_hook_for_magic
 from smash.python import only_py_files, opj, ope, glob, getcwd
 
@@ -32,7 +33,7 @@ class TestsMenu(object):
 
 class TestsHook(object):
     """ FIXME?:  this wont trigger if you 'cd myproject/tests' """
-
+    requires = ['pytest']
     report = report.tests_magic
 
     def handle_python_testdir(self, tdir):
@@ -55,7 +56,6 @@ class TestsHook(object):
         self.report("niy")
 
     def __call__(self):
-
         wd    = getcwd()
         if os.path.split(wd)[-1] == 'tests':
             return self.handle_python_testdir(wd)
@@ -65,8 +65,6 @@ class TestsHook(object):
             self.handle_python_testdir(tdir)
         elif 'tests.py' in files:
             self.handle_python_testfile(wd)
-
-from smash.plugins import SmashPlugin
 
 class Plugin(SmashPlugin):
     def install(self):

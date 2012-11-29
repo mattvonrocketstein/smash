@@ -108,8 +108,8 @@ class VenvMixin(object):
         self.deactivate()
         if isinstance(obj, (str, unicode)):
             return self._activate_str(obj)
-        # FIXME: isinstance here does not work here
-        # ipy_project_manager.Project vs __smash__.Project
+        # FIXME: isinstance here does not work here?
+        # project_manager.Project vs __smash__.Project
         elif type(obj).__name__ == Project.__name__:
             return self._activate_project(obj)
         else:
