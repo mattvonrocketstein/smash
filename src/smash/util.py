@@ -1,7 +1,7 @@
 """ smash.util
 """
-
 import os
+import asciitable
 
 import IPython
 from IPython import ColorANSI
@@ -57,11 +57,15 @@ class Reporter(object):
 
     def __getattr__(self, label):
         return Reporter(label)
+    def _report(self,msg):
+        print colorize('{red}' + self.label + '{normal}: ' + msg)
+    def _warn(self,msg):
+        return self._report(msg)
 
     def __call__(self, msg):
         import smash
         if smash.VERBOSE:
-            print colorize('{red}' + self.label + '{normal}: ' + msg)
+            return self._report(msg)
 report = Reporter()
 
 import threading
@@ -72,3 +76,10 @@ def die():
     """
     threading.Thread(target=lambda: \
                      os.system('kill -KILL ' + str(os.getpid()))).start()
+
+import StringIO
+def list2table(dat):
+    s = StringIO.StringIO()
+    out = asciitable.write(dat, output=s, Writer=asciitable.FixedWidthNoHeader)
+    s.seek(0)
+    return s.read()

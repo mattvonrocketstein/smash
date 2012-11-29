@@ -2,6 +2,7 @@
 """
 import re, os
 
+from smash.util import list2table
 from smash.plugins import SmashPlugin
 
 R_QUOTED = re.compile(r'".*"')
@@ -27,10 +28,10 @@ class RecentF(object):
               "To open the Nth entry, just type \"{1}[N]\".\n\n")
         main=main.format(RECENTF_FILE, self.command_name)
         file_paths = self._file_paths
-        out = []
-        for fpath in file_paths:
-            out.append('{0}: "{1}"'.format(file_paths.index(fpath),fpath))
-        return main + '\n'.join(out)
+        dat = [ ['index', 'name', ] ] + \
+              [ [file_paths.index(p),
+                 p.replace(os.environ['HOME'], '~')] for p in file_paths ]
+        return main + list2table(dat)
 
     def _open_rfile(self,f):
         os.system('emacsclient -n {0}'.format(f))
@@ -48,8 +49,6 @@ class Plugin(SmashPlugin):
           to open one of them from the list:
             $ recentf[i]
     """
-
-    name = 'EmacsRecentFilePlugin'
 
     def install(self):
         self.contribute(RecentF.command_name, RecentF())
