@@ -140,7 +140,12 @@ class Plugins(object):
         for plugin_file in self.enabled_plugins:
             abs_path_to_plugin = os.path.join(self.PLUGINS_DIR, plugin_file)
             if not os.path.exists(abs_path_to_plugin):
-                raise ValueError,'{0} does not exist'.format(abs_path_to_plugin)
+                msg = ('Your configuration file @ "{0}" contains an error.  '
+                       '"{1}" does not exist')
+                from smash.util import die
+                self.report(msg.format(self.plugins_json_file,
+                                       abs_path_to_plugin))
+                die()
             try:
                 self.install_plugin_from_fname(abs_path_to_plugin)
             except Exception, e:
