@@ -1,35 +1,29 @@
 {
   "fabric_support.py": {
-    "enabled": 0,
+    "enabled": 1,
     "requires": []
   },
-  "ipy_git_completers.py": {
-    "enabled": 1
-  },
-  "ipy_project_manager.py": {
-    "enabled": 1
-  },
-  "ipy_pyflakes_helper.py": {
-    "enabled": 0,
+  "git_completers.py": {
+    "enabled": 1,
     "requires": []
   },
   "ipy_smash_aliases.py": {
     "enabled": 0,
     "requires": []
   },
-  "ipy_tests_dir_hook.py": {
-    "enabled": 1,
-    "requires": []
-  },
   "ipy_venv_support.py": {
     "enabled": 0
   },
-  "ipy_ytdl.py": {
-    "enabled": 0,
-    "requires": []
-  },
   "plugin_inspector.py": {
     "enabled": 1,
+    "requires": []
+  },
+  "project_manager.py": {
+    "enabled": 1,
+    "requires": []
+  },
+  "pyflakes_helper.py": {
+    "enabled": 0,
     "requires": []
   },
   "quacker.py": {
@@ -44,10 +38,18 @@
     "enabled": 1,
     "requires": []
   },
+  "tests_dir_hook.py": {
+    "enabled": 1,
+    "requires": []
+  },
   "venv_prompt.py": {
     "enabled": 1
   },
   "which.py": {
+    "enabled": 0,
+    "requires": []
+  },
+  "ytdl.py": {
     "enabled": 0,
     "requires": []
   }
