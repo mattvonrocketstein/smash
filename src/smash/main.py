@@ -6,26 +6,18 @@
 """
 import os
 import sys
-import threading
+
 
 from IPython import ipapi
 
 import smash
 from smash.parser import SmashParser
 from smash.data import OVERRIDE_OPTIONS
-from smash.util import clean_namespace, report
+from smash.util import clean_namespace, report, die
 
 VERBOSE   = False
 SMASH_DIR = os.path.dirname(os.path.dirname(__file__))
 ip        = ipapi.get()
-
-def die():
-    """
-    FIXME: this is horrible, but i remember thinking i had no choice..
-    TODO: document reason
-    """
-    threading.Thread(target=lambda: \
-                     os.system('kill -KILL ' + str(os.getpid()))).start()
 
 for option,val in OVERRIDE_OPTIONS.items():
     setattr(ip.options, option, val)
