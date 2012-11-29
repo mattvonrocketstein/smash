@@ -23,7 +23,7 @@ class Plugins(object):
     def __init__(self):
         import smash
         self.SMASH_DIR = smash.SMASH_DIR
-        self.plugins_json_file = os.path.join(smash.SMASH_DIR, 'config', 'plugins.json')
+        self.plugins_json_file = os.path.join(smash.SMASH_DIR, 'etc', 'plugins.json')
         self._plugins = []
         if self.stale_plugins:
             data = self.plugin_data

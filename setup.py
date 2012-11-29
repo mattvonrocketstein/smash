@@ -1,22 +1,9 @@
 """ setup.py for smash:the smart shell
 
-    At the moment this setup is very hackish and nonstandard.  The main reason
-    for that is because to use smash you should NOT have to perform either of
-    the following:
+    At the moment this setup is very hackish and nonstandard.
 
-        1) system-wide installation
-        2) installation into some one-off virtual-environment
-
-    System wide installation is not elegant for obvious reasons, but avoiding
-    even a virtual-environment goes against a lot of python developers
-    instincts.
-
-    However, the reason for avoiding a virtual-environment is simple: one of
-    the things that smash is designed around is easily managing virtual
-    environments!  So you can imagine that having activated nested virtual
-    environments can lead to surprising consequences.. it's best to avoid it
-    altogether.  See the `README.rst` for a high-level description of what
-    this setup actually does.
+    A container virtualenvironment at ~/.smash is forced, and
+    system-level installation is not possible.
 
 """
 import os, sys
@@ -39,10 +26,10 @@ THIS_DIR    = ops(__file__)[:-1]
 SHELL_PATH  = os.environ['PATH'].split(':')
 SMASH_BIN_DIR = opj(HOME_IPY, 'bin')
 SMASH_ACTUAL_SHELL = opj(os.path.sep.join(THIS_DIR),'scripts','smash_actual_shell')
-SMASH_INSTALLATION_HOME = opj(HOME_IPY, 'smash')
+SMASH_INSTALLATION_HOME = HOME_IPY #opj(HOME_IPY, 'smash')
 SMASH_LIB_DST_DIR = opj(SMASH_INSTALLATION_HOME, 'smash')
 SMASH_PLUGINS_DIR = opj(SMASH_INSTALLATION_HOME, 'plugins')
-SMASH_CONFIG_DIR  = opj(SMASH_INSTALLATION_HOME, 'config')
+SMASH_CONFIG_DIR  = opj(SMASH_INSTALLATION_HOME, 'etc')
 
 def run_pip():
     cmd = '{venv_pip} install -r {smash_reqs}'.format(

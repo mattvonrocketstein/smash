@@ -6,12 +6,12 @@ import os
 from collections import defaultdict
 from smash.python import expanduser
 from smash.reflect import namedAny
-from smash.util import colorize, report
+from smash.util import colorize, report, list2table
 from smash.venv import VenvMixin
 
 COMMAND_NAME = 'proj'
 ROOT_PROJECT_NAME = '__smash__'
-import asciitable
+
 class Hooks(object):
 
     def shutdown(self):
@@ -45,7 +45,7 @@ class Project(VenvMixin, Hooks):
         for x in self._paths:
             fpath = self._paths[x].replace(os.environ['HOME'], '~')
             dat.append([x, fpath])
-        return asciitable.write(dat, Writer=asciitable.FixedWidthNoHeader)
+        return """Projects:\n\n"""+list2table(dat)
 
     @property
     def CURRENT_PROJECT(self):

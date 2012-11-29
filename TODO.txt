@@ -2,7 +2,7 @@
  bugfixes
 ----------
 
- plugins somehow honor 'requires' methods
+ plugins somehow honor 'requires' methods, requires is not moved into plugins.json either
 
  move .smash/smash/* --> .smash/
 
@@ -12,6 +12,8 @@
 
  plugin ideas
 ---------------
+ completers for apt-get, python setup.py
+
  replace unix 'which' with a macro that first tries unix-which,
  then, if it fails, tries py.which (from pycmd library) etc
 
@@ -19,5 +21,3 @@
 
  multiple integrations along the lines of emacs .recentf,
  with and without project-manager
-
- 
