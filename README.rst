@@ -7,7 +7,6 @@ offers features for project management, virtual environment support, a plugin ar
 simple JSON configuration files that try to be as sane as possible.
 
 
-
 ===========
 The problem
 ===========
@@ -15,10 +14,13 @@ The problem
 Shells are still annoying!
 
   * No one wants to manage zillions of aliases or arcane readline configurations
-  * Things like sed / awk are great for quick hacks, but are not maintainable and get obscure really quick.
-  * Not conveniently modular and do not perform well for multiple projects / multiple use-cases
+  * Things like sed / awk are great for quick hacks, but are obscure and not maintainable.
+  * Shells are not conveniently modular, and do not perform well for multiple projects / use-cases
   * Minimal or awkward context-awareness (i.e. things like pre/post "dir-change" triggers)
-  * Not ideal for software development in many ways (and neither is a huge do-everything IDE the True Way)
+  * Not ideal for software development in many ways
+
+Based on the last point, maybe you're already thinking "Use emacs/vim/eclipse!", but I also
+believe that a huge, do-everything IDE is not the True Way.
 
 IPython is great but in many ways is more a framework than a solution, and even though
 it does basic shell stuff, out of the box it is not fit for normal use.
