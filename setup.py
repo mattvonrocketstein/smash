@@ -26,56 +26,19 @@ THIS_DIR    = ops(__file__)[:-1]
 SHELL_PATH  = os.environ['PATH'].split(':')
 SMASH_BIN_DIR = opj(HOME_IPY, 'bin')
 SMASH_ACTUAL_SHELL = opj(os.path.sep.join(THIS_DIR),'scripts','smash_actual_shell')
-SMASH_INSTALLATION_HOME = HOME_IPY #opj(HOME_IPY, 'smash')
-SMASH_LIB_DST_DIR = opj(SMASH_INSTALLATION_HOME, 'smash')
+SMASH_INSTALLATION_HOME = HOME_IPY
+SMASH_LIB_DST_DIR = opj(SMASH_INSTALLATION_HOME, 'smashlib')
 SMASH_PLUGINS_DIR = opj(SMASH_INSTALLATION_HOME, 'plugins')
 SMASH_CONFIG_DIR  = opj(SMASH_INSTALLATION_HOME, 'etc')
 
 def run_pip():
-    cmd = '{venv_pip} install -r {smash_reqs}'.format(
-        venv_pip=opj(HOME_IPY, 'bin', 'pip'),
-        smash_reqs=opj(*(THIS_DIR + tuple(['requirements.txt']))))
+    """ """
+    pip_cmd  = '{venv_pip} install -r {smash_reqs} --timeout=120'
+    req_file = opj(*(THIS_DIR + tuple(['requirements.txt'])))
+    venv_pip = opj(HOME_IPY, 'bin', 'pip')
+    cmd = pip_cmd.format(venv_pip=venv_pip, smash_reqs=req_file)
     error = os.system(cmd)
     return error
-
-    """
-    execfile(athis)
-    from pip.index import PackageFinder
-    from pip.req import InstallRequirement, RequirementSet
-    from pip.locations import build_prefix, src_prefix
-
-    requirement_set = RequirementSet(
-        build_dir=build_prefix,
-        src_dir=src_prefix,
-        download_dir=None)
-    reqs = opj(*(THIS_DIR + tuple(['requirements.txt'])))
-    reqs = open(reqs,'r')
-    reqs = [x.strip() for x in reqs.readlines() if x.strip()]
-    for req in reqs:
-        requirement_set.add_requirement(
-            InstallRequirement.from_line(req, None) )
-    install_options = []
-    global_options = []
-    finder = PackageFinder(find_links=[],
-                           index_urls=["http://pypi.python.org/simple/"])
-    print "\nPreparing:{0}\n==================================".format(reqs)
-    requirement_set.prepare_files(finder, force_root_egg_info=False, bundle=False)
-    print "\nInstalling:{0}\n==================================".format(reqs)
-    requirement_set.install(install_options, global_options)
-
-    print "\nInstalled\n=================================="
-    for package in requirement_set.successfully_installed: print package.name
-    """
-    # FIXME?: assumes no -e git+ssh bizness
-    """
-    unfound = []
-    for req in reqs:
-        try:
-            __import__(req)
-        except ImportError:
-            unfound.append(req)
-    import pip#raise Exception,unfound
-    """
 
 def create_virtualenv(abspath):
     print "Creating virtual-environment: {0}".format(abspath)
@@ -146,8 +109,8 @@ def _from(*args, **kargs):
     return [ opj(*(args + tuple([ ops(x)[-1] ]))) \
              for x in glob(opj(*(args + tuple([suffix])))) ]
 
-LIB      = _from('src','smash')
-PLUGINS  = _from('src','plugins')
+LIB      = _from('lib','smashlib')
+PLUGINS  = _from('lib','plugins')
 CONFIG   = [ opj('config', 'smash.rc'),
              opj('config', 'plugins.json'),
              opj('config', 'projects.json')

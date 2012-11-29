@@ -7,7 +7,7 @@
 
 import os
 
-from smash.util import post_hook_for_magic
+from smashlib.util import post_hook_for_magic
 
 class magic_fabric(object):
     def __init__(self, lazy=True):
@@ -79,8 +79,8 @@ def look_for_fabfile():
         __IPYTHON__.shell.user_ns.update(_fabric=magic_fabric(lazy=False))
 
 
-from smash.plugins import SmashPlugin
-from smash.util import set_complete
+from smashlib.plugins import SmashPlugin
+from smashlib.util import set_complete
 
 def fab_completer(self, event):
     data = event.line.split()[1:] # e.g. 'git',' mv', './<tab>'

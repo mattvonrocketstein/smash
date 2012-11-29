@@ -1,12 +1,12 @@
-""" smash.plugins
+""" smashlib.plugins
 """
 import os
 import json
 import demjson
 from collections import defaultdict
 from IPython import ipapi
-from smash.util import report
-from smash.python import opj, ope
+from smashlib.util import report
+from smashlib.python import opj, ope
 
 ip = ipapi.get()
 
@@ -21,9 +21,9 @@ class Plugins(object):
     report = staticmethod(report.plugins)
 
     def __init__(self):
-        import smash
-        self.SMASH_DIR = smash.SMASH_DIR
-        self.plugins_json_file = os.path.join(smash.SMASH_DIR, 'etc', 'plugins.json')
+        import smashlib
+        self.SMASH_DIR = smashlib.SMASH_DIR
+        self.plugins_json_file = os.path.join(smashlib.SMASH_DIR, 'etc', 'plugins.json')
         self._plugins = []
         if self.stale_plugins:
             data = self.plugin_data
@@ -142,7 +142,7 @@ class Plugins(object):
             if not os.path.exists(abs_path_to_plugin):
                 msg = ('Your configuration file @ "{0}" contains an error.  '
                        '"{1}" does not exist')
-                from smash.util import die
+                from smashlib.util import die
                 self.report(msg.format(self.plugins_json_file,
                                        abs_path_to_plugin))
                 die()
@@ -157,8 +157,8 @@ class Plugins(object):
                 self.report('installed '+plugin_file+' ok')
 
         #FIXME: cleaner way to do this back-ref
-        import smash
-        smash.PLUGINS = self._plugins
+        import smashlib
+        smashlib.PLUGINS = self._plugins
 
 class SmashPlugin(object):
     """ TODO: ... """

@@ -13,8 +13,8 @@
 import os
 import IPython.ipapi
 
-from smash.util import report, set_complete
-from smash.plugins import SmashPlugin
+from smashlib.util import report, set_complete
+from smashlib.plugins import SmashPlugin
 
 
 def uncomitted_files_completer(self, event):
@@ -70,7 +70,7 @@ class Plugin(SmashPlugin):
 
 
     def install(self):
-        from smash import aliases
+        from smashlib import aliases
         [ aliases.add(x, '__git_plugin__') for x in self.GIT_ALIASES ]
         aliases.install()
 

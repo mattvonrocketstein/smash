@@ -1,12 +1,11 @@
 #execute print "executing smash.rc"
 execute import sys; import os.path as _;
-execute x=_.expanduser(_.join('~','.ipython','smash')); sys.path = sys.path+[x] if x not in sys.path else sys.path
-execute x=_.expanduser(_.join('~','.ipython','smash', 'plugins')); sys.path = sys.path+[x] if x not in sys.path else sys.path
-execute import smash.main
+#execute x=_.expanduser(_.join('~','.ipython','smash')); sys.path = sys.path+[x] if x not in sys.path else sys.path
+#execute x=_.expanduser(_.join('~','.ipython','smash', 'plugins')); sys.path = sys.path+[x] if x not in sys.path else sys.path
+execute import smashlib.main
 
 # without this next line, 'smash' is a module and not a system command. moving this
 # code into smash.main or working with __IPYTHON__.user_ns.pop('smash') does not work.
-execute del smash
-execute import smash as smashlib
+execute import smashlib
 # bash/python chimera mode set to "on"
 include ipythonrc-pysh
