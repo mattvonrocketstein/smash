@@ -2,11 +2,11 @@
 
     Things that will be set in this namespace after bootstrap:
 
-      * smash.PLUGINS :: a list of all installed plugins
+      * smashlib.PLUGINS :: a list of all installed plugins
 
 """
-from smash.plugins import Plugins
-from smash.aliases import Aliases
+from smashlib.plugins import Plugins
+from smashlib.aliases import Aliases
 aliases = Aliases()
 
 import os

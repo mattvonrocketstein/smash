@@ -4,8 +4,8 @@
     TODO: 'requires' is not currently enforced
 """
 import threading
-from smash.util import report
-from smash.plugins import SmashPlugin
+from smashlib.util import report
+from smashlib.plugins import SmashPlugin
 
 class Plugin(SmashPlugin):
     """ TODO: caching, integrate with bookmarks """

@@ -1,9 +1,9 @@
-""" smash.parser
+""" smashlib.parser
 """
 
 from optparse import OptionParser
 
-from smash import Plugins
+from smashlib import Plugins
 
 class SmashParser(OptionParser):
 

@@ -1,13 +1,13 @@
-""" smash.projects
+""" smashlib.projects
 """
 
 import os
 
 from collections import defaultdict
-from smash.python import expanduser
-from smash.reflect import namedAny
-from smash.util import colorize, report, list2table
-from smash.venv import VenvMixin
+from smashlib.python import expanduser
+from smashlib.reflect import namedAny
+from smashlib.util import colorize, report, list2table
+from smashlib.venv import VenvMixin
 
 COMMAND_NAME = 'proj'
 ROOT_PROJECT_NAME = '__smash__'
@@ -89,7 +89,7 @@ class Project(VenvMixin, Hooks):
     @property
     def aliases(self):
         """ """
-        from smash.aliases import Aliases
+        from smashlib.aliases import Aliases
         aliases = self._config.get('aliases', {})
         local_aliases = aliases.get(self.name, [])
         out = Aliases()

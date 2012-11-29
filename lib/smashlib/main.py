@@ -1,4 +1,4 @@
-""" smash.main
+""" smashlib.main
 
     NOTE: uses __file__ !
     TODO: install aliases from a file
@@ -10,10 +10,10 @@ import sys
 
 from IPython import ipapi
 
-import smash
-from smash.parser import SmashParser
-from smash.data import OVERRIDE_OPTIONS
-from smash.util import clean_namespace, report, die
+import smashlib
+from smashlib.parser import SmashParser
+from smashlib.data import OVERRIDE_OPTIONS
+from smashlib.util import clean_namespace, report, die
 
 VERBOSE   = False
 SMASH_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -28,16 +28,16 @@ sys.argv = sys.argv[1:]
 
 # Plugin installation MUST come before using/instantiating the
 # CLI parser, because plugins have the option of modifying it.
-smash.SMASH_DIR = SMASH_DIR
-plugins = smash.Plugins()
+smashlib.SMASH_DIR = SMASH_DIR
+plugins = smashlib.Plugins()
 plugins.install()
 
 try: opts, args = SmashParser().parse_args(sys.argv)
 except SystemExit, e: die()
 else:
     VERBOSE = VERBOSE or opts.verbose
-    import smash
-    smash.VERBOSE = VERBOSE
+    import smashlib
+    smashlib.VERBOSE = VERBOSE
     if VERBOSE:
         report.smash('parsed opts: '+str(eval(str(opts)).items()))
     elif opts.enable:  plugins.enable(opts.enable);   die()
@@ -64,10 +64,10 @@ def reinstall_aliases():
         otherwise you even lose color "ls", but it still
         doesnt quite take into per-project aliases correctly
     """
-    from smash import aliases
+    from smashlib import aliases
     aliases.install()
-from smash.util import post_hook_for_magic
+from smashlib.util import post_hook_for_magic
 post_hook_for_magic('rehashx', reinstall_aliases)
 
-from smash.usage import __doc__ as usage
+from smashlib.usage import __doc__ as usage
 __IPYTHON__.usage = usage

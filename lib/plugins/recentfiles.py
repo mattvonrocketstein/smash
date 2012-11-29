@@ -2,8 +2,8 @@
 """
 import re, os
 
-from smash.util import list2table
-from smash.plugins import SmashPlugin
+from smashlib.util import list2table
+from smashlib.plugins import SmashPlugin
 
 R_QUOTED = re.compile(r'".*"')
 RECENTF_FILE = os.path.expanduser('~/.recentf')

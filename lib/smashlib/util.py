@@ -1,4 +1,4 @@
-""" smash.util
+""" smashlib.util
 """
 import os
 import asciitable
@@ -63,8 +63,8 @@ class Reporter(object):
         return self._report(msg)
 
     def __call__(self, msg):
-        import smash
-        if smash.VERBOSE:
+        import smashlib
+        if smashlib.VERBOSE:
             return self._report(msg)
 report = Reporter()
 

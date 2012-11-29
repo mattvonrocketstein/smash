@@ -87,7 +87,7 @@ def checkPath(filename):
         print >> sys.stderr, "%s: %s" % (filename, msg.args[1])
         return 1
 
-from smash.plugins import SmashPlugin
+from smashlib.plugins import SmashPlugin
 class Plugin(SmashPlugin):
     def install(self):
         pass

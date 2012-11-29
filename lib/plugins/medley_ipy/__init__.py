@@ -162,7 +162,7 @@ class L(object):
                        for m in L.appcache.get_models() ] )
 L = L()
 
-from smash.util import report
+from smashlib.util import report
 
 def load_medley_customizations2():
     """ post-activation instructions for medley-related

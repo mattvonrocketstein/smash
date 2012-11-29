@@ -6,11 +6,11 @@
 import os
 import demjson
 
-from smash.util import report
-from smash.python import opd, opj
-from smash.plugins import SmashPlugin
-from smash.util import post_hook_for_magic
-from smash.projects import Project, ROOT_PROJECT_NAME, COMMAND_NAME
+from smashlib.util import report
+from smashlib.python import opd, opj
+from smashlib.plugins import SmashPlugin
+from smashlib.util import post_hook_for_magic
+from smashlib.projects import Project, ROOT_PROJECT_NAME, COMMAND_NAME
 
 CONFIG_FILE_NAME = 'projects.json'
 
@@ -29,7 +29,7 @@ class Plugin(SmashPlugin):
     @staticmethod
     def load_aliases(config):
         default_aliases = config.get('aliases', {}).get(ROOT_PROJECT_NAME, [])
-        from smash import aliases
+        from smashlib import aliases
         default_aliases = [ aliases.add(alias) for alias in default_aliases ]
         report.project_manager('adding aliases: ' + str(default_aliases))
         aliases.install()
@@ -41,8 +41,8 @@ class Plugin(SmashPlugin):
                 project_name,file_extension,extension_handler_list))
 
     def install(self):
-        import smash
-        config_file = opj(smash.config_dir, CONFIG_FILE_NAME)
+        import smashlib
+        config_file = opj(smashlib.config_dir, CONFIG_FILE_NAME)
         Project._config_file = config_file
         report.project_manager('loading config: ' + config_file)
         if not os.path.exists(config_file):
@@ -72,7 +72,7 @@ class Plugin(SmashPlugin):
         self.load_instructions(manager, config)
 
         # add option parsing for project-manager
-        from smash.parser import SmashParser
+        from smashlib.parser import SmashParser
         SmashParser.defer_option(args=('-p', "--project",),
                                        kargs=dict(
                                            dest="project", default='',

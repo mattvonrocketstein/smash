@@ -1,6 +1,6 @@
 """
 """
-from smash.plugins import Plugins, SmashPlugin
+from smashlib.plugins import Plugins, SmashPlugin
 
 def which(input):
     error = os.system('which '+input)

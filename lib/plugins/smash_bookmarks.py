@@ -1,9 +1,9 @@
 """
 """
 
-from smash.projects import Project, COMMAND_NAME
-from smash.util import report
-from smash.plugins import SmashPlugin
+from smashlib.projects import Project, COMMAND_NAME
+from smashlib.util import report
+from smashlib.plugins import SmashPlugin
 
 class Bookmarks(object):
     @property

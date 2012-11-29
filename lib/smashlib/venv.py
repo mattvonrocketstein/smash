@@ -76,7 +76,7 @@ class VenvMixin(object):
             sandbox = dict(__file__ = os.path.join(vbin, 'activate_this.py'))
             execfile(os.path.join(vbin,'activate_this.py'), sandbox)
             __IPYTHON__.ipmagic('rehashx')
-            from smash import aliases
+            from smashlib import aliases
             aliases.install()
         else:
             self.report('  not a venv.. ' + obj)
