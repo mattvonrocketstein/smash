@@ -1,8 +1,9 @@
 """ plugin that provides a plugin inspector
 """
 import asciitable
-from smash.plugins import Plugins, SmashPlugin
 
+from smash.plugins import Plugins, SmashPlugin
+from smash.util import list2table
 
 class PluginInspector(Plugins):
     @property
@@ -15,7 +16,7 @@ class PluginInspector(Plugins):
             dat.append([p,
                         p in self.enabled_plugins,
                         p in fnames])
-        return asciitable.write(dat, Writer=asciitable.FixedWidthNoHeader)
+        return list2table(dat)
 
 class Plugin(SmashPlugin):
     """ """
