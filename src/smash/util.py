@@ -78,8 +78,15 @@ def die():
                      os.system('kill -KILL ' + str(os.getpid()))).start()
 
 import StringIO
-def list2table(dat):
+def list2table(dat, header=[]):
+    if header: dat=[header] + dat
     s = StringIO.StringIO()
     out = asciitable.write(dat, output=s, Writer=asciitable.FixedWidthNoHeader)
     s.seek(0)
-    return s.read()
+    out = s.read()
+    if header:
+        out = out.split('\n')
+        line1 = out[0]
+        out.insert(1,'-'*len(line1))
+        return '\n'.join(out)
+    return out

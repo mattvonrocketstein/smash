@@ -28,10 +28,9 @@ class RecentF(object):
               "To open the Nth entry, just type \"{1}[N]\".\n\n")
         main=main.format(RECENTF_FILE, self.command_name)
         file_paths = self._file_paths
-        dat = [ ['index', 'name', ] ] + \
-              [ [file_paths.index(p),
+        dat = [ [file_paths.index(p),
                  p.replace(os.environ['HOME'], '~')] for p in file_paths ]
-        return main + list2table(dat)
+        return main + list2table(dat,header=['index', 'name',])
 
     def _open_rfile(self,f):
         os.system('emacsclient -n {0}'.format(f))

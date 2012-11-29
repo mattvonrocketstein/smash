@@ -149,7 +149,8 @@ def _from(*args, **kargs):
 LIB      = _from('src','smash')
 PLUGINS  = _from('src','plugins')
 CONFIG   = [ opj('config', 'smash.rc'),
-             opj('config', 'plugins.json')
+             opj('config', 'plugins.json'),
+             opj('config', 'projects.json')
         ]
 SCRIPTS = [ opj('scripts', 'smash'),
             opj('scripts', 'current_git_branch'),] + \

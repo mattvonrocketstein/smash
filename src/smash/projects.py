@@ -41,11 +41,11 @@ class Project(VenvMixin, Hooks):
     @property
     def __doc__(self):
         """ """
-        dat = [['PROJECT NAME', 'PATH']]
+        dat = []
         for x in self._paths:
             fpath = self._paths[x].replace(os.environ['HOME'], '~')
             dat.append([x, fpath])
-        return """Projects:\n\n"""+list2table(dat)
+        return """Projects:\n\n""" + list2table(dat,header=['name', 'path'])
 
     @property
     def CURRENT_PROJECT(self):
