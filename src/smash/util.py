@@ -63,3 +63,12 @@ class Reporter(object):
         if smash.VERBOSE:
             print colorize('{red}' + self.label + '{normal}: ' + msg)
 report = Reporter()
+
+import threading
+def die():
+    """
+    FIXME: this is horrible, but i remember thinking i had no choice..
+    TODO: document reason
+    """
+    threading.Thread(target=lambda: \
+                     os.system('kill -KILL ' + str(os.getpid()))).start()
