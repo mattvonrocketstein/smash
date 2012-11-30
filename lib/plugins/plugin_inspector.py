@@ -16,6 +16,7 @@ class PluginInspector(Plugins):
             dat.append([p,
                         p in self.enabled_plugins,
                         p in fnames])
+        dat = sorted(dat,key=lambda x:x[0])
         return list2table(dat, header=['name', 'enabled', 'installed'])
 
 class Plugin(SmashPlugin):
