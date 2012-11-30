@@ -69,3 +69,35 @@ post_hook_for_magic('rehashx', reinstall_aliases)
 
 from smashlib.usage import __doc__ as usage
 __IPYTHON__.usage = usage
+
+
+# NOTE: a custom importer will become necessary at some point, if venv-switching
+#  support is going to be totally clean.  in practice it is often not a problem,
+#  but technically one venv may a different version of a package  than another
+#  does, so sys.modules needs to be scrubbed as well as sys.path
+"""
+import imp
+class SmashImporter(object):
+    def __init__(self,):
+        self.list = []
+
+    def find_module(self, fullname, path=None):
+        print '*'*80
+        print fullname
+        self.path = path
+        return None#self
+        #if fullname in self.module_names:
+        #    self.path = path
+        #    return self
+        #return None
+
+    def load_module(self, name):
+        if name in sys.modules:
+            return sys.modules[name]
+        module_info = imp.find_module(name, self.path)
+        module = imp.load_module(name, *module_info)
+        sys.modules[name] = module
+        return module
+import sys
+sys.meta_path = [SmashImporter()]
+"""
