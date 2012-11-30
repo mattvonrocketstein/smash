@@ -9,6 +9,9 @@ from IPython.genutils import Term
 
 tc = ColorANSI.TermColors()
 
+def truncate_fpath(fpath):
+    return fpath.replace(os.environ['HOME'], '~')
+
 def get_prompt_t():
     """ get the current prompt template """
     return __IPYTHON__.shell.outputcache.prompt1.p_template

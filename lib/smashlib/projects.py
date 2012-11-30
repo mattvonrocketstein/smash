@@ -4,10 +4,12 @@
 import os
 
 from collections import defaultdict
+
 from smashlib.python import expanduser
 from smashlib.reflect import namedAny
 from smashlib.util import colorize, report, list2table
-from smashlib.venv import VenvMixin
+from smashlib.util import truncate_fpath
+from smashlib.venv import VenvMixin, _contains_venv
 
 COMMAND_NAME = 'proj'
 ROOT_PROJECT_NAME = '__smash__'
@@ -43,9 +45,13 @@ class Project(VenvMixin, Hooks):
         """ """
         dat = []
         for x in self._paths:
-            fpath = self._paths[x].replace(os.environ['HOME'], '~')
-            dat.append([x, fpath])
-        return """Projects:\n\n""" + list2table(dat,header=['name', 'path'])
+            fpath         = self._paths[x]
+            trunc_fpath   = truncate_fpath(fpath) # ~ replace
+            contains_venv = str(_contains_venv(fpath))
+            contains_venv = truncate_fpath(contains_venv)
+            dat.append([x, trunc_fpath, contains_venv])
+        header = ['name', 'path', 'virtualenv']
+        return """Projects:\n\n""" + list2table(dat, header=header)
 
     @property
     def CURRENT_PROJECT(self):

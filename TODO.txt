@@ -2,9 +2,11 @@
  bugfixes
 ----------
 
- plugins somehow honor 'requires' methods, requires is not moved into plugins.json either
+ --project= cli is broken
 
- move .smash/smash/* --> .smash/
+ broken 'git checkout<tab>' completion?
+
+ plugins somehow honor 'requires' methods, requires is not moved into plugins.json either
 
  rehashx may need to reinstall aliases on a per-project basis
 
@@ -12,6 +14,9 @@
 
  plugin ideas
 ---------------
+
+ completer for pip, if requirements.txt is in the working directory
+
  completers for apt-get, python setup.py
 
  replace unix 'which' with a macro that first tries unix-which,

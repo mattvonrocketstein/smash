@@ -3,7 +3,6 @@
 import os
 import json
 import demjson
-from collections import defaultdict
 from IPython import ipapi
 from smashlib.util import report
 from smashlib.python import opj, ope
@@ -153,8 +152,8 @@ class Plugins(object):
                 self.report('Exception: ')
                 print str([type(e),e])
                 raise
-            else:
-                self.report('installed '+plugin_file+' ok')
+            #else:
+            #    self.report('installed '+plugin_file+' ok')
 
         #FIXME: cleaner way to do this back-ref
         import smashlib

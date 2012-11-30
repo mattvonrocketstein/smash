@@ -1,7 +1,6 @@
-""" smash.venv
+""" smashlib.venv
 """
-import os
-import sys
+import os, sys
 
 get_path   = lambda: os.environ['PATH']
 get_venv   = lambda: os.environ['VIRTUAL_ENV']
@@ -12,9 +11,29 @@ def is_venv(dir):
         TODO: find a canonical version of this function or refine it
     """
     y = 'lib bin include'.split()
-    x = os.listdir(dir)
-    if all([y1 in x for y1 in y]):
-        return True
+    try:
+        x = os.listdir(dir)
+    except OSError:
+        # permission denied or something?
+        return False
+    else:
+        if all([y1 in x for y1 in y]):
+            return True
+    return False
+
+def _contains_venv(_dir):
+    """ ascertain whether _dir is, or if it contains, a venv.
+
+        returns the first matching path according to the heuritic
+    """
+    if is_venv(_dir):
+        return _dir
+    searchsub = 'venv node'.split() # FIXME: abstract
+    searchsub = [ os.path.join(_dir, name) for name in searchsub ]
+    searchsub = [ name for name in searchsub if os.path.exists(name) ]
+    for name in searchsub:
+        if is_venv(name):
+            return name
 
 class VenvMixin(object):
 
@@ -50,22 +69,6 @@ class VenvMixin(object):
             return True
 
     @classmethod
-    def _contains_venv(self, _dir):
-        """ ascertain whether _dir is, or if it contains, a venv.
-
-            returns the first matching path according to the heuritic
-        """
-        if is_venv(_dir):
-            return _dir
-        searchsub = 'venv node'.split() # FIXME: abstract
-        searchsub = [ os.path.join(_dir, name) for name in searchsub ]
-        searchsub = [ name for name in searchsub if os.path.exists(name) ]
-        for name in searchsub:
-            self.report('    trying "' + name + '"')
-            if is_venv(name):
-                return name
-
-    @classmethod
     def _activate_str(self, obj):
         if is_venv(obj):
             vbin = to_vbin(obj)
@@ -80,7 +83,7 @@ class VenvMixin(object):
             aliases.install()
         else:
             self.report('  not a venv.. ' + obj)
-            path = self._contains_venv(obj)
+            path = _contains_venv(obj)
             if path:
                 return self._activate(path)
 
@@ -104,7 +107,7 @@ class VenvMixin(object):
 
              FIXME: get rid of Project-dep
         """
-        from smash.projects import Project
+        from smashlib.projects import Project
         self.deactivate()
         if isinstance(obj, (str, unicode)):
             return self._activate_str(obj)

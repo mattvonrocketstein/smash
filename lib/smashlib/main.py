@@ -4,9 +4,7 @@
     TODO: install aliases from a file
     TODO: move to hook-based prompt generation if 0.10 supports it
 """
-import os
-import sys
-
+import os, sys
 
 from IPython import ipapi
 
