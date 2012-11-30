@@ -1,24 +1,27 @@
 """ smashlib.venv
 """
-import os, sys
+import types
+import os, sys, glob
+
+opj = os.path.join
 
 get_path   = lambda: os.environ['PATH']
 get_venv   = lambda: os.environ['VIRTUAL_ENV']
-to_vbin    = lambda venv: os.path.join(venv, 'bin')
-to_vlib    = lambda venv: os.path.join(venv, 'lib')
+to_vbin    = lambda venv: opj(venv, 'bin')
+to_vlib    = lambda venv: opj(venv, 'lib')
 
 def is_venv(dir):
     """ naive.. seems to work
         TODO: find a canonical version of this function or refine it
     """
-    y = 'lib bin include'.split()
+    dir_names = 'lib bin include'.split()
     try:
         x = os.listdir(dir)
     except OSError:
         # permission denied or something?
         return False
     else:
-        if all([y1 in x for y1 in y]):
+        if all([y1 in x for y1 in dir_names]):
             return True
     return False
 
@@ -30,7 +33,7 @@ def _contains_venv(_dir):
     if is_venv(_dir):
         return _dir
     searchsub = 'venv node'.split() # FIXME: abstract
-    searchsub = [ os.path.join(_dir, name) for name in searchsub ]
+    searchsub = [ opj(_dir, name) for name in searchsub ]
     searchsub = [ name for name in searchsub if os.path.exists(name) ]
     for name in searchsub:
         if is_venv(name):
@@ -46,7 +49,8 @@ class VenvMixin(object):
         except KeyError:
             return False
         else:
-            assert os.path.exists(venv), 'wont deactivate a relocated venv'
+            if not os.path.exists(venv):
+                raise RuntimeError,'refusing to deactivate (relocated?) venv'
             del os.environ['VIRTUAL_ENV']
             path = get_path()
             path = path.split(':')
@@ -67,6 +71,9 @@ class VenvMixin(object):
                 if entry and not entry.startswith(venv):
                     nn.append(entry)
             sys.path = nn
+
+            # TODO: clean sys.modules?
+
             return True
 
     @classmethod
@@ -74,21 +81,42 @@ class VenvMixin(object):
         if is_venv(obj):
             vbin = to_vbin(obj)
             vlib = to_vlib(obj)
-            import glob
-            python_dir = glob.glob(os.path.join(vlib, 'python*/'))
+
+            # compute e.g. <venv>/lib/python2.6.
+            # we call bullshit if they have a more than one dir;
+            # it might be a chroot but i dont think it's a venv
+            python_dir = glob.glob(opj(vlib, 'python*/'))
             if not 0 < len(python_dir) < 2:
-                raise RuntimeError, 'not sure how to handle this.  zero or 1+ dirs matching "python*"'
+                err = 'Not sure how to handle this; zero or 1+ dirs matching "python*"'
+                raise RuntimeError, err
             python_dir = python_dir[0]
+
+            # this bit enables switching between two venv's
+            # that might be "no-global-site" vs "use-global-site"
+            site_file = opj(python_dir, 'site.py')
+            assert os.path.exists(site_file)
+            tmp = dict(__file__=site_file)
+            execfile(site_file, tmp)
+            tmp['main']()
+
+            # some environment variable manipulation that would
+            # normally be done by 'source bin/activate', but is
+            # not handled by activate_this.py
             path = get_path().split(':')
             os.environ['PATH'] = ':'.join([vbin] + path)
             os.environ['VIRTUAL_ENV'] = obj
             self.report('      adding "%s" to PATH; rehashing aliases' % vbin)
-            sandbox = dict(__file__ = os.path.join(vbin, 'activate_this.py'))
-            execfile(os.path.join(vbin, 'activate_this.py'), sandbox)
+            sandbox = dict(__file__ = opj(vbin, 'activate_this.py'))
+            execfile(opj(vbin, 'activate_this.py'), sandbox)
+
             #libraries like 'datetime' can fail on import if this isnt done,
             #i'm not sure why activate_this.py doesnt accomplish it.
-            dynload = os.path.join(python_dir,'lib-dynload')
+            dynload = opj(python_dir,'lib-dynload')
             sys.path.append(dynload)
+
+            # rehash aliases based on $PATH, then
+            # reinstall anything else we killed in
+            # the rehash
             __IPYTHON__.ipmagic('rehashx')
             from smashlib import aliases
             aliases.install()
@@ -110,22 +138,21 @@ class VenvMixin(object):
 
     @classmethod
     def _activate(self, obj):
-        """ TODO: move/combine this to ipy_venv_support
-
+        """
             activating a project (referred to instead as "invoking" is
             different than activating a venv (but it might include
             activating a venv)
-
-             FIXME: get rid of Project-dep
         """
+        # TODO: move/combine this to ipy_venv_support ?
+        # FIXME: get rid of Project-dep ?
         from smashlib.projects import Project
         self.deactivate()
-        if isinstance(obj, (str, unicode)):
+        if isinstance(obj, types.StringTypes):
             return self._activate_str(obj)
-        # FIXME: isinstance here does not work here?
-        # project_manager.Project vs __smash__.Project
         elif type(obj).__name__ == Project.__name__:
+            # FIXME: isinstance here does not work here?
+            #        project_manager.Project vs __smash__.Project
             return self._activate_project(obj)
         else:
             err = "Don't know how to activate an object like '" + str(type(obj)) + '"'
-            raise Exception, err
+            raise RuntimeError, err
