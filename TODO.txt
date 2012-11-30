@@ -18,7 +18,6 @@
  completer for pip, if requirements.txt is in the working directory
 
  completer for "git add<tab>"
-
  completers for apt-get, python setup.py
 
  replace unix 'which' with a macro that first tries unix-which,

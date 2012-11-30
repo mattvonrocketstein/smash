@@ -84,3 +84,4 @@ class Plugin(SmashPlugin):
         set_complete(uncomitted_files_completer, 'git commit')
         set_complete(uncomitted_files_completer, 'gd')
         set_complete(uncomitted_files_completer, 'git diff')
+        set_complete(local_branches, 'git merge')
