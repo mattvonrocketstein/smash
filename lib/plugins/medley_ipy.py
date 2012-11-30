@@ -9,6 +9,30 @@ from IPython.genutils import Term
 from ipy_stock_completers import moduleCompletion
 
 tc = ColorANSI.TermColors()
+usage = """
+Hybrid IPython / bash environment tailored for medley development.
+  1) IPython extensions:
+    fab-file integration:
+
+    project manager:
+
+      >>> proj.medley      # cd to src/storyville/medley
+      >>> proj.ellington   # cd to src/storyville/ellington
+      >>> proj.mtemplates  # cd to src/storyville/medley-templates
+
+    shortcuts in webrowser (you can find more using tab completion):
+
+      # opens up hudson's login window in a new tab
+      >>> show.hudson.login
+
+      # opens up munin's celery graphs for FE-5
+      >>> show.munin.celery._5
+
+  2) Extra completions:
+    via ipy_git_completers:
+      * git checkout <branch>
+      * git <subcommand>
+"""
 
 border  = '{yellow}'+"-"*80+'{normal}'
 border  = border.format(yellow=tc.Yellow, normal=tc.Normal)
@@ -162,6 +186,7 @@ class L(object):
                        for m in L.appcache.get_models() ] )
 L = L()
 
+import sys
 from smashlib.util import report
 
 def load_medley_customizations2():
@@ -175,10 +200,13 @@ def load_medley_customizations2():
 
     manager.bind(os.environ.get('JD_DIR','~/jellydoughnut'), 'jd')
     src_dir = opj(os.environ['VIRTUAL_ENV'], 'src')
-    manager.bind(opj(src_dir, 'storyville',       'medley'),    'medley')
+    storyville_dir = opj(src_dir, 'storyville')
+    medley_dir     = opj(storyville_dir, 'medley')
+    sys.path.append(storyville_dir)
+    manager.bind(medley_dir,    'medley')
     manager.bind(opj(src_dir, 'ellington',        'ellington'), 'ellington')
     manager.bind(opj(src_dir, 'medley-templates', 'templates'), 'mtemplates')
-    manager._ipy_install()
+    #manager._ipy_install()
     report.medley_customization('loading three-venv macros')
     load_three_venv_macros()
     if not os.environ.get('DJANGO_SETTINGS_MODULE'):
@@ -231,6 +259,7 @@ def load_medley_customizations():
     ip.set_hook('complete_command', test_completer, str_key = 'test')
     load_utest_macros()
 
+from smashlib.plugins import SmashPlugin
 
 class Engage(object):
     """ """
