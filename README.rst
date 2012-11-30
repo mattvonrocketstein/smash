@@ -53,8 +53,8 @@ Smash is Extensible
 Smash is built on top of pysh, and actually has very little core functionality. Most of what it does
 happens through plugins.  Apart from what the bash/python hybrid features that come from pysh, Smash
 also inherits all the flexibility of IPython in terms of I/O hooks and pre/post processing.  So go
-nuts with your DSL or go attach a lisp-lua-ruby runtime onto this frankenstein bananaphone piano,
-see if I care.
+nuts with your domain specific language or ruby's pry shell or go attach a lisp-lua-node runtime
+onto this frankenstein bananaphone piano, see if I care.
 
 
 
@@ -64,33 +64,54 @@ see if I care.
 Generic Plugins for Smash
 =========================
 
+
 Browser Integration:
 --------------------
-  * manage/open bookmarks, links
-  * performs web searches with http://duckduckgo.com API
+  - manage and open bookmarks globally or per-project
+
+  - performs web searches with http://duckduckgo.com API, allowing for:
+
+    - direct search of stack-overflow, django docs, pypi, etc
 
 Git VCS Integration:
 --------------------
-  * If applicable, default prompt includes current branch name
-  * Tab completion including:
-  * - Branch completion when using checkout
-  * - File-system completion when mv/add
-  * - smart branch/file-system when using diff
-  * Various default aliases and places to put more (just means moving SmaSh config means moving git config is optional)
+  - If applicable, default prompt includes current branch name
+
+  - Tab completion including:
+
+    - Branch completion in all the right spots
+
+    - File-system completion when using 'git mv' or 'git add'
+
+    - smart branch/file-system completion when using 'git diff'
+
+  - Various default aliases and places to put more (making .git/config optional)
 
 Abstractions for project-management:
 ------------------------------------
-  * directories can be registered as Projects
-  * Project configuration is manipulated via the command-line and persisted for you with JSON
-  * Projects can activate their own alias groups that are not shared by the shell at large
-  * Project code does not necessarily need to be python, but if it is you get sweet benefits
-  * Projects can be watched for changes, triggers for linters can be added, etc
-  * code can be searched asynchronously, results delivered in a way that doesnt clutter your screen
-  * Projects can be "activated", which might mean convenient side-effects like
-  * - activating a virtual environment
-  * - starting a virtual machine
-  * - opening a web page
-  * - whatever else you want..
+  - directories can be registered as Projects
+
+  - Project configuration is stored with JSON
+
+    - you can manipulated it via the command-line or edit config-files yourself
+
+  - Projects can activate their own alias groups that are not shared by the shell at large
+
+  - Project code does not necessarily need to be python, but if it is you get sweet benefits
+
+  - Projects can be watched for changes, triggers for linters can be added, etc
+
+  - code can be searched asynchronously, results delivered in a way that doesnt clutter your screen
+
+  - Projects can be "activated", which might mean convenient side-effects like
+
+     - activating a virtual environment
+
+     - starting a virtual machine
+
+     - opening a web page
+
+     - whatever else you want..
 
 
 
@@ -101,21 +122,27 @@ Python Specific Plugins for Smash
 
 Virtual-Environments:
 ---------------------
-  * venvs can be activated/deactivated cleanly and without lasting side-effects
-  * Project activation (in the sense of the plugin above) can trigger
+  - venvs can be activated/deactivated cleanly and without lasting side-effects
+
+  - Project activation (in the sense of the plugin above) can trigger
 
 Fabric integration:
 -------------------
-  * tab-completion over fabfile commands
-  * programmatic access to the functions themselves
-  * PS: this plugin is a good example of a minimal "post-dir-change" trigger
+  - tab-completion over fabfile commands
+
+  - programmatic access to the functions themselves
+
+  - PS: this plugin is a good example of a minimal "post-dir-change" trigger
 
 Unit tests:
 -----------
-  * post-dir-change hook finds "tests/" or "tests.py" in working directory
-  * or, scan everything under this working-directory or a known Project
-  * attempts to detect what type of unittests these are via static analysis (django/vanilla unittest/etc)
-  * test files are enumerated and shortcuts for running them quickly are updated
+  - post-dir-change hook finds "tests/" or "tests.py" in working directory
+
+  - or, scan everything under this working-directory or a known Project
+
+  - attempts to detect what type of unittests these are via static analysis (django/vanilla unittest/etc)
+
+  - test files are enumerated and shortcuts for running them quickly are updated
 
 
 
@@ -143,8 +170,8 @@ not very important- shells are cheap to spawn and a workflow around `screen` wor
 Related Links
 =============
 
-  * http://ipython.org/ipython-doc/dev/interactive/shell.html
-  * http://faculty.washington.edu/rjl/clawpack-4.x/python/ipythondir/ipythonrc-pysh
+  - http://ipython.org/ipython-doc/dev/interactive/shell.html
+  - http://faculty.washington.edu/rjl/clawpack-4.x/python/ipythondir/ipythonrc-pysh
 
 
 
@@ -152,4 +179,4 @@ Related Links
 Other Shells
 ============
 
-  * xiki (a wiki inspired gui shell) http://xiki.org/
+  - xiki (a wiki inspired gui shell) http://xiki.org/
