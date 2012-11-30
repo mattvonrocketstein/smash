@@ -5,6 +5,7 @@ import os, sys
 get_path   = lambda: os.environ['PATH']
 get_venv   = lambda: os.environ['VIRTUAL_ENV']
 to_vbin    = lambda venv: os.path.join(venv, 'bin')
+to_vlib    = lambda venv: os.path.join(venv, 'lib')
 
 def is_venv(dir):
     """ naive.. seems to work
@@ -72,12 +73,22 @@ class VenvMixin(object):
     def _activate_str(self, obj):
         if is_venv(obj):
             vbin = to_vbin(obj)
+            vlib = to_vlib(obj)
+            import glob
+            python_dir = glob.glob(os.path.join(vlib, 'python*/'))
+            if not 0 < len(python_dir) < 2:
+                raise RuntimeError, 'not sure how to handle this.  zero or 1+ dirs matching "python*"'
+            python_dir = python_dir[0]
             path = get_path().split(':')
             os.environ['PATH'] = ':'.join([vbin] + path)
             os.environ['VIRTUAL_ENV'] = obj
             self.report('      adding "%s" to PATH; rehashing aliases' % vbin)
             sandbox = dict(__file__ = os.path.join(vbin, 'activate_this.py'))
-            execfile(os.path.join(vbin,'activate_this.py'), sandbox)
+            execfile(os.path.join(vbin, 'activate_this.py'), sandbox)
+            #libraries like 'datetime' can fail on import if this isnt done,
+            #i'm not sure why activate_this.py doesnt accomplish it.
+            dynload = os.path.join(python_dir,'lib-dynload')
+            sys.path.append(dynload)
             __IPYTHON__.ipmagic('rehashx')
             from smashlib import aliases
             aliases.install()
