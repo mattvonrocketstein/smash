@@ -4,7 +4,7 @@
 
  --project= cli is broken
 
- broken 'git checkout<tab>' completion?
+ broken 'git checkout<tab>' completion and e.g. "git checkout origin/master <tab>"
 
  plugins somehow honor 'requires' methods, requires is not moved into plugins.json either
 
