@@ -1,5 +1,9 @@
 """
 Smash: the smart shell
 
-..various help stuff goes here..
+  for help with plugins:
+   > plugins?
+
+  for help with projects:
+   > projects?
 """
