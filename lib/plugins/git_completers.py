@@ -1,4 +1,4 @@
-""" ipy_git_completers
+""" git_completers
 
     WARNING:
     most of this stuff fails silently and ipython mangles scope on the hooks you
@@ -15,7 +15,6 @@ import IPython.ipapi
 
 from smashlib.util import report, set_complete
 from smashlib.plugins import SmashPlugin
-
 
 def uncomitted_files_completer(self, event):
     """ awkward, but cannot find a better way to do this.. """
