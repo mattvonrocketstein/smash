@@ -17,7 +17,9 @@ class PluginInspector(Plugins):
                         p in self.enabled_plugins,
                         p in fnames])
         dat = sorted(dat,key=lambda x:x[0])
-        return list2table(dat, header=['name', 'enabled', 'installed'])
+        return ("Smash-plugin information: \n\n"
+                "  config-file: {0}\n\n").format(self.plugins_json_file) + \
+                list2table(dat, header=['name', 'enabled', 'installed'])
 
 class Plugin(SmashPlugin):
     """ """

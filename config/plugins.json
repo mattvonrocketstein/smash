@@ -1,14 +1,14 @@
 {
+  "apt_completers.py": {
+    "enabled": 1,
+    "requires": []
+  },
   "fabric_support.py": {
     "enabled": 1,
     "requires": []
   },
   "git_completers.py": {
     "enabled": 1,
-    "requires": []
-  },
-  "ipy_smash_aliases.py": {
-    "enabled": 0,
     "requires": []
   },
   "ipy_venv_support.py": {
@@ -31,6 +31,14 @@
     "requires": []
   },
   "recentfiles.py": {
+    "enabled": 1,
+    "requires": []
+  },
+  "setup_completer.py": {
+    "enabled": 1,
+    "requires": []
+  },
+  "smash_aliases.py": {
     "enabled": 1,
     "requires": []
   },
