@@ -186,3 +186,11 @@ class SmashPlugin(object):
             msg = ("finished installing.  "
                    "type '{0}?' for help with search").format(name)
             report.plugin(msg)
+
+    def contribute_magic(self, name, func):
+        if name.startswith('magic_'):
+            magic_name = name
+        else:
+            magic_name = 'magic_{0}'.format(name)
+        setattr(__IPYTHON__, magic_name, func)
+        return func
