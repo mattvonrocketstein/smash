@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 """ smashlib.util
 """
 import os
@@ -22,13 +23,19 @@ def set_prompt_t(t):
 
 def post_hook_for_magic(original_magic_name, new_func):
     """ attach a new post-run hook for an existing magic function """
+    print 'chaining',original_magic_name,new_func
     old_magic = getattr(__IPYTHON__, 'magic_' + original_magic_name)
-    def new_magic(self, parameter_s=''):
-        out = old_magic(parameter_s=parameter_s)
-        new_func()
-        return out
-    new_magic._wrapped = old_magic
-    IPython.ipapi.get().expose_magic(original_magic_name, new_magic)
+    chain = getattr(__IPYTHON__, '_magic_{0}_chain'.format(original_magic_name), [])
+    if not chain:
+        def new_magic(self, parameter_s=''):
+            out = old_magic(parameter_s=parameter_s)
+            chain = getattr(__IPYTHON__, '_magic_{0}_chain'.format(original_magic_name), [])
+            for f in chain:
+                f()
+            return out
+        IPython.ipapi.get().expose_magic(original_magic_name, new_magic)
+    chain+=[new_func]
+    setattr(__IPYTHON__, '_magic_{0}_chain'.format(original_magic_name), chain)
 
 # NOTE: might be obsolete.  this was only needed if/when
 #       using the "import all available modules" strategy
@@ -55,20 +62,23 @@ def set_complete(func, key):
 
 class Reporter(object):
     """ syntactic sugar for reporting """
-    def __init__(self, label=''):
+    def __init__(self, label=u'>>'):
         self.label = label
 
     def __getattr__(self, label):
         return Reporter(label)
+
     def _report(self,msg):
         print colorize('{red}' + self.label + '{normal}: ' + msg)
+
     def _warn(self,msg):
         return self._report(msg)
 
     def __call__(self, msg):
-        import smashlib
-        if smashlib.VERBOSE:
-            return self._report(msg)
+        #import smashlib
+        return self._report(msg)
+    #if smashlib.VERBOSE:
+
 report = Reporter()
 
 import threading
