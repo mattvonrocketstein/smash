@@ -113,7 +113,8 @@ LIB      = _from('lib','smashlib')
 PLUGINS  = _from('lib','plugins')
 CONFIG   = [ opj('config', 'smash.rc'),
              opj('config', 'plugins.json'),
-             opj('config', 'projects.json')
+             opj('config', 'projects.json'),
+             opj('config', 'editor.json'),
         ]
 SCRIPTS = [ opj('scripts', 'smash'),
             opj('scripts', 'current_git_branch'),] + \
