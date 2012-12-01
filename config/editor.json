@@ -1,0 +1,7 @@
+{
+    // used if a windows system is not available
+    "console_editor":"nano",
+
+    // used if running inside xwindows
+    "editor":"emacsclient -n"
+}
