@@ -10,6 +10,7 @@ from smashlib.reflect import namedAny
 from smashlib.util import colorize, report, list2table
 from smashlib.util import truncate_fpath
 from smashlib.venv import VenvMixin, _contains_venv
+from smashlib.util import report
 
 COMMAND_NAME = 'proj'
 ROOT_PROJECT_NAME = '__smash__'
@@ -18,7 +19,7 @@ class Hooks(object):
 
     def shutdown(self):
         """ NB: this method will be used as an ipython hook """
-        self.report('shutting down')
+        report('shutting down')
         [ x.stop() for x in self.watchlist ]
         #raise ipapi.TryNext()
 
@@ -87,10 +88,10 @@ class Project(VenvMixin, Hooks):
         """
         _dir = os.getcwd()
         if _dir in self._paths.values():
-            m2 = ('This directory is also a project. '
-                  ' To activate it:  "{CMD}.activate(proj.{name})"')
-            m2 = m2.format(CMD=COMMAND_NAME, name=os.path.split(_dir)[1])
-            self.report(m2)
+            report('This directory is also a project. ')
+            cmd = '"{CMD}.activate(proj.{name})"'.format(CMD=COMMAND_NAME,
+                                                         name=os.path.split(_dir)[1])
+            report('  To activate it: '+cmd)
 
     @property
     def aliases(self):
@@ -171,8 +172,8 @@ class Project(VenvMixin, Hooks):
     @classmethod
     def report(kls, *args):
         """ FIXME: use default smash report """
-        if len(args)>1: print colorize('{red}project-manager:{normal}'),args
-        else: report.project_manager(args[0])
+        report(*args)#if len(args)>1: print colorize('{red}project-manager:{normal}'),args
+        #else: report.project_manager(args[0])
 
     @classmethod
     def bind_all(kls, _dir, **kargs):
@@ -182,7 +183,7 @@ class Project(VenvMixin, Hooks):
         if not os.path.exists(_dir):
             # FIXME: make this red
             msg = 'ERROR: cannot bind nonexistant directory @ "{0}"'
-            kls.report(msg.format(_dir))
+            report(msg.format(_dir))
             return
         listing = os.listdir(_dir)
         for name in listing:
@@ -190,12 +191,12 @@ class Project(VenvMixin, Hooks):
             if os.path.isdir(tmp):
                 N += 1
                 kls.bind(tmp, name, **kargs)
-        kls.report('binding ' + _dir + ' (' + str(N) + ' projects found)')
+        report('binding ' + _dir + ' (' + str(N) + ' projects found)')
 
     def check(self):
         if self.msgs:
             msg = self.msgs.pop()
-            self.report(msg)
+            report(msg)
         return None
 
     def watch(self):
@@ -203,17 +204,17 @@ class Project(VenvMixin, Hooks):
         if self.being_watched:
             self.being_watched.stop()
             self.watchlist.remove(self.being_watched)
-            self.report('watch stopped')
+            report('watch stopped')
             return
         try:
             import pyinotify
         except ImportError:
-            self.report("Could not import pyinotify.  You'll need to install "
+            report("Could not import pyinotify.  You'll need to install "
                         "it system wide, or activate a venv where it is already "
                         "installed")
             return
         else:
-            self.report("starting watch")
+            report("starting watch")
             _dir = self.dir
             """
             class EventHandler(pyinotify.ProcessEvent):
