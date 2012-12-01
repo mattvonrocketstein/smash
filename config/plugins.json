@@ -18,6 +18,10 @@
     "enabled": 0, 
     "requires": []
   }, 
+  "pip_completer.py": {
+    "enabled": 1, 
+    "requires": []
+  }, 
   "plugin_inspector.py": {
     "enabled": 1, 
     "requires": []
