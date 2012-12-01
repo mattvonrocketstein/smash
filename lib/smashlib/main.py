@@ -12,9 +12,11 @@ import smashlib
 from smashlib.parser import SmashParser
 from smashlib.data import OVERRIDE_OPTIONS
 from smashlib.util import clean_namespace, report, die
-
+opj = os.path.join
+opd = os.path.dirname
 VERBOSE   = False
-SMASH_DIR = os.path.dirname(os.path.dirname(__file__))
+SMASH_DIR = opd(opd(__file__))
+SMASH_ETC_DIR = opj(SMASH_DIR, 'etc')
 ip        = ipapi.get()
 
 for option,val in OVERRIDE_OPTIONS.items():
@@ -26,6 +28,7 @@ sys.argv = sys.argv[1:]
 
 # Plugin installation MUST come before using/instantiating the
 # CLI parser, because plugins have the option of modifying it.
+smashlib.SMASH_ETC_DIR = SMASH_ETC_DIR
 smashlib.SMASH_DIR = SMASH_DIR
 plugins = smashlib.Plugins()
 plugins.install()
@@ -101,3 +104,9 @@ class SmashImporter(object):
 import sys
 sys.meta_path = [SmashImporter()]
 """
+
+import demjson
+with open(opj(SMASH_ETC_DIR, 'editor.json')) as fhandle:
+  # TODO: test for xwindows so i can actually honor the difference here
+  editor_config = demjson.decode(fhandle.read())
+  ip.options['editor'] = editor_config['editor']

@@ -34,7 +34,4 @@ OVERRIDE_OPTIONS = dict(
     # will ALWAYS complete attribute names starting with '_'; in other words
     # these settings seem to only affect the global namespace.
     readline_omit__names = 1,
-
-    # uses emacs daemon to open files for objects. as if by magic
-    # try it out.. "%edit SomeModelClass" opens the file!
-    editor = 'emacsclient')
+)
