@@ -6,9 +6,12 @@
     your handle functions unless you really know what you're doing.  no idea wtf
     ipython does that or how to work around it.
 
+    TODO: smarter with ?http://pypi.python.org/pypi/gitinfo/0.0.2 ?
+          depends on GitPython, which is largeish
     TODO: 'git diff'' should use branch completion AND fs-completion
     TODO: 'git push' should complete from the names of the remotes
     TODO: 'git push <remote>' should complete from the names of local_branches()
+    TODO: consider .gitignore ?
 """
 import os
 import IPython.ipapi
@@ -21,6 +24,24 @@ def uncomitted_files_completer(self, event):
     lines = os.popen('git status|grep modified').readlines()
     sys_output = [ x.strip()[2:].split()[-1] for x in lines ]
     return sys_output
+
+def fsc_utfc(self, event):
+    """ filesystem-completer + untracked_files-completer """
+    return filesystem_completer(self, event) + \
+           untracked_files_completer(self,event)
+
+def untracked_files_completer(self, event):
+    lines = os.popen('git status').readlines()
+    begin = None
+    for line in lines:
+        if 'Untracked files:' in line:
+            begin = lines.index(line)
+    if begin is None:
+        return []
+    lines = lines[begin:]
+    lines = [line for line in lines if line.startswith('#\t')]
+    lines = [ line.strip().replace('\t','')[1:] for line in lines ]
+    return lines
 
 def filesystem_completer(self, event):
     """ awkward, but cannot find a better way to do this.. """
@@ -77,11 +98,12 @@ class Plugin(SmashPlugin):
         __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
         set_complete(local_branches, 'git checkout')
         set_complete(subcommands, 'git [\S]*$')
-
-        #set_complete(lambda self, event: git.local_branches, 'git push')
-        set_complete(filesystem_completer, 'git add')
         set_complete(filesystem_completer, 'git mv')
         set_complete(uncomitted_files_completer, 'git commit')
         set_complete(uncomitted_files_completer, 'gd')
         set_complete(uncomitted_files_completer, 'git diff')
         set_complete(local_branches, 'git merge')
+        #set_complete(lambda self, event: git.local_branches, 'git push')
+
+        # TODO: .. only need file-system if in the middle of rebase ..
+        set_complete(fsc_utfc, 'git add')
