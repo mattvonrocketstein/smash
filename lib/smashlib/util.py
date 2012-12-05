@@ -23,7 +23,7 @@ def set_prompt_t(t):
 
 def post_hook_for_magic(original_magic_name, new_func):
     """ attach a new post-run hook for an existing magic function """
-    print 'chaining',original_magic_name,new_func
+    #print 'chaining',original_magic_name,new_func
     old_magic = getattr(__IPYTHON__, 'magic_' + original_magic_name)
     chain = getattr(__IPYTHON__, '_magic_{0}_chain'.format(original_magic_name), [])
     if not chain:
@@ -34,7 +34,7 @@ def post_hook_for_magic(original_magic_name, new_func):
                 f()
             return out
         IPython.ipapi.get().expose_magic(original_magic_name, new_magic)
-    chain+=[new_func]
+    chain += [new_func]
     setattr(__IPYTHON__, '_magic_{0}_chain'.format(original_magic_name), chain)
 
 # NOTE: might be obsolete.  this was only needed if/when
