@@ -21,6 +21,6 @@ class Plugin(SmashPlugin):
             """
             import time; time.sleep(2)
             __IPYTHON__._this_venv = this_venv
-            t = '${__IPYTHON__._this_venv()}' + get_prompt_t()
+            t = '''${getattr(__IPYTHON__, '_this_venv', lambda: "")()}''' + get_prompt_t()
             set_prompt_t(t)
         Thread(target=delayed).start()
