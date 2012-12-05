@@ -15,6 +15,13 @@ from smashlib.util import report
 COMMAND_NAME = 'proj'
 ROOT_PROJECT_NAME = '__smash__'
 
+def which_vcs(fpath):
+    import vcs
+    try:
+        return vcs.get_repo(fpath).__class__.__name__
+    except vcs.VCSError:
+        return 'N/A'
+
 class Hooks(object):
 
     def shutdown(self):
@@ -48,10 +55,11 @@ class Project(VenvMixin, Hooks):
         for x in self._paths:
             fpath         = self._paths[x]
             trunc_fpath   = truncate_fpath(fpath) # ~ replace
-            contains_venv = str(_contains_venv(fpath))
-            contains_venv = truncate_fpath(contains_venv)
-            dat.append([x, trunc_fpath, contains_venv])
-        header = ['name', 'path', 'virtualenv']
+            contains_venv = _contains_venv(fpath) or 'N/A'
+            contains_venv = contains_venv.replace(fpath,'.')
+            vcs = which_vcs(fpath)
+            dat.append([x, trunc_fpath, contains_venv, vcs])
+        header = ['name', 'path', 'virtualenv', 'vcs']
         return """Projects:\n\n""" + list2table(dat, header=header)
 
     @property
