@@ -22,6 +22,7 @@ class TestsMenu(object):
         return '<Tests @ "{0}">'.format(self.base)
 
     def run(self, i):
+        """ TODO: running this programmatically is more correct, but more fragile? """
         i = int(i)
         f = self.files[i]
         cmd = 'pytest --capture=no -v {0}'.format(f)
@@ -33,8 +34,9 @@ class TestsMenu(object):
 
 class TestsHook(object):
     """ FIXME?:  this wont trigger if you 'cd myproject/tests' """
-    requires = ['pytest']
+
     report = report.tests_magic
+    CMD_NAME = 'tests'
 
     def handle_python_testdir(self, tdir):
         wd = getcwd()
@@ -43,8 +45,8 @@ class TestsHook(object):
         rel_test_files = [ x[ len(wd) + 1 : ] for x in abs_test_files ]
         self.report(str(rel_test_files))
         tests = TestsMenu(tdir, abs_test_files)
-        if all(['tests' in __IPYTHON__.user_ns,
-                not isinstance(__IPYTHON__.user_ns.get('tests',None), TestsMenu)]):
+        if all([self.CMD_NAME in __IPYTHON__.user_ns,
+                not isinstance(__IPYTHON__.user_ns.get(self.CMD_NAME, None), TestsMenu)]):
             self.report('(oops, "tests" name is already taken.  erring on the side of caution)')
         else:
             __IPYTHON__.user_ns.update(tests=tests)
@@ -67,5 +69,7 @@ class TestsHook(object):
             self.handle_python_testfile(wd)
 
 class Plugin(SmashPlugin):
+    requires = ['pytest']
+
     def install(self):
         post_hook_for_magic('cd', TestsHook())
