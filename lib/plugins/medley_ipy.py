@@ -7,6 +7,7 @@ import IPython.ipapi
 from IPython import ColorANSI
 from IPython.genutils import Term
 from ipy_stock_completers import moduleCompletion
+from smashlib.plugins import SmashPlugin
 
 tc = ColorANSI.TermColors()
 usage = """
@@ -105,7 +106,7 @@ def load_three_venv_macros():
         try:
 
             jd = os.environ['JD_DIR'] if 'JD_DIR' in os.environ else \
-                 __IPYTHON__.user_ns['proj']._paths['jd']
+                 __IPYTHON__.user_ns['proj']._paths['jellydoughnut']
             three_venv = os.path.join(jd, 'three_venv.sh')
 
             os.system('bash -c "source ' + three_venv + '; ' + cmd + '"')
@@ -120,6 +121,8 @@ def load_utest_macros():
     """ macro for utesting that features much better tab
         completion than bash: supports dotpaths as well
         as file-names.
+
+        FIXME this should be magic, not macro..
     """
     dad_test = '!django-admin.py test ' + \
                '${getattr(_margv[0],"__name__",_margv[0])} ' + \
@@ -198,7 +201,7 @@ def load_medley_customizations2():
     report.medley_customization("binding new subprojects: "
                                 "medley-templates, storyville, ellington,")
 
-    manager.bind(os.environ.get('JD_DIR','~/jellydoughnut'), 'jd')
+    #manager.bind(os.environ.get('JD_DIR','~/jellydoughnut'), 'jd')
     src_dir = opj(os.environ['VIRTUAL_ENV'], 'src')
     storyville_dir = opj(src_dir, 'storyville')
     medley_dir     = opj(storyville_dir, 'medley')
@@ -234,19 +237,25 @@ def load_medley_customizations2():
     os.environ['CMG_LOCAL_VENV_VERSION']='1'
 
 
+from smashlib.plugins import SmashPlugin
 
-def load_medley_customizations():
-    report.msh('installing medley support')
-    __IPYTHON__.magic_alias('d dad')
-    __IPYTHON__.magic_alias('ctest dad create_test_template '
-                            '--settings=storyville.conf.utest_template')
-    __IPYTHON__.shell.user_ns.update(engage=engage,)
+class Plugin(SmashPlugin):
+
+    def install(self):
+        self.contribute('engage', 'engage')
+        report.msh('installing medley support')
+        __IPYTHON__.magic_alias('d dad')
+        __IPYTHON__.magic_alias('ctest dad create_test_template '
+                                '--settings=storyville.conf.utest_template')
+        __IPYTHON__.shell.user_ns.update(engage=engage,)
 
     ip = IPython.ipapi.get()
 
+def load_medley_customizations():
+    Plugin().install()
+    """
     # django-specific
     def test_completer(self, event):
-        """ """
         event = event.copy()
         line = event.line.split()
         line = line[line.index('test'):]
@@ -257,6 +266,7 @@ def load_medley_customizations():
 
 
     ip.set_hook('complete_command', test_completer, str_key = 'test')
+    """
     load_utest_macros()
 
 from smashlib.plugins import SmashPlugin
@@ -278,15 +288,24 @@ class Engage(object):
     @property
     def medley_models(self):
         """ """
-        lst = [ [model.__name__, model] for _,model in L.models.items() \
+        lst = [ [model.__name__, model] for _, model in L.models.items() \
                 if model.__module__.startswith('medley') ]
         self._update(dict(lst))
 
         lst = map(lambda x: [x[0].lower(),x[1]],lst)
         self._update(dict(lst))
 
-        map(lambda mdl: setattr(mdl,'o',mdl.objects),
-            [x[1] for x in lst])
+        just_models = [ x[1] for x in lst ]
+        map(lambda mdl: setattr(mdl, 'o', mdl.objects),
+            just_models)
+        def reindex_it(self):
+            from medley.ellington_overrides.search.tasks import HaystackUpdateTask
+            h = HaystackUpdateTask()
+            h.taskfunc(self.__class__, pk_list=[self.id])
+
+        map(lambda mdl: setattr(mdl, 'reindex',
+                                lambda self: reindex_it(self)),
+            just_models)
 
         apps = list(set([ tmp[1]._meta.app_label for tmp in lst]))
         the_test = lambda m: m._meta.app_label==app_label
@@ -296,7 +315,8 @@ class Engage(object):
                                for app_label in apps ])
 
         self._update(dict(_model_dct=models_by_app))
-
+        from django.contrib.sites.models import Site
+        self._update(dict(site=Site, Site=Site))
         print medley_doc
 
     @property
@@ -328,12 +348,14 @@ class Engage(object):
         from medley.extensions.search_indexes \
              import SolrAPICommonFieldIndex
 
-        #from haystack import site
+        from haystack.models import SearchResult
+        from medley.util.testing import RequestFactory
         from medley.medley_search.query import MedleySearchQuerySet
         from medley.medley_search.query import SearchQuerySet
-        #hregistry = site._registry
-        #aregistry = api._registry
         ctx = dict(api=api,
+                   searchresult=SearchResult,
+                   SearchResult=SearchResult,
+                   requestfactory=RequestFactory(),
                    hregistry=api.model_map,
                    aregistry=api._registry,
                    SolrAPICommonFieldIndex=SolrAPICommonFieldIndex,
