@@ -10,7 +10,7 @@ import os
 from smashlib.plugins import Plugins
 from smashlib.aliases import Aliases
 
-aliases    = Aliases()
+ALIASES    = Aliases()
 opd, opj   = os.path.dirname, os.path.join
 config_dir = opj(opd(opd(__file__)), 'etc')
 VERBOSE    = True

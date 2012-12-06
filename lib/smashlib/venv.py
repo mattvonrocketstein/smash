@@ -118,7 +118,7 @@ class VenvMixin(object):
             # reinstall anything else we killed in
             # the rehash
             __IPYTHON__.ipmagic('rehashx')
-            from smashlib import aliases
+            from smashlib import ALIASES as aliases
             aliases.install()
         else:
             self.report('  not a venv.. ' + obj)
