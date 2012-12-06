@@ -9,14 +9,16 @@ class RegistrationList(list):
     def __repr__(self):
         return '<{0}: {1}>'.format(self.__class__.__name__,
                                    list.__repr__(self))
+    def keys(self):
+        return list(set([x.affiliation for x in self]))
 
-    def __mod__(self, project_name):
+    def __getitem__(self, project_name):
         """ filter by project_name """
-        out = defaultdict(lambda:[])
+        out = []
         for x in self:
             if x.affiliation == project_name:
-                out[x.affiliation] += [ x.alias ]
-        return dict(out)
+                out.append(x.alias)
+        return out
 
 
 class Aliases(RegistrationList):

@@ -90,7 +90,7 @@ class Plugin(SmashPlugin):
 
 
     def install(self):
-        from smashlib import aliases
+        from smashlib import ALIASES as aliases
         [ aliases.add(x, '__git_plugin__') for x in self.GIT_ALIASES ]
         aliases.install()
 
