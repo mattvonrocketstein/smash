@@ -3,6 +3,10 @@
     "enabled": 1, 
     "requires": []
   }, 
+  "djangoisms.py": {
+    "enabled": 1, 
+    "requires": []
+  }, 
   "fabric_support.py": {
     "enabled": 1, 
     "requires": []
@@ -27,6 +31,10 @@
     "requires": []
   }, 
   "project_manager.py": {
+    "enabled": 1, 
+    "requires": []
+  }, 
+  "py_dictionary_completer.py": {
     "enabled": 1, 
     "requires": []
   }, 

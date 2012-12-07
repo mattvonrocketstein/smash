@@ -45,10 +45,10 @@ else:
     elif opts.disable: plugins.disable(opts.disable); die()
     elif opts.list:    plugins.list();                die()
     elif opts.panic:
-        #FIXME: do this for them instead of telling them how
-        report.smash("run this:\n\t",
-                     ("ps aux|grep smash|grep -v grep|"
-                      "awk '{print $2}'|xargs kill -KILL"))
+        #FIXME: do this for them with psutil instead of telling them how
+        report.smash("run this:\n\t"
+                     "ps aux|grep smash|grep -v grep|"
+                     "awk '{print $2}'|xargs kill -KILL")
         die()
     else:
         # parse any command-line options which are added by plugins
@@ -65,7 +65,7 @@ def reinstall_aliases():
         otherwise you even lose color "ls", but it still
         doesnt quite take into per-project aliases correctly
     """
-    from smashlib import aliases
+    from smashlib import ALIASES as aliases
     aliases.install()
 from smashlib.util import post_hook_for_magic
 post_hook_for_magic('rehashx', reinstall_aliases)

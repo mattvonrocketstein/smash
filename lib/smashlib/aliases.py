@@ -3,7 +3,10 @@
 from smashlib.plugins import SmashPlugin
 from collections import defaultdict, namedtuple
 
-Alias = namedtuple('Alias', 'alias affiliation'.split())
+class Alias(namedtuple('Alias', 'alias affiliation'.split())):
+    pass
+#def uninstall(self):
+#       print 'niy'
 
 class RegistrationList(list):
     def __repr__(self):
@@ -20,16 +23,18 @@ class RegistrationList(list):
                 out.append(x.alias)
         return out
 
-
+from types import StringTypes
 class Aliases(RegistrationList):
 
     def install(self):
         """ install known all known aliases into this IPython instance """
         [ __IPYTHON__.magic_alias(alias.alias) for alias in self ]
 
-    def uninstall(self):
+    def uninstall(self, alias):
         """ uninstall known all known aliases into this IPython instance """
-        raise NotImplemented
+        if isinstance(alias, StringTypes):
+            return __IPYTHON__.magic_unalias(alias.split()[0])
+        raise Exception,'niy'+str(alias)
 
     def add(self, full_alias, project='__smash__'):
         """ adds an alias to registry, optionally with a project affiliation """

@@ -1,0 +1,16 @@
+//
+// this configuration file represents per-project bookmark entries.
+// the format is { "namespace": [ "nickname http://..",
+//                                "nickname file://..",
+//                                "nickname cmd://..", .. ], }
+//
+//
+{
+    //   NOTE: __smash__ namespace is special; these bookmarks will
+    //    stay registered regardless of the currently active project
+    "__smash__":
+        [ 'rprogramming http://reddit.com/r/programming' ],
+
+    "cms_tango":
+        ['hudson https://hudson.cmgdigital.com/'],
+}

@@ -8,6 +8,8 @@ import IPython
 from IPython import ColorANSI
 from IPython.genutils import Term
 
+opj = os.path.join
+ope = os.path.exists
 tc = ColorANSI.TermColors()
 
 def truncate_fpath(fpath):

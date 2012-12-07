@@ -2,6 +2,10 @@
  bugfixes
 ----------
 
+ which-enhancement doesnt work on non-imported modules
+
+ move smashlib.SMASH_DIR to smashlib._meta={..}
+
  --project= cli is broken
 
  broken 'git checkout<tab>' completion and e.g. "git checkout origin/master <tab>"
@@ -14,16 +18,26 @@
 
  plugin ideas
 ---------------
+ rst-rewriter plugin
 
- completer for pip, if requirements.txt is in the working directory
+ github plugin
 
- completer for "git add<tab>"
- completers for apt-get, python setup.py
+ wmctrl integration for desktop switching, etc
 
- replace unix 'which' with a macro that first tries unix-which,
- then, if it fails, tries py.which (from pycmd library) etc
+ completer for "git add<tab>" (dont need fs if not rebase)
+ completers for apt-get
 
  reddit
 
  multiple integrations along the lines of emacs .recentf,
  with and without project-manager
+
+
+ had to do this many times. I remember a piece of code, a function name, a constant, a file, that was there. And now it’s gone. What happened? In which commit was it removed? This trick rocks as you can search through the entire git diff history for a string. I warn you it might take some time:
+
+git rev-list --all | (
+    while read revision; do
+        git grep -F 'Your search string' $revision
+    done
+)
+http://stackoverflow.com/questions/4468361/search-all-of-git-history-for-string

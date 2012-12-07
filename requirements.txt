@@ -2,3 +2,6 @@ IPython==0.10
 demjson
 pyflakes
 asciitable
+#pynotify
+#dulwhich
+#vcs
