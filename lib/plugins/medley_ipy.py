@@ -83,40 +83,6 @@ import os
 opj=os.path.join
 from IPython.macro import Macro
 
-def load_three_venv_macros():
-    """ chains to three_venv_cmd()) """
-    macro = Macro("__IPYTHON__.three('vm', _margv[0])")
-    __IPYTHON__.shell.user_ns.update(dict(vm = macro))
-    macro = Macro("__IPYTHON__.three('rs')")
-    __IPYTHON__.shell.user_ns.update(dict(rs = macro))
-
-    cmd  = '! cd ' + os.path.join(os.environ['VIRTUAL_ENV'],'src','storyville','solr')
-    cmd += '; kill -KILL `cat solr.pid`; sleep 3'
-    cmd += '; ./run-solr.sh& echo $!>solr.pid'
-    __IPYTHON__.shell.user_ns.update(dict(solr = Macro(cmd)))
-    __IPYTHON__.shell.user_ns.update(dict(review = Macro("three('review')")))
-
-    def three_venv_cmd(*cmd):
-        """ proxy to three_venv.sh """
-        cmd = ' '.join(map(str, cmd))
-        tmp = os.environ.get('CMG_LOCAL_VIRTUALENV_VERSION',None)
-        if tmp:
-            del os.environ['CMG_LOCAL_VIRTUALENV_VERSION']
-
-        try:
-
-            jd = os.environ['JD_DIR'] if 'JD_DIR' in os.environ else \
-                 __IPYTHON__.user_ns['proj']._paths['jellydoughnut']
-            three_venv = os.path.join(jd, 'three_venv.sh')
-
-            os.system('bash -c "source ' + three_venv + '; ' + cmd + '"')
-        finally:
-            if tmp:
-                os.environ['CMG_LOCAL_VIRTUALENV_VERSION'] = tmp
-
-    __IPYTHON__.shell.three = three_venv_cmd
-    __IPYTHON__.shell.user_ns.update(three=three_venv_cmd)
-
 def load_utest_macros():
     """ macro for utesting that features much better tab
         completion than bash: supports dotpaths as well
@@ -197,21 +163,50 @@ def load_medley_customizations2():
         environments.  these use os.environ and can't
         work until after a VENV is activated.
     """
-    manager = __IPYTHON__.user_ns['proj']
-    report.medley_customization("binding new subprojects: "
-                                "medley-templates, storyville, ellington,")
-
-    #manager.bind(os.environ.get('JD_DIR','~/jellydoughnut'), 'jd')
+    from smashlib import PROJECTS as proj
     src_dir = opj(os.environ['VIRTUAL_ENV'], 'src')
     storyville_dir = opj(src_dir, 'storyville')
-    medley_dir     = opj(storyville_dir, 'medley')
     sys.path.append(storyville_dir)
+    #TODO: these should be bookmarks.
+    #medley_dir     = opj(storyville_dir, 'medley')
     #manager.bind(medley_dir,    'medley')
     #manager.bind(opj(src_dir, 'ellington',        'ellington'), 'ellington')
     #manager.bind(opj(src_dir, 'medley-templates', 'templates'), 'mtemplates')
     #manager._ipy_install()
     report.medley_customization('loading three-venv macros')
-    load_three_venv_macros()
+
+    plugin = Plugin()
+    plugin.contribute('vm',
+                      Macro("__IPYTHON__.three('vm', _margv[0])")))
+    plugin.contribute('rs', Macro("__IPYTHON__.three('rs')"))
+    plugin.contribute('review', Macro("__IPYTHON__.three('review')"))
+    cmd  = '! cd ' + os.path.join(os.environ['VIRTUAL_ENV'],'src','storyville','solr')
+    cmd += '; kill -KILL `cat solr.pid`; sleep 3'
+    cmd += '; ./run-solr.sh& echo $!>solr.pid'
+    plugin.contribute('solr',  Macro(cmd))
+
+    def three_venv_cmd(*cmd):
+        """ proxy to three_venv.sh """
+        cmd = ' '.join(map(str, cmd))
+        tmp = os.environ.get('CMG_LOCAL_VIRTUALENV_VERSION',None)
+        if tmp:
+            del os.environ['CMG_LOCAL_VIRTUALENV_VERSION']
+
+        try:
+
+            jd = os.environ['JD_DIR'] if 'JD_DIR' in os.environ else \
+                 __IPYTHON__.user_ns['proj']._paths['jellydoughnut']
+            three_venv = os.path.join(jd, 'three_venv.sh')
+
+            os.system('bash -c "source ' + three_venv + '; ' + cmd + '"')
+        finally:
+            if tmp:
+                os.environ['CMG_LOCAL_VIRTUALENV_VERSION'] = tmp
+
+    __IPYTHON__.shell.three = three_venv_cmd
+    __IPYTHON__.shell.user_ns.update(three=three_venv_cmd)
+
+
     if not os.environ.get('DJANGO_SETTINGS_MODULE'):
         os.environ['DJANGO_SETTINGS_MODULE'] = 'storyville.conf.local'
 
@@ -236,18 +231,26 @@ def load_medley_customizations2():
     settings.DATABASES['default']['PORT'] = port
     os.environ['CMG_LOCAL_VENV_VERSION']='1'
 
-
 from smashlib.plugins import SmashPlugin
 
 class Plugin(SmashPlugin):
 
     def install(self):
-        self.contribute('engage', 'engage')
+        """ fixme: none of this will be uninstalled.. """
+        def jira(*args):
+            import webbrowser
+            page = 'https://jira.cmgdigital.com/browse/{0}'.format(*args)
+            webbrowser.open_new_tab(page)
+            return page
+        self.contribute_magic('jira', jira)
+
+        from smashlib import ALIASES as aliases
         report.msh('installing medley support')
-        __IPYTHON__.magic_alias('d dad')
-        __IPYTHON__.magic_alias('ctest dad create_test_template '
-                                '--settings=storyville.conf.utest_template')
-        __IPYTHON__.shell.user_ns.update(engage=engage,)
+        aliases.add('d dad', '__medley__')
+        ctest=('ctest dad create_test_template '
+               '--settings=storyville.conf.utest_template')
+        aliases.add(ctest,'__medley__')
+        self.contribute('engage', engage)
 
     ip = IPython.ipapi.get()
 
