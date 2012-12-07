@@ -1,19 +1,19 @@
 """ medley_ipy
 """
 
-import os
+import os, sys
 
-import IPython.ipapi
 from IPython import ColorANSI
-from IPython.genutils import Term
-from ipy_stock_completers import moduleCompletion
+from IPython.macro import Macro
+from smashlib.util import report
 from smashlib.plugins import SmashPlugin
 
-tc = ColorANSI.TermColors()
+opj = os.path.join
+tc  = ColorANSI.TermColors()
+
 usage = """
 Hybrid IPython / bash environment tailored for medley development.
   1) IPython extensions:
-    fab-file integration:
 
     project manager:
 
@@ -28,11 +28,6 @@ Hybrid IPython / bash environment tailored for medley development.
 
       # opens up munin's celery graphs for FE-5
       >>> show.munin.celery._5
-
-  2) Extra completions:
-    via ipy_git_completers:
-      * git checkout <branch>
-      * git <subcommand>
 """
 
 border  = '{yellow}'+"-"*80+'{normal}'
@@ -79,34 +74,14 @@ medley_admin_doc = border + """{red}
 """.format(red=tc.Red, normal=tc.Normal) + border
 
 
-import os
-opj=os.path.join
-from IPython.macro import Macro
-
-def load_utest_macros():
-    """ macro for utesting that features much better tab
-        completion than bash: supports dotpaths as well
-        as file-names.
-
-        FIXME this should be magic, not macro..
-    """
-    dad_test = '!django-admin.py test ' + \
-               '${getattr(_margv[0],"__name__",_margv[0])} ' + \
-               '--settings=storyville.conf.utest_template ' + \
-               '--noinput --verbosity=2'
-    __IPYTHON__.shell.user_ns.update(dict(test=Macro(dad_test)))
-
 class L(object):
     """ various lazy stuff.. some of this is experimental """
 
     @property
-    def appcache(self):
-        from django.db.models.loading import AppCache
-        return AppCache()
-
-    @property
     def apps(self):
-        return self.appcache.get_apps()
+        from django.db.models.loading import AppCache
+        appcache = AppCache()
+        return appcache.get_apps()
 
     @property
     def app_dirs(self):
@@ -151,12 +126,12 @@ class L(object):
         """ Helper to get all the models in a dictionary.
             NOTE: this triggers django autodiscovery, obv
         """
+        from django.db.models.loading import AppCache
+        appcache = AppCache()
         return dict( [ [ m.__name__, m] \
-                       for m in L.appcache.get_models() ] )
+                       for m in appcache.get_models() ] )
 L = L()
 
-import sys
-from smashlib.util import report
 
 def load_medley_customizations2():
     """ post-activation instructions for medley-related
@@ -167,14 +142,7 @@ def load_medley_customizations2():
     src_dir = opj(os.environ['VIRTUAL_ENV'], 'src')
     storyville_dir = opj(src_dir, 'storyville')
     sys.path.append(storyville_dir)
-    #TODO: these should be bookmarks.
-    #medley_dir     = opj(storyville_dir, 'medley')
-    #manager.bind(medley_dir,    'medley')
-    #manager.bind(opj(src_dir, 'ellington',        'ellington'), 'ellington')
-    #manager.bind(opj(src_dir, 'medley-templates', 'templates'), 'mtemplates')
-    #manager._ipy_install()
     report.medley_customization('loading three-venv macros')
-
     plugin = SmashPlugin()
     plugin.contribute('vm',
                       Macro("__IPYTHON__.three('vm', _margv[0])"))
@@ -204,7 +172,6 @@ def load_medley_customizations2():
     __IPYTHON__.shell.three = three_venv_cmd
     plugin.contribute('three', three_venv_cmd)
 
-
     if not os.environ.get('DJANGO_SETTINGS_MODULE'):
         os.environ['DJANGO_SETTINGS_MODULE'] = 'storyville.conf.local'
 
@@ -227,9 +194,7 @@ def load_medley_customizations2():
     report.medleys_customization('modding settings.DATABASES[default][port]]')
     from django.conf import settings
     settings.DATABASES['default']['PORT'] = port
-    os.environ['CMG_LOCAL_VENV_VERSION']='1'
-
-from smashlib.plugins import SmashPlugin
+    os.environ['CMG_LOCAL_VENV_VERSION'] = '1'
 
 class Plugin(SmashPlugin):
 
@@ -248,29 +213,14 @@ class Plugin(SmashPlugin):
         ctest=('ctest dad create_test_template '
                '--settings=storyville.conf.utest_template')
         aliases.add(ctest,'__medley__')
-        self.contribute('engage', engage)
+        self.contribute('engage', Engage())
+        dad_test = '!django-admin.py test ' + \
+                   '${getattr(_margv[0],"__name__",_margv[0])} ' + \
+                   '--settings=storyville.conf.utest_template ' + \
+                   '--noinput --verbosity=2'
+        self.contribute('test', Macro(dad_test))
 
-    ip = IPython.ipapi.get()
-
-def load_medley_customizations():
-    Plugin().install()
-    """
-    # django-specific
-    def test_completer(self, event):
-        event = event.copy()
-        line = event.line.split()
-        line = line[line.index('test'):]
-        event.line = ' '.join(['from'] + line[1:])
-        print event.line
-        event.command = 'from'
-        return moduleCompletion(event.line)
-
-
-    ip.set_hook('complete_command', test_completer, str_key = 'test')
-    """
-    load_utest_macros()
-
-from smashlib.plugins import SmashPlugin
+def load_medley_customizations(): Plugin().install()
 
 class Engage(object):
     """ """
@@ -292,16 +242,6 @@ class Engage(object):
                 setattr(model, 'reindex',
                         lambda self: reindex_it(self))
 
-        """
-        apps = list(set([ tmp[1]._meta.app_label for tmp in lst]))
-        the_test = lambda m: m._meta.app_label==app_label
-        models_by_app = dict([ [app_label,
-                                filter(the_test,
-                                       [x[1] for x in lst])] \
-                               for app_label in apps ])
-
-        self._update(dict(_model_dct=models_by_app))
-        """
         from django.contrib.sites.models import Site
         plugin.contribute('site', Site)
         plugin.contribute('Site', Site)
@@ -309,8 +249,7 @@ class Engage(object):
 
     @property
     def medley_admin(self):
-        """
-        """
+        """ """
         plugin = SmashPlugin()
         from django.contrib.admin import site, autodiscover;
         autodiscover()
@@ -323,6 +262,7 @@ class Engage(object):
         plugin.contribute('_admin_dct',admins_by_app)
         print medley_admin_doc
 
+    @property
     def api(self):
         plugin = SmashPlugin()
         print api_doc
@@ -330,31 +270,19 @@ class Engage(object):
         # trigger some of the autodiscovery
         import medley.api.urls
 
+        plugin.ifloat_names(['haystack.models.SearchResult',
+                             'medley.medley_search.query.MedleySearchQuerySet',
+                             'medley.medley_search.query.SearchQuerySet',
+                             'medley.extensions.search_indexes.SolrAPICommonFieldIndex'])
+
+        from medley.util.testing import RequestFactory
+        plugin.contribute('requestfactory', RequestFactory())
+
         # triple-api import deprecated soon..
         try:
-            from medley.api.api import api
-        except ImportError:
-            from medley.api.site import api
-        from medley.extensions.search_indexes \
-             import SolrAPICommonFieldIndex
-
-        from haystack.models import SearchResult
-        from medley.util.testing import RequestFactory
-        from medley.medley_search.query import MedleySearchQuerySet
-        from medley.medley_search.query import SearchQuerySet
-
-        ctx = dict(api=api,
-                   searchresult=SearchResult,
-                   SearchResult=SearchResult,
-                   requestfactory=RequestFactory(),
-                   hregistry=api.model_map,
-                   aregistry=api._registry,
-                   SolrAPICommonFieldIndex=SolrAPICommonFieldIndex,
-                   MedleySearchQuerySet=MedleySearchQuerySet,
-                   medleysearchqueryset=MedleySearchQuerySet,
-                   SearchQuerySet=SearchQuerySet,
-                   searchqueryset=SearchQuerySet,
-                   )
-        [ plugin.contribute(k,v) for k,v in ctx.items() ]
-
-engage = Engage()
+            api = plugin.float_name('medley.api.api.api')
+        except:
+            api = plugin.float_name('medley.api.site.api')
+        plugin.contribute('api',api)
+        plugin.contribute('hregistry', api.model_map)
+        plugin.contribute('aregistry',api._registry)

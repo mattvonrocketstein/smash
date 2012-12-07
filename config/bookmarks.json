@@ -9,7 +9,9 @@
     //   NOTE: __smash__ namespace is special; these bookmarks will
     //    stay registered regardless of the currently active project
     "__smash__":
-        [ 'rprogramming http://reddit.com/r/programming' ],
+        [ 'rprogramming http://reddit.com/r/programming',
+          'dojo http://dojo.robotninja.org',
+          'notes http://dojo.robotninja.org/notes'],
 
     "cms_tango":
         ['hudson    https://hudson.cmgdigital.com/',
