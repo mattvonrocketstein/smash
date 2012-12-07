@@ -175,9 +175,9 @@ def load_medley_customizations2():
     #manager._ipy_install()
     report.medley_customization('loading three-venv macros')
 
-    plugin = Plugin()
+    plugin = SmashPlugin()
     plugin.contribute('vm',
-                      Macro("__IPYTHON__.three('vm', _margv[0])")))
+                      Macro("__IPYTHON__.three('vm', _margv[0])"))
     plugin.contribute('rs', Macro("__IPYTHON__.three('rs')"))
     plugin.contribute('review', Macro("__IPYTHON__.three('review')"))
     cmd  = '! cd ' + os.path.join(os.environ['VIRTUAL_ENV'],'src','storyville','solr')
@@ -191,9 +191,7 @@ def load_medley_customizations2():
         tmp = os.environ.get('CMG_LOCAL_VIRTUALENV_VERSION',None)
         if tmp:
             del os.environ['CMG_LOCAL_VIRTUALENV_VERSION']
-
         try:
-
             jd = os.environ['JD_DIR'] if 'JD_DIR' in os.environ else \
                  __IPYTHON__.user_ns['proj']._paths['jellydoughnut']
             three_venv = os.path.join(jd, 'three_venv.sh')
@@ -204,7 +202,7 @@ def load_medley_customizations2():
                 os.environ['CMG_LOCAL_VIRTUALENV_VERSION'] = tmp
 
     __IPYTHON__.shell.three = three_venv_cmd
-    __IPYTHON__.shell.user_ns.update(three=three_venv_cmd)
+    plugin.contribute('three', three_venv_cmd)
 
 
     if not os.environ.get('DJANGO_SETTINGS_MODULE'):
@@ -277,39 +275,24 @@ from smashlib.plugins import SmashPlugin
 class Engage(object):
     """ """
     @property
-    def standard(self):
-        # the usual suspects
-        import medley
-        import storyville
-        import ellington
-        from inspect import getfile
-        self._update(dict(medley=medley,
-                          getfile=getfile,
-                          storyville=storyville,
-                          ellington=ellington))
-
-    @property
     def medley_models(self):
         """ """
-        lst = [ [model.__name__, model] for _, model in L.models.items() \
-                if model.__module__.startswith('medley') ]
-        self._update(dict(lst))
-
-        lst = map(lambda x: [x[0].lower(),x[1]],lst)
-        self._update(dict(lst))
-
-        just_models = [ x[1] for x in lst ]
-        map(lambda mdl: setattr(mdl, 'o', mdl.objects),
-            just_models)
         def reindex_it(self):
+            "in master one day.."
             from medley.ellington_overrides.search.tasks import HaystackUpdateTask
             h = HaystackUpdateTask()
             h.taskfunc(self.__class__, pk_list=[self.id])
 
-        map(lambda mdl: setattr(mdl, 'reindex',
-                                lambda self: reindex_it(self)),
-            just_models)
+        plugin = SmashPlugin()
+        for _, model in L.models.items():
+            if model.__module__.startswith('medley'):
+                plugin.contribute(model.__name__, model)
+                plugin.contribute(model.__name__.lower(), model)
+                setattr(model, 'o', model.objects)
+                setattr(model, 'reindex',
+                        lambda self: reindex_it(self))
 
+        """
         apps = list(set([ tmp[1]._meta.app_label for tmp in lst]))
         the_test = lambda m: m._meta.app_label==app_label
         models_by_app = dict([ [app_label,
@@ -318,14 +301,17 @@ class Engage(object):
                                for app_label in apps ])
 
         self._update(dict(_model_dct=models_by_app))
+        """
         from django.contrib.sites.models import Site
-        self._update(dict(site=Site, Site=Site))
+        plugin.contribute('site', Site)
+        plugin.contribute('Site', Site)
         print medley_doc
 
     @property
     def medley_admin(self):
         """
         """
+        plugin = SmashPlugin()
         from django.contrib.admin import site, autodiscover;
         autodiscover()
         admins_by_app = {}
@@ -334,10 +320,11 @@ class Engage(object):
                 app = admin.model._meta.app_label
                 if app in admins_by_app: admins_by_app[app] += [admin]
                 else: admins_by_app[app] = [ admin ]
-        self._update(dict(_admin_dct=admins_by_app))
-        #print medley_admin_doc
+        plugin.contribute('_admin_dct',admins_by_app)
+        print medley_admin_doc
 
     def api(self):
+        plugin = SmashPlugin()
         print api_doc
 
         # trigger some of the autodiscovery
@@ -355,6 +342,7 @@ class Engage(object):
         from medley.util.testing import RequestFactory
         from medley.medley_search.query import MedleySearchQuerySet
         from medley.medley_search.query import SearchQuerySet
+
         ctx = dict(api=api,
                    searchresult=SearchResult,
                    SearchResult=SearchResult,
@@ -367,12 +355,6 @@ class Engage(object):
                    SearchQuerySet=SearchQuerySet,
                    searchqueryset=SearchQuerySet,
                    )
-        self._update(ctx)
+        [ plugin.contribute(k,v) for k,v in ctx.items() ]
 
-    def _update(self, ctx):
-        """ this actually effects the namespace mangling,
-            overwriting anything that might already be
-            there
-        """
-        __IPYTHON__.shell.user_ns.update(ctx)
 engage = Engage()
