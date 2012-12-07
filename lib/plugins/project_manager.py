@@ -6,13 +6,44 @@
 import os
 import demjson
 
-from smashlib.util import report
+from smashlib.util import report, list2table
 from smashlib.python import opd, opj
 from smashlib.plugins import SmashPlugin
 from smashlib.util import post_hook_for_magic
 from smashlib.projects import Project, ROOT_PROJECT_NAME, COMMAND_NAME
 
 CONFIG_FILE_NAME = 'projects.json'
+
+class CurrentProject(object):
+    @property
+    def wd(self):
+        return os.getcwd()
+
+    @property
+    def _aliases(self):
+        from smashlib import ALIASES as aliases
+        return aliases
+
+    @property
+    def __doc__(self):
+        from smashlib import PROJECTS as proj
+        current_project = proj.CURRENT_PROJECT
+        header, dat = proj._doc_helper([current_project])
+        out = "This Project:\n\n{0}".format(list2table(dat, header=header))
+        header = 'group shortcut command '.split()
+        dat = []
+        for alias in self._aliases:
+            group = alias.affiliation
+            shortcut = alias.alias.split()[0]
+            cmd = ' '.join(alias.alias.split()[1:])
+            if len(cmd) > 25:
+                cmd=cmd.strip()[:25]+' ..'
+            dat.append([group,shortcut,cmd])
+
+        out+= "\n\nProject Aliases:\n\n{0}".format(list2table(dat, header=header))
+        return out
+
+
 
 class Plugin(SmashPlugin):
 
@@ -28,8 +59,9 @@ class Plugin(SmashPlugin):
 
     @staticmethod
     def load_aliases(config):
+        """ this only loads default aliases.  everything else is handled on activation """
         default_aliases = config.get('aliases', {}).get(ROOT_PROJECT_NAME, [])
-        from smashlib import aliases
+        from smashlib import ALIASES as aliases
         default_aliases = [ aliases.add(alias) for alias in default_aliases ]
         report.project_manager('adding aliases: ' + str(default_aliases))
         aliases.install()
@@ -89,3 +121,5 @@ class Plugin(SmashPlugin):
 
         __IPYTHON__.hooks['shutdown_hook'].add(lambda: manager.shutdown())
         __IPYTHON__.hooks['pre_prompt_hook'].add(manager.check)
+        smashlib.PROJECTS = manager
+        self.contribute('this',CurrentProject())

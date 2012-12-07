@@ -34,8 +34,9 @@ of the box it is not fit for normal use.
 Smash is the best of both worlds
 ================================
 
-What is needed is an environment that functions simultaneously as a shell and a sort of sketchbook
-for programming.  The ``pysh`` profile for IPython already functions as a sort of Python / Bash chimera:
+What is needed is an environment that functions simultaneously as a shell and a
+sort of sketchbook for programming.  The ``pysh`` profile for IPython already
+functions as a sort of Python / Bash chimera:
 
   - Simple: all the simplicity of bash when you want it
   - Flexible: all the power of a RealProgrammingLanguage(tm) when you need it
@@ -49,11 +50,12 @@ for programming.  The ``pysh`` profile for IPython already functions as a sort o
 Smash is Extensible
 ===================
 
-Smash is built on top of pysh, and actually has very little core functionality. Most of what it does
-happens through plugins.  Apart from what the bash/python hybrid features that come from pysh, Smash
-also inherits all the flexibility of IPython in terms of I/O hooks and pre/post processing.  So go
-nuts with your domain specific language or ruby's pry shell or go attach a lisp-lua-node runtime
-onto this frankenstein bananaphone piano, see if I care.
+Smash is built on top of pysh, and actually has very little core functionality.
+Most of what it does happens through plugins.  Apart from what the bash/python
+hybrid features that come from pysh, Smash also inherits all the flexibility of
+IPython in terms of I/O hooks and pre/post processing.  So go nuts with your
+domain specific language or ruby's pry shell or go attach a lisp-lua-node
+runtime onto this frankenstein bananaphone piano, see if I care.
 
 ==========
 Smash Core
@@ -124,10 +126,13 @@ Git VCS Integration:
 Python Specific Plugins for Smash
 =================================
 
-Pip completers
---------------
-  - tab-completion over the standard pip subcommands
-  - tab-completion over contents of requirements.txt if it's in the working directory
+Misc extra completers
+---------------------
+  - Completers for accessing python dictionaries
+  - Completers for setup.py
+  - Pip completers
+    - tab-completion over the standard pip subcommands
+    - tab-completion over contents of requirements.txt if it's in the working directory
 
 
 Virtual-Environments:

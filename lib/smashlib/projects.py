@@ -48,11 +48,9 @@ class Project(VenvMixin, Hooks):
     notifiers = []
     _post_activate = defaultdict(lambda: [])
 
-    @property
-    def __doc__(self):
-        """ """
+    def _doc_helper(self, path_subset):
         dat = []
-        for x in self._paths:
+        for x in path_subset:
             fpath         = self._paths[x]
             trunc_fpath   = truncate_fpath(fpath) # ~ replace
             contains_venv = _contains_venv(fpath) or 'N/A'
@@ -60,13 +58,20 @@ class Project(VenvMixin, Hooks):
             vcs = which_vcs(fpath)
             dat.append([x, trunc_fpath, contains_venv, vcs])
         header = ['name', 'path', 'virtualenv', 'vcs']
+        return header,dat
+
+    @property
+    def __doc__(self):
+        header, dat = self._doc_helper(self._paths)
         return """Projects:\n\n""" + list2table(dat, header=header)
 
     @property
     def CURRENT_PROJECT(self):
         """ FIXME: makes no distinction for whether it's activated, though """
         _dir = os.getcwd()
+        _venv = os.environ.get('VIRTUAL_ENV')
         for name,path in self._paths.items():
+            if _venv and _venv.startswith(path): return name
             if path == _dir: return name
         return None
 
@@ -101,15 +106,14 @@ class Project(VenvMixin, Hooks):
                                                          name=os.path.split(_dir)[1])
             report('  To activate it: '+cmd)
 
-    @property
+    """ @property
     def aliases(self):
-        """ """
-        from smashlib.aliases import Aliases
+        from smashlib import ALIASES as aliases
         aliases = self._config.get('aliases', {})
         local_aliases = aliases.get(self.name, [])
         out = Aliases()
-        [ out.add(alias, self.name) for alias in local_aliases ]
-        return out
+        [ aliases.add(alias, self.name) for alias in local_aliases ]
+        return out"""
 
     @classmethod
     def _add_post_activate(kls, name, something):
@@ -166,13 +170,21 @@ class Project(VenvMixin, Hooks):
         def invoke(self):
             """ FIXME: yeah this is a pretty awful hack..
             """
+            from smashlib import ALIASES as aliases
+            if self.CURRENT_PROJECT:
+                old_aliases = aliases[self.CURRENT_PROJECT]
+                count = [ aliases.uninstall(a) for a in old_aliases ]
+                if count:
+                    self.report("removed {0} aliases from the previous project".format(len(count)))
+
+            new_aliases = self._config.get('aliases',{}).get(name,[])
+            [ aliases.add(a, name) for a in new_aliases]
             p = Project(name)
             p.dir = _dir
             p._config = self._config
             [ f() for f in self._pre_invokage[name] ]
             os.chdir(p.dir)
             [ f() for f in self._post_invokage[name] + post_invoke ]
-            p.aliases.install()
             return p
 
         setattr(kls, name, invoke)
