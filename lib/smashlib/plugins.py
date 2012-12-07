@@ -159,6 +159,7 @@ class Plugins(object):
         import smashlib
         smashlib.PLUGINS = self._plugins
 
+from smashlib.reflect import namedAny
 class SmashPlugin(object):
     """ TODO: ... """
 
@@ -175,17 +176,32 @@ class SmashPlugin(object):
         self.verify_requirements()
         self.install()
 
-    def contribute(self,name,val):
+    def float_names(self, names):
+        return [ self.float_name(name) for name in names ]
+    def ifloat_names(self, names):
+        return [ self.ifloat_name(name) for name in names ]
+
+    def ifloat_name(self, name):
+        return self.icontribute(name.split('.')[-1], namedAny(name))
+    def float_name(self, name):
+        return self.contribute(name.split('.')[-1], namedAny(name))
+
+    def icontribute(self,name,val):
+        return self.contribute(name,val,case_sensitive=False)
+    def contribute(self, name, val, case_sensitive=True):
         """ contribute name/val to IPython shells' namespace """
         if name in __IPYTHON__.user_ns:
             msg = ('"{0}" variable is taken in user namespace.  '
                    'refusing to proceed').format(name)
             report.plugin(msg)
         else:
-            __IPYTHON__.user_ns.update(**{name:val})
+            ctx = {name:val}
+            if not case_sensitive: ctx.update({name.lower():val})
+            __IPYTHON__.user_ns.update(**ctx)
             msg = ("finished installing.  "
                    "type '{0}?' for help with search").format(name)
             report.plugin(msg)
+        return val
 
     def contribute_magic(self, name, func):
         if name.startswith('magic_'):
