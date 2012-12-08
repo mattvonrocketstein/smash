@@ -6,23 +6,35 @@
 "instructions":
     [ ["bind_all", ["~/code"],          {}],
       ["bind",     ["~/jellydoughnut"], {}],
-      ["bind_all",[ '~/devel'],
-       {'post_activate':'medley_ipy.load_medley_customizations2',
-        'post_invoke':'medley_ipy.load_medley_customizations'}]],
+      ["bind_all", [ '~/devel'],
+       {'post_activate' : 'medley_ipy.load_medley_customizations2',
+        'post_invoke'   : 'medley_ipy.load_medley_customizations'}]],
 
 //
 // "aliases" section represents per-project alias entries.
 // the format is {"project_name": ["cmd_alias the_real --command goes_here", .. ] }
 //
-//   NOTE: __smash__ group is special; these aliases are never unregistered,
-//         even when you switch to a new project, however, the new project
-//         can override them.
+//   NOTE:
+//    the __smash__ group is special; these aliases are never
+//    explicitly unregistered, even when you switch to a new
+//    project, however, if the new project mentions the same
+//    alias, the old one will be overwritten.
 //
 'aliases':
-    { '__smash__': [ 'dhclient sudo dhclient',
-                    'apt-get sudo apt-get',
-                    'dad django-admin.py',
-                    'ls ls --color=auto' ],
-      'cms_tango':  [ 'irc irssi -c work', ]
+    { '__smash__':
+      [ 'dhclient sudo dhclient',
+        'top5 ps -eo user,pcpu,pid,cmd | sort -r -k2 | head -6',
+        'l ls -la --color',
+        'ls ls --color=auto',
+        'apt-get sudo apt-get',
+        'plusx chmog ugo+x',
+        'aupdate sudo apt-get update',
+        'acache sudo apt-cache search',
+        'ainstall sudo apt-get install',
+        'ubuntuversion cat /etc/lsb-release',
+        'irc xchat -d ~/code/dotfiles/xchat_default' ],
+      'cms_tango':
+      [ 'irc xchat -d ~/code/dotfiles/xchat_work',
+        'dad django-admin.py',]
     }
 }

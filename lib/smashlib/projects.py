@@ -26,7 +26,7 @@ class Hooks(object):
 
     def shutdown(self):
         """ NB: this method will be used as an ipython hook """
-        report('shutting down')
+        report.project_manager('shutting down')
         [ x.stop() for x in self.watchlist ]
         #raise ipapi.TryNext()
 
