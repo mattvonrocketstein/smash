@@ -83,6 +83,9 @@ class Reporter(object):
 
 report = Reporter()
 
+def add_shutdown_hook(f):
+    __IPYTHON__.hooks['shutdown_hook'].add(f)
+
 import threading
 def die():
     """

@@ -9,7 +9,7 @@ import demjson
 from smashlib.util import report, list2table
 from smashlib.python import opd, opj
 from smashlib.plugins import SmashPlugin
-from smashlib.util import post_hook_for_magic
+from smashlib.util import post_hook_for_magic, add_shutdown_hook
 from smashlib.projects import Project, ROOT_PROJECT_NAME, COMMAND_NAME
 
 CONFIG_FILE_NAME = 'projects.json'
@@ -93,12 +93,11 @@ class Plugin(SmashPlugin):
         manager = Project(ROOT_PROJECT_NAME)
 
         # dont move this next line.  post_activate/post_invoke things might want the manager.
-        __IPYTHON__.shell.user_ns[COMMAND_NAME] = manager
+        self.contribute(COMMAND_NAME, manager)
 
         manager._config = config
         for name, val in config.get('post_activate', {}).items():
             manager._add_post_activate(name, val)
-
 
         KNOWN_EVENT_TYPES = 'file-post-change'.split()
         for project_name,watchdog_config in config.get('watchdog', {}).items():
@@ -126,7 +125,8 @@ class Plugin(SmashPlugin):
         # FIXME: this stopped working
         post_hook_for_magic('cd', manager._announce_if_project)
 
-        __IPYTHON__.hooks['shutdown_hook'].add(lambda: manager.shutdown())
+        add_shutdown_hook(lambda: manager.shutdown())
         __IPYTHON__.hooks['pre_prompt_hook'].add(manager.check)
         smashlib.PROJECTS = manager
         self.contribute('this',CurrentProject())
+
