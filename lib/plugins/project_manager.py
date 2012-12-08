@@ -81,7 +81,14 @@ class Plugin(SmashPlugin):
             config = {}
             report.project_manager(' file does not exist')
         else:
-            config = demjson.decode(open(config_file, 'r').read())
+            with open(config_file, 'r') as fhandle:
+                try: config = demjson.decode(fhandle.read())
+                except demjson.JSONDecodeError,e:
+                    err = "cannot continue, failed to read json file: " + config_file
+                    report.ERROR(err+'\n\n\t' + str(e))
+                    from smashlib.util import die
+                    die()
+                    return # !!
             report.project_manager(' config keys: '+str(config.keys()))
         manager = Project(ROOT_PROJECT_NAME)
 
