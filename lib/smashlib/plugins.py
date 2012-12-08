@@ -80,7 +80,13 @@ class Plugins(object):
     def plugin_data(self):
         """ updates based on files in dir and default schema """
         with open(self.plugins_json_file, 'r') as fhandle:
-            from_file = demjson.decode(fhandle.read())
+            try:
+                from_file = demjson.decode(fhandle.read())
+            except demjson.JSONDecodeError:
+                err="error reading json file: "+self.plugins_json_file
+                report.ERROR(err)
+                import sys
+                sys.exit(err)
         data = from_file.copy()
         for fname in self.possible_plugins:
             if fname not in data:
@@ -150,7 +156,7 @@ class Plugins(object):
             except Exception, e:
                 self.report("ERROR loading plugin @ `" + plugin_file+'`. Exception follows:')
                 self.report('Exception: ')
-                print str([type(e),e])
+                print str([type(e), e])
                 raise
             #else:
             #    self.report('installed '+plugin_file+' ok')
