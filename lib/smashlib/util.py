@@ -2,6 +2,9 @@
 """ smashlib.util
 """
 import os
+import StringIO
+import threading
+
 import asciitable
 
 import IPython
@@ -12,8 +15,10 @@ opj = os.path.join
 ope = os.path.exists
 tc = ColorANSI.TermColors()
 
+def home(): return os.environ['HOME']
+
 def truncate_fpath(fpath):
-    return fpath.replace(os.environ['HOME'], '~')
+    return fpath.replace(home(), '~')
 
 def get_prompt_t():
     """ get the current prompt template """
@@ -27,7 +32,8 @@ def post_hook_for_magic(original_magic_name, new_func):
     """ attach a new post-run hook for an existing magic function """
     #print 'chaining',original_magic_name,new_func
     old_magic = getattr(__IPYTHON__, 'magic_' + original_magic_name)
-    chain = getattr(__IPYTHON__, '_magic_{0}_chain'.format(original_magic_name), [])
+    new_name = '_magic_{0}_chain'.format(original_magic_name)
+    chain = getattr(__IPYTHON__, new_name, [])
     if not chain:
         def new_magic(self, parameter_s=''):
             out = old_magic(parameter_s=parameter_s)
@@ -86,7 +92,6 @@ report = Reporter()
 def add_shutdown_hook(f):
     __IPYTHON__.hooks['shutdown_hook'].add(f)
 
-import threading
 def die():
     """
     FIXME: this is horrible, but i remember thinking i had no choice..
@@ -95,7 +100,6 @@ def die():
     threading.Thread(target=lambda: \
                      os.system('kill -KILL ' + str(os.getpid()))).start()
 
-import StringIO
 def list2table(dat, header=[]):
     if header: dat=[header] + dat
     s = StringIO.StringIO()
