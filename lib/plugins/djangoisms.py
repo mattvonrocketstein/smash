@@ -1,8 +1,4 @@
 """
-
-from django.contrib.sites.models import Site
-ajc=Site.objects.filter(domain='www.ajc.com')
-x.objects.random()
 """
 import os
 opj=os.path.join
@@ -17,11 +13,21 @@ def update_models():
         inject them and their lowercase equivalents
         into the IPython namespace
     """
-def look_for_app():
-    cwd=os.getcwd()
-    if all([ope(opj(cwd,'urls.py')),
-            ope(opj(cwd,'models.py'))]):
-        report.django_magic('detected a django app')
+
+def look_for_project(_dir=None):
+    """ returns True if dir looks like a django project """
+    _dir = _dir or os.getcwd()
+    if all([ope(opj(_dir, 'settings.py')),]):
+        return True
+    return False
+
+def look_for_app(_dir=None):
+    """ returns True if dir looks like a django app"""
+    _dir = _dir or os.getcwd()
+    if all([ope(opj(_dir, 'urls.py')),
+            ope(opj(_dir, 'models.py'))]):
+        return True
+    return False
 
 class Plugin(SmashPlugin):
     requires = []
