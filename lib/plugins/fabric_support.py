@@ -7,7 +7,7 @@
 
 import os
 
-from smashlib.util import post_hook_for_magic
+from smashlib.util import report, post_hook_for_magic
 
 class magic_fabric(object):
     def __init__(self, lazy=True):
@@ -75,7 +75,7 @@ class magic_fabric(object):
 
 def look_for_fabfile():
     if 'fabfile.py' in os.listdir(os.getcwd()):
-        print 'Discovered fabfile.  Type "_fabric?" to list commands'
+        report('Discovered fabfile.  Type "_fabric?" to list commands')
         __IPYTHON__.shell.user_ns.update(_fabric=magic_fabric(lazy=False))
 
 
