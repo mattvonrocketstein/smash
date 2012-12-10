@@ -59,21 +59,31 @@ class VenvMixin(object):
             # TODO: also rehash?
             vbin = to_vbin(venv)
             if vbin in path:
-                self.report('removing old venv bin from PATH', vbin)
+                self.report('removing old venv bin from PATH' + str(vbin))
                 path.remove(vbin)
                 os.environ['PATH'] = ':'.join(path)
 
             # clean sys.path according to python..
             # stupid, but this seems to work
+            import smashlib
             self.report('cleaning sys.path')
-            nn = []
+            new_path = []
             for entry in sys.path:
                 if entry and not entry.startswith(venv):
-                    nn.append(entry)
-            sys.path = nn
+                    new_path.append(entry)
+                else:
+                    if entry.startswith(smashlib.SMASH_DIR) and \
+                       'IPython' in entry:
+                        # careful, dont remove our bootstraps.
+                        # specifically this will break --project=..
+                        # invocation
+                        new_path.append(entry)
+                    else:
+                        #print 'cleaning: ',entry
+                        pass
 
+            sys.path = new_path
             # TODO: clean sys.modules?
-
             return True
 
     @classmethod
@@ -109,17 +119,22 @@ class VenvMixin(object):
             sandbox = dict(__file__ = opj(vbin, 'activate_this.py'))
             execfile(opj(vbin, 'activate_this.py'), sandbox)
 
-            #libraries like 'datetime' can fail on import if this isnt done,
-            #i'm not sure why activate_this.py doesnt accomplish it.
-            dynload = opj(python_dir,'lib-dynload')
+            # libraries like 'datetime' can fail on import if this isnt done,
+            # i'm not sure why activate_this.py doesnt accomplish it.
+            dynload = opj(python_dir, 'lib-dynload')
             sys.path.append(dynload)
 
             # rehash aliases based on $PATH, then
             # reinstall anything else we killed in
             # the rehash
             __IPYTHON__.ipmagic('rehashx')
-            from smashlib import ALIASES as aliases
+            import smashlib
+            aliases = getattr(smashlib, 'ALIASES')
             aliases.install()
+            # FIXME: this should not be here.  need signals or something
+            bookmarks = getattr(smashlib, 'BOOKMARKS')
+            bookmarks._maybe_update()
+
         else:
             self.report('  not a venv.. ' + obj)
             path = _contains_venv(obj)
@@ -154,5 +169,6 @@ class VenvMixin(object):
             #        project_manager.Project vs __smash__.Project
             return self._activate_project(obj)
         else:
-            err = "Don't know how to activate an object like '" + str(type(obj)) + '"'
+            err = "Don't know how to activate an object like '" + \
+                  str(type(obj)) + '"'
             raise RuntimeError, err

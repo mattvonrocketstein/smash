@@ -4,8 +4,10 @@ import os
 import json
 import demjson
 from IPython import ipapi
+
 from smashlib.util import report
 from smashlib.python import opj, ope
+from smashlib.reflect import namedAny
 
 ip = ipapi.get()
 
@@ -22,7 +24,8 @@ class Plugins(object):
     def __init__(self):
         import smashlib
         self.SMASH_DIR = smashlib.SMASH_DIR
-        self.plugins_json_file = os.path.join(smashlib.SMASH_DIR, 'etc', 'plugins.json')
+        self.plugins_json_file = os.path.join(smashlib.SMASH_DIR,
+                                              'etc', 'plugins.json')
         self._plugins = []
         if self.stale_plugins:
             data = self.plugin_data
@@ -154,7 +157,8 @@ class Plugins(object):
             try:
                 self.install_plugin_from_fname(abs_path_to_plugin)
             except Exception, e:
-                self.report("ERROR loading plugin @ `" + plugin_file+'`. Exception follows:')
+                self.report("ERROR loading plugin @ `" + \
+                            plugin_file+'`. Exception follows:')
                 self.report('Exception: ')
                 print str([type(e), e])
                 raise
@@ -165,7 +169,7 @@ class Plugins(object):
         import smashlib
         smashlib.PLUGINS = self._plugins
 
-from smashlib.reflect import namedAny
+
 class SmashPlugin(object):
     """ TODO: ... """
 
@@ -183,16 +187,23 @@ class SmashPlugin(object):
         self.install()
 
     def float_names(self, names):
+        """import names and add them to the global interpretter namespace """
         return [ self.float_name(name) for name in names ]
     def ifloat_names(self, names):
+        """ import names and add them (and their lowercase equivalent)
+            to the global interpretter namespace """
         return [ self.ifloat_name(name) for name in names ]
-
     def ifloat_name(self, name):
+        """ import name and add it (and its lowercase equivalent)
+            to the global interpretter namespace """
         return self.icontribute(name.split('.')[-1], namedAny(name))
     def float_name(self, name):
+        """ import name and add them to the global interpretter namespace """
         return self.contribute(name.split('.')[-1], namedAny(name))
-
     def icontribute(self,name,val):
+        """  contribute name/val (and lowercase equivalent
+             to the global interpretter namespace
+        """
         return self.contribute(name,val,case_sensitive=False)
     def contribute(self, name, val, case_sensitive=True):
         """ contribute name/val to IPython shells' namespace """
@@ -204,9 +215,6 @@ class SmashPlugin(object):
             ctx = {name:val}
             if not case_sensitive: ctx.update({name.lower():val})
             __IPYTHON__.user_ns.update(**ctx)
-            msg = ("finished installing.  "
-                   "type '{0}?' for help with search").format(name)
-            report.plugin(msg)
         return val
 
     def contribute_magic(self, name, func):

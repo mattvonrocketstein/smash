@@ -24,6 +24,7 @@
     { '__smash__':
       [ 'dhclient sudo dhclient',
         'top5 ps -eo user,pcpu,pid,cmd | sort -r -k2 | head -6',
+        'df df-h',
         'l ls -la --color',
         'ls ls --color=auto',
         'apt-get sudo apt-get',
@@ -32,9 +33,11 @@
         'acache sudo apt-cache search',
         'ainstall sudo apt-get install',
         'ubuntuversion cat /etc/lsb-release',
-        'irc xchat -d ~/code/dotfiles/xchat_default' ],
+        //'irc xchat -d ~/code/dotfiles/xchat_default&',
+        'irc irssi -c work',
+        ],
       'cms_tango':
-      [ 'irc xchat -d ~/code/dotfiles/xchat_work',
+      [ 'irc xchat -d ~/code/dotfiles/xchat_work&',
         'dad django-admin.py',]
     }
 }

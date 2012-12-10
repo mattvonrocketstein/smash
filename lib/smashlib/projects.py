@@ -131,39 +131,37 @@ class Project(VenvMixin, Hooks):
             elif isinstance(x, basestring):
                 if x.startswith('$'):
                     func = lambda: os.system(x[1:])
-                    func.__doc__ = 'post-activation command for {0}\n\n:{1}'.format(name, x)
+                    tmp = 'post-activation command for {0}\n\n:{1}'
+                    tmp = tmp.format(name, x)
+                    func.__doc__ = tmp
 
                 # FIXME: ugly and special-cased because __IPY__.system() doesnt work
                 elif x.startswith('cd'):
                     dname = x.split()[-1]
                     func = lambda: os.chdir(dname)
-                    func.__doc__ = 'post-activation command for {0}\n\n:os.chdir(\'{1}\')'.format(name, dname)
-
+                    tmp = 'post-activation command for {0}\n\n:os.chdir(\'{1}\')'
+                    tmp = tmp.format(name, dname)
+                    func.__doc__ = tmp
                 else:
                     func = namedAny(x)
             else:
                 raise Exception,'niy: ' + str(x)
-
             if func not in kls._post_activate[name]:
                 kls._post_activate[name] += [func]
 
     @classmethod
     def bind(kls, _dir, name=None, post_activate=[], post_invoke=[]):
         """ installs a named alias for changing directory to "_dir". """
-
         _dir = expanduser(_dir)
         if name is None:
             name = os.path.split(_dir)[1]
         if not isinstance(post_invoke, list):   post_invoke   = [ post_invoke   ]
         kls._add_post_activate(name, post_activate)
-
         tmp = []
         for x in post_invoke:
             x = namedAny(x) if isinstance(x, (str, unicode)) else x
             tmp.append(x)
         post_invoke = tmp
-
-
         kls._paths[name] = _dir
 
         @property
@@ -175,7 +173,9 @@ class Project(VenvMixin, Hooks):
                 old_aliases = aliases[self.CURRENT_PROJECT]
                 count = [ aliases.uninstall(a) for a in old_aliases ]
                 if count:
-                    self.report("removed {0} aliases from the previous project".format(len(count)))
+                    msg = "removed {0} aliases from the previous project"
+                    msg = msg.format(len(count))
+                    report.project_manager(msg)
 
             new_aliases = self._config.get('aliases',{}).get(name,[])
             [ aliases.add(a, name) for a in new_aliases]
@@ -192,8 +192,7 @@ class Project(VenvMixin, Hooks):
     @classmethod
     def report(kls, *args):
         """ FIXME: use default smash report """
-        report(*args)#if len(args)>1: print colorize('{red}project-manager:{normal}'),args
-        #else: report.project_manager(args[0])
+        report(*args)
 
     @classmethod
     def bind_all(kls, _dir, **kargs):
@@ -211,7 +210,7 @@ class Project(VenvMixin, Hooks):
             if os.path.isdir(tmp):
                 N += 1
                 kls.bind(tmp, name, **kargs)
-        report('binding ' + _dir + ' (' + str(N) + ' projects found)')
+        report.project_manager('binding ' + _dir + ' (' + str(N) + ' projects found)')
 
     def check(self):
         if self.msgs:
@@ -230,8 +229,8 @@ class Project(VenvMixin, Hooks):
             import pyinotify
         except ImportError:
             report("Could not import pyinotify.  You'll need to install "
-                        "it system wide, or activate a venv where it is already "
-                        "installed")
+                   "it system wide, or activate a venv where it is already "
+                   "installed")
             return
         else:
             report("starting watch")

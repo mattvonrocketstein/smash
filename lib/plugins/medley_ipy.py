@@ -11,6 +11,12 @@ from smashlib.plugins import SmashPlugin
 opj = os.path.join
 tc  = ColorANSI.TermColors()
 
+FE_T = 'ssh djaapafes{0}.ddtc.cmgdigital.com -l manderson'
+
+def fe(*args, **kargs):
+    cmd = FE_T.format(*args)
+    __IPYTHON__.system(cmd)
+
 usage = """
 Hybrid IPython / bash environment tailored for medley development.
   1) IPython extensions:
@@ -144,6 +150,7 @@ def load_medley_customizations2():
     sys.path.append(storyville_dir)
     report.medley_customization('loading three-venv macros')
     plugin = SmashPlugin()
+    plugin.contribute_magic('fe', fe)
     plugin.contribute('vm',
                       Macro("__IPYTHON__.three('vm', _margv[0])"))
     plugin.contribute('rs', Macro("__IPYTHON__.three('rs')"))

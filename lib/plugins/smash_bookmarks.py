@@ -1,5 +1,7 @@
+""" bookmarks
 """
-"""
+from __future__ import print_function
+import webbrowser
 
 from collections import defaultdict, namedtuple
 
@@ -10,7 +12,9 @@ from smashlib.util import add_shutdown_hook, post_hook_for_magic
 from smashlib.plugins import SmashPlugin
 from smashlib.aliases import RegistrationList
 
-Bookmark = namedtuple('Bookmark', 'affiliation nickname uri'.split())
+class Bookmark(namedtuple('Bookmark', 'affiliation nickname uri'.split())):
+    def launch(self):
+        webbrowser.open_new_tab(self.uri)
 
 class BookmarkLauncher(property):
     pass
@@ -82,18 +86,22 @@ class Bookmarks(object):
         count = 0
         relevant_groups = self._relevant_context()
         for x in dir(self):
-            obj = getattr(self,x)
+            obj = getattr(self, x)
             if isinstance(obj, BookmarkLauncher):
-                delattr(self, x)
+                delattr(self.__class__,
+                        x)
                 count+=1
         if count:
             msg = 'removed {0} stale bookmarks from the context'
             msg = msg.format(count)
             report.bookmarks(msg)
-        for x in self:
-            if x.affiliation in relevant_groups:
-                setattr(self, x.nickname,
-                        BookmarkLauncher(lambda himself: x.nickname))
+
+        z = [ [x.nickname, lambda p: report(x.uri) ] for x in self ]
+        #if x.affiliation in relevant_groups:
+        for q in z:
+            setattr(self.__class__,
+                    q[0],
+                    BookmarkLauncher(q[1]))
 
 
 class Plugin(SmashPlugin):
