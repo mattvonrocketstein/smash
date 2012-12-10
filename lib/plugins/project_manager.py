@@ -109,14 +109,7 @@ class Plugin(SmashPlugin):
 
         self.load_instructions(manager, config)
 
-        # add option parsing for project-manager
-        from smashlib.parser import SmashParser
-        SmashParser.defer_option(args=('-p', "--project",),
-                                       kargs=dict(
-                                           dest="project", default='',
-                                           help="specify a project to initialize", ),
-                                       handler = lambda opts: getattr(manager,
-                                                                      opts.project).activate)
+
 
         # per-project aliases
         self.load_aliases(config)
@@ -130,3 +123,16 @@ class Plugin(SmashPlugin):
         smashlib.PROJECTS = manager
         self.contribute('this',CurrentProject())
 
+
+        # add option parsing for project-manager
+        from smashlib.parser import SmashParser
+        handler = lambda opts: report('testing')
+        def handler(opts):
+            project = getattr(manager, opts.project)
+            #print 'stiff'
+            project.activate
+        SmashParser.defer_option(args=('-p', "--project",),
+                                       kargs=dict(
+                                           dest="project", default='',
+                                           help="specify a project to initialize", ),
+                                 handler=handler)

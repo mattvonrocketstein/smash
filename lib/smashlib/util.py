@@ -22,11 +22,19 @@ def truncate_fpath(fpath):
 
 def get_prompt_t():
     """ get the current prompt template """
-    return __IPYTHON__.shell.outputcache.prompt1.p_template
+    opc = getattr(__IPYTHON__.shell, 'outputcache', None)
+    if opc:
+        return opc.prompt1.p_template
+    else:
+        return 'error-getting-output-prompt'
+
 
 def set_prompt_t(t):
     """ set the current prompt template """
-    __IPYTHON__.shell.outputcache.prompt1.p_template = t
+    opc = getattr(__IPYTHON__.shell, 'outputcache', None)
+    if opc:
+        opc.prompt1.p_template = t
+
 
 def post_hook_for_magic(original_magic_name, new_func):
     """ attach a new post-run hook for an existing magic function """
