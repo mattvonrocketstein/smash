@@ -20,21 +20,22 @@ def home(): return os.environ['HOME']
 def truncate_fpath(fpath):
     return fpath.replace(home(), '~')
 
-def get_prompt_t():
-    """ get the current prompt template """
-    opc = getattr(__IPYTHON__.shell, 'outputcache', None)
-    if opc:
-        return opc.prompt1.p_template
-    else:
-        return 'error-getting-output-prompt'
-
-
-def set_prompt_t(t):
-    """ set the current prompt template """
-    opc = getattr(__IPYTHON__.shell, 'outputcache', None)
-    if opc:
-        opc.prompt1.p_template = t
-
+class Prompt(object):
+    """ wrapping ipython internals, """
+    def _get_template(self):
+        """ get the current prompt template """
+        opc = getattr(__IPYTHON__.shell, 'outputcache', None)
+        if opc:
+            return opc.prompt1.p_template
+        else:
+            return 'error-getting-output-prompt'
+    def _set_template(self, t):
+        """ set the current prompt template """
+        opc = getattr(__IPYTHON__.shell, 'outputcache', None)
+        if opc:
+            opc.prompt1.p_template = t
+    template = property(_get_template, _set_template)
+prompt = Prompt()
 
 def post_hook_for_magic(original_magic_name, new_func):
     """ attach a new post-run hook for an existing magic function """
