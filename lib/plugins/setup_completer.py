@@ -8,7 +8,7 @@
 """
 
 from smashlib.util import set_complete
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 
 setup_re = 'python.*setup.py'
 

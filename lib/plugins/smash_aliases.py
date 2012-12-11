@@ -3,7 +3,7 @@
     TODO: these aliases may not survive a "rehash" when proj is activated?
 """
 
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 from IPython.Magic import Magic
 
 def install_aliases():

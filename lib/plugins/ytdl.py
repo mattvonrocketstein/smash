@@ -20,7 +20,7 @@ def ytdl(url):
     print '>>>',cmd
     return os.system(cmd)
 
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 
 class Plugin(SmashPlugin):
     def install(self):

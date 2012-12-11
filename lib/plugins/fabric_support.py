@@ -79,7 +79,7 @@ def look_for_fabfile():
         __IPYTHON__.shell.user_ns.update(_fabric=magic_fabric(lazy=False))
 
 
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import set_complete
 
 def fab_completer(self, event):

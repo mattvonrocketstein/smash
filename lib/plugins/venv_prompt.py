@@ -3,7 +3,7 @@
 import os
 from threading import Thread
 from smashlib.util import prompt #get_prompt_t, set_prompt_t
-from smashlib.plugins import Plugins, SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 
 def this_venv():
     result = os.environ.get('VIRTUAL_ENV','')
