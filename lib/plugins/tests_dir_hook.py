@@ -2,7 +2,7 @@
 """
 import os
 
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import report, post_hook_for_magic
 from smashlib.python import only_py_files, opj, ope, glob, getcwd
 

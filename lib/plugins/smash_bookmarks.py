@@ -9,7 +9,7 @@ import smashlib
 from smashlib.projects import Project
 from smashlib.util import report, ope, opj, list2table
 from smashlib.util import add_shutdown_hook, post_hook_for_magic
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 from smashlib.aliases import RegistrationList
 
 class Bookmark(namedtuple('Bookmark', 'affiliation nickname uri'.split())):

@@ -1,12 +1,22 @@
-""" plugin that provides a plugin inspector
+""" plugin_inspector:
+
+      this is a plugin that helps with inspecting other plugins.
+      if this plugin is enabled, type "plugins?" at the prompt
+      for more information.
 """
 import asciitable
 
 import smashlib
-from smashlib.plugins import Plugins, SmashPlugin
+from smashlib.plugin_manager import PluginManager
+from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import list2table
 
-class PluginInspector(Plugins):
+class PluginInspector(PluginManager):
+    """ """
+    def __iter__(self):
+        for x in smashlib.PLUGINS:
+            yield x
+
     @property
     def __doc__(self):
         """ lists all plugins """
@@ -22,6 +32,5 @@ class PluginInspector(Plugins):
                 list2table(dat, header=['name', 'enabled', 'installed'])
 
 class Plugin(SmashPlugin):
-    """ """
     def install(self):
         self.contribute('plugins', PluginInspector())

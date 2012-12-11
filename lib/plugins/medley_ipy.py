@@ -6,7 +6,7 @@ import os, sys
 from IPython import ColorANSI
 from IPython.macro import Macro
 from smashlib.util import report
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 
 opj = os.path.join
 tc  = ColorANSI.TermColors()
@@ -204,6 +204,8 @@ def load_medley_customizations2():
     os.environ['CMG_LOCAL_VENV_VERSION'] = '1'
 
 class Plugin(SmashPlugin):
+
+    requires_plugins = ['djangoisms2']
 
     def install(self):
         """ fixme: none of this will be uninstalled.. """

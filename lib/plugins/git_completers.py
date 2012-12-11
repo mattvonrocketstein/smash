@@ -17,7 +17,7 @@ import os
 import IPython.ipapi
 
 from smashlib.util import report, set_complete
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 
 def uncomitted_files_completer(self, event):
     """ awkward, but cannot find a better way to do this.. """

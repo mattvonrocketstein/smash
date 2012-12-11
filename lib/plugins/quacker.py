@@ -5,7 +5,7 @@
 """
 import threading
 from smashlib.util import report
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 
 class Plugin(SmashPlugin):
     """ TODO: caching, integrate with bookmarks """

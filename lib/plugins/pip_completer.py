@@ -6,7 +6,7 @@
 """
 import os
 
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import report, set_complete
 
 PIP_CMDS = 'bundle freeze help install search uninstall unzip zip'.split()

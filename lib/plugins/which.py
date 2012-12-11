@@ -7,7 +7,7 @@
       3) return the file for module "name", if such a module is available
 """
 import sys, os, inspect
-from smashlib.plugins import Plugins, SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 
 def which(name):
     cmd = os.popen('which '+name).read().strip()

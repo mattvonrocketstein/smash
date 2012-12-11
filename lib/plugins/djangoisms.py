@@ -6,7 +6,7 @@ ope=os.path.exists
 
 from smashlib.projects import Project, COMMAND_NAME
 from smashlib.util import report, post_hook_for_magic
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 
 def update_models():
     """ find all the models in INSTALLED_APPS,

@@ -8,7 +8,7 @@ import demjson
 
 from smashlib.util import report, list2table, die
 from smashlib.python import opd, opj
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import post_hook_for_magic, add_shutdown_hook
 from smashlib.projects import Project, ROOT_PROJECT_NAME, COMMAND_NAME
 

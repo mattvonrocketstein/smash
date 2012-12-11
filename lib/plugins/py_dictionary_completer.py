@@ -2,7 +2,7 @@
 """
 import smashlib
 from smashlib.util import report, ope, opj, set_complete
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 
 def pydict_completer(self,event):
     dotpath_before_dict = event.line[:event.line.find('[')]
