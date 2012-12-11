@@ -2,7 +2,7 @@
 """
 import os
 from threading import Thread
-from smashlib.util import get_prompt_t, set_prompt_t
+from smashlib.util import prompt #get_prompt_t, set_prompt_t
 from smashlib.plugins import Plugins, SmashPlugin
 
 def this_venv():
@@ -21,6 +21,6 @@ class Plugin(SmashPlugin):
             """
             import time; time.sleep(2)
             __IPYTHON__._this_venv = this_venv
-            t = '''${getattr(__IPYTHON__, '_this_venv', lambda: "")()}''' + get_prompt_t()
-            set_prompt_t(t)
+            t = '''${getattr(__IPYTHON__, '_this_venv', lambda: "")()}''' + prompt.template
+            prompt.template = t
         Thread(target=delayed).start()
