@@ -6,7 +6,7 @@
 import os
 import demjson
 
-from smashlib.util import report, list2table
+from smashlib.util import report, list2table, die
 from smashlib.python import opd, opj
 from smashlib.plugins import SmashPlugin
 from smashlib.util import post_hook_for_magic, add_shutdown_hook
@@ -86,7 +86,6 @@ class Plugin(SmashPlugin):
                 except demjson.JSONDecodeError,e:
                     err = "cannot continue, failed to read json file: " + config_file
                     report.ERROR(err+'\n\n\t' + str(e))
-                    from smashlib.util import die
                     die()
                     return # !!
             report.project_manager(' config keys: '+str(config.keys()))
@@ -126,11 +125,12 @@ class Plugin(SmashPlugin):
 
         # add option parsing for project-manager
         from smashlib.parser import SmashParser
-        handler = lambda opts: report('testing')
         def handler(opts):
-            project = getattr(manager, opts.project)
-            #print 'stiff'
-            project.activate
+            project = getattr(manager, opts.project, None)
+            if project is None:
+                report("nonexistant project: {0}".format(opts.project))
+                die()
+            manager._activate(project)
         SmashParser.defer_option(args=('-p', "--project",),
                                        kargs=dict(
                                            dest="project", default='',
