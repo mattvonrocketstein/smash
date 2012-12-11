@@ -188,14 +188,14 @@ def load_medley_customizations2():
     # whenever you try to do anything with django.
 
     try:
-        activate_file = os.path.join(os.environ['VIRTUAL_ENV'],'bin','activate')
+        activate_file = os.path.join(os.environ['VIRTUAL_ENV'], 'bin', 'activate')
         c = open(activate_file).readlines()
         port = [ line for line in c if 'CMG_DB_PORT' in line][0].strip().split('=')[1]
         os.environ['CMG_DB_PORT'] = port
     except Exception,e:
-        report.medley_customization('error setting CMG_DB_PORT from ',activate_file)
+        report.medley_customization('error setting CMG_DB_PORT from ', activate_file)
     else:
-        report.medley_customization('set CMG_DB_PORT='+port)
+        report.medley_customization('set CMG_DB_PORT=' + port)
 
     report.medleys_customization('faking CMG_LOCAL_VENV_VERSION')
     report.medleys_customization('modding settings.DATABASES[default][port]]')
