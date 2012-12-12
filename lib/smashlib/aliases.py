@@ -1,12 +1,14 @@
 """ smashlib.aliases
 """
-from smashlib.smash_plugin import SmashPlugin
+from types import StringTypes
 from collections import defaultdict, namedtuple
+
+from smashlib.smash_plugin import SmashPlugin
+
 
 class Alias(namedtuple('Alias', 'alias affiliation'.split())):
     pass
-#def uninstall(self):
-#       print 'niy'
+
 
 class RegistrationList(list):
     def __repr__(self):
@@ -23,7 +25,7 @@ class RegistrationList(list):
                 out.append(x.alias)
         return out
 
-from types import StringTypes
+
 class Aliases(RegistrationList):
 
     def install(self):

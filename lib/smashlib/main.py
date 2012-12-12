@@ -7,16 +7,35 @@
 import os, sys
 import psutil,os
 
+import demjson
+
 from IPython import ipapi
 
 import smashlib
 from smashlib.parser import SmashParser
 from smashlib.data import OVERRIDE_OPTIONS
 from smashlib.util import clean_namespace, report, die
-from smashlib.util import post_hook_for_magic
+from smashlib.util import post_hook_for_magic, opj, opd
+from smashlib.usage import __doc__ as usage
+from smashlib.util import colorize
 
-opj = os.path.join
-opd = os.path.dirname
+def panic():
+    matches = [ x for x in psutil.process_iter() \
+                if 'smash' in ' '.join(x.cmdline) ]
+    proc = [ x for x in matches if x.pid==os.getpid() ][0]
+    matches.remove(proc)
+    [ m.kill() for m in matches ]
+    proc.kill()
+
+def reinstall_aliases():
+    """ this is here because 'rehash' normally kills
+        aliases. this is better than nothing, because
+        otherwise you even lose color "ls", but it still
+        doesnt quite take into per-project aliases correctly
+    """
+    from smashlib import ALIASES as aliases
+    aliases.install()
+
 VERBOSE   = False
 SMASH_DIR = opd(opd(__file__))
 SMASH_ETC_DIR = opj(SMASH_DIR, 'etc')
@@ -35,29 +54,13 @@ smashlib.SMASH_ETC_DIR = SMASH_ETC_DIR
 smashlib.SMASH_DIR = SMASH_DIR
 plugins = smashlib.PluginManager()
 plugins.install()
-def panic():
-    matches = [ x for x in psutil.process_iter() \
-                if 'smash' in ' '.join(x.cmdline) ]
-    proc = [ x for x in matches if x.pid==os.getpid() ][0]
-    matches.remove(proc)
-    [ m.kill() for m in matches ]
-    proc.kill()
 
 # removes various common namespace collisions between py-modules / shell commands
 clean_namespace()
-def reinstall_aliases():
-    """ this is here because 'rehash' normally kills
-        aliases. this is better than nothing, because
-        otherwise you even lose color "ls", but it still
-        doesnt quite take into per-project aliases correctly
-    """
-    from smashlib import ALIASES as aliases
-    aliases.install()
+
 post_hook_for_magic('rehashx', reinstall_aliases)
-from smashlib.usage import __doc__ as usage
-from smashlib.util import colorize
 __IPYTHON__.usage = colorize(usage)
-import demjson
+
 with open(opj(SMASH_ETC_DIR, 'editor.json')) as fhandle:
     # TODO: test for xwindows so i can actually honor the difference here
     editor_config = demjson.decode(fhandle.read())
