@@ -80,6 +80,7 @@ def subcommands(*args, **kargs):
 class Plugin(SmashPlugin):
     GIT_ALIASES = [ 'grm git rebase -i origin/master',
                     'grc git rebase --continue',
+                    'gra git rebase --abort',
                     'checkout git checkout',
                     'rebase git rebase -i',
                     'gc git commit',
