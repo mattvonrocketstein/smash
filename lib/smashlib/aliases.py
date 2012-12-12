@@ -1,6 +1,6 @@
 """ smashlib.aliases
 """
-from smashlib.plugins import SmashPlugin
+from smashlib.smash_plugin import SmashPlugin
 from collections import defaultdict, namedtuple
 
 class Alias(namedtuple('Alias', 'alias affiliation'.split())):
