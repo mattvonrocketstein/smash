@@ -4,6 +4,8 @@
     TODO: 'requires' is not currently enforced
 """
 import threading
+import urllib2
+import webbrowser
 from smashlib.util import report
 from smashlib.smash_plugin import SmashPlugin
 
@@ -35,23 +37,33 @@ class Plugin(SmashPlugin):
         def __getattr__(self, name):
             return lambda *x: self( *(('!'+name,) + x) )
 
+        @property
+        def pynotify(self):
+            try:
+                import pynotify
+                return pynotify
+            except:
+                return None
+
         def note(self, msg):
-            import pynotify
-            pynotify.init("Test Capabilities")
-            caps = pynotify.get_server_caps()
-            note = pynotify.Notification('Search "{0}" finished'.format(self.last_search), msg)
+            self.pynotify.init("Test Capabilities")
+            caps = self.pynotify.get_server_caps()
+            note = self.pynotify.Notification('Search "{0}" finished'.format(self.last_search), msg)
             return note
 
         def __call__(self, *search_string):
             search_string = ' '.join(search_string)
             self.last_search = search_string
             def func():
-                import webbrowser
                 import duckduckgo
                 result = duckduckgo.query(search_string)
                 if result.type=='exclusive':
                     note = self.note("Opening {0}".format(result.redirect.url))
-                    webbrowser.open_new_tab(result.redirect.url)
+                    try:
+                        webbrowser.open_new_tab(result.redirect.url)
+                    except urllib2.URLError:
+                        note=self.note('caught URLError.  is the internet turned on?')
+                        note.show()
                 else:
                     note   = self.note('type={0} related={1}'.format(result.type, len(result.related)))
                     note.set_timeout(120*1000) # dont auto-hide for two minutes
@@ -63,8 +75,10 @@ class Plugin(SmashPlugin):
                 note.show()
                 __IPYTHON__.user_ns.update(result = result)
                 return result, note
-
-            threading.Thread(target=func).start()
+            if self.pynotify is not None:
+                threading.Thread(target=func).start()
+            else:
+                report('pynotify is not available')
     q = q()
 
     def install(self):
