@@ -55,7 +55,8 @@ def reinstall_aliases():
     aliases.install()
 post_hook_for_magic('rehashx', reinstall_aliases)
 from smashlib.usage import __doc__ as usage
-__IPYTHON__.usage = usage
+from smashlib.util import colorize
+__IPYTHON__.usage = colorize(usage)
 import demjson
 with open(opj(SMASH_ETC_DIR, 'editor.json')) as fhandle:
     # TODO: test for xwindows so i can actually honor the difference here
