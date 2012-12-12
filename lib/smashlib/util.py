@@ -11,6 +11,7 @@ import IPython
 from IPython import ColorANSI
 from IPython.genutils import Term
 
+opd = os.path.dirname
 opj = os.path.join
 ope = os.path.exists
 tc = ColorANSI.TermColors()
