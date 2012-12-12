@@ -33,7 +33,7 @@ sys.argv = sys.argv[1:]
 # CLI parser, because plugins have the option of modifying it.
 smashlib.SMASH_ETC_DIR = SMASH_ETC_DIR
 smashlib.SMASH_DIR = SMASH_DIR
-plugins = smashlib.Plugins()
+plugins = smashlib.PluginManager()
 plugins.install()
 def panic():
     matches = [ x for x in psutil.process_iter() \
