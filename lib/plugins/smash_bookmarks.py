@@ -20,7 +20,21 @@ def bookmarks_cmp(x,y):
 
 class Bookmark(namedtuple('Bookmark', 'affiliation nickname uri'.split())):
     def launch(self):
-        report('woudl have launched: ' + self.uri)
+        import urlparse, os
+        parsed = urlparse.urlparse(self.uri)
+        if parsed.scheme=='ssh':
+            netloc = parsed.netloc
+            if '@' not in netloc:
+                netloc = os.environ['USER']+'@' + netloc
+            user, host=netloc.split('@')
+            cmd_t = 'ssh -l {user} {host}'
+            cmd = cmd_t.format(user=user, host=host)
+            report.executing(cmd)
+            return __IPYTHON__.system(cmd)
+        elif parsed.scheme in 'http https ftp file'.split():
+            return webbrowser.open_new_tab(self.uri)
+        else:
+            report('dont know how to work with {0} scheme yet'.format(parsed.scheme))
 
 class Bookmarks(object):
 

@@ -17,5 +17,6 @@
         ['hudson    https://hudson.cmgdigital.com/',
          'hudson_fe https://hudson.cmgdigital.com/view/FE/',
          'logger    http://logger.cmgdigital.com/all/latest.log.html',
+         'prod      ssh://manderson@djaapaprd1.ddtc.cmgdigital.com'
          ],
 }
