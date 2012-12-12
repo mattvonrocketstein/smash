@@ -118,7 +118,7 @@ class Plugin(SmashPlugin):
         post_hook_for_magic('cd', manager._announce_if_project)
 
         add_shutdown_hook(lambda: manager.shutdown())
-        __IPYTHON__.hooks['pre_prompt_hook'].add(manager.check)
+        #__IPYTHON__.hooks['pre_prompt_hook'].add(manager.check)
         smashlib.PROJECTS = manager
         self.contribute('this',CurrentProject())
 

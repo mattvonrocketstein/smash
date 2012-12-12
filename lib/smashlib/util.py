@@ -71,7 +71,9 @@ def clean_namespace():
 
 def colorize(msg):
     """ """
-    return msg.format(red=tc.Red, normal=tc.Normal)
+    # .format() is not used because KeyError might happen
+    # when using report(msg+str(some_dictionary))
+    return msg.replace('{red}',tc.Red).replace('{normal}',tc.Normal)
 
 def set_complete(func, key):
     ip = IPython.ipapi.get()
@@ -109,7 +111,7 @@ def die():
     threading.Thread(target=lambda: \
                      os.system('kill -KILL ' + str(os.getpid()))).start()
 
-def list2table(dat, header=[]):
+def list2table(dat, header=[],indent=''):
     if header: dat=[header] + dat
     s = StringIO.StringIO()
     out = asciitable.write(dat, output=s, Writer=asciitable.FixedWidthNoHeader)
@@ -119,5 +121,9 @@ def list2table(dat, header=[]):
         out = out.split('\n')
         line1 = out[0]
         out.insert(1,'-'*len(line1))
-        return '\n'.join(out)
+        out = '\n'.join(out)
+    if indent:
+        out = out.split('\n')
+        out = [indent+line for line in out]
+        out = '\n'.join(out)
     return out

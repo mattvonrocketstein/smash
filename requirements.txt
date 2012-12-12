@@ -2,6 +2,7 @@ IPython==0.10
 psutil
 demjson
 pyflakes
+cyrusbus
 asciitable
 #pynotify
 #dulwhich

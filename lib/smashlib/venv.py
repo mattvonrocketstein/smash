@@ -131,9 +131,6 @@ class VenvMixin(object):
             import smashlib
             aliases = getattr(smashlib, 'ALIASES')
             aliases.install()
-            # FIXME: this should not be here.  need signals or something
-            bookmarks = getattr(smashlib, 'BOOKMARKS')
-            bookmarks._maybe_update()
 
         else:
             self.report('  not a venv.. ' + obj)
@@ -163,12 +160,15 @@ class VenvMixin(object):
         from smashlib.projects import Project
         self.deactivate()
         if isinstance(obj, types.StringTypes):
-            return self._activate_str(obj)
+            result = self._activate_str(obj)
         elif type(obj).__name__ == Project.__name__:
             # FIXME: isinstance here does not work here?
             #        project_manager.Project vs __smash__.Project
-            return self._activate_project(obj)
+            result = self._activate_project(obj)
+            from smashlib import PROJECTS as Project
+            Project.bus.publish('post_activate', name=obj.name, )
         else:
             err = "Don't know how to activate an object like '" + \
                   str(type(obj)) + '"'
             raise RuntimeError, err
+        return result
