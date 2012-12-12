@@ -5,6 +5,8 @@ import os
 
 from collections import defaultdict
 
+from cyrusbus import Bus
+
 from smashlib.python import expanduser
 from smashlib.reflect import namedAny
 from smashlib.util import colorize, report, list2table
@@ -48,6 +50,16 @@ class Project(VenvMixin, Hooks):
     notifiers = []
     _post_activate = defaultdict(lambda: [])
 
+    bus = Bus()
+    bus.subscribe('post_invoke',
+                  lambda bus, *args, **kargs: report('post_invoke:' + str(kargs)))
+    bus.subscribe('pre_invoke',
+                  lambda bus, *args, **kargs: report('pre_invoke:' + str(kargs)))
+    bus.subscribe('pre_activate',
+                  lambda bus, *args, **kargs: report('pre_activate:' + str(kargs)))
+    bus.subscribe('post_activate',
+                  lambda bus, *args, **kargs: report('post_activate:' + str(kargs)))
+
     def _doc_helper(self, path_subset):
         dat = []
         for x in path_subset:
@@ -58,7 +70,7 @@ class Project(VenvMixin, Hooks):
             vcs = which_vcs(fpath)
             dat.append([x, trunc_fpath, contains_venv, vcs])
         header = ['name', 'path', 'virtualenv', 'vcs']
-        return header,dat
+        return header, dat
 
     @property
     def __doc__(self):
@@ -86,7 +98,7 @@ class Project(VenvMixin, Hooks):
         return self._config.get('watchdog',{}).get(self.name,{})
 
     def __repr__(self):
-        return 'project: ' + self.name
+        return 'Project("{0}")'.format(self.name)
 
     @property
     def _active_project(self):
@@ -105,15 +117,6 @@ class Project(VenvMixin, Hooks):
             cmd = '"{CMD}.activate(proj.{name})"'.format(CMD=COMMAND_NAME,
                                                          name=os.path.split(_dir)[1])
             report('  To activate it: '+cmd)
-
-    """ @property
-    def aliases(self):
-        from smashlib import ALIASES as aliases
-        aliases = self._config.get('aliases', {})
-        local_aliases = aliases.get(self.name, [])
-        out = Aliases()
-        [ aliases.add(alias, self.name) for alias in local_aliases ]
-        return out"""
 
     @classmethod
     def _add_post_activate(kls, name, something):
@@ -166,8 +169,8 @@ class Project(VenvMixin, Hooks):
 
         @property
         def invoke(self):
-            """ FIXME: yeah this is a pretty awful hack..
-            """
+            """ FIXME: yeah this is a pretty awful hack.. """
+            Project.bus.publish('pre_invoke',name=name)
             from smashlib import ALIASES as aliases
             if self.CURRENT_PROJECT:
                 old_aliases = aliases[self.CURRENT_PROJECT]
@@ -185,6 +188,7 @@ class Project(VenvMixin, Hooks):
             [ f() for f in self._pre_invokage[name] ]
             os.chdir(p.dir)
             [ f() for f in self._post_invokage[name] + post_invoke ]
+            Project.bus.publish('post_invoke', name=name)
             return p
 
         setattr(kls, name.replace('-','_'), invoke)
@@ -211,52 +215,3 @@ class Project(VenvMixin, Hooks):
                 N += 1
                 kls.bind(tmp, name, **kargs)
         report.project_manager('binding ' + _dir + ' (' + str(N) + ' projects found)')
-
-    def check(self):
-        if self.msgs:
-            msg = self.msgs.pop()
-            report(msg)
-        return None
-
-    def watch(self):
-        """ TODO: fix / refactor """
-        if self.being_watched:
-            self.being_watched.stop()
-            self.watchlist.remove(self.being_watched)
-            report('watch stopped')
-            return
-        try:
-            import pyinotify
-        except ImportError:
-            report("Could not import pyinotify.  You'll need to install "
-                   "it system wide, or activate a venv where it is already "
-                   "installed")
-            return
-        else:
-            report("starting watch")
-            _dir = self.dir
-            """
-            class EventHandler(pyinotify.ProcessEvent):
-                #def process_IN_CREATE(himself, event):
-                #def process_default(himself, event):
-                def base(himself, *ars):
-                    self.report('testing')
-
-                def process_IN_MODIFY(himself, event):
-                    if fnmatch.fnmatch(event.pathname, '*.py'):
-                        clean = [[type(x).__name__,x] for x in checkPath(event.pathname)]
-                        clean = [ x[1] for x in clean if not x[0].startswith('Unused') ]
-                        for msg in clean:
-                            self.msgs.append(str(msg))
-
-
-
-            mask = pyinotify.IN_DELETE | pyinotify.IN_CREATE | pyinotify.IN_MODIFY
-            wm = pyinotify.WatchManager()
-            wm.add_watch(_dir, mask, rec=1)
-            notifier = pyinotify.ThreadedNotifier(wm, default_proc_fun=EventHandler())
-            self.being_watched = notifier
-            self.watchlist.append(self.being_watched)
-            notifier.start()
-            self.notifiers += [notifier]
-            """

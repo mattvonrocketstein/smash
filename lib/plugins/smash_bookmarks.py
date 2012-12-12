@@ -3,23 +3,27 @@
 from __future__ import print_function
 import webbrowser
 
+
 from collections import defaultdict, namedtuple
 
 import smashlib
 from smashlib.projects import Project
-from smashlib.util import report, ope, opj, list2table
+from smashlib.util import report, ope, opj, list2table,colorize
 from smashlib.util import add_shutdown_hook, post_hook_for_magic
 from smashlib.smash_plugin import SmashPlugin
 from smashlib.aliases import RegistrationList
 
+def bookmarks_cmp(x,y):
+    """sorts based on group, then nickname """
+    l1 = cmp(x.affiliation, y.affiliation)
+    return cmp(x.nickname, y.nickname) if l1==0 else l1
+
 class Bookmark(namedtuple('Bookmark', 'affiliation nickname uri'.split())):
     def launch(self):
-        webbrowser.open_new_tab(self.uri)
-
-class BookmarkLauncher(property):
-    pass
+        report('woudl have launched: ' + self.uri)
 
 class Bookmarks(object):
+
     CMD_NAME = 'bookmarks'
 
     def __iter__(self):
@@ -35,6 +39,7 @@ class Bookmarks(object):
     @property
     def _config_file(self):
         return opj(smashlib.SMASH_ETC_DIR, 'bookmarks.json')
+
     def _get_config(self, force=False):
         if not force and getattr(self,'_cached_config',None):
             return self._cached_config
@@ -53,24 +58,53 @@ class Bookmarks(object):
 
     @property
     def __doc__(self):
-        out = ('Note that this only shows bookmarks which are relevant for the '
-               'current context.  If you want to see all bookmarks, '
-               'type "bookmarks.everything?"'
-               '\n\nBookmarks:\n{0}')
+        out = colorize(
+            '\n{red}Hints:{normal} (try typing these)\n'
+            '  bookmarks[index]         launches the bookmark at `index`\n'
+            '  bookmarks[nickname]      launches the bookmark named `nickname`\n'
+            '  bookmarks.everything?    shows all the bookmarks\n'
+            '  bookmarks.files?         shows all file bookmarks\n'
+            '  bookmarks.ssh?           shows all ssh bookmarks\n'
+            '\n\n{red}Bookmarks for this context:{normal}\n\n')
         dat, headers = self._doc_helper(self._relevant_context())
-        out = out.format(list2table(dat, header=headers))
-        return out
-        #out = out.format(list2table(dat, header=headers))
-        #dat, headers = doit(self._relevant_context())
+        tmp = list2table(dat, header=headers, indent='  ')
+        return out+tmp
+
+    def _sorted_bookmarks(self, keys):
+        bookmarks = [b for b in self if b.affiliation in keys]
+        bookmarks.sort(bookmarks_cmp)
+        return bookmarks
+
+    def _relevant_bookmarks(self):
+        return self._sorted_bookmarks(self._relevant_context())
+
+    def __getitem__(self, index_or_name):
+        context = self._relevant_bookmarks()
+        error = lambda: report("no such bookmark.  type {red}bookmarks?{normal} for help")
+        try:
+            return context[index_or_name].launch()
+        except TypeError:
+            choice = [ bookmark for bookmark in context if bookmark.nickname==index_or_name ]
+            if not choice: return error()
+            elif len(choice)>1:
+                report('multiple bookmarks match that name.  check your configuration')
+            else:
+                choice = choice[0]
+                choice.launch()
+        except IndexError:
+            error()
+
 
     def _doc_helper(self, keys):
         """ get a table for some subset of the bookmarks """
         dat = []
-        for bookmark in self:
-            if bookmark.affiliation in keys:
-                dat.append([bookmark.affiliation,
-                            bookmark.nickname, bookmark.uri])
-        headers='group nickname pointer'.split()
+        bookmarks = self._sorted_bookmarks(keys)
+        for bookmark in bookmarks:
+            index = bookmarks.index(bookmark)
+            dat.append([index,
+                        bookmark.affiliation,
+                        bookmark.nickname, bookmark.uri])
+        headers='index group nickname uri'.split()
         return dat, headers
 
     def _relevant_context(self):
@@ -82,27 +116,10 @@ class Bookmarks(object):
         out += [ proj.CURRENT_PROJECT ]
         return out
 
-    def _maybe_update(self):
-        count = 0
-        relevant_groups = self._relevant_context()
-        for x in dir(self):
-            obj = getattr(self, x)
-            if isinstance(obj, BookmarkLauncher):
-                delattr(self.__class__,
-                        x)
-                count+=1
-        if count:
-            msg = 'removed {0} stale bookmarks from the context'
-            msg = msg.format(count)
-            report.bookmarks(msg)
-
-        z = [ [x.nickname, lambda p: report(x.uri) ] for x in self ]
-        #if x.affiliation in relevant_groups:
-        for q in z:
-            setattr(self.__class__,
-                    q[0],
-                    BookmarkLauncher(q[1]))
-
+    def _maybe_update(self, *args, **kargs):
+        """ proof of concept.. """
+        report('updating bookmarks' + str(kargs))
+        return
 
 class Plugin(SmashPlugin):
     requires = []
@@ -114,8 +131,6 @@ class Plugin(SmashPlugin):
                         "  refusing to continue")
         else:
             bookmarks = Bookmarks()
-            import smashlib
-            smashlib.BOOKMARKS = bookmarks
             self.contribute('bookmarks', bookmarks)
             post_hook_for_magic('cd', bookmarks._maybe_update)
-            #post_hook_for_activation(bookmarks._maybe_update)
+            Project.bus.subscribe('post_activate', bookmarks._maybe_update)

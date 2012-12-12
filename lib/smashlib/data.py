@@ -12,6 +12,11 @@ OVERRIDE_OPTIONS = dict(
     autoedit_syntax=1,
     confirm_exit = 0,
 
+    # there is a bug with autocall where it can execute properties
+    # twice.  very annoying since plugins rely on that heavily
+    # for e.g. "obj?" style help menus, etc
+    autocall=0,
+
     # TODO: this should really be part of the git plugin.
     # TODO: see smash.util.set_prompt_t for changing prompt on the fly
     prompt_in1= ''' \C_Red${getattr(__IPYTHON__,'_cgb',lambda:'')()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>''',
