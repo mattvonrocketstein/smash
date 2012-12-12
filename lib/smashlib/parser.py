@@ -3,7 +3,7 @@
 
 from optparse import OptionParser
 
-from smashlib import Plugins
+from smashlib import PluginManager
 
 class SmashParser(OptionParser):
 
@@ -25,12 +25,12 @@ class SmashParser(OptionParser):
                           help='install new smash module')
         self.add_option('-l', '--list',
                           action='store_true',dest='list', default=False,
-                          help=Plugins.list.__doc__)
+                          help=PluginManager.list.__doc__)
         self.add_option('--enable',
                           dest='enable', default='',
-                          help=Plugins.enable.__doc__)
+                          help=PluginManager.enable.__doc__)
         self.add_option('--disable',
                           dest='disable', default='',
-                          help=Plugins.disable.__doc__)
+                          help=PluginManager.disable.__doc__)
         for args, kargs,handler in self.extra_options:
             self.add_option(*args, **kargs)
