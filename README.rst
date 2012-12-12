@@ -166,18 +166,15 @@ Enhanced 'which'
 Possible deal-breakers
 ======================
 
-At this point to use Smash you unfortunately will need IPython==0.10 installed, and even more
-unfortunately you probably need it installed at the system level.  (Later versions of IPython are
-not compatible ``pysh`` IPython profile, and I have not gotten around to porting it yet).  You will
-likely need it installed at the system level because smash itself aims at managing virtual-envs..
-running it from one might be possible but could lead to confusion.
+Smash unfortunately will need IPython==0.10 installed in it's sandbox in ~/.smash, because
+later versions of IPython are not compatible ``pysh`` IPython profile, and I have not gotten
+around to porting it yet.
 
-One current limitation of the combination of pysh / ipython / smash is a lack of job control in the
-sense that you might be used to.  Specifically you can background tasks with an ``&`` as usual, but
-``fg`` does not resume.  At first this seemed horrible but in practice I think this consideration is
-not very important- shells are cheap to spawn and a workflow around ``screen`` works better anyway.
-
-
+One current limitation of the combination of pysh / ipython / smash is a lack of job control
+in the sense that you might be used to.  Specifically you can background tasks with an ``&``
+as usual, but ``fg`` does not resume.  At first this seemed horrible but in practice I think
+this consideration is not very important- shells are cheap to spawn and a workflow around
+``screen`` works better anyway.
 
 
 =============
