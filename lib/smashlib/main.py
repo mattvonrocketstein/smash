@@ -72,9 +72,9 @@ else:
     VERBOSE = VERBOSE or opts.verbose
     import smashlib
     smashlib.VERBOSE = VERBOSE
-    if VERBOSE:
-        report.smash('parsed opts: ' + str(eval(str(opts)).items()))
-    elif opts.enable:  plugins.enable(opts.enable);   die()
+    #if VERBOSE:
+    #report.smash('parsed opts: ' + str(eval(str(opts)).items()))
+    if opts.enable:  plugins.enable(opts.enable);   die()
     elif opts.disable: plugins.disable(opts.disable); die()
     elif opts.list:    plugins.list();                die()
     elif opts.panic:  panic();

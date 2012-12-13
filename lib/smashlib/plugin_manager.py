@@ -69,8 +69,9 @@ class PluginManager(object):
 
     def install_plugin_from_fname(self, abs_path_to_plugin):
         G = globals().copy()
-        L = dict(report=self.report)
-        G.update(__name__='__smash__')
+        L = {} #dict(report=self.report)
+        G.update(__file__=abs_path_to_plugin,
+                 __name__='__smash__')
         execfile(abs_path_to_plugin, G, L)
         G.update(**L)
         if 'Plugin' not in G:
@@ -84,6 +85,16 @@ class PluginManager(object):
         plugin.filename = rel_fname
         #plugin.pre_install()
         plugin.install()
+        import sys
+        from types import ModuleType
+        from smashlib import active_plugins
+        n = os.path.splitext(abs_path_to_plugin.split(os.path.sep)[-1])[0]
+        n = str(n)
+        m = ModuleType(n)
+        G.pop('__name__')
+        for x in G: setattr(m, x, G[x])
+        setattr(active_plugins,n,m)
+        sys.modules['smashlib.active_plugins.'+n]=m
         self._plugins.append(plugin)
 
     def _get_some_plugins(self, name, val):

@@ -8,6 +8,22 @@ from smashlib.projects import Project, COMMAND_NAME
 from smashlib.util import report, post_hook_for_magic
 from smashlib.smash_plugin import SmashPlugin
 
+class D(object):
+    @property
+    def apps(self):
+        from django.db.models.loading import AppCache
+        appcache = AppCache()
+        return appcache.get_apps()
+    @property
+    def models(self):
+        """ Helper to get all the models in a dictionary.
+            NOTE: this triggers django autodiscovery, obv
+        """
+        from django.db.models.loading import AppCache
+        appcache = AppCache()
+        return dict( [ [ m.__name__, m] \
+                       for m in appcache.get_models() ] )
+
 def update_models():
     """ find all the models in INSTALLED_APPS,
         inject them and their lowercase equivalents
