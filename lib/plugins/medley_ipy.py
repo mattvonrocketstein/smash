@@ -79,20 +79,15 @@ medley_admin_doc = border + """{red}
    >>> _admin_dct | idump        # view it in sweet ncurses browser
 """.format(red=tc.Red, normal=tc.Normal) + border
 
-
 class L(object):
     """ various lazy stuff.. some of this is experimental """
 
     @property
-    def apps(self):
-        from django.db.models.loading import AppCache
-        appcache = AppCache()
-        return appcache.get_apps()
-
-    @property
     def app_dirs(self):
+        from smashlib.active_plugins import djangoisms
+        apps=D().apps
         files_or_dirs = [ os.path.splitext(a.__file__)[0] \
-                          for a in self.apps ]
+                          for a in apps ]
         files_or_dirs = [ fod.split(os.path.sep) \
                           for fod in files_or_dirs ]
         files_or_dirs = [ fod[:fod.index('models')] \
@@ -127,15 +122,6 @@ class L(object):
         out = set(out)
         return out
 
-    @property
-    def models(self):
-        """ Helper to get all the models in a dictionary.
-            NOTE: this triggers django autodiscovery, obv
-        """
-        from django.db.models.loading import AppCache
-        appcache = AppCache()
-        return dict( [ [ m.__name__, m] \
-                       for m in appcache.get_models() ] )
 L = L()
 
 
@@ -205,7 +191,7 @@ def load_medley_customizations2():
 
 class Plugin(SmashPlugin):
 
-    requires_plugins = ['djangoisms2']
+    requires_plugins = ['djangoisms'] # FIXME: enforce
 
     def install(self):
         """ fixme: none of this will be uninstalled.. """
@@ -241,9 +227,9 @@ class Engage(object):
             from medley.ellington_overrides.search.tasks import HaystackUpdateTask
             h = HaystackUpdateTask()
             h.taskfunc(self.__class__, pk_list=[self.id])
-
+        from smashlib.active_plugins.djangoisms import D
         plugin = SmashPlugin()
-        for _, model in L.models.items():
+        for _, model in D().models.items():
             if model.__module__.startswith('medley'):
                 plugin.contribute(model.__name__, model)
                 plugin.contribute(model.__name__.lower(), model)
