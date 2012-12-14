@@ -97,7 +97,7 @@ class Plugin(SmashPlugin):
         manager._config = config
         for name, val in config.get('post_activate', {}).items():
             manager._add_post_activate(name, val)
-
+            manager.bus.subscribe('post_activate.' + name, val)
         KNOWN_EVENT_TYPES = 'file-post-change'.split()
         for project_name,watchdog_config in config.get('watchdog', {}).items():
             assert isinstance(watchdog_config, dict), 'expected dictionary for wd-config@' + project_name

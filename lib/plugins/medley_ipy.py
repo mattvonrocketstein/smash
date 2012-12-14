@@ -60,11 +60,8 @@ medley_doc = border + """{red}
  Augmenting ipython namespace with the following:{normal}
    - every Model like medley.<app>.models.<Model>, available at <Model>.__name__
    - lowercase versions of the aforementioned are also permitted
-   - a special value ``_model_dct``, which is a dictionary like:
-     :: <Model>._meta.app_label -> [<Model>,..]
 
  {red}Hints (try typing these lines):{normal}
-   >>> _model_dct | idump        # view it in sweet ncurses browser
    >>> MedleyS<tab>              # tab completion on model uppercase names
    >>> medleys<tab>              # tab completion on model uppercase names
    >>> medleystory.o.all()       # shortcut for ".objects"
@@ -83,22 +80,8 @@ class L(object):
     """ various lazy stuff.. some of this is experimental """
 
     @property
-    def app_dirs(self):
-        from smashlib.active_plugins import djangoisms
-        apps=D().apps
-        files_or_dirs = [ os.path.splitext(a.__file__)[0] \
-                          for a in apps ]
-        files_or_dirs = [ fod.split(os.path.sep) \
-                          for fod in files_or_dirs ]
-        files_or_dirs = [ fod[:fod.index('models')] \
-                          for fod in files_or_dirs ]
-        dirs = [ os.path.sep.join(fod) \
-                for fod in files_or_dirs ]
-        return dirs
-
-    @property
     def medley_app_dirs(self):
-        return [ x for x in self.app_dirs \
+        return [ x for x in D().app_dirs \
                  if 'storyville/medley' in x ]
 
     @property
@@ -125,7 +108,7 @@ class L(object):
 L = L()
 
 
-def load_medley_customizations2():
+def load_medley_customizations2(*args):
     """ post-activation instructions for medley-related
         environments.  these use os.environ and can't
         work until after a VENV is activated.
@@ -215,7 +198,8 @@ class Plugin(SmashPlugin):
                    '--noinput --verbosity=2'
         self.contribute('test', Macro(dad_test))
 
-def load_medley_customizations(): Plugin().install()
+def load_medley_customizations(bus):
+    Plugin().install()
 
 class Engage(object):
     """ """
@@ -226,7 +210,7 @@ class Engage(object):
             "in master one day.."
             from medley.ellington_overrides.search.tasks import HaystackUpdateTask
             h = HaystackUpdateTask()
-            h.taskfunc(self.__class__, pk_list=[self.id])
+            h.taskfunc(self.__class__, pk_list=[self.id],commit=True)
         from smashlib.active_plugins.djangoisms import D
         plugin = SmashPlugin()
         for _, model in D().models.items():

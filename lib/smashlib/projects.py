@@ -32,6 +32,20 @@ class Hooks(object):
         [ x.stop() for x in self.watchlist ]
         #raise ipapi.TryNext()
 
+def update_aliases(bus, *args, **kargs):
+    """ """
+    report('dddddddddddd')
+    cp = Project('whatever').CURRENT_PROJECT
+    if cp:
+        from smashlib import ALIASES as aliases
+        old_aliases = aliases[cp]
+        count = [ aliases.uninstall(a) for a in old_aliases ]
+        if count:
+            msg = "removed {0} aliases from the previous project"
+            msg = msg.format(len(count))
+            report.project_manager(msg)
+
+
 class Project(VenvMixin, Hooks):
     #   class for holding Project abstractions. in the simplest case,
     #   beginning work on on a project just means changing directories.
@@ -59,6 +73,7 @@ class Project(VenvMixin, Hooks):
                   lambda bus, *args, **kargs: report('pre_activate:' + str(kargs)))
     bus.subscribe('post_activate',
                   lambda bus, *args, **kargs: report('post_activate:' + str(kargs)))
+    bus.subscribe('pre_invoke', update_aliases)
 
     def _doc_helper(self, path_subset):
         dat = []
@@ -149,6 +164,7 @@ class Project(VenvMixin, Hooks):
                     func = namedAny(x)
             else:
                 raise Exception,'niy: ' + str(x)
+            Project.bus.subscribe('post_activate.'+name, func)
             if func not in kls._post_activate[name]:
                 kls._post_activate[name] += [func]
 
@@ -164,7 +180,8 @@ class Project(VenvMixin, Hooks):
         for x in post_invoke:
             x = namedAny(x) if isinstance(x, (str, unicode)) else x
             tmp.append(x)
-        post_invoke = tmp
+            Project.bus.subscribe('post_invoke.'+name, x)
+
         kls._paths[name] = _dir
 
         @property
@@ -172,14 +189,6 @@ class Project(VenvMixin, Hooks):
             """ FIXME: yeah this is a pretty awful hack.. """
             Project.bus.publish('pre_invoke',name=name)
             from smashlib import ALIASES as aliases
-            if self.CURRENT_PROJECT:
-                old_aliases = aliases[self.CURRENT_PROJECT]
-                count = [ aliases.uninstall(a) for a in old_aliases ]
-                if count:
-                    msg = "removed {0} aliases from the previous project"
-                    msg = msg.format(len(count))
-                    report.project_manager(msg)
-
             new_aliases = self._config.get('aliases',{}).get(name,[])
             [ aliases.add(a, name) for a in new_aliases]
             p = Project(name)
@@ -187,8 +196,7 @@ class Project(VenvMixin, Hooks):
             p._config = self._config
             [ f() for f in self._pre_invokage[name] ]
             os.chdir(p.dir)
-            [ f() for f in self._post_invokage[name] + post_invoke ]
-            Project.bus.publish('post_invoke', name=name)
+            Project.bus.publish('post_invoke.' + name)
             return p
 
         setattr(kls, name.replace('-','_'), invoke)
