@@ -112,7 +112,10 @@ def die():
     threading.Thread(target=lambda: \
                      os.system('kill -KILL ' + str(os.getpid()))).start()
 
-def list2table(dat, header=[],indent=''):
+def list2table(dat, header=[], indent=''):
+    """ using asciitable, this function can return
+        strings of neatly formated tabular data
+    """
     if header: dat=[header] + dat
     s = StringIO.StringIO()
     out = asciitable.write(dat, output=s, Writer=asciitable.FixedWidthNoHeader)

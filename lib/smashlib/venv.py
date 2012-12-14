@@ -140,9 +140,10 @@ class VenvMixin(object):
 
     @classmethod
     def _activate_project(self, obj):
-        """ """
+        """ #FIXME: this is in the wrong file.. """
         result = self._activate_str(obj.dir)
-        [ f() for f in self._post_activate[obj.name] ]
+        from smashlib import PROJECTS as Project
+        Project.bus.publish('post_activate.' + obj.name)
 
     @property
     def activate(self):
@@ -157,15 +158,16 @@ class VenvMixin(object):
         """
         # TODO: move/combine this to ipy_venv_support ?
         # FIXME: get rid of Project-dep ?
-        from smashlib.projects import Project
+        from smashlib.projects import Project as ProjectClass
+        from smashlib import PROJECTS as Project
+        Project.bus.publish('pre_activate', obj=obj, )
         self.deactivate()
         if isinstance(obj, types.StringTypes):
             result = self._activate_str(obj)
-        elif type(obj).__name__ == Project.__name__:
+        elif type(obj).__name__ == ProjectClass.__name__:
             # FIXME: isinstance here does not work here?
             #        project_manager.Project vs __smash__.Project
             result = self._activate_project(obj)
-            from smashlib import PROJECTS as Project
             Project.bus.publish('post_activate', name=obj.name, )
         else:
             err = "Don't know how to activate an object like '" + \

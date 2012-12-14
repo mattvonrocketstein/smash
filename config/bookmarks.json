@@ -1,9 +1,11 @@
+
+// This configuration file represents per-project bookmark entries.
 //
-// this configuration file represents per-project bookmark entries.
-// the format is { "namespace": [ "nickname http://..",
+// The format is { "namespace": [ "nickname http://..",
 //                                "nickname file://..",
 //                                "nickname cmd://..", .. ], }
 //
+// NOTE: changes to this file take effect in running shells immediately.//
 //
 {
     //   NOTE: __smash__ namespace is special; these bookmarks will
@@ -17,6 +19,9 @@
         ['hudson    https://hudson.cmgdigital.com/',
          'hudson_fe https://hudson.cmgdigital.com/view/FE/',
          'logger    http://logger.cmgdigital.com/all/latest.log.html',
-         'prod      ssh://manderson@djaapaprd1.ddtc.cmgdigital.com'
+         'psa       http://intranet.cmgdigital.com/display/collaboration/PSAs'
+         'prod1     ssh://manderson@djaapaprd1.ddtc.cmgdigital.com',
+         'prod2     ssh://manderson@djaapaprd2.ddtc.cmgdigital.com',
+         'fe_assign http://intranet.cmgdigital.com/display/collaboration/Feature+Environment+Assignment',
          ],
 }

@@ -9,6 +9,11 @@ from smashlib.util import report, post_hook_for_magic
 from smashlib.smash_plugin import SmashPlugin
 
 class D(object):
+    """ lazy django stuff.
+
+        you can't mess around with this until
+        SETTINGS_MODULE is set in os.environ
+    """
     @property
     def apps(self):
         from django.db.models.loading import AppCache
@@ -23,6 +28,20 @@ class D(object):
         appcache = AppCache()
         return dict( [ [ m.__name__, m] \
                        for m in appcache.get_models() ] )
+
+    @property
+    def app_dirs(self):
+        from smashlib.active_plugins import djangoisms
+        apps=D().apps
+        files_or_dirs = [ os.path.splitext(a.__file__)[0] \
+                          for a in apps ]
+        files_or_dirs = [ fod.split(os.path.sep) \
+                          for fod in files_or_dirs ]
+        files_or_dirs = [ fod[:fod.index('models')] \
+                          for fod in files_or_dirs ]
+        dirs = [ os.path.sep.join(fod) \
+                for fod in files_or_dirs ]
+        return dirs
 
 def update_models():
     """ find all the models in INSTALLED_APPS,
