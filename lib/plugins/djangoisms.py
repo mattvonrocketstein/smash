@@ -1,11 +1,11 @@
-"""
+""" djangoisms:
+
+      a smash plugin for supporting various django stuffs
 """
 import os
-opj=os.path.join
-ope=os.path.exists
 
 from smashlib.projects import Project, COMMAND_NAME
-from smashlib.util import report, post_hook_for_magic
+from smashlib.util import opj, ope, report, post_hook_for_magic
 from smashlib.smash_plugin import SmashPlugin
 
 def set_settings(dsm):

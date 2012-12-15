@@ -1,20 +1,20 @@
-""" bookmarks
+""" smash_bookmarks:
+
+      a plugin adding support for http/ssh/file-style bookmarks
 """
-from __future__ import print_function
 import webbrowser
-
-
 from collections import defaultdict, namedtuple
 
 import smashlib
 from smashlib.projects import Project
+from smashlib.util import bus
 from smashlib.util import report, ope, opj, list2table,colorize
 from smashlib.util import add_shutdown_hook, post_hook_for_magic
 from smashlib.smash_plugin import SmashPlugin
 from smashlib.aliases import RegistrationList
 
 def bookmarks_cmp(x,y):
-    """sorts based on group, then nickname """
+    """ utility for sorting based on group, then nickname """
     l1 = cmp(x.affiliation, y.affiliation)
     return cmp(x.nickname, y.nickname) if l1==0 else l1
 
@@ -151,5 +151,5 @@ class Plugin(SmashPlugin):
             bookmarks = Bookmarks()
             self.contribute('bookmarks', bookmarks)
             post_hook_for_magic('cd', bookmarks._maybe_update)
-            from smashlib import bus
-            bus.subscribe('post_activate', bookmarks._maybe_update)
+
+            bus().subscribe('post_activate', bookmarks._maybe_update)
