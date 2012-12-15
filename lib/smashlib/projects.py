@@ -10,7 +10,7 @@ from smashlib.reflect import namedAny
 from smashlib.util import colorize, report, list2table
 from smashlib.util import truncate_fpath
 from smashlib.venv import VenvMixin, _contains_venv
-from smashlib.util import report
+from smashlib.util import report, bus
 
 COMMAND_NAME = 'proj'
 ROOT_PROJECT_NAME = '__smash__'
@@ -94,8 +94,7 @@ class Project(VenvMixin, Hooks):
         self.name = name
         self._pre_invokage  = defaultdict(lambda: [])
         self._post_invokage = defaultdict(lambda: [])
-        from smashlib import bus
-        bus.subscribe('pre_invoke', update_aliases)
+        bus().subscribe('pre_invoke', update_aliases)
 
     @property
     def watched(self):
@@ -153,15 +152,13 @@ class Project(VenvMixin, Hooks):
                     func = namedAny(x)
             else:
                 raise Exception,'niy: ' + str(x)
-            from smashlib import bus
-            bus.subscribe('post_activate.'+name, func)
+            bus().subscribe('post_activate.'+name, func)
             if func not in kls._post_activate[name]:
                 kls._post_activate[name] += [func]
 
     @classmethod
     def bind(kls, _dir, name=None, post_activate=[], post_invoke=[]):
         """ installs a named alias for changing directory to "_dir". """
-        from smashlib import bus
         _dir = expanduser(_dir)
         if name is None:
             name = os.path.split(_dir)[1]
@@ -171,13 +168,13 @@ class Project(VenvMixin, Hooks):
         for x in post_invoke:
             x = namedAny(x) if isinstance(x, (str, unicode)) else x
             tmp.append(x)
-            bus.subscribe('post_invoke.'+name, x)
+            bus().subscribe('post_invoke.'+name, x)
         kls._paths[name] = _dir
 
         @property
         def invoke(self):
             """ FIXME: yeah this is a pretty awful hack.. """
-            bus.publish('pre_invoke',name=name)
+            bus().publish('pre_invoke',name=name)
             from smashlib import ALIASES as aliases
             new_aliases = self._config.get('aliases', {}).get(name, [])
             [ aliases.add(a, name) for a in new_aliases]
@@ -186,7 +183,7 @@ class Project(VenvMixin, Hooks):
             p._config = self._config
             [ f() for f in self._pre_invokage[name] ]
             os.chdir(p.dir)
-            bus.publish('post_invoke.' + name)
+            bus().publish('post_invoke.' + name)
             return p
 
         setattr(kls, name.replace('-','_'), invoke)

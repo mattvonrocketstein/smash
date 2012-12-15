@@ -16,6 +16,13 @@ opj = os.path.join
 ope = os.path.exists
 tc = ColorANSI.TermColors()
 
+def bus():
+    """ get the main bus.  this is used instead of a direct import,
+        because the later is usually not safe
+    """
+    from smashlib import bus
+    return bus
+
 def home(): return os.environ['HOME']
 
 def truncate_fpath(fpath):

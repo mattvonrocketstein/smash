@@ -1,9 +1,10 @@
 """ smashlib.venv
 """
+
 import types
 import os, sys, glob
 
-opj = os.path.join
+from smashlib.util import opj, bus
 
 get_path   = lambda: os.environ['PATH']
 get_venv   = lambda: os.environ['VIRTUAL_ENV']
@@ -142,8 +143,7 @@ class VenvMixin(object):
     def _activate_project(self, obj):
         """ #FIXME: this is in the wrong file.. """
         result = self._activate_str(obj.dir)
-        from smashlib import bus
-        bus.publish('post_activate.' + obj.name)
+        bus().publish('post_activate.' + obj.name)
         return result
 
     @property
@@ -160,15 +160,14 @@ class VenvMixin(object):
         # TODO: move/combine this to ipy_venv_support ?
         # FIXME: get rid of Project-dep ?
         from smashlib.projects import Project as ProjectClass
-        from smashlib import bus
-        bus.publish('pre_activate', obj=obj, )
+        bus().publish('pre_activate', obj=obj, )
         self.deactivate()
         if isinstance(obj, types.StringTypes):
             result = self._activate_str(obj)
         #elif type(obj).__name__ == ProjectClass.__name__:
         elif isinstance(obj, ProjectClass):
             result = self._activate_project(obj)
-            bus.publish('post_activate', name=obj.name, )
+            bus().publish('post_activate', name=obj.name, )
         else:
             err = "Don't know how to activate an object like '" + \
                   str(type(obj)) + '"'
