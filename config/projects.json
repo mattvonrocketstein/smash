@@ -17,14 +17,14 @@
 //   NOTE:
 //    the __smash__ group is special; these aliases are never
 //    explicitly unregistered, even when you switch to a new
-//    project, however, if the new project mentions the same
-//    alias, the old one will be overwritten.
+//    project (however, if the new project mentions the same
+//    alias, the old one will be overwritten).
 //
 'aliases':
     { '__smash__':
       [ 'dhclient sudo dhclient',
         'top5 ps -eo user,pcpu,pid,cmd | sort -r -k2 | head -6',
-        'df df-h',
+        'df df -h',
         'l ls -la --color',
         'ls ls --color=auto',
         'apt-get sudo apt-get',
@@ -33,11 +33,13 @@
         'acache sudo apt-cache search',
         'ainstall sudo apt-get install',
         'ubuntuversion cat /etc/lsb-release',
-        //'irc xchat -d ~/code/dotfiles/xchat_default&',
-        'irc irssi -c work',
+        'irc xchat -d ~/code/dotfiles/xchat_default&',
         ],
       'cms_tango':
       [ 'irc xchat -d ~/code/dotfiles/xchat_work&',
-        'dad django-admin.py',]
+        'dad django-admin.py',
+        'd dad',
+        'ctest dad create_test_template --settings=storyville.conf.utest_template',
+        ]
     }
 }
