@@ -80,9 +80,13 @@ class Bookmarks(object):
             '  bookmarks.files?         shows all file bookmarks\n'
             '  bookmarks.ssh?           shows all ssh bookmarks\n'
             '\n\n{red}Bookmarks for this context:{normal}\n\n')
-        dat, headers = self._doc_helper(self._relevant_context())
-        tmp = list2table(dat, header=headers, indent='  ')
-        return out+tmp
+        try:
+            dat, headers = self._doc_helper(self._relevant_context())
+            tmp = list2table(dat, header=headers, indent='  ')
+        except Exception,e:
+            return "Error building bookmark summary: "+str(e)
+        else:
+            return out+tmp
 
     def _sorted_bookmarks(self, keys):
         bookmarks = [b for b in self if b.affiliation in keys]
