@@ -40,6 +40,13 @@ def three_venv_cmd(*cmd):
         if tmp:
             os.environ['CMG_LOCAL_VIRTUALENV_VERSION'] = tmp
 
+def reindex_it(self):
+    """ contributed to models instances so solr can quickly be updated """
+    from medley.ellington_overrides.search.tasks import HaystackUpdateTask
+    h = HaystackUpdateTask()
+    h.taskfunc(self.__class__, pk_list=[self.id],commit=True)
+
+
 usage = """
 Hybrid IPython / bash environment tailored for medley development.
 
@@ -137,13 +144,7 @@ class Plugin(SmashPlugin):
     def install(self):
         """ fixme: none of this will be uninstalled.. """
         self.contribute_magic('jira', jira)
-
-        from smashlib import ALIASES as aliases
         report.msh('installing medley support')
-        aliases.add('d dad', '__medley__')
-        ctest=('ctest dad create_test_template '
-               '--settings=storyville.conf.utest_template')
-        aliases.add(ctest,'__medley__')
         self.contribute('engage', Engage())
         dad_test = '!django-admin.py test ' + \
                    '${getattr(_margv[0],"__name__",_margv[0])} ' + \
@@ -168,11 +169,6 @@ class Engage(object):
     @property
     def medley_models(self):
         """ """
-        def reindex_it(self):
-            "in master one day.."
-            from medley.ellington_overrides.search.tasks import HaystackUpdateTask
-            h = HaystackUpdateTask()
-            h.taskfunc(self.__class__, pk_list=[self.id],commit=True)
         from smashlib.active_plugins.djangoisms import D
         plugin = SmashPlugin()
         for _, model in D().models.items():
