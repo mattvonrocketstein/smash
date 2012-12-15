@@ -19,7 +19,7 @@
         ['hudson    https://hudson.cmgdigital.com/',
          'hudson_fe https://hudson.cmgdigital.com/view/FE/',
          'logger    http://logger.cmgdigital.com/all/latest.log.html',
-         'psa       http://intranet.cmgdigital.com/display/collaboration/PSAs'
+         'psa       http://intranet.cmgdigital.com/display/collaboration/PSAs',
          'prod1     ssh://manderson@djaapaprd1.ddtc.cmgdigital.com',
          'prod2     ssh://manderson@djaapaprd2.ddtc.cmgdigital.com',
          'fe_assign http://intranet.cmgdigital.com/display/collaboration/Feature+Environment+Assignment',
