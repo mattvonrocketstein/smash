@@ -147,4 +147,5 @@ class Plugin(SmashPlugin):
             bookmarks = Bookmarks()
             self.contribute('bookmarks', bookmarks)
             post_hook_for_magic('cd', bookmarks._maybe_update)
-            Project.bus.subscribe('post_activate', bookmarks._maybe_update)
+            from smashlib import bus
+            bus.subscribe('post_activate', bookmarks._maybe_update)

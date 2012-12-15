@@ -5,8 +5,6 @@ import os
 
 from collections import defaultdict
 
-from cyrusbus import Bus
-
 from smashlib.python import expanduser
 from smashlib.reflect import namedAny
 from smashlib.util import colorize, report, list2table
@@ -34,7 +32,7 @@ class Hooks(object):
 
 def update_aliases(bus, *args, **kargs):
     """ """
-    report('dddddddddddd')
+    report.project_manager('updating aliases')
     cp = Project('whatever').CURRENT_PROJECT
     if cp:
         from smashlib import ALIASES as aliases
@@ -63,17 +61,6 @@ class Project(VenvMixin, Hooks):
     _paths    = {}
     notifiers = []
     _post_activate = defaultdict(lambda: [])
-
-    bus = Bus()
-    bus.subscribe('post_invoke',
-                  lambda bus, *args, **kargs: report('post_invoke:' + str(kargs)))
-    bus.subscribe('pre_invoke',
-                  lambda bus, *args, **kargs: report('pre_invoke:' + str(kargs)))
-    bus.subscribe('pre_activate',
-                  lambda bus, *args, **kargs: report('pre_activate:' + str(kargs)))
-    bus.subscribe('post_activate',
-                  lambda bus, *args, **kargs: report('post_activate:' + str(kargs)))
-    bus.subscribe('pre_invoke', update_aliases)
 
     def _doc_helper(self, path_subset):
         dat = []
@@ -107,6 +94,8 @@ class Project(VenvMixin, Hooks):
         self.name = name
         self._pre_invokage  = defaultdict(lambda: [])
         self._post_invokage = defaultdict(lambda: [])
+        from smashlib import bus
+        bus.subscribe('pre_invoke', update_aliases)
 
     @property
     def watched(self):
@@ -164,13 +153,15 @@ class Project(VenvMixin, Hooks):
                     func = namedAny(x)
             else:
                 raise Exception,'niy: ' + str(x)
-            Project.bus.subscribe('post_activate.'+name, func)
+            from smashlib import bus
+            bus.subscribe('post_activate.'+name, func)
             if func not in kls._post_activate[name]:
                 kls._post_activate[name] += [func]
 
     @classmethod
     def bind(kls, _dir, name=None, post_activate=[], post_invoke=[]):
         """ installs a named alias for changing directory to "_dir". """
+        from smashlib import bus
         _dir = expanduser(_dir)
         if name is None:
             name = os.path.split(_dir)[1]
@@ -180,14 +171,13 @@ class Project(VenvMixin, Hooks):
         for x in post_invoke:
             x = namedAny(x) if isinstance(x, (str, unicode)) else x
             tmp.append(x)
-            Project.bus.subscribe('post_invoke.'+name, x)
-
+            bus.subscribe('post_invoke.'+name, x)
         kls._paths[name] = _dir
 
         @property
         def invoke(self):
             """ FIXME: yeah this is a pretty awful hack.. """
-            Project.bus.publish('pre_invoke',name=name)
+            bus.publish('pre_invoke',name=name)
             from smashlib import ALIASES as aliases
             new_aliases = self._config.get('aliases',{}).get(name,[])
             [ aliases.add(a, name) for a in new_aliases]
@@ -196,7 +186,7 @@ class Project(VenvMixin, Hooks):
             p._config = self._config
             [ f() for f in self._pre_invokage[name] ]
             os.chdir(p.dir)
-            Project.bus.publish('post_invoke.' + name)
+            bus.publish('post_invoke.' + name)
             return p
 
         setattr(kls, name.replace('-','_'), invoke)
