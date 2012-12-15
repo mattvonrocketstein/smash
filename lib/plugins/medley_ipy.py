@@ -13,100 +13,87 @@ tc  = ColorANSI.TermColors()
 
 FE_T = 'ssh djaapafes{0}.ddtc.cmgdigital.com -l manderson'
 
+def jira(*args):
+    """ """
+    import webbrowser
+    page = 'https://jira.cmgdigital.com/browse/{0}'.format(*args)
+    webbrowser.open_new_tab(page)
+    return page
+
 def fe(*args, **kargs):
+    """ """
     cmd = FE_T.format(*args)
     __IPYTHON__.system(cmd)
 
+def three_venv_cmd(*cmd):
+    """ proxy to three_venv.sh """
+    cmd = ' '.join(map(str, cmd))
+    tmp = os.environ.get('CMG_LOCAL_VIRTUALENV_VERSION',None)
+    if tmp:
+        del os.environ['CMG_LOCAL_VIRTUALENV_VERSION']
+    try:
+        jd = os.environ['JD_DIR'] if 'JD_DIR' in os.environ else \
+             __IPYTHON__.user_ns['proj']._paths['jellydoughnut']
+        three_venv = os.path.join(jd, 'three_venv.sh')
+        os.system('bash -c "source ' + three_venv + '; ' + cmd + '"')
+    finally:
+        if tmp:
+            os.environ['CMG_LOCAL_VIRTUALENV_VERSION'] = tmp
+
 usage = """
 Hybrid IPython / bash environment tailored for medley development.
-  1) IPython extensions:
 
-    project manager:
+  project manager:
 
-      >>> proj.medley      # cd to src/storyville/medley
-      >>> proj.ellington   # cd to src/storyville/ellington
-      >>> proj.mtemplates  # cd to src/storyville/medley-templates
+    >>> proj.medley      # cd to src/storyville/medley
+    >>> proj.ellington   # cd to src/storyville/ellington
+    >>> proj.mtemplates  # cd to src/storyville/medley-templates
 
-    shortcuts in webrowser (you can find more using tab completion):
-
-      # opens up hudson's login window in a new tab
-      >>> show.hudson.login
-
-      # opens up munin's celery graphs for FE-5
-      >>> show.munin.celery._5
 """
 
 border  = '{yellow}'+"-"*80+'{normal}'
 border  = border.format(yellow=tc.Yellow, normal=tc.Normal)
 api_doc = border + """
- {red}Augmenting ipython namespace with the following:{normal}
-  - the haystack registry @ ``hregistry`` is a dictionary like:
-     :: ModelClass -> SearchIndexInstance
-  - the api registry @ ``aregistry`` is a dictionary like:
-     :: ModelClass.__name__.lower() -> ResourceInstance
-  - all the conversion utilities bundled with medley api.  try listing them:
-    >>> api.get_<tab>
-  - misc (also available in lowercase versions):
-    ``SolrAPICommonFieldIndex``
-    ``MedleySearchQueryset``
-    ``SearchQueryset``
+    {red}Augmenting ipython namespace with the following:{normal}
+        - the haystack registry @ ``hregistry`` is a dictionary like:
+            :: ModelClass -> SearchIndexInstance
+        - the api registry @ ``aregistry`` is a dictionary like:
+            :: ModelClass.__name__.lower() -> ResourceInstance
+        - all the conversion utilities bundled with medley api.  try listing them:
+            >>> api.get_<tab>
+        - misc (also available in lowercase versions):
+            ``SolrAPICommonFieldIndex``
+            ``MedleySearchQueryset``
+            ``SearchQueryset``
 
- {red}Hints (try typing these lines):{normal}
-  >>> aregistry['story']
-  >>> hregistry[medleystory]
+    {red}Hints (try typing these lines):{normal}
+        >>> aregistry['story']
+        >>> hregistry[medleystory]
 """.format(red=tc.Red, normal=tc.Normal) + border
 
 medley_doc = border + """{red}
- Augmenting ipython namespace with the following:{normal}
-   - every Model like medley.<app>.models.<Model>, available at <Model>.__name__
-   - lowercase versions of the aforementioned are also permitted
+    Augmenting ipython namespace with the following:{normal}
+        - every Model like medley.<app>.models.<Model>, available at <Model>.__name__
+        - lowercase versions of the aforementioned are also permitted
 
- {red}Hints (try typing these lines):{normal}
-   >>> MedleyS<tab>              # tab completion on model uppercase names
-   >>> medleys<tab>              # tab completion on model uppercase names
-   >>> medleystory.o.all()       # shortcut for ".objects"
+    {red}Hints (try typing these lines):{normal}
+        >>> MedleyS<tab>              # tab completion on model uppercase names
+        >>> medleys<tab>              # tab completion on model uppercase names
+        >>> medleystory.o.all()       # shortcut for ".objects"
 """.format(red=tc.Red, normal=tc.Normal) + border
 
 medley_admin_doc = border + """{red}
- Augmenting ipython namespace with the following:{normal}
-   - a special value ``_admin_dct``, which is a dictionary like:
-     :: <Model>._meta.app_label -> [<ModelAdmin>,..]
+    Augmenting ipython namespace with the following:{normal}
+        - a special value ``_admin_dct``, which is a dictionary like:
+            :: <Model>._meta.app_label -> [<ModelAdmin>,..]
 
- {red}Hints (try typing these lines):{normal}
-   >>> _admin_dct | idump        # view it in sweet ncurses browser
+    {red}Hints (try typing these lines):{normal}
+        >>> _admin_dct | idump        # view it in sweet ncurses browser
 """.format(red=tc.Red, normal=tc.Normal) + border
 
-class L(object):
-    """ various lazy stuff.. some of this is experimental """
-
-    @property
-    def medley_app_dirs(self):
-        return [ x for x in D().app_dirs \
-                 if 'storyville/medley' in x ]
-
-    @property
-    def medley_tests_files(self):
-        out=[]
-        for x in self.medley_app_dirs:
-            testdir = os.path.join(x,'tests')
-            testfile = os.path.join(x,'tests.py')
-            if os.path.exists(testdir):
-                out.append(testdir)
-            if os.path.exists(testfile):
-                out.append(testfile)
-        return out
-
-    @property
-    def medley_tests(self):
-        from medley.util.testing import import_test_classes
-        out = []
-        for fod in self.medley_tests_files:
-            out += import_test_classes(fod, None)
-        out = set(out)
-        return out
-
-L = L()
-
+def storyville_dir():
+    src_dir = opj(os.environ['VIRTUAL_ENV'], 'src')
+    return opj(src_dir, 'storyville')
 
 def load_medley_customizations2(*args):
     """ post-activation instructions for medley-related
@@ -114,48 +101,19 @@ def load_medley_customizations2(*args):
         work until after a VENV is activated.
     """
     from smashlib import PROJECTS as proj
-    src_dir = opj(os.environ['VIRTUAL_ENV'], 'src')
-    storyville_dir = opj(src_dir, 'storyville')
-    sys.path.append(storyville_dir)
+    from smashlib.active_plugins.djangoisms import set_settings
+
+    sys.path.append(storyville_dir())
     report.medley_customization('loading three-venv macros')
     plugin = SmashPlugin()
-    plugin.contribute_magic('fe', fe)
-    plugin.contribute('vm',
-                      Macro("__IPYTHON__.three('vm', _margv[0])"))
-    plugin.contribute('rs', Macro("__IPYTHON__.three('rs')"))
-    plugin.contribute('review', Macro("__IPYTHON__.three('review')"))
-    cmd  = '! cd ' + os.path.join(os.environ['VIRTUAL_ENV'],'src','storyville','solr')
-    cmd += '; kill -KILL `cat solr.pid`; sleep 3'
-    cmd += '; ./run-solr.sh& echo $!>solr.pid'
-    plugin.contribute('solr',  Macro(cmd))
+    __IPYTHON__.shell.three = plugin.contribute('three', three_venv_cmd)
 
-    def three_venv_cmd(*cmd):
-        """ proxy to three_venv.sh """
-        cmd = ' '.join(map(str, cmd))
-        tmp = os.environ.get('CMG_LOCAL_VIRTUALENV_VERSION',None)
-        if tmp:
-            del os.environ['CMG_LOCAL_VIRTUALENV_VERSION']
-        try:
-            jd = os.environ['JD_DIR'] if 'JD_DIR' in os.environ else \
-                 __IPYTHON__.user_ns['proj']._paths['jellydoughnut']
-            three_venv = os.path.join(jd, 'three_venv.sh')
-
-            os.system('bash -c "source ' + three_venv + '; ' + cmd + '"')
-        finally:
-            if tmp:
-                os.environ['CMG_LOCAL_VIRTUALENV_VERSION'] = tmp
-
-    __IPYTHON__.shell.three = three_venv_cmd
-    plugin.contribute('three', three_venv_cmd)
-
-    if not os.environ.get('DJANGO_SETTINGS_MODULE'):
-        os.environ['DJANGO_SETTINGS_MODULE'] = 'storyville.conf.local'
+    set_settings('storyville.conf.local')
 
     # set the DB port.  the 'activate' file has been modified by three_venv's create_environment
     # but activate.py was left untouched so we have to snag a value from the former file in
     # this fashion.  doing this is critical or you'll get FATAL: authorization blah blah errors
     # whenever you try to do anything with django.
-
     try:
         activate_file = os.path.join(os.environ['VIRTUAL_ENV'], 'bin', 'activate')
         c = open(activate_file).readlines()
@@ -178,11 +136,6 @@ class Plugin(SmashPlugin):
 
     def install(self):
         """ fixme: none of this will be uninstalled.. """
-        def jira(*args):
-            import webbrowser
-            page = 'https://jira.cmgdigital.com/browse/{0}'.format(*args)
-            webbrowser.open_new_tab(page)
-            return page
         self.contribute_magic('jira', jira)
 
         from smashlib import ALIASES as aliases
@@ -197,6 +150,15 @@ class Plugin(SmashPlugin):
                    '--settings=storyville.conf.utest_template ' + \
                    '--noinput --verbosity=2'
         self.contribute('test', Macro(dad_test))
+        self.contribute('rs', Macro("__IPYTHON__.three('rs')"))
+        self.contribute_magic('fe', fe)
+        self.contribute('vm',
+                        Macro("__IPYTHON__.three('vm', _margv[0])"))
+        self.contribute('review', Macro("__IPYTHON__.three('review')"))
+        cmd  = '! cd ' + os.path.join(os.environ['VIRTUAL_ENV'],'src','storyville','solr')
+        cmd += '; kill -KILL `cat solr.pid`; sleep 3'
+        cmd += '; ./run-solr.sh& echo $!>solr.pid'
+        self.contribute('solr',  Macro(cmd))
 
 def load_medley_customizations(bus):
     Plugin().install()
@@ -222,8 +184,7 @@ class Engage(object):
                         lambda self: reindex_it(self))
 
         from django.contrib.sites.models import Site
-        plugin.contribute('site', Site)
-        plugin.contribute('Site', Site)
+        plugin.icontribute('Site', Site)
         print medley_doc
 
     @property

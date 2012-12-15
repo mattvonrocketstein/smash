@@ -179,7 +179,7 @@ class Project(VenvMixin, Hooks):
             """ FIXME: yeah this is a pretty awful hack.. """
             bus.publish('pre_invoke',name=name)
             from smashlib import ALIASES as aliases
-            new_aliases = self._config.get('aliases',{}).get(name,[])
+            new_aliases = self._config.get('aliases', {}).get(name, [])
             [ aliases.add(a, name) for a in new_aliases]
             p = Project(name)
             p.dir = _dir

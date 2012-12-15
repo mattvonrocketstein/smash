@@ -8,6 +8,9 @@
 from __future__ import print_function
 import os, sys
 from types import ModuleType
+
+from cyrusbus import Bus
+
 from smashlib.plugin_manager import PluginManager
 from smashlib.aliases import Aliases
 
@@ -18,7 +21,7 @@ VERBOSE     = True
 active_plugins = sys.modules['smashlib.active_plugins'] = ModuleType('smashlib.active_plugins')
 
 
-from cyrusbus import Bus
+
 bus = Bus()
 bus.subscribe('post_invoke',
               lambda bus, *args, **kargs: print('post_invoke:' + str(kargs)))

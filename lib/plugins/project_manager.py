@@ -15,6 +15,7 @@ from smashlib.projects import Project, ROOT_PROJECT_NAME, COMMAND_NAME
 CONFIG_FILE_NAME = 'projects.json'
 
 class CurrentProject(object):
+    """ """
     @property
     def wd(self):
         return os.getcwd()

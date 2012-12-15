@@ -8,6 +8,9 @@ from smashlib.projects import Project, COMMAND_NAME
 from smashlib.util import report, post_hook_for_magic
 from smashlib.smash_plugin import SmashPlugin
 
+def set_settings(dsm):
+    os.environ['DJANGO_SETTINGS_MODULE'] = dsm
+
 class D(object):
     """ lazy django stuff.
 

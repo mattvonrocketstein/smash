@@ -1,4 +1,4 @@
-"""
+""" smashlib.smash_plugin
 """
 from IPython import ipapi
 
@@ -8,7 +8,7 @@ from smashlib.reflect import namedAny
 ip = ipapi.get()
 
 class SmashPlugin(object):
-    """ TODO: ... """
+    """ to make a new plugin for SmaSh, extend this class """
 
     requires = []
     requires_plugins = []

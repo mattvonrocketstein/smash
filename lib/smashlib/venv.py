@@ -144,6 +144,7 @@ class VenvMixin(object):
         result = self._activate_str(obj.dir)
         from smashlib import bus
         bus.publish('post_activate.' + obj.name)
+        return result
 
     @property
     def activate(self):
@@ -164,9 +165,8 @@ class VenvMixin(object):
         self.deactivate()
         if isinstance(obj, types.StringTypes):
             result = self._activate_str(obj)
-        elif type(obj).__name__ == ProjectClass.__name__:
-            # FIXME: isinstance here does not work here?
-            #        project_manager.Project vs __smash__.Project
+        #elif type(obj).__name__ == ProjectClass.__name__:
+        elif isinstance(obj, ProjectClass):
             result = self._activate_project(obj)
             bus.publish('post_activate', name=obj.name, )
         else:
