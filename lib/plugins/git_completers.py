@@ -104,6 +104,7 @@ class Plugin(SmashPlugin):
         set_complete(uncomitted_files_completer, 'gd')
         set_complete(uncomitted_files_completer, 'git diff')
         set_complete(local_branches, 'git merge')
+        set_complete(local_branches, 'git log')
         #set_complete(lambda self, event: git.local_branches, 'git push')
 
         # TODO: .. only need file-system if in the middle of rebase ..
