@@ -6,13 +6,16 @@
 import os
 import demjson
 
-from smashlib.util import report, list2table, die, bus
-from smashlib.python import opd, opj
+
+from smashlib.util import die, read_config
+from smashlib.util import report, list2table, bus
+from smashlib.python import opd, opj, ope
 from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import post_hook_for_magic, add_shutdown_hook
 from smashlib.projects import Project, ROOT_PROJECT_NAME, COMMAND_NAME
 
 CONFIG_FILE_NAME = 'projects.json'
+
 
 class CurrentProject(object):
     """ """
@@ -64,26 +67,15 @@ class Plugin(SmashPlugin):
         default_aliases = config.get('aliases', {}).get(ROOT_PROJECT_NAME, [])
         from smashlib import ALIASES as aliases
         default_aliases = [ aliases.add(alias) for alias in default_aliases ]
-        report.project_manager('adding aliases: ' + str(default_aliases))
+        #report.project_manager('adding aliases: ' + str(default_aliases))
         aliases.install()
 
     def install(self):
         import smashlib
-        config_file = opj(smashlib.config_dir, CONFIG_FILE_NAME)
+        config_file = opj(smashlib._meta['config_dir'], CONFIG_FILE_NAME)
         Project._config_file = config_file
         report.project_manager('loading config: ' + config_file)
-        if not os.path.exists(config_file):
-            config = {}
-            report.project_manager(' file does not exist')
-        else:
-            with open(config_file, 'r') as fhandle:
-                try: config = demjson.decode(fhandle.read())
-                except demjson.JSONDecodeError,e:
-                    err = "cannot continue, failed to read json file: " + config_file
-                    report.ERROR(err+'\n\n\t' + str(e))
-                    die()
-                    return # !!
-            report.project_manager(' config keys: '+str(config.keys()))
+        config = read_config(config_file)
         manager = Project(ROOT_PROJECT_NAME)
 
         # dont move this next line.  post_activate/post_invoke things might want the manager.
@@ -91,33 +83,18 @@ class Plugin(SmashPlugin):
 
         manager._config = config
         for name, val in config.get('post_activate', {}).items():
-            manager._add_post_activate(name, val)
             bus().subscribe('post_activate.' + name, val)
-        KNOWN_EVENT_TYPES = 'file-post-change'.split()
-        for project_name,watchdog_config in config.get('watchdog', {}).items():
-            assert isinstance(watchdog_config, dict), 'expected dictionary for wd-config@' + project_name
-            for event_type, event_config in watchdog_config.items():
-                assert event_type in KNOWN_EVENT_TYPES, 'unknown eventtype'
-                event_type_handler = getattr(self, 'ethandler_' + event_type.replace('-','_'))
-                event_type_handler(project_name, event_config)
-
         self.load_instructions(manager, config)
-
-
-
-        # per-project aliases
         self.load_aliases(config)
-
-        # install hooks in the environment
-        # FIXME: this stopped working
         post_hook_for_magic('cd', manager._announce_if_project)
 
         add_shutdown_hook(lambda: manager.shutdown())
-        #__IPYTHON__.hooks['pre_prompt_hook'].add(manager.check)
         smashlib.PROJECTS = manager
         self.contribute('this',CurrentProject())
 
+        self._add_option_parsing(manager)
 
+    def _add_option_parsing(self, manager):
         # add option parsing for project-manager
         from smashlib.parser import SmashParser
         def handler(opts):
