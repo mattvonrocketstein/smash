@@ -5,16 +5,30 @@ import os
 import StringIO
 import threading
 
+import demjson
 import asciitable
 
 import IPython
 from IPython import ColorANSI
-from IPython.genutils import Term
 
 opd = os.path.dirname
+ops = os.path.split
 opj = os.path.join
 ope = os.path.exists
 tc = ColorANSI.TermColors()
+
+def watch(*args, **kargs):
+    print 'this is watch',args,kargs
+
+def read_config(config_file):
+    """ TODO: parameter for wheter errors are fatal? """
+    with open(config_file, 'r') as fhandle:
+        try: config = demjson.decode(fhandle.read())
+        except demjson.JSONDecodeError,e:
+            err = "cannot continue, failed to read json file: " + config_file
+            report.ERROR(err+'\n\n\t' + str(e))
+            return die()
+        return config
 
 def bus():
     """ get the main bus.  this is used instead of a direct import,
@@ -109,7 +123,11 @@ class Reporter(object):
 report = Reporter()
 
 def add_shutdown_hook(f):
-    __IPYTHON__.hooks['shutdown_hook'].add(f)
+    def newf(*args, **kargs):
+        f(*args,**kargs)
+        from IPython.ipapi import TryNext
+        raise TryNext()
+    __IPYTHON__.hooks['shutdown_hook'].add(newf)
 
 def die():
     """
