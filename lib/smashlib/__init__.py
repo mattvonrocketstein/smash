@@ -14,23 +14,19 @@ from cyrusbus import Bus
 from smashlib.plugin_manager import PluginManager
 from smashlib.aliases import Aliases
 
+VERBOSE     = True
 ALIASES     = Aliases()
 opd, opj    = os.path.dirname, os.path.join
-config_dir  = opj(opd(opd(__file__)), 'etc')
-VERBOSE     = True
 active_plugins = sys.modules['smashlib.active_plugins'] = ModuleType('smashlib.active_plugins')
 
+_meta = dict( config_dir = opj(opd(opd(__file__)), 'etc'),
+              bin_dir = opj(opd(opd(__file__)), 'bin'),)
+def fac(m):
+    return lambda bus, *args, **kargs: print(m + str(kargs))
 
-_meta = {}
 
 bus = Bus()
-bus.subscribe('post_invoke',
-              lambda bus, *args, **kargs: print('post_invoke:' + str(kargs)))
-bus.subscribe('pre_invoke',
-              lambda bus, *args, **kargs: print('pre_invoke:' + str(kargs)))
-bus.subscribe('pre_activate',
-              lambda bus, *args, **kargs: print('pre_activate:' + str(kargs)))
-bus.subscribe('post_activate',
-              lambda bus, *args, **kargs: print('post_activate:' + str(kargs)))
-
-__all__     = [PluginManager, Aliases, aliases, config_dir]
+bus.subscribe('post_invoke',   fac('post_invoke:'))
+bus.subscribe('pre_invoke',    fac('pre_invoke'))
+bus.subscribe('pre_activate',  fac('pre_activate'))
+bus.subscribe('post_activate', fac('post_activate'))
