@@ -27,8 +27,8 @@ class PluginManager(object):
 
     @property
     def SMASH_DIR(self):
-        from smashlib import SMASH_DIR
-        return SMASH_DIR
+        import smashlib
+        return smashlib._meta['SMASH_DIR']
 
     @property
     def PLUGINS_CONF(self):
