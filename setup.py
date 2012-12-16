@@ -42,7 +42,10 @@ def run_pip():
 
 def create_virtualenv(abspath):
     print "Creating virtual-environment: {0}".format(abspath)
-    return os.system('virtualenv --no-site-packages {0}'.format(abspath))
+    #cmd = 'virtualenv --no-site-packages {0}'
+    cmd = 'virtualenv {0}'
+    cmd = cmd.format(abspath)
+    return os.system(cmd)
 
 if HOME_BIN not in SHELL_PATH:
     raise SystemExit("""
