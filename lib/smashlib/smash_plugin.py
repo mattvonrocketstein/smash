@@ -9,7 +9,7 @@ ip = ipapi.get()
 
 class SmashPlugin(object):
     """ to make a new plugin for SmaSh, extend this class """
-
+    installation_priority = 10
     requires = []
     requires_plugins = []
 
@@ -56,14 +56,10 @@ class SmashPlugin(object):
         return val
 
     def pre_install(self):
-        already_plugged_in = [x.name for x in self._plugins]
-        for prereq in self.requires_plugins:
-            raise Exception
-            if not prereq.endswith('.py'):
-                # HACK.. one day non-python plugins would be nice..
-                prereq.append('.py')
-            if prereq not in already_plugged_in:
-                raise ValueError, 'prerequisite {0} not found'.format(prereq)
+        print 'installing',self
+        from smashlib.reflect import namedAny
+        for name in self.requires:
+            obj = namedAny(name)
 
     def contribute_magic(self, name, func):
         if name.startswith('magic_'):
