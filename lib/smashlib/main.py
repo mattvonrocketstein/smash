@@ -37,8 +37,8 @@ def reinstall_aliases():
     aliases.install()
 
 VERBOSE   = False
-SMASH_DIR = opd(opd(__file__))
-SMASH_ETC_DIR = opj(SMASH_DIR, 'etc')
+smashlib._meta['SMASH_DIR'] = opd(opd(__file__))
+SMASH_ETC_DIR = opj(smashlib._meta['SMASH_DIR'], 'etc')
 ip        = ipapi.get()
 
 for option, val in OVERRIDE_OPTIONS.items():
@@ -51,7 +51,7 @@ sys.argv = sys.argv[1:]
 # Plugin installation MUST come before using/instantiating the
 # CLI parser, because plugins have the option of modifying it.
 smashlib.SMASH_ETC_DIR = SMASH_ETC_DIR
-smashlib.SMASH_DIR = SMASH_DIR
+
 plugins = smashlib.PluginManager()
 plugins.install()
 
