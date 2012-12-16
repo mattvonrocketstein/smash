@@ -21,6 +21,7 @@ VERBOSE     = True
 active_plugins = sys.modules['smashlib.active_plugins'] = ModuleType('smashlib.active_plugins')
 
 
+_meta = {}
 
 bus = Bus()
 bus.subscribe('post_invoke',
