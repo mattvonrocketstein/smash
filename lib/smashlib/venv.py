@@ -73,7 +73,7 @@ class VenvMixin(object):
                 if entry and not entry.startswith(venv):
                     new_path.append(entry)
                 else:
-                    if entry.startswith(smashlib.SMASH_DIR) and \
+                    if entry.startswith(smashlib._meta['SMASH_DIR']) and \
                        'IPython' in entry:
                         # careful, dont remove our bootstraps.
                         # specifically this will break --project=..

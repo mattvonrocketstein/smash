@@ -67,12 +67,6 @@ class Plugin(SmashPlugin):
         report.project_manager('adding aliases: ' + str(default_aliases))
         aliases.install()
 
-    def ethandler_file_post_change(self, project_name, event_config):
-        for file_extension, extension_handler_list in event_config.items():
-            assert isinstance(extension_handler_list, list),extension_handler_list
-            report.watchdog('would have built watchdog for {0}, handling {1} with {2}'.format(
-                project_name,file_extension,extension_handler_list))
-
     def install(self):
         import smashlib
         config_file = opj(smashlib.config_dir, CONFIG_FILE_NAME)
