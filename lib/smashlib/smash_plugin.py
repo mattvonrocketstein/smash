@@ -38,13 +38,24 @@ class SmashPlugin(object):
     def float_name(self, name):
         """ import name and add them to the global interpretter namespace """
         return self.contribute(name.split('.')[-1], namedAny(name))
-    def icontribute(self,name,val):
+    def icontribute(self,*args, **kargs):
         """  contribute name/val (and lowercase equivalent
              to the global interpretter namespace
         """
-        return self.contribute(name,val,case_sensitive=False)
-    def contribute(self, name, val, case_sensitive=True):
+        kargs.update(case_sensitive=False)
+        return self.contribute(*args, **kargs)
+    def contribute(self, *args, **kargs): #case_sensitive=True):
         """ contribute name/val to IPython shells' namespace """
+        case_sensitive = kargs.pop('case_sensitive',False)
+        name, val = None, None
+        if len(args)==2:
+            name, val= args
+        else:
+            assert len(kargs)==1,'not implemented yet, maybe never..'
+            name,val = kargs.items()[0]
+
+        assert name and val, 'error unpacking args'
+
         if name in __IPYTHON__.user_ns:
             msg = ('"{0}" variable is taken in user namespace.  '
                    'refusing to proceed').format(name)
