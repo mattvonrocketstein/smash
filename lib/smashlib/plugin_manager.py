@@ -73,7 +73,10 @@ class PluginManager(object):
         if 'Plugin' not in G:
             err  = abs_path_to_plugin + ' is old style,'
             err += ' "Plugin" not found in namespace'
-            raise Exception, err
+            from smashlib.util import die
+            report(err)
+            die()
+            return
         plugin = G['Plugin']()
         rel_fname = os.path.split(abs_path_to_plugin)[-1]
         if not getattr(plugin, 'name', None):
