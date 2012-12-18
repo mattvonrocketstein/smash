@@ -12,6 +12,7 @@
     TODO: 'git push' should complete from the names of the remotes
     TODO: 'git push <remote>' should complete from the names of local_branches()
     TODO: consider .gitignore ?
+    TODO: 'git add' could be smarter during rebase
 """
 import os
 import IPython.ipapi
