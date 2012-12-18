@@ -1,80 +1,92 @@
 {
   "apt_completers.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
+  "currency_conversion.py": {
+    "enabled": 1
+  },
   "djangoisms.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "fabric_support.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "git_completers.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "ipy_venv_support.py": {
     "enabled": 0
-  }, 
+  },
   "medley_ipy.py": {
-    "enabled": 0, 
+    "enabled": 0,
     "requires": []
-  }, 
+  },
+  "notifier.py": {
+    "enabled": 1
+  },
   "pip_completer.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
+  "pkill_completer.py": {
+    "enabled": 1
+  },
   "plugin_inspector.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "project_manager.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "py_dictionary_completer.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "pyflakes_helper.py": {
-    "enabled": 0, 
+    "enabled": 0,
     "requires": []
-  }, 
+  },
   "quacker.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "recentfiles.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "setup_completer.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "smash_aliases.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "smash_bookmarks.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
+  //"smash_notify.py": {
+  //  "enabled": 1
+  //},
   "tests_dir_hook.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "venv_prompt.py": {
     "enabled": 1
-  }, 
+  },
   "which.py": {
-    "enabled": 1, 
+    "enabled": 1,
     "requires": []
-  }, 
+  },
   "ytdl.py": {
-    "enabled": 0, 
+    "enabled": 0,
     "requires": []
   }
 }
