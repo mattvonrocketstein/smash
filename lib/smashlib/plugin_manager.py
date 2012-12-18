@@ -26,11 +26,6 @@ class PluginManager(object):
         return opj(self.SMASH_DIR, 'plugins')
 
     @property
-    def SMASH_DIR(self):
-        import smashlib
-        return smashlib._meta['SMASH_DIR']
-
-    @property
     def PLUGINS_CONF(self):
         return os.path.join(self.SMASH_DIR, 'etc', 'plugins.json')
 
