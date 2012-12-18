@@ -1,5 +1,9 @@
 """ pkill_completer
+
+      tab-completer for unix kill commands
 """
+
+import signal
 
 import psutil
 
@@ -11,9 +15,13 @@ def proc_name_completer(self, event):
                  if ' ' not in x.name and \
                  '/' not in x.name and \
                  ':' not in x.name ])
-
     return procs
+
+def signal_completer(self, event):
+    return [ '-'+x[3:] for x in dir(signal) if x.startswith('SIG') ]
 
 class Plugin(SmashPlugin):
     def install(self):
         set_complete(proc_name_completer, 'pkill')
+        set_complete(signal_completer, 'kill')
+        #set_complete(proc_pid_completer, 'kill -KILL')
