@@ -5,6 +5,7 @@ import json
 import demjson
 from IPython import ipapi
 
+import smashlib
 from smashlib.util import report,ope
 from smashlib.util import die
 from smashlib.python import opj, ope
@@ -21,15 +22,15 @@ class PluginManager(object):
     """ smash plugins manager """
     report = staticmethod(report.plugins)
 
-    @property
-    def PLUGINS_DIR(self):
-        return opj(self.SMASH_DIR, 'plugins')
-
-    @property
-    def PLUGINS_CONF(self):
-        return os.path.join(self.SMASH_DIR, 'etc', 'plugins.json')
-
     def __init__(self):
+        self.SMASH_DIR = smashlib._meta['SMASH_DIR']
+        self.PLUGINS_DIR = opj(self.SMASH_DIR, 'plugins')
+        self.PLUGINS_CONF = opj(self.SMASH_DIR,
+                                'etc', 'plugins.json')
+        # set these in the global metadata, so anyone can grab it
+        smashlib._meta['PLUGINS_DIR'] = self.PLUGINS_DIR
+        smashlib._meta['PLUGINS_CONF'] = self.PLUGINS_CONF
+
         self.plugins_json_file = self.PLUGINS_CONF
         self._plugins = []
         if self.stale_plugins:
