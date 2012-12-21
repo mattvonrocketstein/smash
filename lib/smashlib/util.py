@@ -2,6 +2,7 @@
 """ smashlib.util
 """
 import os
+import time
 import StringIO
 import threading
 
@@ -156,3 +157,13 @@ def list2table(dat, header=[], indent=''):
         out = [indent+line for line in out]
         out = '\n'.join(out)
     return out
+
+def do_it_later(func, delay=1):
+    """ this is ugly, but sometimes using
+        __IPYTHON__.hooks['late_startup_hook']
+        just wont work.
+    """
+    def tmp():
+        time.sleep(1)
+        func()
+    threading.Thread(target=tmp).start()
