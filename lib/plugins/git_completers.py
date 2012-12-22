@@ -1,10 +1,10 @@
 """ git_completers
 
     WARNING:
-    most of this stuff fails silently and ipython mangles scope on the hooks you
-    register, so for instance DO NOT attempt to abstract local variables out of
-    your handle functions unless you really know what you're doing.  no idea wtf
-    ipython does that or how to work around it.
+      most of this stuff fails silently and ipython mangles scope on the hooks
+      you register, so for instance DO NOT attempt to abstract local variables
+      out of your handle functions unless you really know what you're doing.
+      no idea wtf ipython does that or how to work around it.
 
     TODO: smarter with ?http://pypi.python.org/pypi/gitinfo/0.0.2 ?
           depends on GitPython, which is largeish
