@@ -15,20 +15,21 @@ class SmashParser(OptionParser):
 
     def __init__(self, *args, **kargs):
         OptionParser.__init__(self, *args, **kargs)
+        from smashlib.util import panic
         self.add_option("-v", dest="verbose", action="store_true",
                           default=False, help='more verbose bootstrapping info')
         self.add_option("--panic", dest="panic",
                           default=False, action="store_true",
-                          help="kill all running instances of 'smash'", )
+                          help=panic.__doc__, )
         self.add_option('-i', '--install',
                           dest='install', default='',
-                          help='install new smash module')
+                          help=PluginManager.cmdline_install_new_plugin.__doc__)
         self.add_option('-l', '--list',
-                          action='store_true',dest='list', default=False,
-                          help=PluginManager.list.__doc__)
+                          action='store_true', dest='list', default=False,
+                          help=PluginManager.cmdline_list.__doc__)
         self.add_option('--enable',
                           dest='enable', default='',
-                          help=PluginManager.enable.__doc__)
+                          help=PluginManager.cmdline_enable.__doc__)
         self.add_option('--disable',
                           dest='disable', default='',
                           help=PluginManager.disable.__doc__)
