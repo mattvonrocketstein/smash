@@ -18,6 +18,17 @@ opj = os.path.join
 ope = os.path.exists
 tc = ColorANSI.TermColors()
 
+def panic():
+    ("kill ALL the running instances of smash.\n"
+     "useful when you have a misbehaving plugin..")
+    import psutil,os
+    matches = [ x for x in psutil.process_iter() \
+                if 'smash' in ' '.join(x.cmdline) ]
+    proc = [ x for x in matches if x.pid==os.getpid() ][0]
+    matches.remove(proc)
+    [ m.kill() for m in matches ]
+    proc.kill()
+
 def watch(*args, **kargs):
     print 'this is watch',args,kargs
 
