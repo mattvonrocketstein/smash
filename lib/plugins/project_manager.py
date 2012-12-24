@@ -69,10 +69,13 @@ class Plugin(SmashPlugin):
         default_aliases = [ aliases.add(alias) for alias in default_aliases ]
         #report.project_manager('adding aliases: ' + str(default_aliases))
         aliases.install()
+    @property
+    def config_filename(self):
+        import smashlib
+        return opj(smashlib._meta['config_dir'], CONFIG_FILE_NAME)
 
     def install(self):
-        import smashlib
-        config_file = opj(smashlib._meta['config_dir'], CONFIG_FILE_NAME)
+        config_file = self.config_filename
         Project._config_file = config_file
         report.project_manager('loading config: ' + config_file)
         config = read_config(config_file)
@@ -94,17 +97,20 @@ class Plugin(SmashPlugin):
 
         self._add_option_parsing(manager)
 
+    def cmdline_activate_project(self, opts):
+        ('specify a project to inialize.\n'
+         '(the project should already be recognized '
+         'by the project manager)')
+        project = getattr(manager, opts.project, None)
+        if project is None:
+            report("nonexistant project: {0}".format(opts.project))
+            die()
+        manager._activate(project)
     def _add_option_parsing(self, manager):
         # add option parsing for project-manager
         from smashlib.parser import SmashParser
-        def handler(opts):
-            project = getattr(manager, opts.project, None)
-            if project is None:
-                report("nonexistant project: {0}".format(opts.project))
-                die()
-            manager._activate(project)
         SmashParser.defer_option(args=('-p', "--project",),
                                        kargs=dict(
                                            dest="project", default='',
-                                           help="specify a project to initialize", ),
-                                 handler=handler)
+                                           help=self.cmdline_activate_project.__doc__ ),
+                                 handler=self.cmdline_activate_project)
