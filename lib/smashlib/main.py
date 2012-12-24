@@ -14,18 +14,10 @@ from IPython import ipapi
 import smashlib
 from smashlib.parser import SmashParser
 from smashlib.data import OVERRIDE_OPTIONS
-from smashlib.util import clean_namespace, report, die
+from smashlib.util import clean_namespace, report, die, panic
 from smashlib.util import post_hook_for_magic, opj, opd
 from smashlib.usage import __doc__ as usage
 from smashlib.util import colorize
-
-def panic():
-    matches = [ x for x in psutil.process_iter() \
-                if 'smash' in ' '.join(x.cmdline) ]
-    proc = [ x for x in matches if x.pid==os.getpid() ][0]
-    matches.remove(proc)
-    [ m.kill() for m in matches ]
-    proc.kill()
 
 def reinstall_aliases():
     """ this is here because 'rehash' normally kills
@@ -74,10 +66,11 @@ else:
     smashlib.VERBOSE = VERBOSE
     #if VERBOSE:
     #report.smash('parsed opts: ' + str(eval(str(opts)).items()))
-    if opts.enable:  plugins.enable(opts.enable);   die()
+    if opts.enable:  plugins.cmdline_enable(opts.enable);   die()
     elif opts.disable: plugins.disable(opts.disable); die()
     elif opts.list:    plugins.list();                die()
     elif opts.panic:  panic();
+    elif opts.install:  plugins.cmdline_install_new_plugin(opts.install); die()
     else:
         # parse any command-line options which are added by plugins
         for args,kargs,handler in SmashParser.extra_options:

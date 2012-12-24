@@ -8,6 +8,8 @@ opj = os.path.join
 ope = os.path.exists
 ops = os.path.split
 opd = os.path.dirname
+splitext = os.path.splitext
+abspath=os.path.abspath
 expanduser = os.path.expanduser
 getcwd = os.getcwd
 
