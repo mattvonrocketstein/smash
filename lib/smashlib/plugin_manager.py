@@ -8,10 +8,12 @@ from IPython import ipapi
 import smashlib
 from smashlib.util import report,ope
 from smashlib.util import die
-from smashlib.python import opj, ope
+from smashlib.python import opj, ope, splitext,abspath, ops
 from smashlib.reflect import namedAny
 
 ip = ipapi.get()
+
+import shutil
 
 # plugins can define their own persistent settings, and they
 # should be stored here. by default the schema only consists in
@@ -20,7 +22,68 @@ DEFAULT_SCHEMA = dict(enabled=0,)
 
 class PluginManager(object):
     """ smash plugins manager """
+
     report = staticmethod(report.plugins)
+    def cmdline_enable(self, name):
+        ('enable a plugin by name.  \nthis must be one of the '
+         'plugins in ~/.smash/plugins, and you need not specify'
+         ' an absolute path.  \n(to move a file or url'
+         ' into that directory, use --install.\n')
+        self.report('enabling {0}'.format(name))
+        self._set_enabled(name, 1)
+
+    def cmdline_list(self):
+        ("lists and categorizes all available plugins in ~/.smash/plugins.\n")
+
+        plugins     = self.plugin_data
+        enabled     = self.enabled_plugins
+        disabled    = self.disabled_plugins
+        if enabled:
+            self.report('enabled plugins')
+            for p in enabled: print '  ',p
+            print
+        if disabled:
+            self.report('disabled plugins:')
+            for p in disabled: print '  ',p
+        if not (enabled or disabled):
+            self.report('no plugins at all in ' + self.SMASH_DIR)
+
+    def cmdline_install_new_plugin(self, s):
+        ('move plugin @ "INSTALL" to the smash plugin directory'
+         'you can enter a path to a file on disk or a url.')
+        report.plugin_manager('installing ' + s)
+        success = False
+        if s.split('://')[0] in 'https http ftp file'.split():
+            import urlparse,urllib
+            try:
+                urlparse.urlparse(s)
+            except:
+                report.plugin_manager('bad url?')
+            else:
+                fname = s.split('/')[-1].split('?')[0]
+                plugin_name = fname
+                d = self.PLUGINS_DIR
+                fname = opj(d, fname)
+                report.plugin_manager('downloading to {0}'.format(fname))
+                c = urllib.urlopen(s).read()
+                with open(fname,'w') as fhandle:
+                    fhandle.write(c)
+                success=True
+        else:
+            s = abspath(s)
+            assert ope(s),'file does not exist: '+e
+            if splitext(s)[-1] not in ['.py']:
+                report('not implemented yet for '+str(splitext(s)))
+                return
+            fname = ops(s)[-1]
+            plugin_name = fname
+            fname = opj(self.PLUGINS_DIR,fname)
+            report('copying to {0}'.format(fname))
+            shutil.copy(s, fname)
+            success = True
+        if success:
+            report.plugin_manager('plugin acquired. enabling it..')
+            self.install_plugin_from_fname(plugin_name)
 
     def __init__(self):
         self.SMASH_DIR = smashlib._meta['SMASH_DIR']
@@ -58,10 +121,12 @@ class PluginManager(object):
         self.report('disabling {0}'.format(name))
         self._set_enabled(name, 0)
 
-    def enable(self, name):
-        """ enable plugin by name """
-        self.report('enabling {0}'.format(name))
-        self._set_enabled(name, 1)
+    def install_plugin_from_plugin_name(self, plugin_name):
+        abs_path_to_plugin = opj(self.PLUGINS_DIR, plugin_name)
+        if not ope(abs_path_to_plugin):
+            report("no such plugin @ "+abs_path_to_plugin)
+            die()
+        return self.install_plugin_from_fname(abs_path_to_plugin)
 
     def install_plugin_from_fname(self, abs_path_to_plugin):
         G = globals().copy()
@@ -142,23 +207,6 @@ class PluginManager(object):
             if not ope(x):
                 stale.append(x)
         return stale
-
-    def list(self):
-        """ lists available plugins (from {0}) """.format(self.SMASH_DIR)
-        # reconstructed because `plugins_json_file` may not be up to date with system
-        plugins     = self.plugin_data
-        enabled     = self.enabled_plugins
-        disabled    = self.disabled_plugins
-        if enabled:
-            self.report('enabled plugins')
-            for p in enabled: print '  ',p
-            print
-        if disabled:
-            self.report('disabled plugins:')
-            for p in disabled: print '  ',p
-        if not (enabled or disabled):
-            self.report('no plugins at all in ' + self.SMASH_DIR)
-
 
     def install(self):
         """ install all plugins into the running environment """
