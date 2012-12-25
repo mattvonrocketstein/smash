@@ -2,11 +2,11 @@
 About
 =====
 
-Smash is the smart-shell, a python/bash hybrid which builds on the pysh profile for IPython.  It
-offers features for project management, virtual environment support, a flexible plugin
+Smash is the smart-shell.  It offers features for project management, a flexible plugin
 architecture that is easy to use, and simple JSON configuration files that try to be as
-sane as possible.
-
+sane as possible.  Python developers might be particularly interested because it also
+happens to be a python/bash hybrid which builds on the pysh profile for IPython.  It builds
+on, and offers very sophisticated support for python virtual environments.
 
 ===========
 The Problem
@@ -156,7 +156,7 @@ Hostname completion:
 
 Enhanced Bookmarks:
 
-  - sophisticated global or per-project bookmarks
+  - offers sophisticated global or per-project bookmarks
   - bookmark directories, urls, macros, or even things like ssh://person@place
   - launching bookmark actions is keyboard-friendly
 
@@ -178,7 +178,12 @@ Git VCS Integration:
   - Various default aliases and places to put more (making .git/config optional)
   - Should you be inclined: hopefully enough abstraction here to easily support other VCS's
 
-
+Notification support:
+  - Asynchronous notifications via freedesktop
+  - When this works, it's pretty great, but..
+     - currently no support for osx (growl)
+     - this may involve extra system-level requirements
+     - may require some fiddling to get it to work outside of ubuntu
 
 =================================
 Python Specific Plugins for Smash
@@ -245,7 +250,7 @@ Related Links
 
   - ``ipython`` http://ipython.org/ipython-doc/dev/interactive/shell.html
   - ``pysh`` http://faculty.washington.edu/rjl/clawpack-4.x/python/ipythondir/ipythonrc-pysh
-
+  - ``virtualenv for python`` http://some-link-here
 
 ============
 Other Shells
