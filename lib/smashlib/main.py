@@ -68,7 +68,7 @@ else:
     #report.smash('parsed opts: ' + str(eval(str(opts)).items()))
     if opts.enable:  plugins.cmdline_enable(opts.enable);   die()
     elif opts.disable: plugins.disable(opts.disable); die()
-    elif opts.list:    plugins.list();                die()
+    elif opts.list:    plugins.cmdline_list();                die()
     elif opts.panic:  panic();
     elif opts.install:  plugins.cmdline_install_new_plugin(opts.install); die()
     else:
