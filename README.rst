@@ -111,6 +111,10 @@ method.  From the command line you can use `smash --install` to "acquire" plugin
 to ~/.smash/plugins.  Plugins can be grabbed from disk, or from url's but the preferred method
 for distributing them is via github gist's using `smash --install gist://<id>`.
 
+Smash tries to encourage writing small plugins without dependencies, but if you need to reuse
+code from another plugin, every plugin that's enabled can be imported at any time from
+the `smashlib.active_plugins` module.
+
 
 The Project-management Abstraction:
 -----------------------------------
