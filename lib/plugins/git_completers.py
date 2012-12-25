@@ -48,6 +48,13 @@ def untracked_files_completer(self, event):
     lines = [ line.strip().replace('\t','')[1:] for line in lines ]
     return lines
 
+def reset_completer(self,event):
+    options = '--patch --soft --mixed --hard --merge --keep'.split()
+    #print '\n\n',event.symbol,options,event.symbol in options
+    #if str(event.symbol.strip().split()) in options:
+    #    return local_branches(self, event)
+    return options
+
 def filesystem_completer(self, event):
     """ awkward, but cannot find a better way to do this.. """
     data = event.line.split()[2:] # e.g. 'git',' mv', './<tab>'
@@ -123,6 +130,8 @@ class Plugin(SmashPlugin):
         set_complete(uncomitted_files_completer, 'git diff')
         set_complete(local_branches, 'git merge')
         set_complete(local_branches, 'git log')
+        set_complete(reset_completer,'git reset')
+        set_complete(local_branches, 'git reset --.* ')
         #set_complete(lambda self, event: git.local_branches, 'git push')
 
         # TODO: .. only need file-system if in the middle of rebase ..
