@@ -7,8 +7,8 @@
     [ ["bind_all", ["~/code"],          {}],
       ["bind",     ["~/jellydoughnut"], {}],
       ["bind_all", [ '~/devel'],
-       {'post_activate' : 'medley_ipy.load_medley_customizations2',
-        'post_invoke'   : 'medley_ipy.load_medley_customizations'}]],
+       {'post_activate' : 'smash_cmgd.load_medley_customizations2',
+        'post_invoke'   : 'smash_cmgd.load_medley_customizations'}]],
 
 //
 // "aliases" section represents per-project alias entries.

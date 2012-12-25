@@ -2,7 +2,9 @@
 """
 import os
 import json
+import shutil
 import demjson
+import urlparse,urllib
 from IPython import ipapi
 
 import smashlib
@@ -13,7 +15,7 @@ from smashlib.reflect import namedAny
 
 ip = ipapi.get()
 
-import shutil
+
 
 # plugins can define their own persistent settings, and they
 # should be stored here. by default the schema only consists in
@@ -23,14 +25,15 @@ DEFAULT_SCHEMA = dict(enabled=0,)
 class PluginManager(object):
     """ smash plugins manager """
 
-    report = staticmethod(report.plugins)
+    report = staticmethod(report.plugin_manager)
+
     def cmdline_enable(self, name, quiet=False):
-        ('enable a plugin by name.  \nthis must be one of the '
+        ('Enable a plugin by name.  \nThis must be one of the '
          'plugins in ~/.smash/plugins, and you need not specify'
-         ' an absolute path.  \n(to move a file or url'
+         ' an absolute path.  \n(To move a file or url'
          ' into that directory, use --install.\n')
         if not quiet:
-            report.plugin_manager('enabling {0}'.format(name))
+            self.report('enabling {0}'.format(name))
         self._set_enabled(name, 1)
 
     def cmdline_list(self):
@@ -50,13 +53,43 @@ class PluginManager(object):
         if not (enabled or disabled):
             self.report('no plugins at all in ' + self.SMASH_DIR)
 
-    def cmdline_install_new_plugin(self, s):
-        ('move plugin @ "INSTALL" to the smash plugin directory'
-         'you can enter a path to a file on disk or a url.')
+    def cmdline_install_new_plugin(self, s, opts_enable):
+        ('Moves plugin @ "INSTALL" to the smash plugin directory'
+         'You can enter a path to a file on disk or a uri.  '
+         'There is also support for github gists using '
+         'gist://<gist-id>')
         report.plugin_manager('Working on --install on ' + s)
+        plugin = None
         success = False
-        if s.split('://')[0] in 'https http ftp file'.split():
-            import urlparse,urllib
+        uris = [ z +'://' for z in 'http https ftp file'.split()]
+        if s.startswith('gist://'):
+            import glob
+            import tempfile
+            gist_id = urlparse.urlparse(s).netloc
+            tdir = tempfile.gettempdir()
+            clone_dir = opj(tdir, gist_id)
+            url_t   = 'https://gist.github.com/{0}.git'
+
+            url     = url_t.format(gist_id)
+            report.plugin_manager('Cloning gist:')
+            self.report('   {0} --> {1}'.format(url,clone_dir))
+            __IPYTHON__.magic_pushd(tdir)
+            error = os.system('git clone {0}'.format(url))
+            if error:
+                self.report('failure acquiring gist: could not clone')
+            else:
+                gist_files = glob.glob(opj(clone_dir, '*.py'))
+                if len(gist_files) > 1:
+                    self.report('failure acquiring gist: multiple files in gist')
+                else:
+                    fname = gist_files[0]
+                    self.report('Successfully acquired gist: '+fname)
+                    __IPYTHON__.magic_popd()
+                    plugin = self.cmdline_install_new_plugin(fname, opts_enable)
+                    self.report("Cleaning " + clone_dir)
+                    shutil.rmtree(clone_dir)
+                    self.report("Finished installing.")
+        elif any([s.startswith(x) for x in uris]):
             try:
                 urlparse.urlparse(s)
             except:
@@ -70,7 +103,7 @@ class PluginManager(object):
                 c = urllib.urlopen(s).read()
                 with open(fname,'w') as fhandle:
                     fhandle.write(c)
-                success=True
+                success = True
         else:
             s = abspath(s)
             assert ope(s),'file does not exist: '+e
@@ -87,16 +120,32 @@ class PluginManager(object):
             report.plugin_manager('Plugin acquired successfully.')
             report.plugin_manager('Verifying plugin..')
             try:
-                self.install_plugin_from_fname(plugin_name)
-            except:
+                plugin = self.install_plugin_from_fname(fname)
+            except Exception,e:
                 report.plugin_manager('Giving up, plugin test-install failed.')
-                report.plugin_manager('DONT use --enable until this is fixed!')
+                self.report('')
+                self.report(str(e))
+                self.report('')
+                report.plugin_manager('DO NOT use --enable until this is fixed!')
             else:
                 report.plugin_manager('Plugin was verified successfully.')
-                report.plugin_manager('Enabling plugin..')
-                self.cmdline_enable(plugin_name,quiet=True)
-                report.plugin_manager('Plugin was enabled successfully.')
-                report.plugin_manager('Plugin "{0}" will load the next time smash is run.'.format(plugin_name))
+
+                if opts_enable:
+                    report.plugin_manager('Enabling plugin..')
+                    self.cmdline_enable(plugin_name,quiet=True)
+                    self.report('Plugin was enabled successfully.')
+                    self.report('Plugin "{0}" will load the next time '
+                                'smash is run.'.format(plugin_name))
+                else:
+                    self.report('Looks good.. you can use `smash --enable` '
+                                'to enable this plugin.')
+        if plugin:
+            self.report('-'*80)
+            plugin_module = getattr(smashlib.active_plugins,
+                                    os.path.splitext(plugin_name)[0])
+            print plugin_module.__doc__
+            self.report('-'*80)
+        return plugin
 
 
     def __init__(self):
@@ -174,6 +223,7 @@ class PluginManager(object):
         setattr(active_plugins,n,m)
         sys.modules['smashlib.active_plugins.'+n]=m
         self._plugins.append(plugin)
+        return plugin
 
     def _get_some_plugins(self, name, val):
         plugins     = self.plugin_data

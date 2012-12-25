@@ -6,7 +6,7 @@ import os
 from collections import defaultdict
 
 from smashlib.python import expanduser
-from smashlib.reflect import namedAny
+from smashlib.reflect import namedAny, ObjectNotFound
 from smashlib.util import colorize, report, list2table
 from smashlib.util import truncate_fpath
 from smashlib.venv import VenvMixin, _contains_venv
@@ -149,7 +149,12 @@ class Project(VenvMixin, Hooks):
                     tmp = tmp.format(name, dname)
                     func.__doc__ = tmp
                 else:
-                    func = namedAny(x)
+                    try:
+                        func = namedAny(x)
+                    except ObjectNotFound,e:
+                        report("There is an error in your configuration "
+                                    "file.  Could not import name \"{0}\"".format(x))
+                        return
             else:
                 raise Exception,'niy: ' + str(x)
             bus().subscribe('post_activate.'+name, func)
@@ -166,7 +171,12 @@ class Project(VenvMixin, Hooks):
         kls._add_post_activate(name, post_activate)
         tmp = []
         for x in post_invoke:
-            x = namedAny(x) if isinstance(x, (str, unicode)) else x
+            try:
+                x = namedAny(x) if isinstance(x, (str, unicode)) else x
+            except ObjectNotFound,e:
+                report("There is an error in your configuration "
+                       "file.  Could not import name \"{0}\"".format(x))
+                return
             tmp.append(x)
             bus().subscribe('post_invoke.'+name, x)
         kls._paths[name] = _dir
