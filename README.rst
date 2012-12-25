@@ -91,6 +91,17 @@ Smash Core
 The Plugin Architecture:
 -------------------------
 
+Lots of plugins are included with SmaSh (read more below).  I don't necessarily claim these
+are all useful to you, and they won't be enabled by default.  The provided plugins are intended
+to provide a wealth of examples for some of the basic things you might want to do.  SmaSh plugins
+can alter all sorts of things about the environment that they run in.  For example:
+
+  - loading other plugins
+  - altering prompt behaviour
+  - altering completion strategies
+  - contributing methods, macros, or magic to the shell's global namespace
+  - and even alter (and act on) the command-line arguments that `smash` itself will use.
+
 Plugins can be enabled unconditionally, in which case they are loaded when SmaSh bootstraps,
 or they can be loaded conditionally, in which case they are triggered by project activation
 or loaded dynamically by another plugin.
@@ -99,12 +110,6 @@ To write a plugin you must extend smashlib.smash_plugin.SmashPlugin, and define 
 method.  From the command line you can use `smash --install` to "acquire" plugins and move them
 to ~/.smash/plugins.  Plugins can be grabbed from disk, or from url's but the preferred method
 for distributing them is via github gist's using `smash --install gist://<id>`.
-
-SmaSh plugins can do all sorts of things to the shell by
-  - loading other plugins
-  - altering prompt behaviour
-  - altering completion strategies
-  - contributing methods, macros, or magic to the shell's global namespace
 
 
 The Project-management Abstraction:
@@ -141,20 +146,26 @@ Generic Plugins for Smash
 =========================
 
 Hostname completion:
----------------------
+
   - works for ssh
   - works for any program using standard uri's like ftp://, http://, etc
 
+Enhanced Bookmarks:
+
+  - sophisticated global or per-project bookmarks
+  - bookmark directories, urls, macros, or even things like ssh://person@place
+  - launching bookmark actions is keyboard-friendly
+
 Browser Integration:
---------------------
+
   - manage and open bookmarks globally or per-project
   - performs web searches with http://duckduckgo.com API, allowing for:
     - direct search of stack-overflow, django docs, pypi, etc
     - asynchronous notification that doesnt clutter your display (via growl-style popups)
-  - reddit plugin
+  - reddit plugin??
 
 Git VCS Integration:
---------------------
+
   - If applicable, default prompt includes current branch name
   - Tab completion including:
     - Branch completion in all the right spots
@@ -230,7 +241,6 @@ Related Links
 
   - ``ipython`` http://ipython.org/ipython-doc/dev/interactive/shell.html
   - ``pysh`` http://faculty.washington.edu/rjl/clawpack-4.x/python/ipythondir/ipythonrc-pysh
-
 
 
 ============
