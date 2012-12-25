@@ -13,6 +13,9 @@ class SmashPlugin(object):
     requires = []
     requires_plugins = []
 
+    def unalias(self, name):
+        return __IPYTHON__.magic_unalias(name)
+
     def __repr__(self):
         return '<SmashPlugin@"{0}">'.format(self.name)
 
