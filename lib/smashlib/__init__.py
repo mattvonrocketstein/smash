@@ -21,6 +21,8 @@ active_plugins = sys.modules['smashlib.active_plugins'] = ModuleType('smashlib.a
 
 _meta = dict( config_dir = opj(opd(opd(__file__)), 'etc'),
               bin_dir = opj(opd(opd(__file__)), 'bin'),)
+_meta.update(smash_rc=opj(_meta['config_dir'], 'smash.rc'))
+
 def fac(m):
     return lambda bus, *args, **kargs: print(m + str(kargs))
 
