@@ -101,6 +101,10 @@ Prompt and Aliases:
 Generic Plugins for Smash
 =========================
 
+Hostname completion:
+---------------------
+  - works for ssh
+  - works for any program using ftp://, http://, etc
 
 Browser Integration:
 --------------------

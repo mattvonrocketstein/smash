@@ -2,8 +2,6 @@
  bugfixes
 ----------
 
- which-enhancement doesnt work on non-imported modules
-
  broken 'git checkout<tab>' completion and e.g. "git checkout origin/master <tab>"
 
  plugins somehow honor 'requires' methods, requires is not moved into plugins.json either
@@ -15,6 +13,10 @@
  plugin ideas
 ---------------
  rst-rewriter plugin
+ apt-completer is already available-
+   node/lib/python2.6/site-packages/IPython/Extensions/ipy_completers.py
+
+ also use the vcs_completer to implement the git completer..
 
  github plugin
 
