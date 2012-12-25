@@ -22,10 +22,12 @@ ops  = os.path.split
 
 HOME_BIN    = expanduser('~/bin')
 HOME_IPY    = os.path.expanduser('~/.smash')
-THIS_DIR    = ops(__file__)[:-1]
+VENV_PIP    = opj(HOME_IPY, 'bin', 'pip')
+VENV_PY    = opj(HOME_IPY, 'bin', 'python')
+THESE_DIR_COMPONENTS    = ops(__file__)[:-1]
 SHELL_PATH  = os.environ['PATH'].split(':')
 SMASH_BIN_DIR = opj(HOME_IPY, 'bin')
-SMASH_ACTUAL_SHELL = opj(os.path.sep.join(THIS_DIR),'scripts','smash_actual_shell')
+SMASH_ACTUAL_SHELL = opj(os.path.sep.join(THESE_DIR_COMPONENTS),'scripts','smash_actual_shell')
 SMASH_INSTALLATION_HOME = HOME_IPY
 SMASH_LIB_DST_DIR = opj(SMASH_INSTALLATION_HOME, 'smashlib')
 SMASH_PLUGINS_DIR = opj(SMASH_INSTALLATION_HOME, 'plugins')
@@ -34,11 +36,20 @@ SMASH_CONFIG_DIR  = opj(SMASH_INSTALLATION_HOME, 'etc')
 def run_pip():
     """ """
     pip_cmd  = '{venv_pip} install -r {smash_reqs} --timeout=120'
-    req_file = opj(*(THIS_DIR + tuple(['requirements.txt'])))
-    venv_pip = opj(HOME_IPY, 'bin', 'pip')
-    cmd = pip_cmd.format(venv_pip=venv_pip, smash_reqs=req_file)
+    req_file = opj(*(THESE_DIR_COMPONENTS + ('requirements.txt',)))
+    cmd = pip_cmd.format(venv_pip=VENV_PIP, smash_reqs=req_file)
     error = os.system(cmd)
     return error
+
+def venv_gen_ipython():
+    if not ope(expanduser('~/.ipython')):
+        cmd = ("import os; "
+               " from IPython.genutils import get_ipython_dir;"
+               " from IPython.iplib import user_setup;"
+               " rc_suffix = '' if os.name == 'posix' else '.ini';"
+               "user_setup(get_ipython_dir(), rc_suffix, mode='install', interactive=False)")
+        t = '{python} -c "{cmd}"'.format(python=VENV_PY,cmd=cmd)
+        return os.system(t)
 
 def create_virtualenv(abspath):
     print "Creating virtual-environment: {0}".format(abspath)
@@ -51,14 +62,11 @@ if HOME_BIN not in SHELL_PATH:
     raise SystemExit("""
 Since SmaSh is beta, scripts are currently installed to ~/bin directory, and I
 notice that ~/bin is not in your $PATH.  Until system-wide installation is
-implemented, can you add it there please?  Copy-pasta below might help you:
+implemented, can you add it there please?\n\nThe copy-pasta below might help you:
 
-$ export PATH=$PATH:~/bin
+    $ mkdir ~/bin; export PATH=$PATH:~/bin
 
 """)
-
-if not ope(expanduser('~/.ipython')):
-    raise SystemExit("No .ipython folder in your home directory?")
 
 has_virtualenv = not os.system('which virtualenv > /dev/null 2>&1')
 if not has_virtualenv:
@@ -68,21 +76,30 @@ if not has_virtualenv:
                       "\"apt-get install python-virtualenv\""))
 
 if not ope(HOME_IPY):
+    print HOME_IPY, 'doesnt exist'
     error = create_virtualenv(HOME_IPY)
     if error: raise SystemExit('Error creating virtual-environment for shell')
     print 'Finished creating virtual-environment.\n'
-    pip_error = run_pip()
-else: pip_error = run_pip()
+pip_error = run_pip()
 if pip_error:
     raise SystemExit('Failed to install requirements into virtual-environment')
 else: print 'Finished installing requirements.\n'
+initialize_ipy_error = venv_gen_ipython()
+if initialize_ipy_error:
+    raise SystemExit('Failed to init ipython using virtual-environment')
+else:
+    print 'ipython looks good..'
+
+
+
+
 
 class install_data(_install_data):
     def copy_file(self, rel_src, dst_dir):
         """ TODO: DOX """
         if not ope(rel_src):
             err = 'ERROR:\n\t{0} does not exist.\n\ncheck that your working directory is {1}'
-            err = err.format(rel_src, THIS_DIR)
+            err = err.format(rel_src, THESE_DIR_COMPONENTS)
             raise SystemExit(err)
         else:
             link = 'sym' if 'develop' in sys.argv else None
