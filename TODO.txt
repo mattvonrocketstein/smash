@@ -4,10 +4,6 @@
 
  which-enhancement doesnt work on non-imported modules
 
- move smashlib.SMASH_DIR to smashlib._meta={..}
-
- --project= cli is broken
-
  broken 'git checkout<tab>' completion and e.g. "git checkout origin/master <tab>"
 
  plugins somehow honor 'requires' methods, requires is not moved into plugins.json either
