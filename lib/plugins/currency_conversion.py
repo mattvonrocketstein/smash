@@ -4,8 +4,8 @@
       provides an input preprocess that allows for currency conversions.
       query must match a regex that recognizes stuff like this:
 
-        10 lkr to usd
-        100 eur to usd
+        "10 lkr to usd"
+        "100 eur to usd"
 """
 import re
 import urllib
