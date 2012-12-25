@@ -50,8 +50,16 @@ def handler(line, mo):
     report('retrieved base-rate: {0}'.format(rate))
     return 'smashlib.util.report("{0} {1}")'.format(result, c2.upper())
 
+
+
 class Plugin(SmashPlugin):
     def install(self):
         meta = ip.meta
-        prefilter = [PATTERN, handler]
-        do_it_later(lambda: meta.re_prefilters.append(prefilter))
+        def add_prefilter():
+            try:
+                meta.re_prefilters.append([PATTERN, handler])
+            except AttributeError:
+                report.ERROR("could not install currency-converter plugin.. "
+                       "re_prefilter still not set")
+
+        do_it_later(add_prefilter)

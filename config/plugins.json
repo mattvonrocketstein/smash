@@ -27,10 +27,6 @@
   "ipy_venv_support.py": {
     "enabled": 0
   }, 
-  "medley_ipy.py": {
-    "enabled": 0, 
-    "requires": []
-  }, 
   "notifier.py": {
     "enabled": 1
   }, 
@@ -76,6 +72,9 @@
   "smash_bookmarks.py": {
     "enabled": 1, 
     "requires": []
+  }, 
+  "smash_cmgd.py": {
+    "enabled": 0
   }, 
   "smash_notify.py": {
     "enabled": 0

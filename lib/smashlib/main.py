@@ -66,11 +66,12 @@ else:
     smashlib.VERBOSE = VERBOSE
     #if VERBOSE:
     #report.smash('parsed opts: ' + str(eval(str(opts)).items()))
-    if opts.enable:  plugins.cmdline_enable(opts.enable);   die()
+    if opts.install:  plugins.cmdline_install_new_plugin(opts.install, opts.enable); die()
+    elif opts.enable:  plugins.cmdline_enable(opts.enable);   die()
     elif opts.disable: plugins.disable(opts.disable); die()
     elif opts.list:    plugins.cmdline_list();                die()
     elif opts.panic:  panic();
-    elif opts.install:  plugins.cmdline_install_new_plugin(opts.install); die()
+
     else:
         # parse any command-line options which are added by plugins
         for args,kargs,handler in SmashParser.extra_options:
