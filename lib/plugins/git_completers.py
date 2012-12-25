@@ -123,6 +123,7 @@ class Plugin(SmashPlugin):
         __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
         set_complete(local_branches, 'git checkout [\S]*$')
         set_complete(fsc2, 'git checkout [\S]* ')
+        set_complete(fsc2, 'git rm')
         set_complete(subcommands, 'git [\s]*[\S]*$')
         set_complete(filesystem_completer, 'git mv')
         set_complete(uncomitted_files_completer, 'git commit')
@@ -132,6 +133,7 @@ class Plugin(SmashPlugin):
         set_complete(local_branches, 'git log')
         set_complete(reset_completer,'git reset')
         set_complete(local_branches, 'git reset --.* ')
+        set_complete(local_branches, 'git rebase .* ')
         #set_complete(lambda self, event: git.local_branches, 'git push')
 
         # TODO: .. only need file-system if in the middle of rebase ..
