@@ -3,58 +3,75 @@ About
 =====
 
 Smash is the smart-shell, a python/bash hybrid which builds on the pysh profile for IPython.  It
-offers features for project management, virtual environment support, a plugin architecture, and
-simple JSON configuration files that try to be as sane as possible.
+offers features for project management, virtual environment support, a flexible plugin
+architecture that is easy to use, and simple JSON configuration files that try to be as
+sane as possible.
 
 
-===========
-The problem
-===========
+=====================
+Shells are a Problem
+=====================
 
 Shells are still annoying!
 
   - No one wants to manage zillions of aliases or arcane readline configurations
   - Things like sed / awk are great for quick hacks, but are obscure and not maintainable.
-  - Shells are not conveniently modular, and do not perform well for multiple projects / use-cases
-  - Minimal or awkward context-awareness (i.e. things like pre/post "dir-change" triggers)
+  - Shells are not conveniently modular, and do not perform well for things like
+     - multiple projects
+     - multiple use-cases
+     - domain specific languages
+  - Minimal or awkward context-awareness (things like pre/post "dir-change" triggers)
   - Not ideal for software development in many ways
 
-Based on the last point, maybe you're already thinking "`Use emacs/vim/eclipse!`", but I also
-believe that a huge, do-everything IDE is not the True Way.  IPython is fairly great, but in
-many ways is more a framework than a solution, and even though it does basic shell stuff, out
-of the box it is not fit for normal use.
+Based on the last point, maybe you're already thinking "`Use emacs/vim/eclipse!`", but, I also
+personally think that a huge, do-everything IDE is not the True Way.  The problems most people solve
+on a daily are similar to the problems from yesterday, and shell experiences are often characterized
+by too much repetition.  We fumble with awkward histories with our control-r's and we do things like
+build one-off aliases or scripts and throw them in a .bashrc or ~/bin and they rot, usually because
+they weren't quite general enough to use everywhere.
+
+====================================
+pysh+IPython is not quite a solution
+====================================
+
+IPython is fairly great, but in many ways is more a framework than a solution, and even though it does
+basic shell stuff, out of the box it is primarily intended for python developers, and not fit for use
+as a generic shell.  Here are just a few reasons vanilla IPython and pysh+IPython are not usable as
+system shells:
 
   - obviously not completely bash-like (nor should it be): 'cd <dir>' works but 'tail -f <file>' does not
-  - lack of consistency: profiles vs. rc-files vs straight programmatic api configuration all gets confusing
+  - lack of consistency: profiles vs. rc-files vs straight programmatic api configuration is confusing
+
+Although IPython is flexible enough to do almost anything in terms of triggers, aliases, macros,
+input pre/post-processing.. adding fancy stuff on to the IPython core to leverage this
+functionality (e.g. via profiles) is *still* not maintainable.
 
 
 
-
-================================
-Smash is the best of both worlds
-================================
+======================
+SmaSh is a way Forward
+======================
 
 What is needed is an environment that functions simultaneously as a shell and a
 sort of sketchbook for programming.  The ``pysh`` profile for IPython already
-functions as a sort of Python / Bash chimera:
+functions as a sort of Python / Bash chimera, and SmaSh leverages everything it
+offers:
 
   - Simple: all the simplicity of bash when you want it
   - Flexible: all the power of a RealProgrammingLanguage(tm) when you need it
   - Unsurprising: bashy commands and pythony code both work the way you would expect
   - Hybrid: Mixing python and shell code is possible
 
-
-
-
 ===================
 Smash is Extensible
 ===================
 
 Smash is built on top of pysh, and actually has very little core functionality.
-Most of what it does happens through plugins.  Apart from what the bash/python
-hybrid features that come from pysh, Smash also inherits all the flexibility of
-IPython in terms of I/O hooks and pre/post processing.  So go nuts with your
-domain specific language or ruby's pry shell or go attach a lisp-lua-node
+A big part of what it offers  is an organized approach to configuration management
+and plugins.  In fact, almost all of what it does happens through plugins.  Apart
+from what the bash/python hybrid features that come from pysh, SmaSh also inherits
+all the flexibility of IPython in terms of I/O hooks and pre/post processing.  So go
+nuts with your domain specific language or ruby's pry shell or go attach a lisp-lua-node
 runtime onto this frankenstein bananaphone piano, see if I care.
 
 ==========
@@ -66,7 +83,7 @@ Philosophy:
 
 Smash is installed and modified on a per-user basis; nothing is installed at the system level.
 This is important because as you continue to add plugins to smash, any third-party support
-libraries don't clutter up your system.
+libraries that are required won't clutter up the rest of your system.
 
    - Installation, including IPython, is completely inside a python virtual-env located at ~/.smash
    - All configuration is JSON, stored in ~/.smash/etc
@@ -93,8 +110,9 @@ Project management:
 
 Prompt and Aliases:
 -------------------
-  - Aliases can be global, or stored per project
   - Alias configuration is stored with JSON
+  - Aliases can be global, or stored per project
+  - Aliases that are project specific do not clutter things up when a project is not activated
   - Prompt is split into "components" that can be easily added/substracted on the fly
 
 =========================

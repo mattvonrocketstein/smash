@@ -156,7 +156,8 @@ class Project(VenvMixin, Hooks):
                                     "file.  Could not import name \"{0}\"".format(x))
                         return
             else:
-                raise Exception,'niy: ' + str(x)
+                raise Exception,('post-activation entries should be callable'
+                                 ' or strings that point to callables: ') + str(x)
             bus().subscribe('post_activate.'+name, func)
             if func not in kls._post_activate[name]:
                 kls._post_activate[name] += [func]
