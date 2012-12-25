@@ -21,6 +21,11 @@ class SmashPlugin(object):
 
     def verify_requirements(self):
         report('pretending to verify requirements: {0}'.format(self.requires))
+        print 'installing',self
+        from smashlib.reflect import namedAny
+        raise Exception, 'niy'
+        for name in self.requires:
+            obj = namedAny(name)
 
     def install_into_smash(self):
         """ install this plugin into the smash shell """
@@ -70,10 +75,8 @@ class SmashPlugin(object):
         return val
 
     def pre_install(self):
-        print 'installing',self
-        from smashlib.reflect import namedAny
-        for name in self.requires:
-            obj = namedAny(name)
+        """ TODO: not used yet """
+        self.verify_requirements()
 
     def contribute_magic(self, name, func):
         if name.startswith('magic_'):
