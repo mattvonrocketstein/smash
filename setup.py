@@ -14,12 +14,16 @@ from distutils.file_util import copy_file
 from distutils.command.install import install as _install
 from distutils.command.install_data import install_data as _install_data
 
+## begin aliases
+################################################################################
 ope  = os.path.exists
 opj  = os.path.join
 opd  = os.path.dirname
 opil = os.path.islink
 ops  = os.path.split
 
+## begin constants
+################################################################################
 HOME_BIN    = expanduser('~/bin')
 HOME_IPY    = os.path.expanduser('~/.smash')
 VENV_PIP    = opj(HOME_IPY, 'bin', 'pip')
@@ -33,6 +37,35 @@ SMASH_LIB_DST_DIR = opj(SMASH_INSTALLATION_HOME, 'smashlib')
 SMASH_PLUGINS_DIR = opj(SMASH_INSTALLATION_HOME, 'plugins')
 SMASH_CONFIG_DIR  = opj(SMASH_INSTALLATION_HOME, 'etc')
 
+## begin classes
+################################################################################
+class install_data(_install_data):
+    def copy_file(self, rel_src, dst_dir):
+        """ TODO: DOX """
+        if not ope(rel_src):
+            err = 'ERROR:\n\t{0} does not exist.\n\ncheck that your working directory is {1}'
+            err = err.format(rel_src, THESE_DIR_COMPONENTS)
+            raise SystemExit(err)
+        else:
+            link = 'sym' if 'develop' in sys.argv else None
+            src_fname = ops(rel_src)[-1]
+            dst_file = opj(dst_dir, src_fname)
+            if ope(dst_file) or opil(dst_file):
+                os.remove(dst_file)
+            result = copy_file(os.path.abspath(rel_src),
+                               dst_dir, link=link, verbose=1)
+            return result
+
+class install(_install):
+    def run(self):
+        return self.run_command('install_data')
+
+class develop(install_data):
+    def run(self):
+        self.run_command('install_data')
+
+## begin functions
+################################################################################
 def run_pip():
     """ """
     pip_cmd  = '{venv_pip} install -r {smash_reqs} --timeout=120'
@@ -58,6 +91,19 @@ def create_virtualenv(abspath):
     cmd = cmd.format(abspath)
     return os.system(cmd)
 
+def _from(*args, **kargs):
+    """ generates lists of files in the style that setup() expects.
+        only python files!  no emacs tmp files or vcs junk allowed.
+
+        NB: expects flatness in python packages (not a recursive dir-walker)
+    """
+    suffix = kargs.pop('suffix', '*.py')
+    return [ opj(*(args + tuple([ ops(x)[-1] ]))) \
+             for x in glob(opj(*(args + tuple([suffix])))) ]
+
+
+## entry point
+################################################################################
 if HOME_BIN not in SHELL_PATH:
     raise SystemExit("""
 Since SmaSh is beta, scripts are currently installed to ~/bin directory, and I
@@ -88,46 +134,7 @@ initialize_ipy_error = venv_gen_ipython()
 if initialize_ipy_error:
     raise SystemExit('Failed to init ipython using virtual-environment')
 else:
-    print 'ipython looks good..'
-
-
-
-
-
-class install_data(_install_data):
-    def copy_file(self, rel_src, dst_dir):
-        """ TODO: DOX """
-        if not ope(rel_src):
-            err = 'ERROR:\n\t{0} does not exist.\n\ncheck that your working directory is {1}'
-            err = err.format(rel_src, THESE_DIR_COMPONENTS)
-            raise SystemExit(err)
-        else:
-            link = 'sym' if 'develop' in sys.argv else None
-            src_fname = ops(rel_src)[-1]
-            dst_file = opj(dst_dir, src_fname)
-            if ope(dst_file) or opil(dst_file):
-                os.remove(dst_file)
-            result = copy_file(os.path.abspath(rel_src),
-                               dst_dir, link=link, verbose=1)
-            return result
-
-class install(_install):
-    def run(self):
-        return self.run_command('install_data')
-
-class develop(install_data):
-    def run(self):
-        self.run_command('install_data')
-
-def _from(*args, **kargs):
-    """ generates lists of files in the style that setup() expects.
-        only python files!  no emacs tmp files or vcs junk allowed.
-
-        NB: expects flatness in python packages (not a recursive dir-walker)
-    """
-    suffix = kargs.pop('suffix', '*.py')
-    return [ opj(*(args + tuple([ ops(x)[-1] ]))) \
-             for x in glob(opj(*(args + tuple([suffix])))) ]
+    print 'Finished initializing ~/.ipython.\n'
 
 LIB      = _from('lib','smashlib')
 PLUGINS  = _from('lib','plugins')
