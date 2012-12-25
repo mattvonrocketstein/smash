@@ -10,9 +10,8 @@
           depends on GitPython, which is largeish
     TODO: 'git diff'' should use branch completion AND fs-completion
     TODO: 'git push' should complete from the names of the remotes
-    TODO: 'git push <remote>' should complete from the names of local_branches()
     TODO: consider .gitignore ?
-    TODO: 'git add' could be smarter during rebase
+    TODO: 'git add' could be smarter if i could detect rebase state
 
     useful- __IPYTHON__.shell.Completer.custom_completers.regexs
 
