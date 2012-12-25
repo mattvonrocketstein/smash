@@ -13,12 +13,16 @@
     TODO: 'git push <remote>' should complete from the names of local_branches()
     TODO: consider .gitignore ?
     TODO: 'git add' could be smarter during rebase
+
+    useful- __IPYTHON__.shell.Completer.custom_completers.regexs
+
 """
 import os
 import IPython.ipapi
 
 from smashlib.util import report, set_complete
 from smashlib.smash_plugin import SmashPlugin
+
 
 def uncomitted_files_completer(self, event):
     """ awkward, but cannot find a better way to do this.. """
@@ -59,11 +63,22 @@ def filesystem_completer(self, event):
         r = [ x for x in base if os.path.exists(x) ]
         return r
 
-def local_branches(*args, **kargs):
+def remote_branches_completer(self, event):
+    all_branches_cmd = 'git branch -a|grep remote'
+    tmp = os.popen(all_branches_cmd).readlines()
+    tmp = [x.split()[0].strip() for x in tmp if x]
+    tmp = [x.replace("remotes/",'') for x in tmp ]
+    return tmp
+
+def local_branches(self, event):
     """ """
+    if event.symbol.startswith('origin'):
+        return remote_branches_completer(self, event)
+
     all_branches_cmd = 'git branch -a|grep -v remote'
-    return filter(None, map(lambda x: x.replace("*","").strip(),
-                            os.popen(all_branches_cmd).readlines()))
+    return ['origin/'] + \
+               filter(None, map(lambda x: x.replace("*","").strip(),
+                                os.popen(all_branches_cmd).readlines()))
 
 def subcommands(*args, **kargs):
     # WOW.. be careful!
@@ -98,8 +113,10 @@ class Plugin(SmashPlugin):
 
         report.git_completer('setting prompt to use git vcs')
         __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
-        set_complete(local_branches, 'git checkout')
-        set_complete(subcommands, 'git [\S]*$')
+        #set_complete(remote_branches_completer, 'git checkout origin/[\S]*$')
+        set_complete(local_branches, 'git checkout [\S]*$')
+        #set_complete(remote_branches_completer, 'git checkout origin/')
+        set_complete(subcommands, 'git [\s]*[\S]*$')
         set_complete(filesystem_completer, 'git mv')
         set_complete(uncomitted_files_completer, 'git commit')
         set_complete(uncomitted_files_completer, 'gd')
