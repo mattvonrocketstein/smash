@@ -8,6 +8,7 @@ sane as possible.  Python developers might be particularly interested because it
 happens to be a python/bash hybrid which builds on the pysh profile for IPython.  It builds
 on, and offers very sophisticated support for python virtual environments.
 
+
 ===========
 The Problem
 ===========
@@ -34,7 +35,7 @@ they weren't quite general enough to use everywhere.
 pysh+IPython is not quite a solution
 ====================================
 
-IPython is fairly great, but in many ways is more a framework than a solution, and even though it does
+IPython is pretty great, but in many ways is more a framework than a solution.  Even though it does
 basic shell stuff, out of the box it is primarily intended for python developers, and not fit for use
 as a generic shell.  Here are just a few reasons vanilla IPython and pysh+IPython are not usable as
 system shells:
@@ -48,24 +49,28 @@ functionality (e.g. via profiles) is *still* not maintainable.
 
 
 
-======================
-SmaSh is a Way Forward
-======================
+=================
+Vision of a Shell
+=================
 
-What is needed is an environment that functions simultaneously as a shell and a
-sort of sketchbook for programming.  The ``pysh`` profile for IPython already
-functions as a sort of Python / Bash chimera, and SmaSh leverages everything it
-offers:
+Why do you occasionally go to google to type in things '1024*768' or 'cos(98)' or
+'current time in zimbabwe'?  My guess is your shell is just not smart enough, and
+teaching it to be smart is not so much difficult as it is simply disorganized.  It
+takes effort and in the end it doesn't come out quite the way you hoped.  And that's
+just the average user.  For developers, what is needed is an environment that functions
+simultaneously as a shell and a sort of sketchbook for programming.  The ``pysh`` profile
+for IPython already functions as a sort of Python / Bash chimera, and SmaSh leverages
+everything it offers:
 
   - Simple: all the simplicity of bash when you want it
   - Flexible: all the power of a RealProgrammingLanguage(tm) when you need it
   - Unsurprising: bashy commands and pythony code both work the way you would expect
   - Hybrid: Mixing python and shell code is possible
 
-SmaSh is extensible and although it is built on top of pysh, and actually has very
+SmaSh is extensible and even though it is built on top of `pysh`, it actually has very
 little core functionality.  A big part of what it offers  is an organized approach
 to configuration management and plugins.  In fact, almost all of what it does happens
-through plugins.  Apart from what the bash/python hybrid features that come from pysh,
+through plugins!  Apart from what the bash/python hybrid features that come from pysh,
 SmaSh also inherits all the flexibility of IPython in terms of I/O hooks and pre/post
 processing.  So go nuts with your domain specific language or ruby's pry shell or go
 attach a lisp-lua-node runtime onto this frankenstein bananaphone piano, see if I care.
@@ -73,47 +78,19 @@ attach a lisp-lua-node runtime onto this frankenstein bananaphone piano, see if 
 ================
 Smash Philosophy
 ================
+
 Smash is installed and modified on a per-user basis; nothing is installed at the system level.
-This is important because as you continue to add plugins to smash, any third-party support
-libraries that are required won't clutter up the rest of your system.
+This is important because, as you continue to add plugins to smash, any third-party support
+libraries that are required won't clutter up the rest of your system.  In particular,
 
    - Installation, including IPython, is completely inside a python virtual-env located at ~/.smash
    - All configuration is JSON, stored in ~/.smash/etc
    - All plugins are in ~/.smash/plugins
    - Core support libraries live in ~/.smash/smashlib
 
-
 ==========
 Smash Core
 ==========
-
-
-The Plugin Architecture:
--------------------------
-
-Lots of plugins are included with SmaSh (read more below).  I don't necessarily claim these
-are all useful to you, and they won't be enabled by default.  The provided plugins are intended
-to provide a wealth of examples for some of the basic things you might want to do.  SmaSh plugins
-can alter all sorts of things about the environment that they run in.  For example:
-
-  - loading other plugins
-  - altering prompt behaviour
-  - altering completion strategies
-  - contributing methods, macros, or magic to the shell's global namespace
-  - and even alter (and act on) the command-line arguments that `smash` itself will use.
-
-Plugins can be enabled unconditionally, in which case they are loaded when SmaSh bootstraps,
-or they can be loaded conditionally, in which case they are triggered by project activation
-or loaded dynamically by another plugin.
-
-To write a plugin you must extend smashlib.smash_plugin.SmashPlugin, and define an install()
-method.  From the command line you can use `smash --install` to "acquire" plugins and move them
-to ~/.smash/plugins.  Plugins can be grabbed from disk, or from url's but the preferred method
-for distributing them is via github gist's using `smash --install gist://<id>`.
-
-Smash tries to encourage writing small plugins without dependencies, but if you need to reuse
-code from another plugin, every plugin that's enabled can be imported at any time from
-the `smashlib.active_plugins` module.
 
 
 The Project-management Abstraction:
@@ -145,24 +122,62 @@ Prompt and Aliases:
   - Prompt is split into "components" that can be easily added/substracted on the fly, and
   - Prompts can also be project-specific.
 
+The Plugin Architecture:
+-------------------------
+
+Lots of plugins are included with SmaSh (read more below).  I don't necessarily claim all these
+are useful to you, and they won't be enabled by default.  The provided plugins are intended to
+provide a wealth of examples for some of the basic things you might want to do.  SmaSh plugins
+can alter all sorts of things about the environment that they run in.  For example:
+
+  - loading other plugins
+  - altering prompt behaviour
+  - altering completion strategies
+  - contributing methods, macros, or magic to the shell's global namespace
+  - and even alter (and act on) the command-line arguments that `smash` itself will use.
+
+Plugins can be enabled unconditionally, in which case they are loaded when SmaSh bootstraps,
+or they can be loaded conditionally, in which case they are triggered by project activation
+or loaded dynamically by another plugin.
+
+To write a plugin you must extend smashlib.smash_plugin.SmashPlugin, and define an install()
+method.  From the command line you can use `smash --install` to "acquire" plugins and move them
+to `~/.smash/plugins`.  Plugins can be grabbed from disk, or from URLs but the preferred method
+for distributing plugins is via github gist's using `smash --install gist://<id>`.
+
+SmaSh tries to encourage writing small plugins without dependencies, but if you need to reuse
+code from another plugin, every plugin that's enabled can be imported at any time from
+the `smashlib.active_plugins` module.  If you require a python module that may not be installed
+at the system level, make sure your plugin specifies values in `requires_modules`.
+
+SmaSh plugins can specify any prerequisites they might have in terms of python modules, system
+binaries, or other SmaSh plugins.  At bootstrap, most systems that involve prerequisites use
+"priorities" for loading libraries-- SmaSh is different and drama free.  You specify your
+prerequisites, and if your configuration is feasible then SmaSh will determine a consistent
+ordering for the bootstrap or tell you if there is a contradiction.
+
+
 =========================
 Generic Plugins for Smash
 =========================
 
 Hostname completion:
 
+  - works for any program using standard URIs like ftp://, http://, etc
+  - TODO: add one more here since two looks skinny
   - works for ssh
-  - works for any program using standard uri's like ftp://, http://, etc
+
 
 Enhanced Bookmarks:
 
-  - offers sophisticated global or per-project bookmarks
-  - bookmark directories, urls, macros, or even things like ssh://person@place
+  - offers sophisticated bookmarks, globally or per-project
+  - bookmark directories, URLs, macros
+  - bookmark nonstandard URIs like ssh://person@place
   - launching bookmark actions is keyboard-friendly
 
 Browser Integration:
 
-  - manage and open bookmarks globally or per-project
+  - manage and open bookmarks, (global or per-project)
   - performs web searches with http://duckduckgo.com API, allowing for:
     - direct search of stack-overflow, django docs, pypi, etc
     - asynchronous notification that doesnt clutter your display (via growl-style popups)
@@ -183,7 +198,7 @@ Notification support:
   - When this works, it's pretty great, but..
      - currently no support for osx (growl)
      - this may involve extra system-level requirements
-     - may require some fiddling to get it to work outside of ubuntu
+     - may require some fiddling to get it to work outside of ubuntu/gnome (!)
 
 =================================
 Python Specific Plugins for Smash
@@ -193,20 +208,22 @@ Misc extra completers
 
    - Completers for accessing python dictionaries
    - Completers for setup.py
-   - Pip completers
-      - tab-completion over the standard pip subcommands
-      - tab-completion over contents of requirements.txt if it's in the working directory
+   - Pip / easy_install completers
+      - Completion over the standard pip subcommands
+      - Completion over contents of requirements.txt if it's in the working directory
 
 
 Virtual-Environments:
 
-  - venvs can be activated/deactivated cleanly, and without lasting side-effects
-  - ``Project activation`` can trigger venv-activation
+  - Venv's can be activated/deactivated cleanly, and without lasting side-effects
+  - Close integration with projects such that
+     - if a project is activated and it is a venv, it will be activated
+     - if a project contains a venv at the top-level, that venv will be activated
 
 Fabric integration:
 
-  - tab-completion over fabfile commands
-  - programmatic access to the functions themselves
+  - Completion over fabfile commands
+  - Programmatic access to the functions themselves
   - PS: this plugin is a good example of a minimal "post-dir-change" trigger
 
 Unit tests:
@@ -215,13 +232,28 @@ Unit tests:
   - or, scan everything under this working-directory or a known Project
   - attempts to detect what type of unittests these are via static analysis (django/vanilla unittest/etc)
   - test files are enumerated and shortcuts for running them quickly are updated
-
+  - etc
 
 Enhanced 'which'
 
   1) for unix shell commands, ``which`` works as usual
   2) failing (1), if the name matches a python objects in the global namespace, show the file that defined it
-  3) failing (3), if the name matches an importable module, show the path it would be imported from
+  3) failing (2), if the name matches an importable module, show the path it would be imported from
+  4) failing (3), if name matches a host, show the IP address according to host files
+  5) failing (4), if name matches an internet domain, show the IP address according to DNS
+
+
+
+==============================
+Installation and Prerequisites
+==============================
+
+SmaSh works well with python 2.6, and 2.7 and possibly earlier.  SmaSh is comptible
+with python3 only insofar as IPython is.  You will need virtualenv installed at the
+system level ( in debian-based distros, use `apt-get install python-virtualenv`).
+
+Several other python libraries are required (see requirements.txt), but cloning
+SmaSh and running `python setup.py install` should install those.
 
 
 
@@ -235,14 +267,14 @@ around to porting it yet.
 
 One current limitation of the combination of pysh / IPython / SmaSh is a lack of job control
 in the sense that you might be used to.  Specifically you can background tasks with an ``&``
-as usual, but ``fg`` does not resume.  At first this seemed horrible but in practice I think
+as usual, but ``fg`` does not resume.  (At first this seemed horrible but in practice I think
 this consideration is not very important- shells are cheap to spawn and a workflow around
-``screen`` works better anyway.
+``screen`` works better anyway)
 
 Currently, SmaSh plugins must be written in python.  However, a very simple python plugin,
 say for bash or ruby support, should be able to "build a bridge" between that language and
-SmaSh.  If you're interested in helping with this, send me a message about your use-case
-and I would be happy to help.
+SmaSh.  If you're interested in this, send me a message about your use-case and I would be
+happy to help.
 
 =============
 Related Links
