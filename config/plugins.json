@@ -21,6 +21,9 @@
     "enabled": 1, 
     "requires": []
   }, 
+  "host_completer.py": {
+    "enabled": 1
+  }, 
   "ipy_venv_support.py": {
     "enabled": 0
   }, 
