@@ -30,14 +30,19 @@ def which(name):
                 except TypeError,e:
                     return str(e)
         else:
-            if name in sys.modules:
-                return sys.modules['name']
+            try:
+                obj = eval(name)
+            except:
+                if name in sys.modules:
+                    return sys.modules['name']
+                else:
+                    try: return __import__(name)
+                    except:
+                        report.which(('Name {0} known to none of '
+                                     'shell / interpretter / module '
+                                     'search path').format(name))
             else:
-                try: return __import__(name)
-                except:
-                    report.which(('Name {0} known to none of '
-                                 'shell / interpretter / module '
-                                 'search path').format(name))
+                return inspect.getfile(obj)
 
 class Plugin(SmashPlugin):
     """
