@@ -48,11 +48,8 @@ def untracked_files_completer(self, event):
     lines = [ line.strip().replace('\t','')[1:] for line in lines ]
     return lines
 
-def reset_completer(self,event):
+def reset_completer(self, event):
     options = '--patch --soft --mixed --hard --merge --keep'.split()
-    #print '\n\n',event.symbol,options,event.symbol in options
-    #if str(event.symbol.strip().split()) in options:
-    #    return local_branches(self, event)
     return options
 
 def filesystem_completer(self, event):
@@ -78,12 +75,10 @@ def remote_branches_completer(self, event):
     return tmp
 
 def local_branches(self, event):
-    """ """
     if event.symbol.startswith('origin'):
         return remote_branches_completer(self, event)
-
     all_branches_cmd = 'git branch -a|grep -v remote'
-    return ['origin/'] + \
+    return ['HEAD', 'origin/'] + \
                filter(None, map(lambda x: x.replace("*","").strip(),
                                 os.popen(all_branches_cmd).readlines()))
 
@@ -99,6 +94,12 @@ def subcommands(*args, **kargs):
                        'reset', 'rm', 'show', 'status', 'tag']
 
     return GIT_SUBCOMMANDS
+
+def fsc2(self, event):
+    """ better file system completer that uses the working
+        directory. the other code should probably use this..
+    """
+    return __IPYTHON__.Completer.file_matches(event.symbol)
 
 class Plugin(SmashPlugin):
     GIT_ALIASES = [ 'grm git rebase -i origin/master',
@@ -120,9 +121,8 @@ class Plugin(SmashPlugin):
 
         report.git_completer('setting prompt to use git vcs')
         __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
-        #set_complete(remote_branches_completer, 'git checkout origin/[\S]*$')
         set_complete(local_branches, 'git checkout [\S]*$')
-        #set_complete(remote_branches_completer, 'git checkout origin/')
+        set_complete(fsc2, 'git checkout [\S]* ')
         set_complete(subcommands, 'git [\s]*[\S]*$')
         set_complete(filesystem_completer, 'git mv')
         set_complete(uncomitted_files_completer, 'git commit')
