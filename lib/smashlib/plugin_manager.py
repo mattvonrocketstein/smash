@@ -24,12 +24,13 @@ class PluginManager(object):
     """ smash plugins manager """
 
     report = staticmethod(report.plugins)
-    def cmdline_enable(self, name):
+    def cmdline_enable(self, name, quiet=False):
         ('enable a plugin by name.  \nthis must be one of the '
          'plugins in ~/.smash/plugins, and you need not specify'
          ' an absolute path.  \n(to move a file or url'
          ' into that directory, use --install.\n')
-        self.report('enabling {0}'.format(name))
+        if not quiet:
+            report.plugin_manager('enabling {0}'.format(name))
         self._set_enabled(name, 1)
 
     def cmdline_list(self):
@@ -45,13 +46,14 @@ class PluginManager(object):
         if disabled:
             self.report('disabled plugins:')
             for p in disabled: print '  ',p
+        # TODO: staleness
         if not (enabled or disabled):
             self.report('no plugins at all in ' + self.SMASH_DIR)
 
     def cmdline_install_new_plugin(self, s):
         ('move plugin @ "INSTALL" to the smash plugin directory'
          'you can enter a path to a file on disk or a url.')
-        report.plugin_manager('installing ' + s)
+        report.plugin_manager('Working on --install on ' + s)
         success = False
         if s.split('://')[0] in 'https http ftp file'.split():
             import urlparse,urllib
@@ -78,12 +80,24 @@ class PluginManager(object):
             fname = ops(s)[-1]
             plugin_name = fname
             fname = opj(self.PLUGINS_DIR,fname)
-            report('copying to {0}'.format(fname))
+            report.plugin_manager('Copying plugin to {0}'.format(fname))
             shutil.copy(s, fname)
             success = True
         if success:
-            report.plugin_manager('plugin acquired. enabling it..')
-            self.install_plugin_from_fname(plugin_name)
+            report.plugin_manager('Plugin acquired successfully.')
+            report.plugin_manager('Verifying plugin..')
+            try:
+                self.install_plugin_from_fname(plugin_name)
+            except:
+                report.plugin_manager('Giving up, plugin test-install failed.')
+                report.plugin_manager('DONT use --enable until this is fixed!')
+            else:
+                report.plugin_manager('Plugin was verified successfully.')
+                report.plugin_manager('Enabling plugin..')
+                self.cmdline_enable(plugin_name,quiet=True)
+                report.plugin_manager('Plugin was enabled successfully.')
+                report.plugin_manager('Plugin "{0}" will load the next time smash is run.'.format(plugin_name))
+
 
     def __init__(self):
         self.SMASH_DIR = smashlib._meta['SMASH_DIR']
@@ -163,7 +177,7 @@ class PluginManager(object):
 
     def _get_some_plugins(self, name, val):
         plugins     = self.plugin_data
-        return [ fname for fname in plugins if plugins[fname][name] == val ]
+        return sorted([ fname for fname in plugins if plugins[fname][name] == val ])
 
     @property
     def plugin_data(self):
