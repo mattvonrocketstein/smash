@@ -8,9 +8,9 @@ architecture that is easy to use, and simple JSON configuration files that try t
 sane as possible.
 
 
-=====================
-Shells are a Problem
-=====================
+===========
+The Problem
+===========
 
 Shells are still annoying!
 
@@ -49,7 +49,7 @@ functionality (e.g. via profiles) is *still* not maintainable.
 
 
 ======================
-SmaSh is a way Forward
+SmaSh is a Way Forward
 ======================
 
 What is needed is an environment that functions simultaneously as a shell and a
@@ -62,25 +62,17 @@ offers:
   - Unsurprising: bashy commands and pythony code both work the way you would expect
   - Hybrid: Mixing python and shell code is possible
 
-===================
-Smash is Extensible
-===================
+SmaSh is extensible and although it is built on top of pysh, and actually has very
+little core functionality.  A big part of what it offers  is an organized approach
+to configuration management and plugins.  In fact, almost all of what it does happens
+through plugins.  Apart from what the bash/python hybrid features that come from pysh,
+SmaSh also inherits all the flexibility of IPython in terms of I/O hooks and pre/post
+processing.  So go nuts with your domain specific language or ruby's pry shell or go
+attach a lisp-lua-node runtime onto this frankenstein bananaphone piano, see if I care.
 
-Smash is built on top of pysh, and actually has very little core functionality.
-A big part of what it offers  is an organized approach to configuration management
-and plugins.  In fact, almost all of what it does happens through plugins.  Apart
-from what the bash/python hybrid features that come from pysh, SmaSh also inherits
-all the flexibility of IPython in terms of I/O hooks and pre/post processing.  So go
-nuts with your domain specific language or ruby's pry shell or go attach a lisp-lua-node
-runtime onto this frankenstein bananaphone piano, see if I care.
-
-==========
-Smash Core
-==========
-
-Philosophy:
------------
-
+================
+Smash Philosophy
+================
 Smash is installed and modified on a per-user basis; nothing is installed at the system level.
 This is important because as you continue to add plugins to smash, any third-party support
 libraries that are required won't clutter up the rest of your system.
@@ -91,12 +83,40 @@ libraries that are required won't clutter up the rest of your system.
    - Core support libraries live in ~/.smash/smashlib
 
 
-Project management:
--------------------
-  - Directories can be registered as Projects
-  - Project configuration is stored with JSON
-    - you can manipulate it via the command-line or edit config-files yourself
-  - Projects can be "activated", which might mean convenient side-effects like
+==========
+Smash Core
+==========
+
+
+The Plugin Architecture:
+-------------------------
+
+Plugins can be enabled unconditionally, in which case they are loaded when SmaSh bootstraps,
+or they can be loaded conditionally, in which case they are triggered by project activation
+or loaded dynamically by another plugin.
+
+To write a plugin you must extend smashlib.smash_plugin.SmashPlugin, and define an install()
+method.  From the command line you can use `smash --install` to "acquire" plugins and move them
+to ~/.smash/plugins.  Plugins can be grabbed from disk, or from url's but the preferred method
+for distributing them is via github gist's using `smash --install gist://<id>`.
+
+SmaSh plugins can do all sorts of things to the shell by
+  - loading other plugins
+  - altering prompt behaviour
+  - altering completion strategies
+  - contributing methods, macros, or magic to the shell's global namespace
+
+
+The Project-management Abstraction:
+-----------------------------------
+
+`Projects` are typically objects that correspond to directories.
+
+  - Bind individual directories (`~/myproject`) or directories of directories (`~/code/*`)
+  - Project configuration is stored with JSON in `~/.smash/etc/projects.json`
+     - you can manipulate it via the command-line or edit config-files yourself
+  - Projects can be "activated", "invoked", or "deactivated" and each can trigger pre/post actions
+  - Pre/post actions might mean convenient side-effects such as
      - activating a virtual environment
      - starting a virtual machine
      - opening a web page
@@ -113,7 +133,8 @@ Prompt and Aliases:
   - Alias configuration is stored with JSON
   - Aliases can be global, or stored per project
   - Aliases that are project specific do not clutter things up when a project is not activated
-  - Prompt is split into "components" that can be easily added/substracted on the fly
+  - Prompt is split into "components" that can be easily added/substracted on the fly, and
+  - Prompts can also be project-specific.
 
 =========================
 Generic Plugins for Smash
@@ -122,7 +143,7 @@ Generic Plugins for Smash
 Hostname completion:
 ---------------------
   - works for ssh
-  - works for any program using ftp://, http://, etc
+  - works for any program using standard uri's like ftp://, http://, etc
 
 Browser Integration:
 --------------------
@@ -149,27 +170,27 @@ Python Specific Plugins for Smash
 =================================
 
 Misc extra completers
----------------------
-  - Completers for accessing python dictionaries
-  - Completers for setup.py
-  - Pip completers
-    - tab-completion over the standard pip subcommands
-    - tab-completion over contents of requirements.txt if it's in the working directory
+
+   - Completers for accessing python dictionaries
+   - Completers for setup.py
+   - Pip completers
+      - tab-completion over the standard pip subcommands
+      - tab-completion over contents of requirements.txt if it's in the working directory
 
 
 Virtual-Environments:
----------------------
+
   - venvs can be activated/deactivated cleanly, and without lasting side-effects
   - ``Project activation`` can trigger venv-activation
 
 Fabric integration:
--------------------
+
   - tab-completion over fabfile commands
   - programmatic access to the functions themselves
   - PS: this plugin is a good example of a minimal "post-dir-change" trigger
 
 Unit tests:
------------
+
   - post-dir-change hook finds `tests/` or `tests.py` in working directory
   - or, scan everything under this working-directory or a known Project
   - attempts to detect what type of unittests these are via static analysis (django/vanilla unittest/etc)
@@ -177,7 +198,7 @@ Unit tests:
 
 
 Enhanced 'which'
-----------------
+
   1) for unix shell commands, ``which`` works as usual
   2) failing (1), if the name matches a python objects in the global namespace, show the file that defined it
   3) failing (3), if the name matches an importable module, show the path it would be imported from
@@ -188,16 +209,20 @@ Enhanced 'which'
 Possible deal-breakers
 ======================
 
-Smash unfortunately will need IPython==0.10 installed in it's sandbox in ~/.smash, because
+SmaSh unfortunately will need IPython==0.10 installed in it's sandbox in ~/.smash, because
 later versions of IPython are not compatible ``pysh`` IPython profile, and I have not gotten
 around to porting it yet.
 
-One current limitation of the combination of pysh / ipython / smash is a lack of job control
+One current limitation of the combination of pysh / IPython / SmaSh is a lack of job control
 in the sense that you might be used to.  Specifically you can background tasks with an ``&``
 as usual, but ``fg`` does not resume.  At first this seemed horrible but in practice I think
 this consideration is not very important- shells are cheap to spawn and a workflow around
 ``screen`` works better anyway.
 
+Currently, SmaSh plugins must be written in python.  However, a very simple python plugin,
+say for bash or ruby support, should be able to "build a bridge" between that language and
+SmaSh.  If you're interested in helping with this, send me a message about your use-case
+and I would be happy to help.
 
 =============
 Related Links
