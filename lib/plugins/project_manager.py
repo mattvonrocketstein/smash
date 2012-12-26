@@ -74,17 +74,22 @@ class Plugin(SmashPlugin):
         import smashlib
         return opj(smashlib._meta['config_dir'], CONFIG_FILE_NAME)
 
+    def _manager(self):
+        """ HACK """
+        manager = Project(ROOT_PROJECT_NAME)
+        manager._config = self.config
+        return manager
+
     def install(self):
         config_file = self.config_filename
         Project._config_file = config_file
         report.project_manager('loading config: ' + config_file)
         config = read_config(config_file)
-        manager = Project(ROOT_PROJECT_NAME)
+        self.config = config
+        manager = self._manager() #dont move this line
 
         # dont move this next line.  post_activate/post_invoke things might want the manager.
         self.contribute(COMMAND_NAME, manager)
-
-        manager._config = config
         for name, val in config.get('post_activate', {}).items():
             bus().subscribe('post_activate.' + name, val)
         self.load_instructions(manager, config)
@@ -101,6 +106,7 @@ class Plugin(SmashPlugin):
         ('specify a project to inialize.\n'
          '(the project should already be recognized '
          'by the project manager)')
+        manager=self._manager()
         project = getattr(manager, opts.project, None)
         if project is None:
             report("nonexistant project: {0}".format(opts.project))
