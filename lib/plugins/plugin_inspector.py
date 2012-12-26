@@ -12,29 +12,7 @@ import smashlib
 from smashlib.plugin_manager import PluginManager
 from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import list2table, colorize
-
-
-class AliasInspector(object):
-    """ """
-    @staticmethod
-    def _sort_aliases(x,y):
-        t1 = cmp(x.affiliation, y.affiliation)
-        if t1==0:
-            t1 = cmp(x.alias, y.alias)
-        return t1
-
-    @property
-    def __doc__(self):
-        from smashlib import ALIASES as aliases
-        lst = [x for x in aliases]
-        lst.sort(self._sort_aliases)
-        dat=[]
-        headers = 'group alias command'.split()
-        for alias in aliases:
-            nick = alias.alias.split(' ')[0]
-            cmd = ' '.join(alias.alias.split(' ')[1:])
-            dat.append([alias.affiliation, nick, cmd])
-        return colorize("{red}Aliases:{normal}\n\n") + list2table(dat, headers)
+from smashlib.aliases import Aliases
 
 class PluginInspector(PluginManager):
     """ """
@@ -58,5 +36,6 @@ class PluginInspector(PluginManager):
 
 class Plugin(SmashPlugin):
     def install(self):
+        from smashlib import ALIASES
         self.contribute('plugins', PluginInspector())
-        self.contribute('aliases', AliasInspector())
+        self.contribute('aliases', ALIASES)
