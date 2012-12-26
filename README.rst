@@ -14,20 +14,26 @@ on, and offers very sophisticated support for python virtual environments.
 The Problem
 ===========
 
-Shells are still annoying!  No one wants to manage zillions of aliases or arcane readline
-configurations. Things like sed / awk are great for quick hacks, but are obscure and not
-maintainable.  Shells are not conveniently modular, and do not perform well for things
-like multiple projects, multiple use-cases, or domain specific languages.  Shells offer
-only minimal or awkward context-awareness (things like pre/post "dir-change" triggers).
+Shells are still annoying!::
 
-Shells are also no ideal for software development.  And based on that point, maybe you're
-already thinking "`Use emacs/vim/eclipse!`", but, I also personally think that a huge,
-do-everything IDE is not the True Way.
+  - No one wants to manage zillions of aliases or arcane readline configurations.
+  - Things like sed / awk are great for quick hacks, but are obscure and not maintainable.
+  - Shells are not conveniently modular, and do not perform well for things like:
+    - multiple projects,
+    - multiple use-cases,
+    - or domain specific languages.
+  - Shells offer only minimal or awkward context-awareness
+    - no triggers for things like pre/post "dir-change"
+    - no hooks for pre/post processing of IO
 
-The problems most people solve on a daily are similar to the problems from yesterday,
+Shells are also not ideal for software development.  And based on that point, maybe
+you're already thinking *"Use emacs/vim/eclipse!"*.  But, I also personally think that
+a huge, do-everything IDE is not the True Way.
+
+Still the problems most people solve on a daily are similar to the problems from yesterday,
 and shell experiences are often characterized by too much repetition.  We fumble with
 awkward histories with our control-r's and we do things like build one-off aliases or
-scripts and throw them in a .bashrc or ~/bin and there they rot, usually because they
+scripts and throw them in a *.bashrc* or *~/bin* and there they rot, usually because they
 weren't readable a week after they were written, and they weren't quite general enough
 to be used everywhere.
 
@@ -38,7 +44,7 @@ IPython+pysh is not quite a solution
 IPython is pretty great, but in many ways is more a framework than a solution.  Even though it does
 basic shell stuff, out of the box it is primarily intended for python developers, and not fit for use
 as a generic shell.  Here are just a few reasons vanilla IPython and pysh+IPython are not usable as
-system shells:
+system shells::
 
   - obviously not completely bash-like (nor should it be): 'cd <dir>' works but 'tail -f <file>' does not
   - lack of consistency: profiles vs. rc-files vs straight programmatic api configuration is confusing
@@ -66,8 +72,8 @@ leverages everything it offers:
   - Unsurprising: bashy commands and pythony code both work the way you would expect
   - Hybrid: Mixing python and shell code is possible
 
-SmaSh is extensible and actually has very little core functionality.  A big part of what it
-offers  is an organized approach to configuration management and plugins.  In fact, almost
+SmaSh is also extensible, and actually has very little core functionality.  A big part of what it
+offers is just an organized approach to configuration management and plugins.  In fact, almost
 all of what it does happens through plugins!  Apart from what the bash/python hybrid features
 that come from pysh, SmaSh also inherits all the flexibility of IPython in terms of I/O hooks
 and pre/post processing.  So go nuts with your domain specific language or ruby's pry shell or
@@ -94,10 +100,10 @@ Smash Core
 The Project-management Abstraction:
 -----------------------------------
 
-**Projects** are typically objects that correspond to directories.
+**Projects** are typically objects that correspond to directories.::
 
-  - Bind individual directories (*~/myproject*) or directories of directories (*~/code/**)
-  - Project configuration is stored with JSON in *~/.smash/etc/projects.json*
+  - Bind individual directories ("~/myproject") or directories of directories ("~/code/"")
+  - Project configuration is stored with JSON in "~/.smash/etc/projects.json"
      - you can manipulate it via the command-line or edit config-files yourself
   - Projects can be "activated", "invoked", or "deactivated" and each can trigger pre/post actions
   - Pre/post actions might mean convenient side-effects such as
@@ -114,6 +120,9 @@ The Project-management Abstraction:
 
 Prompt and Aliases:
 -------------------
+
+::
+
   - Alias configuration is stored with JSON
   - Aliases can be global, or stored per project
   - Aliases that are project specific do not clutter things up when a project is not activated
@@ -126,13 +135,13 @@ The Plugin Architecture:
 Lots of plugins are included with SmaSh (read more below).  I don't necessarily claim all these
 are useful to you, and they won't be enabled by default.  The provided plugins are intended to
 provide a wealth of examples for some of the basic things you might want to do.  SmaSh plugins
-can alter all sorts of things about the environment that they run in.  For example:
+can alter all sorts of things about the environment that they run in.  For example::
 
   - loading other plugins
   - altering prompt behaviour
   - altering completion strategies
   - contributing methods, macros, or magic to the shell's global namespace
-  - and even alter (and act on) the command-line arguments that `smash` itself will use.
+  - and even alter/act-on command line arguments that SmaSh itself will use.
 
 Plugins can be enabled unconditionally, in which case they are loaded when SmaSh bootstraps,
 or they can be loaded conditionally, in which case they are triggered by project activation
@@ -159,38 +168,37 @@ ordering for the bootstrap or tell you if there is a contradiction.
 Generic Plugins for Smash
 =========================
 
-Hostname completion:
+Hostname completion::
 
   - works for ssh
   - works for any program using standard URIs like ftp://, http://, etc
-  - uses the contents of *~/.smash/etc/hosts.json* and, if available, contents of /etc/hosts
+  - uses the contents of "~/.smash/etc/hosts.json" and, if available, contents of /etc/hosts
 
-Enhanced Bookmarks:
+Enhanced Bookmarks::
 
   - offers sophisticated bookmarks, globally or per-project
   - bookmark directories, URLs, macros
   - bookmark nonstandard URIs like ssh://person@place
   - launching bookmark actions is keyboard-friendly
 
-Browser Integration:
+Browser Integration::
 
   - manage and open bookmarks, (global or per-project)
   - performs web searches with http://duckduckgo.com API, allowing for:
     - direct search of stack-overflow, django docs, pypi, etc
     - asynchronous notification that doesnt clutter your display (via growl-style popups)
-  - reddit plugin??
 
-Git VCS Integration:
+Git VCS Integration::
 
   - If applicable, default prompt includes current branch name
   - Tab completion including:
      - Branch completion in all the right spots
      - File-system completion when using 'git mv' or 'git add'
      - smart branch/file-system completion when using 'git diff'
-  - Various default aliases and places to put more (making *.git/config* optional)
+  - Various default aliases and places to put more (making ".git/config" optional)
   - Should you be inclined: hopefully enough abstraction here to easily support other VCS's
 
-Notification support:
+Notification support::
 
   - Asynchronous notifications via freedesktop
   - When this works, it's pretty great, but..
@@ -202,7 +210,7 @@ Notification support:
 Python Specific Plugins for Smash
 =================================
 
-Misc extra completers
+Misc extra completers::
 
    - Completers for accessing python dictionaries
    - Completers for setup.py
@@ -211,20 +219,20 @@ Misc extra completers
       - Completion over contents of requirements.txt if it's in the working directory
 
 
-Virtual-Environments:
+Virtual-Environments::
 
   - Venv's can be activated/deactivated cleanly, and without lasting side-effects
   - Close integration with projects such that
      - if a project is activated and it is a venv, it will be activated
      - if a project contains a venv at the top-level, that venv will be activated
 
-Fabric integration:
+Fabric integration::
 
   - Completion over fabfile commands
   - Programmatic access to the functions themselves
   - PS: this plugin is a good example of a minimal "post-dir-change" trigger
 
-Unit tests:
+Unit tests::
 
   - post-dir-change hook finds `tests/` or `tests.py` in working directory
   - or, scan everything under this working-directory or a known Project
@@ -232,9 +240,9 @@ Unit tests:
   - test files are enumerated and shortcuts for running them quickly are updated
   - etc
 
-Enhanced **which**
+Enhanced **which**::
 
-  1) for unix shell commands, **which** works as usual
+  1) for unix shell commands, "which" works as usual
   2) failing (1), if the name matches a python objects in the global namespace, show the file that defined it
   3) failing (2), if the name matches an importable module, show the path it would be imported from
   4) failing (3), if name matches a host, show the IP address according to host files
