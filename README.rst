@@ -187,7 +187,7 @@ Git VCS Integration:
      - Branch completion in all the right spots
      - File-system completion when using 'git mv' or 'git add'
      - smart branch/file-system completion when using 'git diff'
-  - Various default aliases and places to put more (making .git/config optional)
+  - Various default aliases and places to put more (making *.git/config* optional)
   - Should you be inclined: hopefully enough abstraction here to easily support other VCS's
 
 Notification support:
