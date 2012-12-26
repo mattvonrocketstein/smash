@@ -62,8 +62,6 @@ class SmashPlugin(object):
             assert len(kargs)==1,'not implemented yet, maybe never..'
             name,val = kargs.items()[0]
 
-        assert name and val, 'error unpacking args'
-
         if name in __IPYTHON__.user_ns:
             msg = ('"{0}" variable is taken in user namespace.  '
                    'refusing to proceed').format(name)
