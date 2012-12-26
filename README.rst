@@ -159,9 +159,9 @@ at the system level, make sure your plugin specifies values in ``Plugin.requires
 
 SmaSh plugins can specify any prerequisites they might have in terms of python modules, system
 binaries, or other SmaSh plugins.  At bootstrap, most systems that involve prerequisites use
-"priorities" for loading libraries-- *SmaSh is different and drama free*.  You specify your
-prerequisites, and if your configuration is feasible then SmaSh will determine a consistent
-ordering for the bootstrap or tell you if there is a contradiction.
+"priorities" for loading dependencies, but *SmaSh is different and drama free*.  You specify
+your prerequisites, and if your configuration is feasible then SmaSh will determine a
+consistent ordering for the bootstrap or tell you if there is a contradiction.
 
 
 =========================
