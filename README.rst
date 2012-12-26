@@ -267,6 +267,97 @@ system level ( in debian-based distros, use **apt-get install python-virtualenv*
 
     $ python setup.py develop
 
+  If everything went well, you should be able to run 'smash' now::
+
+    $ smash
+
+====================
+Working with Plugins
+====================
+
+By default, enabled plugins are kept to a minimum.  You can get a list of available,
+enabled, and disabled plugins like this::
+
+    $ smash --list
+
+If you use git VCS, I suggest enabling support for that.  This will customize your prompt
+to show the current branch, turn on various completers, add convenient aliases.::
+
+    $ smash --enable git_completers.py
+    bootstrap: launching with rc-file: /home/testing/.smash/etc/smash.rc
+    git_completer: setting prompt to use git vcs
+    project_manager: loading config: /home/testing/.smash/etc/projects.json
+    plugin_manager: enabling git_completers.py
+
+Changes will take affect when you next relaunch the shell.
+
+If you're a python programmer, I suggest turning on a few more:::
+
+    $ smash --enable venv_prompt.py
+    $ smash --enable pip_completer.py
+    $ smash --enable setup_completer.py
+    $ smash --enable which.py
+    $ smash --enable fabric_support.py
+
+
+=====================
+Working with Projects
+=====================
+
+First open *~/.smash/etc/projects.json* in the editor of your choice.
+
+The simplest thing you can do is add a single directory as a project.  To do that,
+add a line like this to the "instructions" section:::
+
+   ["bind",     ["~/myproject"], {}]
+
+To add all directories under a certain directory, add an entry like this:::
+
+   ["bind_all", ["~/code"],          {}],
+
+Note that **bind_all** is not recursive, it only goes one layer deep.
+Once you've added this and restarted SmaSh, then it knows about your projects:::
+
+   matt@vagabond:~$ smash
+   bootstrap: launching with rc-file: /home/matt/.smash/etc/smash.rc
+   project_manager: loading config: /home/matt/.smash/etc/projects.json
+   project_manager: binding /home/matt/code (21 projects found)
+   [~]>
+
+The shell's handle for interacting with projects is simple "proj".  It already
+exists there, and you can query it for some simple information like this:::
+
+   [~]> proj?
+
+   Found Projects:
+   |                 name |                        path | virtualenv |           vcs |
+   -----------------------------------------------------------------------------------
+   |           robotninja |           ~/code/robotninja |     ./node | GitRepository |
+   | readertray-read-only | ~/code/readertray-read-only |        N/A |    Subversion |
+   |          plurlpicker |          ~/code/plurlpicker |        N/A |           N/A |
+
+
+Your projects might be registered, but they have not yet declared any post or
+pre-invocation hooks.  Still, you immediately get a simple alias for changing
+directories.  Since the code for SmaSh is in my ~/code directory, I can do this::
+
+   [~]> proj.robotninja
+   pre_invoke{'name': u'robotninja'}
+   project_manager: updating aliases
+   [~/code/robotninja]>
+
+Useful, but that was kind of boring.  Let's add an alias that means different things
+depending on which project you've activated.  You can see from the table above that
+one project is using subversion for VCS, whereas another is using git.. so how about
+we make one "status" alias that does the right thing in the right place?  Open
+*~/.smash/etc/projects.json* again, and make your alias section look like this:::
+
+  'aliases': {
+    'robotninja': ['status git status',],
+    'readertray-read-only':['status svn status']
+   }
+
+
 =============
 Related Links
 =============
