@@ -4,7 +4,7 @@
 import types
 import os, sys, glob
 
-from smashlib.util import opj, bus
+from smashlib.util import opj, bus, report,truncate_fpath
 
 get_path   = lambda: os.environ['PATH']
 get_venv   = lambda: os.environ['VIRTUAL_ENV']
@@ -45,6 +45,8 @@ class VenvMixin(object):
     @classmethod
     def deactivate(self):
         """ TODO: move this to ipy_venv_support """
+        from smashlib.projects import Project
+        bus().publish('pre_deactivate',name=Project('__smash__').CURRENT_PROJECT)
         try:
             venv = get_venv()
         except KeyError:
@@ -60,14 +62,14 @@ class VenvMixin(object):
             # TODO: also rehash?
             vbin = to_vbin(venv)
             if vbin in path:
-                self.report('removing old venv bin from PATH' + str(vbin))
+                report.venv_mixin('removing old venv bin from PATH: ' + truncate_fpath(str(vbin)))
                 path.remove(vbin)
                 os.environ['PATH'] = ':'.join(path)
 
             # clean sys.path according to python..
             # stupid, but this seems to work
             import smashlib
-            self.report('cleaning sys.path')
+            report.venv_mixin('cleaning sys.path')
             new_path = []
             for entry in sys.path:
                 if entry and not entry.startswith(venv):
@@ -85,6 +87,7 @@ class VenvMixin(object):
 
             sys.path = new_path
             # TODO: clean sys.modules?
+            bus().publish('post_deactivate',name=Project('__smash__').CURRENT_PROJECT)
             return True
 
     @classmethod
@@ -116,7 +119,7 @@ class VenvMixin(object):
             path = get_path().split(':')
             os.environ['PATH'] = ':'.join([vbin] + path)
             os.environ['VIRTUAL_ENV'] = obj
-            self.report('      adding "%s" to PATH; rehashing aliases' % vbin)
+            report.venv_mixin('\tadding "%s" to PATH; rehashing aliases' % truncate_fpath(vbin))
             sandbox = dict(__file__ = opj(vbin, 'activate_this.py'))
             execfile(opj(vbin, 'activate_this.py'), sandbox)
 
@@ -129,15 +132,12 @@ class VenvMixin(object):
             # reinstall anything else we killed in
             # the rehash
             __IPYTHON__.ipmagic('rehashx')
-            import smashlib
-            aliases = getattr(smashlib, 'ALIASES')
-            aliases.install()
 
         else:
-            self.report('  not a venv.. ' + obj)
+            report.venv_mixin('\ttoplevel@"{0}" is not a venv, looking elsewhere'.format(truncate_fpath(obj)))
             path = _contains_venv(obj)
             if path:
-                return self._activate(path)
+                return self._activate_str(path)
 
     @classmethod
     def _activate_project(self, obj):
@@ -160,12 +160,13 @@ class VenvMixin(object):
         # TODO: move/combine this to ipy_venv_support ?
         # FIXME: get rid of Project-dep ?
         from smashlib.projects import Project as ProjectClass
-        bus().publish('pre_activate', obj=obj, )
+
         self.deactivate()
         if isinstance(obj, types.StringTypes):
             result = self._activate_str(obj)
         #elif type(obj).__name__ == ProjectClass.__name__:
         elif isinstance(obj, ProjectClass):
+            bus().publish('pre_activate', name=obj.name, )
             result = self._activate_project(obj)
             bus().publish('post_activate', name=obj.name, )
         else:
