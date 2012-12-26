@@ -3,7 +3,7 @@
 About SmaSh
 ===========
 
-Smash is the smart-shell.  It offers features for project management, a flexible plugin
+SmaSh is the smart-shell.  It offers features for project management, a flexible plugin
 architecture that is easy to use, and simple JSON configuration files that try to be as
 sane as possible.  Python developers might be particularly interested because it also
 happens to be a python/bash hybrid which builds on the pysh profile for IPython.  It builds
@@ -80,10 +80,10 @@ and pre/post processing.  So go nuts with your domain specific language or ruby'
 go attach a lisp/lua/node runtime onto this frankenstein bananaphone piano, see if I care.
 
 ================
-Smash Philosophy
+SmaSh Philosophy
 ================
 
-Smash is installed and modified on a per-user basis; nothing is installed at the system level.
+SmaSh is installed and modified on a per-user basis; nothing is installed at the system level.
 This is important because, as you continue to add plugins to smash, any third-party support
 libraries that are required won't clutter up the rest of your system.  In particular,
 
@@ -93,7 +93,7 @@ libraries that are required won't clutter up the rest of your system.  In partic
    - Core support libraries live in *~/.smash/smashlib*
 
 ==========
-Smash Core
+SmaSh Core
 ==========
 
 
@@ -165,7 +165,7 @@ ordering for the bootstrap or tell you if there is a contradiction.
 
 
 =========================
-Generic Plugins for Smash
+Generic Plugins for SmaSh
 =========================
 
 Hostname completion::
@@ -207,7 +207,7 @@ Notification support::
      - may require some fiddling to get it to work outside of ubuntu/gnome (!)
 
 =================================
-Python Specific Plugins for Smash
+Python Specific Plugins for SmaSh
 =================================
 
 Misc extra completers::
