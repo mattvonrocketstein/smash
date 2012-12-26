@@ -28,11 +28,11 @@ class PluginInspector(PluginManager):
         for p in self.all_plugins:
             dat.append([p,
                         p in self.enabled_plugins,
-                        p in fnames])
+                        str(0)])
         dat = sorted(dat,key=lambda x:x[0])
         return ("Smash-plugin information: \n\n"
                 "  config-file: {0}\n\n").format(self.plugins_json_file) + \
-                list2table(dat, header=['name', 'enabled', 'installed'])
+                list2table(dat, header=['name', 'enabled', 'errors'])
 
 class Plugin(SmashPlugin):
     def install(self):
