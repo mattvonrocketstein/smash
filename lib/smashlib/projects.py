@@ -9,17 +9,20 @@ from smashlib.python import expanduser
 from smashlib.reflect import namedAny, ObjectNotFound
 from smashlib.util import colorize, report, list2table
 from smashlib.util import truncate_fpath
-from smashlib.venv import VenvMixin, _contains_venv
+from smashlib.venv import VenvMixin, _contains_venv,get_venv
 from smashlib.util import report, bus
 
 COMMAND_NAME = 'proj'
 ROOT_PROJECT_NAME = '__smash__'
 
 def which_vcs(fpath):
-    import vcs
-    try:
-        return vcs.get_repo(fpath).__class__.__name__
-    except vcs.VCSError:
+    files = os.listdir(fpath)
+    if '.svn' in files:
+        # why doesnt vcs do this..
+        return 'Subversion'
+    elif '.git' in files:
+        return 'git'
+    else:
         return 'N/A'
 
 class Hooks(object):
@@ -30,20 +33,8 @@ class Hooks(object):
         [ x.stop() for x in self.watchlist ]
         #raise ipapi.TryNext()
 
-def update_aliases(bus, *args, **kargs):
-    """ """
-    report.project_manager('updating aliases')
-    cp = Project('whatever').CURRENT_PROJECT
-    if cp:
-        from smashlib import ALIASES as aliases
-        old_aliases = aliases[cp]
-        count = [ aliases.uninstall(a) for a in old_aliases ]
-        if count:
-            msg = "removed {0} aliases from the previous project"
-            msg = msg.format(len(count))
-            report.project_manager(msg)
-
-
+from smashlib.aliases import kill_old_aliases, add_new_aliases, rehash_aliases
+NO_ACTIVE_PROJECT = '__not_set__'
 class Project(VenvMixin, Hooks):
     #   class for holding Project abstractions. in the simplest case,
     #   beginning work on on a project just means changing directories.
@@ -54,7 +45,7 @@ class Project(VenvMixin, Hooks):
     #
     #   TODO: document difference between project "invoking" vs "activation"
     #   TODO: should really rename to 'projectman' or something
-
+    CURRENT_PROJECT = NO_ACTIVE_PROJECT
     msgs      = []
     watchlist = []
     dir       = None
@@ -79,22 +70,24 @@ class Project(VenvMixin, Hooks):
         header, dat = self._doc_helper(self._paths)
         return """Projects:\n\n""" + list2table(dat, header=header)
 
-    @property
-    def CURRENT_PROJECT(self):
-        """ FIXME: makes no distinction for whether it's activated, though """
-        _dir = os.getcwd()
-        _venv = os.environ.get('VIRTUAL_ENV')
-        for name,path in self._paths.items():
-            if _venv and _venv.startswith(path): return name
-            if path == _dir: return name
-        return None
+    #@property
+    #def CURRENT_PROJECT(self):
+    #    """ FIXME: makes no distinction for whether it's activated, though """
+    #    _dir = os.getcwd()
+    #    _venv = get_venv()
+    #    for name,path in self._paths.items():
+    #        if _venv and _venv.startswith(path): return name
+    #        if path == _dir: return name
+    #    return None
 
     def __init__(self, name):
         """ """
         self.name = name
         self._pre_invokage  = defaultdict(lambda: [])
         self._post_invokage = defaultdict(lambda: [])
-        bus().subscribe('pre_invoke', update_aliases)
+        bus().subscribe('pre_activate', kill_old_aliases)
+        bus().subscribe('post_activate', add_new_aliases)
+        bus().subscribe('post_activate', rehash_aliases)
 
     @property
     def watched(self):
@@ -161,6 +154,10 @@ class Project(VenvMixin, Hooks):
             bus().subscribe('post_activate.'+name, func)
             if func not in kls._post_activate[name]:
                 kls._post_activate[name] += [func]
+    @property
+    def files(self):
+        """ TODO: allow globbing """
+        return [x.strip() for x in os.popen('find '+self.dir).readlines()]
 
     @classmethod
     def bind(kls, _dir, name=None, post_activate=[], post_invoke=[]):
