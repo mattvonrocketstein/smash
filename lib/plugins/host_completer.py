@@ -4,6 +4,7 @@
     but, if something is missing just add an extra
     re to the HOST_REGEXES list.
 """
+import smashlib
 from smashlib.util import report, set_complete
 from smashlib.smash_plugin import SmashPlugin
 
@@ -29,6 +30,12 @@ def get_hosts():
                     if all(['::' not in host,
                             'ip6-' not in host]):
                         hosts.append(host.strip())
+    hosts_json = opj(smashlib._meta['config_dir'],'hosts.json')
+    if ope(hosts_json):
+        with open(hosts_json) as fhandle:
+            hosts_json = demjson.decode(fhandle.read())
+        for alias,host in hosts_json.items():
+            hosts += [alias,host]
     return hosts
 
 def uri_completer(self, event):

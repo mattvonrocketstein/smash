@@ -142,6 +142,7 @@ CONFIG   = [ opj('config', 'smash.rc'),
              opj('config', 'plugins.json'),
              opj('config', 'projects.json'),
              opj('config', 'editor.json'),
+             opj('config', 'hosts.json'),
              opj('config', 'bookmarks.json'),
         ]
 SCRIPTS = [ opj('scripts', 'smash'),
