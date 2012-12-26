@@ -52,6 +52,7 @@ class SmashPlugin(object):
         """
         kargs.update(case_sensitive=False)
         return self.contribute(*args, **kargs)
+
     def contribute(self, *args, **kargs): #case_sensitive=True):
         """ contribute name/val to IPython shells' namespace """
         case_sensitive = kargs.pop('case_sensitive',False)
@@ -59,7 +60,7 @@ class SmashPlugin(object):
         if len(args)==2:
             name, val= args
         else:
-            assert len(kargs)==1,'not implemented yet, maybe never..'
+            assert len(kargs)==1, 'not implemented yet, maybe never..'
             name,val = kargs.items()[0]
 
         if name in __IPYTHON__.user_ns:
