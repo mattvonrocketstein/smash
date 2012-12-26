@@ -1,8 +1,7 @@
-""" simple completion for debian/ubuntu's apt
-
-    want to trigger on:
+""" completion for debian/ubuntu's apt
 """
 
+#This might be newer than what's in ipython
 APT_CMDS = ("update upgrade install remove autoremove "
             "purge source build-dep dist-upgrade "
             "dselect-upgrade clean autoclean check "
@@ -10,8 +9,8 @@ APT_CMDS = ("update upgrade install remove autoremove "
 
 from smashlib.util import set_complete
 from smashlib.smash_plugin import SmashPlugin
+from IPython.Extensions.ipy_completers import apt_get_packages, apt_completer
 
 class Plugin(SmashPlugin):
     def install(self):
-        completer = lambda *args,**kargs: APT_GET_CMDS
-        set_complete(completer, 'apt-get')
+        set_complete(apt_completer, 'apt-get')

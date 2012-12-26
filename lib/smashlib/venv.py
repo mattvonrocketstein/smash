@@ -128,13 +128,13 @@ class VenvMixin(object):
             dynload = opj(python_dir, 'lib-dynload')
             sys.path.append(dynload)
 
-            # rehash aliases based on $PATH, then
-            # reinstall anything else we killed in
-            # the rehash
+            # NB: this updates bins but kills other aliases!
             __IPYTHON__.ipmagic('rehashx')
 
         else:
-            report.venv_mixin('\ttoplevel@"{0}" is not a venv, looking elsewhere'.format(truncate_fpath(obj)))
+            msg = '\ttoplevel@"{0}" is not a venv, looking elsewhere'
+            msg = msg.format(truncate_fpath(obj))
+            report.venv_mixin(msg)
             path = _contains_venv(obj)
             if path:
                 return self._activate_str(path)
