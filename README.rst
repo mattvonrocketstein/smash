@@ -147,19 +147,19 @@ Plugins can be enabled unconditionally, in which case they are loaded when SmaSh
 or they can be loaded conditionally, in which case they are triggered by project activation
 or loaded dynamically by another plugin.
 
-To write a plugin you must extend smashlib.smash_plugin.SmashPlugin, and define an install()
+To write a plugin you must extend ``smashlib.smash_plugin.SmashPlugin``, and define an install()
 method.  From the command line you can use **smash --install** to "acquire" plugins and move them
 to **~/.smash/plugins**.  Plugins can be grabbed from disk, or from URLs but the preferred method
 for distributing plugins is via github gist's using **smash --install gist://<id>**.
 
 SmaSh tries to encourage writing small plugins without dependencies, but if you need to reuse
 code from another plugin, every plugin that's enabled can be imported at any time from
-the **smashlib.active_plugins** module.  If you require a python module that may not be installed
-at the system level, make sure your plugin specifies values in **requires_modules**.
+the ``smashlib.active_plugins`` module.  If you require a python module that may not be installed
+at the system level, make sure your plugin specifies values in ``Plugin.requires_modules``.
 
 SmaSh plugins can specify any prerequisites they might have in terms of python modules, system
 binaries, or other SmaSh plugins.  At bootstrap, most systems that involve prerequisites use
-"priorities" for loading libraries-- SmaSh is different and drama free.  You specify your
+"priorities" for loading libraries-- *SmaSh is different and drama free*.  You specify your
 prerequisites, and if your configuration is feasible then SmaSh will determine a consistent
 ordering for the bootstrap or tell you if there is a contradiction.
 
