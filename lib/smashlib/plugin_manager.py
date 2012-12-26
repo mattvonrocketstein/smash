@@ -1,13 +1,19 @@
 """ smashlib.plugin_manager
 """
+import sys
+import glob
+import tempfile
 import os
 import json
 import shutil
 import demjson
-import urlparse,urllib
+import urlparse, urllib
+from types import ModuleType
+
 from IPython import ipapi
 
 import smashlib
+from smashlib.util import die
 from smashlib.util import report,ope
 from smashlib.util import die
 from smashlib.python import opj, ope, splitext,abspath, ops
@@ -22,11 +28,8 @@ ip = ipapi.get()
 # answering whether a plugin is enabled.
 DEFAULT_SCHEMA = dict(enabled=0,)
 
-class PluginManager(object):
-    """ smash plugins manager """
 
-    report = staticmethod(report.plugin_manager)
-
+class CommandLineAspect(object):
     def cmdline_enable(self, name, quiet=False):
         ('Enable a plugin by name.  \nThis must be one of the '
          'plugins in ~/.smash/plugins, and you need not specify'
@@ -42,12 +45,17 @@ class PluginManager(object):
         plugins     = self.plugin_data
         enabled     = self.enabled_plugins
         disabled    = self.disabled_plugins
+        stale       = self.stale_plugins
+        if stale:
+            self.report('\nstale plugins:')
+            for p in stale: print '  ',p
+            print
         if enabled:
-            self.report('enabled plugins')
+            self.report('\nenabled plugins:')
             for p in enabled: print '  ',p
             print
         if disabled:
-            self.report('disabled plugins:')
+            self.report('\ndisabled plugins:')
             for p in disabled: print '  ',p
         # TODO: staleness
         if not (enabled or disabled):
@@ -63,8 +71,6 @@ class PluginManager(object):
         success = False
         uris = [ z +'://' for z in 'http https ftp file'.split()]
         if s.startswith('gist://'):
-            import glob
-            import tempfile
             gist_id = urlparse.urlparse(s).netloc
             tdir = tempfile.gettempdir()
             clone_dir = opj(tdir, gist_id)
@@ -147,6 +153,42 @@ class PluginManager(object):
             self.report('-'*80)
         return plugin
 
+class EnumeratingAspect(object):
+    @property
+    def possible_plugins(self):
+        return [ fname for fname in os.listdir(self.PLUGINS_DIR) if fname.endswith('.py') ]
+    all_plugins = possible_plugins
+
+    @property
+    def enabled_plugins(self):
+        """ lists plugins mentioned as enabled in config """
+        return self._get_some_plugins('enabled', 1)
+
+    @property
+    def disabled_plugins(self):
+        """ lists plugins mentioned as disabled in config """
+        return self._get_some_plugins('enabled', 0)
+
+    @property
+    def stale_plugins(self):
+        """ lists plugins mentioned in config but not found on filesystem """
+        return set(self.plugin_data.keys())-set(self.possible_plugins)
+        stale = []
+        for x in self.plugin_data.keys():
+            x = opj(self.PLUGINS_DIR, x)
+            if not ope(x):
+                stale.append(x)
+        return stale
+
+    def _get_some_plugins(self, name, val):
+        plugins     = self.plugin_data
+        return sorted([ fname for fname in plugins if plugins[fname][name] == val ])
+
+
+class PluginManager(CommandLineAspect, EnumeratingAspect):
+    """ smash plugins manager """
+
+    report = staticmethod(report.plugin_manager)
 
     def __init__(self):
         self.SMASH_DIR = smashlib._meta['SMASH_DIR']
@@ -201,7 +243,6 @@ class PluginManager(object):
         if 'Plugin' not in G:
             err  = abs_path_to_plugin + ' is old style,'
             err += ' "Plugin" not found in namespace'
-            from smashlib.util import die
             report(err)
             die()
             return
@@ -212,8 +253,6 @@ class PluginManager(object):
         plugin.filename = rel_fname
         #plugin.pre_install()
         plugin.install()
-        import sys
-        from types import ModuleType
         from smashlib import active_plugins
         n = os.path.splitext(abs_path_to_plugin.split(os.path.sep)[-1])[0]
         n = str(n)
@@ -224,10 +263,6 @@ class PluginManager(object):
         sys.modules['smashlib.active_plugins.'+n]=m
         self._plugins.append(plugin)
         return plugin
-
-    def _get_some_plugins(self, name, val):
-        plugins     = self.plugin_data
-        return sorted([ fname for fname in plugins if plugins[fname][name] == val ])
 
     @property
     def plugin_data(self):
@@ -245,32 +280,6 @@ class PluginManager(object):
             if fname not in data:
                 data[fname] = DEFAULT_SCHEMA
         return data
-
-    @property
-    def possible_plugins(self):
-        return [ fname for fname in os.listdir(self.PLUGINS_DIR) if fname.endswith('.py') ]
-    all_plugins = possible_plugins
-
-    @property
-    def enabled_plugins(self):
-        """ lists plugins mentioned as enabled in config """
-        return self._get_some_plugins('enabled', 1)
-
-    @property
-    def disabled_plugins(self):
-        """ lists plugins mentioned as disabled in config """
-        return self._get_some_plugins('enabled', 0)
-
-    @property
-    def stale_plugins(self):
-        """ lists plugins mentioned in config but not found on filesystem """
-        return set(self.plugin_data.keys())-set(self.possible_plugins)
-        stale = []
-        for x in self.plugin_data.keys():
-            x = opj(self.PLUGINS_DIR, x)
-            if not ope(x):
-                stale.append(x)
-        return stale
 
     def install(self):
         """ install all plugins into the running environment """
@@ -294,7 +303,6 @@ class PluginManager(object):
                    raise
 
         #FIXME: cleaner way to do this back-ref
-        import smashlib
         smashlib.PLUGINS = self._plugins
 
 
