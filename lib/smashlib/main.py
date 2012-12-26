@@ -109,3 +109,6 @@ class SmashImporter(object):
 import sys
 sys.meta_path = [SmashImporter()]
 """
+
+from smashlib.patches import replace_global_matcher
+replace_global_matcher()

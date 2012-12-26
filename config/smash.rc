@@ -4,6 +4,6 @@ execute import sys; import os.path as _;
 #execute _tmp = os.path.dirname(_tmp); sys.path = sys.path+[x] if x not in sys.path else sys.path
 #execute x=_.expanduser(_.join('~','.ipython','smash', 'plugins')); sys.path = sys.path+[x] if x not in sys.path else sys.path
 execute import smashlib.main
-execute import smashlib
+
 # bash/python chimera mode set to "on"
 include ipythonrc-pysh
