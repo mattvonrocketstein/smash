@@ -115,7 +115,7 @@ The Project-management Abstraction:
      - alias groups are activated when the project is
      - alias groups are deactivated when you leave the project
   - Projects can be watched for changes, triggers for linters can be added, etc
-  - Project code can be searched asynchronously, results delivered in a way that doesnt clutter your screen
+  - Project code can be searched asynchronously, results shown in a way that doesnt clutter the screen
   - Project code does not necessarily need to be python, but if it is you get sweet benefits
 
 Prompt and Aliases:
@@ -240,13 +240,13 @@ Unit tests::
   - test files are enumerated and shortcuts for running them quickly are updated
   - etc
 
-Enhanced **which**::
+Enhanced **which** with cascading search behaviour::
 
   1) for unix shell commands, "which" works as usual
-  2) failing (1), if the name matches a python objects in the global namespace, show the file that defined it
-  3) failing (2), if the name matches an importable module, show the path it would be imported from
-  4) failing (3), if name matches a host, show the IP address according to host files
-  5) failing (4), if name matches an internet domain, show the IP address according to DNS
+  2) if the name matches a python obj in the global namespace, show the file that defined it
+  3) if the name matches an importable module, show the path it would be imported from
+  4) if name matches a host, show the IP address according to host files
+  5) if name matches an internet domain, show the IP address according to DNS
 
 
 
