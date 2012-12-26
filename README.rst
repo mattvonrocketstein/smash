@@ -258,6 +258,15 @@ SmaSh works well with python 2.6, and 2.7 and possibly earlier.  SmaSh is compti
 with python3 only insofar as IPython is.  You will need virtualenv installed at the
 system level ( in debian-based distros, use **apt-get install python-virtualenv**).
 
+  To install, clone this repository::
+
+    $ mkdir ~/code; cd ~/code
+    $ git clone git://github.com/mattvonrocketstein/smash.git
+
+  Install it (development mode obligatory for now, since SmaSh is beta)::
+
+    $ python setup.py develop
+
 =============
 Related Links
 =============
