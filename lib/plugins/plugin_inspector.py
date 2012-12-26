@@ -21,6 +21,10 @@ class PluginInspector(PluginManager):
             yield x
 
     @property
+    def plugins(self):
+        return smashlib.PLUGINS
+
+    @property
     def __doc__(self):
         """ lists all plugins """
         dat = [ ]

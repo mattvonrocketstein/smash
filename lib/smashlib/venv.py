@@ -133,8 +133,7 @@ class VenvMixin(object):
 
         else:
             msg = '\ttoplevel@"{0}" is not a venv, looking elsewhere'
-            msg = msg.format(truncate_fpath(obj))
-            report.venv_mixin(msg)
+            report.venv_mixin(msg.format(truncate_fpath(obj)))
             path = _contains_venv(obj)
             if path:
                 return self._activate_str(path)

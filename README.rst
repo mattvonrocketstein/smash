@@ -100,7 +100,8 @@ SmaSh Core
 The Project-management Abstraction:
 -----------------------------------
 
-**Projects** are typically objects that correspond to directories.::
+**Projects** are typically objects that correspond to directories.
+Project names should be kept unique.::
 
   - Bind individual directories ("~/myproject") or directories of directories ("~/code/"")
   - Project configuration is stored with JSON in "~/.smash/etc/projects.json"
@@ -284,10 +285,10 @@ If you use git VCS, I suggest enabling support for that.  This will customize yo
 to show the current branch, turn on various completers, add convenient aliases.::
 
     $ smash --enable git_completers.py
-    bootstrap: launching with rc-file: /home/testing/.smash/etc/smash.rc
-    git_completer: setting prompt to use git vcs
-    project_manager: loading config: /home/testing/.smash/etc/projects.json
-    plugin_manager: enabling git_completers.py
+      bootstrap: launching with rc-file: /home/testing/.smash/etc/smash.rc
+      git_completer: setting prompt to use git vcs
+      project_manager: loading config: /home/testing/.smash/etc/projects.json
+      plugin_manager: enabling git_completers.py
 
 Changes will take affect when you next relaunch the shell.
 
@@ -299,6 +300,24 @@ If you're a python programmer, I suggest turning on a few more:::
     $ smash --enable which.py
     $ smash --enable fabric_support.py
 
+From inside SmaSh, you can interact with the plugins via the **plugins** command.
+(This command is actually an object that represents the plugin manager.  If you
+want the plugin objects themselves use **plugins.plugins**.  If you want the
+namespace defined by a given plugin file, import
+**smashlib.active_plugins.some_plugin_name**)::
+
+    [~]> plugins?
+
+    Smash-plugin information:
+      config-file: /home/matt/.smash/etc/plugins.json
+
+    |                       name | enabled | errors |
+    -------------------------------------------------
+    |          apt_completers.py |    True |      0 |
+    |     currency_conversion.py |    True |      0 |
+    |              djangoisms.py |   False |      0 |
+    |          fabric_support.py |   False |      0 |
+    |          git_completers.py |    True |      0 |
 
 =====================
 Working with Projects
@@ -319,9 +338,9 @@ Note that **bind_all** is not recursive, it only goes one layer deep.
 Once you've added this and restarted SmaSh, then it knows about your projects:::
 
    matt@vagabond:~$ smash
-   bootstrap: launching with rc-file: /home/matt/.smash/etc/smash.rc
-   project_manager: loading config: /home/matt/.smash/etc/projects.json
-   project_manager: binding /home/matt/code (21 projects found)
+     bootstrap: launching with rc-file: /home/matt/.smash/etc/smash.rc
+     project_manager: loading config: /home/matt/.smash/etc/projects.json
+     project_manager: binding /home/matt/code (21 projects found)
    [~]>
 
 The shell's handle for interacting with projects is simple "proj".  It already
@@ -342,21 +361,65 @@ pre-invocation hooks.  Still, you immediately get a simple alias for changing
 directories.  Since the code for SmaSh is in my ~/code directory, I can do this::
 
    [~]> proj.robotninja
-   pre_invoke{'name': u'robotninja'}
-   project_manager: updating aliases
+     pre_invoke{'name': u'robotninja'}
    [~/code/robotninja]>
 
 Useful, but that was kind of boring.  Let's add an alias that means different things
 depending on which project you've activated.  You can see from the table above that
 one project is using subversion for VCS, whereas another is using git.. so how about
 we make one "status" alias that does the right thing in the right place?  Open
-*~/.smash/etc/projects.json* again, and make your alias section look like this:::
+*~/.smash/etc/projects.json* again, and make your alias section look something like
+this:::
 
   'aliases': {
     'robotninja': ['status git status',],
     'readertray-read-only':['status svn status']
    }
 
+The first time when only "proj.robotninja" was used, the project was "invoked", not
+"activated".  Activation is accomplished like so:::
+
+   [~]> proj.robotninja.activate
+     pre_invoke{'name': u'robotninja'}
+     pre_activate: {'name': u'robotninja'}
+     post_activate: {'name': u'robotninja'}
+     alias_manager: adding new aliases for "robotninja"
+     alias_manager:  added 1 aliases for this project
+     project_manager: resetting CURRENT_PROJECT
+
+Note that project "activation" implies "invocation" in the debugging information
+printed above.  Via *invocation* we changed directories and via *activation* we
+gained an alias.::
+
+   [~/code/robotninja]> status
+     # On branch voltron
+     # Untracked files:
+     #   (use "git add <file>...
+
+So that 'status' alias works as expected.  Let's try the other one..::
+
+   [~/code/robotninja]> proj.readertray_read_only.activate
+     pre_invoke: {'name': u'readertray-read-only'}
+     pre_deactivate: {'name': u'robotninja'}
+     post_deactivate: {'name': u'robotninja'}
+     pre_activate: {'name': u'readertray-read-only'}
+     alias_manager: killing old aliases for "robotninja"
+     alias_manager: removed 1 aliases from the previous project
+     post_activate: {'name': u'readertray-read-only'}
+     alias_manager: adding new aliases for "readertray-read-only"
+     alias_manager:  added 1 aliases for this project
+     project_manager: resetting CURRENT_PROJECT
+
+   [~/code/readertray-read-only]> status
+     M       readergui.py
+
+Neato, so shows that the 'status' alias is now attached to subversion rather than git.
+
+======================
+Working with Bookmarks
+======================
+
+Bookmarks are very similar to aliases.
 
 =============
 Related Links
