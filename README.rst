@@ -258,6 +258,13 @@ SmaSh works well with python 2.6, and 2.7 and possibly earlier.  SmaSh is compti
 with python3 only insofar as IPython is.  You will need virtualenv installed at the
 system level ( in debian-based distros, use **apt-get install python-virtualenv**).
 
+=============
+Related Links
+=============
+
+  - ``ipython`` http://ipython.org/ipython-doc/dev/interactive/shell.html
+  - ``pysh`` http://faculty.washington.edu/rjl/clawpack-4.x/python/ipythondir/i
+  - ``virtualenv for python`` http://some-link-here
 
 ============
 Other Shells
