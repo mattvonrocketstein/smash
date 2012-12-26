@@ -4,11 +4,7 @@
 //  project manager.  the expected format is basically ['function_name', args, kwargs ]
 //
 "instructions":
-    [ ["bind_all", ["~/code"],          {}],
-      ["bind",     ["~/jellydoughnut"], {}],
-      ["bind_all", [ '~/devel'],
-       {'post_activate' : 'smash_cmgd.load_medley_customizations2',
-        'post_invoke'   : 'smash_cmgd.load_medley_customizations'}]],
+    [],
 
 //
 // "aliases" section represents per-project alias entries.
@@ -23,23 +19,10 @@
 'aliases':
     { '__smash__':
       [ 'dhclient sudo dhclient',
-        'top5 ps -eo user,pcpu,pid,cmd | sort -r -k2 | head -6',
         'df df -h',
         'l ls -la --color',
         'ls ls --color=auto',
         'apt-get sudo apt-get',
-        'plusx chmog ugo+x',
-        'aupdate sudo apt-get update',
-        'acache sudo apt-cache search',
-        'ainstall sudo apt-get install',
-        'ubuntuversion cat /etc/lsb-release',
-        'irc xchat -d ~/code/dotfiles/xchat_default&',
         ],
-      'cms_tango':
-      [ 'irc xchat -d ~/code/dotfiles/xchat_work&',
-        'dad django-admin.py',
-        'd dad',
-        'ctest dad create_test_template --settings=storyville.conf.utest_template',
-        ]
     }
 }
