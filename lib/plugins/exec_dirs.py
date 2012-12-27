@@ -1,4 +1,8 @@
-"""
+""" exec_dirs:
+
+     SmaSh plugin that allows "execution" of directories by changing directory
+     to them.  In fact 'pushd' is used, so you can use 'popd' to get back to where
+     you came from.
 """
 from IPython.ipapi import TryNext
 from smashlib.smash_plugin import SmashPlugin
@@ -10,7 +14,6 @@ def executable_dirs_hook(cmd):
         return __IPYTHON__.magic_pushd(cmd)
     raise TryNext()
 
-#def editable_files_hook)
 class Plugin(SmashPlugin):
 
     def install(self):
