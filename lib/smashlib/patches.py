@@ -1,4 +1,6 @@
 """ smashlib.patches
+
+    yup, this means I need to use IPython.ipmaker.make_IPython..
 """
 
 import new
@@ -30,8 +32,8 @@ def replace_global_matcher():
         2 pages of junk, including python keywords and
         what not
     """
-    bigC = __IPYTHON__.shell.Completer
-    do_it_later(lambda: setattr(bigC,
+    do_it_later(lambda: setattr(__IPYTHON__.shell.Completer,
                                 'global_matches',
                                 new.instancemethod(global_matches,
-                                                   bigC,bigC.__class__)))
+                                                   __IPYTHON__.shell.Completer,
+                                                   __IPYTHON__.shell.Completer.__class__)))
