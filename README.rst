@@ -186,6 +186,15 @@ consistent ordering for the bootstrap or tell you if there is a contradiction.
 Generic Plugins for SmaSh
 =========================
 
+"Do what I mean"::
+  - typing "/etc/" means "cd /etc/"
+    - actually, this uses pushd so you can popd back to where you came from
+  - typing "/etc/hosts" means "edit /etc/hosts"
+    - only works whenever /etc/hosts/ is not executable
+    - shows a warning if you will not be able to save the file
+    - editor preferences are defined in ~/.smash/etc/editor.json
+      - possible to specify one editor for console, and one for windowing environment
+
 Hostname completion::
 
   - works for ssh
@@ -436,7 +445,7 @@ Neato, so shows that the 'status' alias is now attached to subversion rather tha
 Working with Bookmarks
 ======================
 
-Bookmarks are very similar to aliases.
+Bookmarks are very similar to aliases. blah, blah blah
 
 =============
 Related Links
