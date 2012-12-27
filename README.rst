@@ -281,7 +281,7 @@ Enhanced **which** with cascading search behaviour::
 Installation and Prerequisites
 ==============================
 
-SmaSh works well with python 2.6, and 2.7 and possibly earlier.  SmaSh is comptible
+SmaSh works well with python 2.6, and 2.7 and possibly earlier.  SmaSh is compatible
 with python3 only insofar as IPython is.  You will need virtualenv installed at the
 system level ( in debian-based distros, use **apt-get install python-virtualenv**),
 but anything else that is required should be installed automatically by the
