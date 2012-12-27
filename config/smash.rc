@@ -7,16 +7,8 @@ include ipythonrc
 # in the InterpreterExec standard extension.
 import_all IPython.Extensions.InterpreterExec
 
-############################################################################
-# PROMPTS
-#
-# Configure prompt for more shell-like usage.
 
-# Most bash-like escapes can be used to customize IPython's prompts, as well as
-# a few additional ones which are IPython-specific.  All valid prompt escapes
-# are described in detail in the Customization section of the IPython HTML/PDF
-# manual.
-
+# TODO: this is overwritten anyway right?  see if i can remove it
 prompt_in1 '\C_LightGreen\u@\h\C_LightBlue[\C_LightCyan\Y1\C_LightBlue]\C_Green|\#> '
 prompt_in2 '\C_Green|\C_LightGreen\D\C_Green> '
 prompt_out '<\#> '

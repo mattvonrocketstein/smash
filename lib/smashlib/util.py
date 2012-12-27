@@ -84,6 +84,7 @@ def post_hook_for_magic(original_magic_name, new_func):
             for f in chain:
                 f()
             return out
+        new_magic.__doc__=old_magic.__doc__
         IPython.ipapi.get().expose_magic(original_magic_name, new_magic)
     chain += [new_func]
     setattr(__IPYTHON__, '_magic_{0}_chain'.format(original_magic_name), chain)
@@ -144,7 +145,7 @@ def add_shutdown_hook(f):
 def die():
     """
     FIXME: this is horrible, but i remember thinking i had no choice..
-    TODO: document reason
+    TODO:  hahahaha document reason SOB?
     """
     threading.Thread(target=lambda: \
                      os.system('kill -KILL ' + str(os.getpid()))).start()
@@ -172,7 +173,7 @@ def list2table(dat, header=[], indent=''):
 def do_it_later(func, delay=1):
     """ this is ugly, but sometimes using
         __IPYTHON__.hooks['late_startup_hook']
-        just wont work.
+        just doesnt work.  cry me a river
     """
     def tmp():
         time.sleep(1)
