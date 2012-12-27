@@ -1,9 +1,39 @@
-#execute print "executing smash.rc"
-execute import sys; import os.path as _;
-#execute from IPython.Extensions import __file__ as _tmp
-#execute _tmp = os.path.dirname(_tmp); sys.path = sys.path+[x] if x not in sys.path else sys.path
-#execute x=_.expanduser(_.join('~','.ipython','smash', 'plugins')); sys.path = sys.path+[x] if x not in sys.path else sys.path
 execute import smashlib.main
 
-# bash/python chimera mode set to "on"
-include ipythonrc-pysh
+include ipythonrc
+
+############################################################################
+# Load all the actual syntax extensions for shell-like operation, which live
+# in the InterpreterExec standard extension.
+import_all IPython.Extensions.InterpreterExec
+
+############################################################################
+# PROMPTS
+#
+# Configure prompt for more shell-like usage.
+
+# Most bash-like escapes can be used to customize IPython's prompts, as well as
+# a few additional ones which are IPython-specific.  All valid prompt escapes
+# are described in detail in the Customization section of the IPython HTML/PDF
+# manual.
+
+prompt_in1 '\C_LightGreen\u@\h\C_LightBlue[\C_LightCyan\Y1\C_LightBlue]\C_Green|\#> '
+prompt_in2 '\C_Green|\C_LightGreen\D\C_Green> '
+prompt_out '<\#> '
+
+# Here's a more complex prompt, showing the hostname and more path depth (\Y3)
+#prompt_in1 '\C_LightRed\u\C_Blue@\C_Red\h\C_LightBlue[\C_LightCyan\Y3\C_LightBlue]\C_LightGreen\#> '
+
+# Select whether to left-pad the output prompts to match the length of the
+# input ones.  This allows you for example to use a simple '>' as an output
+# prompt, and yet have the output line up with the input.  If set to false,
+# the output prompts will be unpadded (flush left).
+prompts_pad_left 1
+
+# Remove all blank lines in between prompts, like a normal shell.
+separate_in 0
+separate_out 0
+separate_out2 0
+
+# Allow special syntax (!, magics and aliases) in multiline input
+multi_line_specials 1
