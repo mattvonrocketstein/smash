@@ -26,16 +26,32 @@ Shells are still annoying!::
     - no triggers for things like pre/post "dir-change"
     - no hooks for pre/post processing of IO
 
-Shells are also not ideal for software development.  And based on that point, maybe
-you're already thinking *"Use emacs/vim/eclipse!"*.  But, I also personally think that
-a huge, do-everything IDE is not the True Way.
+"Do what I mean" is a pretty reasonable expectation for a modern computer program..
+that's why we get what we expect when we type "1024*231" into google, namely a numerical
+result instead of just a bunch of matching webpages.
 
-Still the problems most people solve on a daily are similar to the problems from yesterday,
-and shell experiences are often characterized by too much repetition.  We fumble with
+Type */etc/* into your shell and what do you see?  Probably something like this:::
+
+   bash:/etc/: Is a directory
+
+No kidding.  I even put a "/" at the end, so probably I know it is a directory and, in the
+absence of any other context, I probably want to move into that directory.  Or, if I were
+to type out the name of a non-executable file that ends in .txt, chances are good I want to
+EDIT THE FILE and not see some kind of error about how the file is not executable.
+
+How would you even go about fixing something like this in bash, where the interface comes
+burdened with so many assumptions?
+
+On top of those problems, shells are not at all ideal for software development.  And based
+on that point, maybe you're already thinking *"Use emacs/vim/eclipse!"*.  But, I also
+personally think that a huge, do-everything IDE is not the True Way.
+
+Still the problems most people solve on a daily basis are similar to the problems from
+yesterday, and shell experiences are often characterized by too much repetition.  We fumble with
 awkward histories with our control-r's and we do things like build one-off aliases or
 scripts and throw them in a *.bashrc* or *~/bin* and there they rot, usually because they
 weren't readable a week after they were written, and they weren't quite general enough
-to be used everywhere.
+to be used everywhere.  Enough is enough!
 
 ====================================
 IPython+pysh is not quite a solution
@@ -59,13 +75,14 @@ Vision of a Shell
 =================
 
 Why do you occasionally go to google to type in things like "1024 * 768" or "cos(53)" or
-"current time in zimbabwe"?  My guess is your shell is just not smart enough, and
-teaching it to be smart is not so much difficult as it is simply disorganized.  It
-takes effort and in the end it doesn't come out quite the way you hoped.  And that's
-just for the average user.  For developers, what is often needed is an environment that
-functions simultaneously as a shell and a sort of sketchbook for programming.  The **pysh**
-profile for IPython already functions as a sort of Python / Bash chimera, and SmaSh
-leverages everything it offers:
+"current time in zimbabwe"?  And again, why can't it be obvious that typing "/etc/" by itself
+clearly means "cd /etc/"/?  My guess is your shell is just not smart enough, and teaching it
+to be smart is not so much difficult as it is simply disorganized.  It takes effort and in the
+end it doesn't come out quite the way you hoped.  And that's just for the average user.
+
+For developers, what is often needed is an environment that functions simultaneously as a shell
+and a sort of sketchbook for programming.  The **pysh** profile for IPython already functions as
+a sort of Python / Bash chimera, and SmaSh leverages everything it offers:
 
   - Simple: all the simplicity of bash when you want it
   - Flexible: all the power of a RealProgrammingLanguage(tm) when you need it

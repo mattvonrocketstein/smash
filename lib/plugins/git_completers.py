@@ -106,6 +106,7 @@ class Plugin(SmashPlugin):
                     'gra git rebase --abort',
                     'checkout git checkout',
                     'rebase git rebase -i',
+                    'gs git show --color',
                     'gc git commit',
                     'gd git diff --color',
                     'st git status',
