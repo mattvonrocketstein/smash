@@ -35,11 +35,19 @@ class PluginInspector(PluginManager):
                         str(0)])
         dat = sorted(dat,key=lambda x:x[0])
         return ("Smash-plugin information: \n\n"
-                "  config-file: {0}\n\n").format(self.plugins_json_file) + \
+                "This information is derived from the configuration file at {0}.").format(self.plugins_json_file)+\
+                '  You can also use  "plugins.enabled._plugins?", and "plugins.disabled_plugins?"'+\
+                ' to see subsets of this information.\n\n'+\
                 list2table(dat, header=['name', 'enabled', 'errors'])
 
 class Plugin(SmashPlugin):
     def install(self):
         from smashlib import ALIASES
-        self.contribute('plugins', PluginInspector())
+        plugins_i = PluginInspector()
+        self.contribute('plugins', plugins_i)
+        # TODO: this should be loaded last so that this is accurate.
+        for x in dir(smashlib.active_plugins):
+            if not x.startswith('__'):
+                setattr(plugins_i, x, getattr(smashlib.active_plugins,x))
+
         self.contribute('aliases', ALIASES)
