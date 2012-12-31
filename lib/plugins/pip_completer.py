@@ -1,8 +1,10 @@
 """ pip_completer
 
-    Provides completion for the standard pip subcommands and
-    additional "pip install <tab>" will complete from
-    requirements.txt if it is in the working directory.
+    Provides completion for the standard pip subcommands.
+    Also, "pip install <tab>" will be made to complete
+    values from requirements.txt whenever such a file
+    exists in the working directory.
+
 """
 import os
 
