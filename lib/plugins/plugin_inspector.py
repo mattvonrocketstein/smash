@@ -44,10 +44,10 @@ class Plugin(SmashPlugin):
     def install(self):
         from smashlib import ALIASES
         plugins_i = PluginInspector()
+        self.contribute('aliases', ALIASES)
         self.contribute('plugins', plugins_i)
-        # TODO: this should be loaded last so that this is accurate.
+        # TODO: this plugin should really be loaded last
+        #       so that this is guaranteed to be accurate.
         for x in dir(smashlib.active_plugins):
             if not x.startswith('__'):
                 setattr(plugins_i, x, getattr(smashlib.active_plugins,x))
-
-        self.contribute('aliases', ALIASES)
