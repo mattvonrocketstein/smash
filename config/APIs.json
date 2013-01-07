@@ -1,0 +1,8 @@
+{
+ // http://wiki.openstreetmap.org/wiki/Nominatim",
+ "geo" : "http://nominatim.openstreetmap.org/search/{0}?format=json",
+
+ // http://airportcode.riobard.com/about
+ "airport_code":"http://airportcode.riobard.com/airport/{0}?fmt=JSON",
+ "airport_loc":"http://airportcode.riobard.com/search?q={0}&fmt=JSON"
+}
