@@ -272,9 +272,9 @@ Enhanced **which** with cascading search behaviour::
   1) for unix shell commands, "which" works as usual
   2) if the name matches a python obj in the global namespace, show the file that defined it
   3) if the name matches an importable module, show the path it would be imported from
-  4) if name matches a host, show the IP address according to host files
-  5) if name matches an internet domain, show the IP address according to DNS
-
+  4) if name matches a file, determine file type with file(1)
+  5) if name matches a host, show the IP address according to host files
+  6) if name matches an internet domain, show the IP address according to DNS
 
 
 ==============================

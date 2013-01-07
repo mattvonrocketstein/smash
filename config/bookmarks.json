@@ -12,16 +12,7 @@
     //    stay registered regardless of the currently active project
     "__smash__":
         [ 'rprogramming http://reddit.com/r/programming',
-          'dojo http://dojo.robotninja.org',
-          'notes http://dojo.robotninja.org/notes'],
+          'google http://google.com'
+          ],
 
-    "cms_tango":
-        ['hudson    https://hudson.cmgdigital.com/',
-         'hudson_fe https://hudson.cmgdigital.com/view/FE/',
-         'logger    http://logger.cmgdigital.com/all/latest.log.html',
-         'psa       http://intranet.cmgdigital.com/display/collaboration/PSAs',
-         'prod1     ssh://manderson@djaapaprd1.ddtc.cmgdigital.com',
-         'prod2     ssh://manderson@djaapaprd2.ddtc.cmgdigital.com',
-         'fe_assign http://intranet.cmgdigital.com/display/collaboration/Feature+Environment+Assignment',
-         ],
 }

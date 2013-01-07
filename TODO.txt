@@ -4,41 +4,36 @@
 
  broken 'git checkout<tab>' completion and e.g. "git checkout origin/master <tab>"
 
- plugins somehow honor 'requires' methods, requires is not moved into plugins.json either
-
  rehashx may need to reinstall aliases on a per-project basis
 
  when virtualenv changes, unalias all the old things
 
  plugin ideas
 ---------------
+ plugins somehow honor 'requires' methods,
+ requires is not moved into plugins.json either
+ use spock csp
 
---install to support a gist:// protocol
+ automatically trigger rehash after things like setup.py, make install, etc
+
+ project activation could open a file if emacs isn't already editing one..
+ now, how to get a list of files currently being edited?
 
  rst-rewriter plugin
  apt-completer is already available-
    node/lib/python2.6/site-packages/IPython/Extensions/ipy_completers.py
-
- also use the vcs_completer to implement the git completer..
 
  github plugin
 
  wmctrl integration for desktop switching, etc
 
  completer for "git add<tab>" (dont need fs if not rebase)
- completers for apt-get
+ use standard ipython completers for apt-get
 
- reddit
+ reddit?
 
  multiple integrations along the lines of emacs .recentf,
  with and without project-manager
 
-
- had to do this many times. I remember a piece of code, a function name, a constant, a file, that was there. And now it’s gone. What happened? In which commit was it removed? This trick rocks as you can search through the entire git diff history for a string. I warn you it might take some time:
-
-git rev-list --all | (
-    while read revision; do
-        git grep -F 'Your search string' $revision
-    done
-)
-http://stackoverflow.com/questions/4468361/search-all-of-git-history-for-string
+ nice addition for the git-plugin:
+ http://stackoverflow.com/questions/4468361/search-all-of-git-history-for-string
