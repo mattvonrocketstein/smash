@@ -24,7 +24,7 @@
         'l ls -la --color',
         'ls ls --color=auto',
         'apt-get sudo apt-get',
-        'plusx chmog ugo+x',
+        'plusx chmod ugo+x',
         'aupdate sudo apt-get update',
         'acache sudo apt-cache search',
         'ainstall sudo apt-get install',
