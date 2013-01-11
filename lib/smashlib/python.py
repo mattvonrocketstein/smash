@@ -1,4 +1,5 @@
 """ smash.python
+    TODO: probably move everything to util
 """
 
 import os
