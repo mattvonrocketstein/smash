@@ -71,6 +71,13 @@ class Prompt(object):
     template = property(_get_template, _set_template)
 prompt = Prompt()
 
+def pre_magic(original_magic_name, parameter_s_mutator):
+    old_magic = getattr(__IPYTHON__,'magic_'+original_magic_name)
+    def new_magic(parameter_s, *args, **kargs):
+        parameter_s = parameter_s_mutator(parameter_s)
+        return old_magic(parameter_s, *args, **kargs)
+    setattr(__IPYTHON__, 'magic_' + original_magic_name, new_magic)
+
 def post_hook_for_magic(original_magic_name, new_func):
     """ attach a new post-run hook for an existing magic function """
     #print 'chaining',original_magic_name,new_func
