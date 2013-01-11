@@ -52,7 +52,7 @@ clean_namespace()
 
 post_hook_for_magic('rehashx', reinstall_aliases)
 __IPYTHON__.usage = colorize(usage)
-from smashlib.util import pre_magic
+
 with open(opj(SMASH_ETC_DIR, 'editor.json')) as fhandle:
     # TODO: test for xwindows so i can actually honor the difference here
     editor_config = demjson.decode(fhandle.read())
@@ -60,6 +60,7 @@ with open(opj(SMASH_ETC_DIR, 'editor.json')) as fhandle:
     if editor_config.get("never_execute_code", False):
         # if never_excute_code is set, then "edit foo"
         # will be translated to "edit -x foo"
+        from smashlib.util import pre_magic
         parameter_s_mutator = lambda parameter_s: '-x ' + parameter_s
         pre_magic('ed', parameter_s_mutator)
         pre_magic('edit', parameter_s_mutator)
