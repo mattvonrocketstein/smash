@@ -210,8 +210,6 @@ class Project(VenvMixin, Hooks):
             # FIXME: make this red
             msg = '\tCannot bind nonexistant directory @ "{0}"'
             report.WARNING(msg.format(_dir))
-            report.WARNING('\tCheck your config file: '+Project._config_file)
-
             return
         listing = os.listdir(_dir)
         for name in listing:
@@ -219,4 +217,4 @@ class Project(VenvMixin, Hooks):
             if os.path.isdir(tmp):
                 N += 1
                 kls.bind(tmp, name, **kargs)
-        report.project_manager('binding ' + _dir + ' (' + str(N) + ' projects found)')
+        report.project_manager('binding {0} ({1} projects found)'.format(_dir,N))

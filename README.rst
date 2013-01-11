@@ -386,7 +386,7 @@ exists there, and you can query it for some simple information like this:::
 
 Your projects might be registered, but they have not yet declared any post or
 pre-invocation hooks.  Still, you immediately get a simple alias for changing
-directories.  Since the code for SmaSh is in my ~/code directory, I can do this::
+directories.  Since I have a project called robotninja in my ~/code directory, I can do this::
 
    [~]> proj.robotninja
      pre_invoke{'name': u'robotninja'}
