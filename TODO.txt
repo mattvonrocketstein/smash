@@ -1,3 +1,8 @@
+ improvements
+--------------
+ use jsonschema
+ reread aliases/bookmarks/etc constantly
+ warn is a typo is introduced but dont die?
 
  bugfixes
 ----------

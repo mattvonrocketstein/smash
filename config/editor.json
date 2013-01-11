@@ -1,4 +1,7 @@
 {
+    // useful for editing non-python files
+    "never_execute_code":1,
+
     // used if a windows system is not available
     "console_editor":"nano",
 
