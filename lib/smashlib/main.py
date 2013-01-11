@@ -73,9 +73,11 @@ else:
     smashlib.VERBOSE = VERBOSE
     #if VERBOSE:
     #report.smash('parsed opts: ' + str(eval(str(opts)).items()))
-    if opts.install:  plugins.cmdline_install_new_plugin(opts.install, opts.enable); die()
+    if opts.install:
+        plugins.cmdline_install_new_plugin(opts.install, opts.enable);
+        die()
     elif opts.enable:  plugins.cmdline_enable(opts.enable);   die()
-    elif opts.disable: plugins.disable(opts.disable); die()
+    elif opts.disable: plugins.disable(opts.disable);         die()
     elif opts.list:    plugins.cmdline_list();                die()
     elif opts.panic:  panic();
 

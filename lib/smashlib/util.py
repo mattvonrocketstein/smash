@@ -72,7 +72,11 @@ class Prompt(object):
 prompt = Prompt()
 
 def pre_magic(original_magic_name, parameter_s_mutator):
-    old_magic = getattr(__IPYTHON__,'magic_'+original_magic_name)
+    """ mechanism for mutating parameters that go into magic functions
+        before they are called.  for example, this is used so that
+        editor.json can support "never_execute_code" (see smashlib.main)
+    """
+    old_magic = getattr(__IPYTHON__,'magic_' + original_magic_name)
     def new_magic(parameter_s, *args, **kargs):
         parameter_s = parameter_s_mutator(parameter_s)
         return old_magic(parameter_s, *args, **kargs)
