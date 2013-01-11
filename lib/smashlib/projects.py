@@ -68,7 +68,7 @@ class Project(VenvMixin, Hooks):
     @property
     def __doc__(self):
         header, dat = self._doc_helper(self._paths)
-        return """Projects:\n\n""" + list2table(dat, header=header)
+        return "Smash-Projects:\n  config-file: {0}\n\n".format(self._config_file) + list2table(dat, header=header)
 
     #@property
     #def CURRENT_PROJECT(self):

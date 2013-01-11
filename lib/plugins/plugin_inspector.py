@@ -34,10 +34,11 @@ class PluginInspector(PluginManager):
                         p in self.enabled_plugins,
                         str(0)])
         dat = sorted(dat,key=lambda x:x[0])
-        return ("Smash-plugin information: \n\n"
-                "This information is derived from the configuration file at {0}.").format(self.plugins_json_file)+\
-                '  You can also use  "plugins.enabled._plugins?", and "plugins.disabled_plugins?"'+\
-                ' to see subsets of this information.\n\n'+\
+        return ("Smash-plugin information:\n"
+                "  config-file: {0}\n").format(self.plugins_json_file) + \
+                '  for subsets of this info, type:\n' + \
+                '    plugins.enabled._plugins?\n' + \
+                '    plugins.disabled_plugins?\n\n'+\
                 list2table(dat, header=['name', 'enabled', 'errors'])
 
 class Plugin(SmashPlugin):
