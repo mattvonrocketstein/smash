@@ -208,8 +208,10 @@ class Project(VenvMixin, Hooks):
         _dir = os.path.expanduser(_dir)
         if not os.path.exists(_dir):
             # FIXME: make this red
-            msg = 'ERROR: cannot bind nonexistant directory @ "{0}"'
-            report(msg.format(_dir))
+            msg = '\tCannot bind nonexistant directory @ "{0}"'
+            report.WARNING(msg.format(_dir))
+            report.WARNING('\tCheck your config file: '+Project._config_file)
+
             return
         listing = os.listdir(_dir)
         for name in listing:
