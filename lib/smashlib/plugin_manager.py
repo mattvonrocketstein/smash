@@ -91,6 +91,8 @@ class CommandLineAspect(object):
                     fname = gist_files[0]
                     self.report('Successfully acquired gist: '+fname)
                     __IPYTHON__.magic_popd()
+                    plugin_name = os.path.split(fname)[-1]
+                    self.report("Plugin name is: "+plugin_name)
                     plugin = self.cmdline_install_new_plugin(fname, opts_enable)
                     self.report("Cleaning " + clone_dir)
                     shutil.rmtree(clone_dir)
