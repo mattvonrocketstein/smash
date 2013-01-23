@@ -136,7 +136,7 @@ class Bookmarks(object):
 
     def _maybe_update(self, *args, **kargs):
         """ proof of concept.. """
-        report('updating bookmarks' + str(kargs))
+        report('updating bookmarks ' + str(kargs))
         return
 
 class Plugin(SmashPlugin):

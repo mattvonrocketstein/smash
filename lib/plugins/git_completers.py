@@ -9,10 +9,11 @@
     TODO: smarter with ?http://pypi.python.org/pypi/gitinfo/0.0.2 ?
           depends on GitPython, which is largeish
     TODO: 'git diff'' should use branch completion AND fs-completion
+    TODO: completion for e.g. 'git push origin XYZ'
     TODO: 'git push' should complete from the names of the remotes
     TODO: consider .gitignore ?
     TODO: 'git add' could be smarter if i could detect rebase state
-
+    TODO: format-patch isn't completed
     useful- __IPYTHON__.shell.Completer.custom_completers.regexs
 
 """
