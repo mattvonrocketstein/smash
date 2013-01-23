@@ -25,6 +25,7 @@
  now, how to get a list of files currently being edited?
 
  rst-rewriter plugin
+
  apt-completer is already available-
    node/lib/python2.6/site-packages/IPython/Extensions/ipy_completers.py
 
