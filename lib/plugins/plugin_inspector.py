@@ -1,10 +1,10 @@
 """ plugin_inspector:
 
-      this is a plugin that helps with inspecting the internals
-      of smash including aliases, projects, and plugins.
+    This is a plugin that helps with inspecting the internals
+    of smash including aliases, projects, and plugins.
 
-      once this plugin is enabled, type "plugins?" or "aliases?"
-      at the prompt for more information.
+    When this plugin is enabled, type "plugins?" or "aliases?"
+    at the prompt for more information.
 """
 import asciitable
 

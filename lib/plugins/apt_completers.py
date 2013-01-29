@@ -1,11 +1,10 @@
-""" completion for debian/ubuntu's apt
-"""
+""" apt_completers.py
 
-#This might be newer than what's in ipython
-APT_CMDS = ("update upgrade install remove autoremove "
-            "purge source build-dep dist-upgrade "
-            "dselect-upgrade clean autoclean check "
-            "changelog download").split()
+    install IPython's completion for debian/ubuntu's apt.
+
+    TODO: ipython's default is very slow
+
+"""
 
 from smashlib.util import set_complete
 from smashlib.smash_plugin import SmashPlugin

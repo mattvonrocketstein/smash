@@ -7,12 +7,35 @@ from smashlib.reflect import namedAny
 
 ip = ipapi.get()
 
+def track_changes(fxn):
+    def newf(*args, **kargs):
+        SmashPlugin.changes[fxn.__name__] = args, kargs
+        return fxn(*args, **kargs)
+    return newf
+
 class SmashPlugin(object):
     """ to make a new plugin for SmaSh, extend this class """
+
+    # TODO: dont use this, use spock constraints
     installation_priority = 10
     requires = []
     requires_plugins = []
 
+    # track any changes made by this
+    #  plugin so we can invert them
+    changes = {}
+
+    inversions = dict(alias='unlias',
+                      contribute=NotImplemented,
+                      # 'delete_magic'
+                      contribute_magic=NotImplemented,
+                      )
+    @track_changes
+    def add_hook(self, *args,**kargs):
+        from smashlib.util import add_hook
+        return add_hook(*args, **kargs)
+
+    @track_changes
     def unalias(self, name):
         return __IPYTHON__.magic_unalias(name)
 
@@ -53,6 +76,7 @@ class SmashPlugin(object):
         kargs.update(case_sensitive=False)
         return self.contribute(*args, **kargs)
 
+    @track_changes
     def contribute(self, *args, **kargs): #case_sensitive=True):
         """ contribute name/val to IPython shells' namespace """
         case_sensitive = kargs.pop('case_sensitive',False)
@@ -77,6 +101,7 @@ class SmashPlugin(object):
         """ TODO: not used yet """
         self.verify_requirements()
 
+    @track_changes
     def contribute_magic(self, name, func):
         if name.startswith('magic_'):
             magic_name = name

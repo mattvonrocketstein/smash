@@ -1,6 +1,8 @@
-""" djangoisms:
+""" djangoisms.py
 
-      a smash plugin for supporting various django stuffs
+    A smaSh plugin for supporting various djangoy things.
+    This is not currently used as a plugin actually, but
+    as a support library for the 'cmg_smash' plugin.
 """
 import os
 

@@ -1,4 +1,4 @@
-""" pip_completer
+""" pip_completer.py
 
     Provides completion for the standard pip subcommands.
     Also, "pip install <tab>" will be made to complete

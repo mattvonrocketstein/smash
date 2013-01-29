@@ -1,5 +1,4 @@
 """ api_helper
-
 """
 import urllib
 import demjson
