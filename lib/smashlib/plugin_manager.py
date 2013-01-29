@@ -151,7 +151,7 @@ class CommandLineAspect(object):
             self.report('-'*80)
             plugin_module = getattr(smashlib.active_plugins,
                                     os.path.splitext(plugin_name)[0])
-            print plugin_module.__doc__
+            self.report('\n'+plugin_module.__doc__)
             self.report('-'*80)
         return plugin
 
