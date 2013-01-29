@@ -43,7 +43,8 @@ sys.argv = sys.argv[1:]
 # Plugin installation MUST come before using/instantiating the
 # CLI parser, because plugins have the option of modifying it.
 smashlib.SMASH_ETC_DIR = SMASH_ETC_DIR
-
+SMASH_EDITOR_CONFIG = opj(SMASH_ETC_DIR, 'editor.json')
+smashlib._meta['editor_config'] = SMASH_EDITOR_CONFIG
 plugins = smashlib.PluginManager()
 plugins.install()
 
@@ -53,17 +54,32 @@ clean_namespace()
 post_hook_for_magic('rehashx', reinstall_aliases)
 __IPYTHON__.usage = colorize(usage)
 
-with open(opj(SMASH_ETC_DIR, 'editor.json')) as fhandle:
+with open(SMASH_EDITOR_CONFIG) as fhandle:
     # TODO: test for xwindows so i can actually honor the difference here
     editor_config = demjson.decode(fhandle.read())
     ip.options['editor'] = editor_config['editor']
-    if editor_config.get("never_execute_code", False):
+    from smashlib.util import pre_magic
+    def parameter_s_mutator(parameter_s):
+
+        # as long as it evaluates to something that works as a string,
+        # allow for things like "edit dictionary['foo']".  note that this
+        # gets weird if you edit a filename="foo" and you type "edit filename",
+        # that means you open a file named "filename" instead of one named
+        # "foo"
+        try: tmp = eval(parameter_s, __IPYTHON__.user_ns)
+        except Exception,e: pass
+        else:
+            if isinstance(tmp, basestring):
+                parameter_s = tmp
+
         # if never_excute_code is set, then "edit foo"
         # will be translated to "edit -x foo"
-        from smashlib.util import pre_magic
-        parameter_s_mutator = lambda parameter_s: '-x ' + parameter_s
-        pre_magic('ed', parameter_s_mutator)
-        pre_magic('edit', parameter_s_mutator)
+        if editor_config.get("never_execute_code", False):
+            parameter_s = '-x ' + parameter_s
+        return parameter_s
+
+    pre_magic('ed', parameter_s_mutator)
+    pre_magic('edit', parameter_s_mutator)
 
 try: opts, args = SmashParser().parse_args(sys.argv)
 except SystemExit, e: die()
