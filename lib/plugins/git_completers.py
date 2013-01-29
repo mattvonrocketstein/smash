@@ -1,6 +1,13 @@
 """ git_completers
 
-    WARNING:
+    Adds lots of git tab completion:
+
+    And a few utilities:
+      Type any of these commands follows "?" to read help about them:
+        "clone_gist"
+"""
+
+"""    WARNING:
       most of this stuff fails silently and ipython mangles scope on the hooks
       you register, so for instance DO NOT attempt to abstract local variables
       out of your handle functions unless you really know what you're doing.

@@ -1,8 +1,9 @@
-""" ipy_fabric_support
+""" fabric_support.py
 
-      install fabric support. detects and gives relevant advice if we change into
-      a directory where a fabric command is present.  also provides tab-completion
-      and direct access to the fabfile's namespace via the dynamic variable `_fabric`.
+    Install fabric support, which detects and gives relevant advice if
+    you change into a directory where a fabric command is present.  Also
+    provides tab-completion and direct access to the fabfile's namespace
+    via the dynamic variable `_fabric`.
 """
 
 import os

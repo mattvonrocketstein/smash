@@ -1,14 +1,17 @@
 """ host completion for SmaSh.
 
-    this doesn't work with many programs right now,
-    but, if something is missing just add an extra
-    re to the HOST_REGEXES list.
+    Should always work when typing urls, or emails, but other
+    than that you'll have to be using one of the known programs
+    (see HOST_REGEXES for a list).
 """
 import smashlib
 from smashlib.util import report, set_complete
 from smashlib.smash_plugin import SmashPlugin
 
+# This doesn't work with many programs right now, but, if something
+# is missing just add an extra re to the HOST_REGEXES list.
 HOST_REGEXES = [
+    'wget .*$',
     'ssh .*$',
     'ssh .*@$', ]
 

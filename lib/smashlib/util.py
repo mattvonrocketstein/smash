@@ -18,6 +18,10 @@ opj = os.path.join
 ope = os.path.exists
 tc = ColorANSI.TermColors()
 
+def add_hook(hook_name, new_hook, priority):
+    hook_obj = getattr(__IPYTHON__.hooks, hook_name)
+    return hook_obj.add(new_hook, priority)
+
 def panic():
     ("kill ALL the running instances of smash.\n"
      "useful when you have a misbehaving plugin..")

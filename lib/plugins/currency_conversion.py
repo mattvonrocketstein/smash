@@ -1,8 +1,8 @@
 # -*- coding: utf-8
-""" currency conversion:
-
-      provides an input preprocess that allows for currency conversions.
-      query must match a regex that recognizes stuff like this:
+""" currency_conversion.py
+    currency conversion for SmaSh provides an input
+    preprocessor that allows for currency conversions.
+    query must match a regex that recognizes stuff like this:
 
         "10 lkr to usd"
         "100 eur to usd"
