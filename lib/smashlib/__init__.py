@@ -1,9 +1,13 @@
-""" SmaSh lib
+""" SmaShlib
 
     Things that will be set in this namespace after bootstrap:
 
-      * smashlib.PLUGINS :: a list of all installed plugins
+      * smashlib.PLUGINS
+         a list of all installed plugins
 
+      * smashlib._meta
+         a dictionary with the smash installation dir,
+         paths to various configuration files, etc.
 """
 from __future__ import print_function
 import os, sys

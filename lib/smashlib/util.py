@@ -84,6 +84,7 @@ def pre_magic(original_magic_name, parameter_s_mutator):
     def new_magic(parameter_s, *args, **kargs):
         parameter_s = parameter_s_mutator(parameter_s)
         return old_magic(parameter_s, *args, **kargs)
+    new_magic.__doc__ = old_magic.__doc__
     setattr(__IPYTHON__, 'magic_' + original_magic_name, new_magic)
 
 def post_hook_for_magic(original_magic_name, new_func):
