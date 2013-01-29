@@ -19,10 +19,19 @@
 """
 import os
 import IPython.ipapi
+from IPython.macro import Macro
 
 from smashlib.util import report, set_complete
 from smashlib.smash_plugin import SmashPlugin
 
+def clone_gist(parameter_s=''):
+    cmd  = 'git clone git@gist.github.com:{0}.git {1}'
+    args = parameter_s.split()
+    assert args
+    if len(args)==1: args+=['']
+    cmd = cmd.format(*args)
+    print '\t', cmd
+    __IPYTHON__.system(cmd)
 
 def uncomitted_files_completer(self, event):
     """ awkward, but cannot find a better way to do this.. """
@@ -139,3 +148,4 @@ class Plugin(SmashPlugin):
 
         # TODO: .. only need file-system if in the middle of rebase ..
         set_complete(fsc_utfc, 'git add')
+        self.contribute_magic('clone_gist', clone_gist)
