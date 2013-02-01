@@ -53,7 +53,6 @@ clean_namespace()
 
 post_hook_for_magic('rehashx', reinstall_aliases)
 __IPYTHON__.usage = colorize(usage)
-
 from smashlib.util import report, pre_magic, set_editor
 with open(SMASH_EDITOR_CONFIG) as fhandle:
     editor_config = demjson.decode(fhandle.read())
