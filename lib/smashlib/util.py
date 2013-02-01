@@ -11,12 +11,20 @@ import asciitable
 
 import IPython
 from IPython import ColorANSI
+from IPython import ipapi
 
 opd = os.path.dirname
 ops = os.path.split
 opj = os.path.join
 ope = os.path.exists
 tc = ColorANSI.TermColors()
+
+def _ip():
+    return ipapi.get()
+
+def set_editor(editor):
+    _ip().options['editor'] = editor
+    return editor
 
 def add_hook(hook_name, new_hook, priority):
     hook_obj = getattr(__IPYTHON__.hooks, hook_name)
