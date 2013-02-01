@@ -54,11 +54,21 @@ clean_namespace()
 post_hook_for_magic('rehashx', reinstall_aliases)
 __IPYTHON__.usage = colorize(usage)
 
+from smashlib.util import report, pre_magic, set_editor
 with open(SMASH_EDITOR_CONFIG) as fhandle:
-    # TODO: test for xwindows so i can actually honor the difference here
     editor_config = demjson.decode(fhandle.read())
-    ip.options['editor'] = editor_config['editor']
-    from smashlib.util import pre_magic
+    try:
+        editor = editor_config['editor'] \
+                 if os.environ.get('DISPLAY', '') else \
+                 editor_config['console_editor']
+    except KeyError:
+        report.bootstrap(("{0} should at least define"
+                          " values for 'editor', 'console_editor'").format(
+                             SMASH_EDITOR_CONFIG,))
+
+    else:
+        report.bootstrap("Your editor is set to: " + set_editor(editor))
+
     def parameter_s_mutator(parameter_s):
 
         # as long as it evaluates to something that works as a string,
