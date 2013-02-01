@@ -25,9 +25,9 @@
 
 """
 import os
-import IPython.ipapi
 from IPython.macro import Macro
 
+from smashlib.python import expanduser
 from smashlib.util import report, set_complete
 from smashlib.smash_plugin import SmashPlugin
 
@@ -135,9 +135,9 @@ class Plugin(SmashPlugin):
         from smashlib import ALIASES as aliases
         [ aliases.add(x, '__git_plugin__') for x in self.GIT_ALIASES ]
         aliases.install()
-
         report.git_completer('setting prompt to use git vcs')
-        __IPYTHON__._cgb = lambda : os.popen("current_git_branch").read().strip()
+        cgb_path = expanduser(opj('~','bin',"current_git_branch"))
+        __IPYTHON__._cgb = lambda: os.popen(cgb_path).read().strip()
         set_complete(local_branches, 'git checkout [\S]*$')
         set_complete(fsc2, 'git checkout [\S]* ')
         set_complete(fsc2, 'git rm')

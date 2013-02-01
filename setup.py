@@ -146,7 +146,8 @@ CONFIG   = [ opj('config', 'smash.rc'),
              opj('config', 'bookmarks.json'),
         ]
 SCRIPTS = [ opj('scripts', 'smash'),
-            opj('scripts', 'current_git_branch'),] + \
+            opj('scripts', 'current_git_branch'),
+            ] + \
           _from('scripts')
 
 kargs = dict(
