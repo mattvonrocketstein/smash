@@ -20,6 +20,11 @@ class PluginInspector(PluginManager):
         for x in smashlib.PLUGINS:
             yield x
 
+    #@property
+    #def disabled_plugins
+    # this doesnt work as advertised with 'plugins.disabled_plugins?'
+    # can properties call super?
+
     @property
     def plugins(self):
         return smashlib.PLUGINS
@@ -34,12 +39,12 @@ class PluginInspector(PluginManager):
                         p in self.enabled_plugins,
                         str(0)])
         dat = sorted(dat,key=lambda x:x[0])
-        return ("Smash-plugin information:\n"
+        report(("Smash-plugin information:\n"
                 "  config-file: {0}\n").format(self.plugins_json_file) + \
                 '  for subsets of this info, type:\n' + \
                 '    plugins.enabled._plugins?\n' + \
                 '    plugins.disabled_plugins?\n\n'+\
-                list2table(dat, header=['name', 'enabled', 'errors'])
+                list2table(dat, header=['name', 'enabled', 'errors']))
 
 class Plugin(SmashPlugin):
     def install(self):
