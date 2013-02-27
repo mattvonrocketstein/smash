@@ -112,6 +112,8 @@ implemented, can you add it there please?\n\nThe copy-pasta below might help you
 
     $ mkdir ~/bin; export PATH=$PATH:~/bin
 
+You may also want to change $PATH in your .bashrc or whatever, please consult
+your shell's documentation.
 """)
 
 has_virtualenv = not os.system('which virtualenv > /dev/null 2>&1')

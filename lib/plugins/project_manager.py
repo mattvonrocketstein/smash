@@ -83,6 +83,8 @@ class Plugin(SmashPlugin):
     def install(self):
         config_file = self.config_filename
         Project._config_file = config_file
+        import smashlib
+        smashlib._meta['project_config'] = config_file
         report.project_manager('loading config: ' + config_file)
         config = read_config(config_file)
         self.config = config
