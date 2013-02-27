@@ -42,7 +42,7 @@ def panic():
     proc.kill()
 
 def watch(*args, **kargs):
-    print 'this is watch',args,kargs
+    print 'placeholder for watch', args, kargs
 
 def read_config(config_file):
     """ TODO: parameter for wheter errors are fatal? """

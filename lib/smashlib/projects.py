@@ -34,7 +34,9 @@ class Hooks(object):
         #raise ipapi.TryNext()
 
 from smashlib.aliases import kill_old_aliases, add_new_aliases, rehash_aliases
+
 NO_ACTIVE_PROJECT = '__not_set__'
+
 class Project(VenvMixin, Hooks):
     #   class for holding Project abstractions. in the simplest case,
     #   beginning work on on a project just means changing directories.
@@ -68,7 +70,8 @@ class Project(VenvMixin, Hooks):
     @property
     def __doc__(self):
         header, dat = self._doc_helper(self._paths)
-        return "Smash-Projects:\n  config-file: {0}\n\n".format(self._config_file) + list2table(dat, header=header)
+        return "Smash-Projects:\n  config-file: {0}\n\n".format(self._config_file) + \
+               list2table(dat, header=header)
 
     #@property
     #def CURRENT_PROJECT(self):
@@ -208,8 +211,10 @@ class Project(VenvMixin, Hooks):
         _dir = os.path.expanduser(_dir)
         if not os.path.exists(_dir):
             # FIXME: make this red
-            msg = '\tCannot bind nonexistant directory @ "{0}"'
+            msg = '\tCannot bind nonexistant directory @ "{0}".  '
             report.WARNING(msg.format(_dir))
+            msg = '\Check your configuration @ "{0}".  '
+            report.WARNING(msg.format(smashlib._meta['project_config']))
             return
         listing = os.listdir(_dir)
         for name in listing:
