@@ -5,6 +5,7 @@ import os
 
 from collections import defaultdict
 
+import smashlib
 from smashlib.python import expanduser
 from smashlib.reflect import namedAny, ObjectNotFound
 from smashlib.util import colorize, report, list2table
