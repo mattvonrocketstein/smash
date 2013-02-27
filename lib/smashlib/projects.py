@@ -214,7 +214,7 @@ class Project(VenvMixin, Hooks):
             # FIXME: make this red
             msg = '\tCannot bind nonexistant directory @ "{0}".  '
             report.WARNING(msg.format(_dir))
-            msg = '\Check your configuration @ "{0}".  '
+            msg = '\tCheck your configuration @ "{0}".'
             report.WARNING(msg.format(smashlib._meta['project_config']))
             return
         listing = os.listdir(_dir)
