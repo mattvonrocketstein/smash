@@ -114,7 +114,11 @@ class CommandLineAspect(object):
                 success = True
         else:
             s = abspath(s)
-            assert ope(s),'file does not exist: '+e
+            if not ope(s):
+                report.ERROR('file does not exist: '+s)
+                report.ERROR(' did you mean "smash --enable {0}" ? '.format(s))
+                die()
+                return None
             if splitext(s)[-1] not in ['.py']:
                 report('not implemented yet for '+str(splitext(s)))
                 return
@@ -245,10 +249,17 @@ class PluginManager(CommandLineAspect, EnumeratingAspect):
         if 'Plugin' not in G:
             err  = abs_path_to_plugin + ' is old style,'
             err += ' "Plugin" not found in namespace'
-            report(err)
+            report.ERROR(err)
             die()
-            return
+            return None
         plugin = G['Plugin']()
+        if not isinstance(plugin,SmashPlugin):
+            report.ERROR('problem with plugin @ "{0}".'.format(abs_path_to_plugin))
+            report.ERROR('  Plugin class was found but does not subclass SmashPlugin.')
+            report.ERROR('  to disable this plugin, run: smash --disable {0}'.format(
+                rel_fname))
+            die()
+            return None
         rel_fname = os.path.split(abs_path_to_plugin)[-1]
         if not getattr(plugin, 'name', None):
             plugin.name = rel_fname
@@ -306,6 +317,6 @@ class PluginManager(CommandLineAspect, EnumeratingAspect):
 
         #FIXME: cleaner way to do this back-ref
         smashlib.PLUGINS = self._plugins
-
+        return smashlib.PLUGINS
 
 from .smash_plugin import SmashPlugin
