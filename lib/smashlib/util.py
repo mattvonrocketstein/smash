@@ -61,13 +61,21 @@ def bus():
     from smashlib import bus
     return bus
 
-def home(): return os.environ['HOME']
+def home():
+    return os.environ['HOME']
 
 def truncate_fpath(fpath):
     return fpath.replace(home(), '~')
 
 class Prompt(object):
-    """ wrapping ipython internals, """
+    """ wrapping ipython internals """
+
+    def get_parts(self):
+        return self.template.split()
+    def set_parts(self, parts):
+        self.template = ' '.join(parts)
+    parts = property(get_parts, set_parts)
+
     def _get_template(self):
         """ get the current prompt template """
         opc = getattr(__IPYTHON__.shell, 'outputcache', None)
@@ -144,7 +152,7 @@ class Reporter(object):
         self.label = label
 
     def __getattr__(self, label):
-        return Reporter(label)
+        return self.__class__(label)
 
     def _report(self,msg):
         print colorize('{red}' + self.label + '{normal}: ' + msg)
@@ -153,10 +161,15 @@ class Reporter(object):
         return self._report(msg)
 
     def __call__(self, msg):
-        #import smashlib
         return self._report(msg)
-    #if smashlib.VERBOSE:
 
+class MaybeReport(Reporter):
+    def _report(self, msg):
+        from smashlib import VERBOSE
+        if VERBOSE:
+            super(MaybeReport,self)._report(msg)
+
+report_if_verbose = MaybeReport()
 report = Reporter()
 
 def add_shutdown_hook(f):
