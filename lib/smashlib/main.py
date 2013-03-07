@@ -46,7 +46,6 @@ smashlib.SMASH_ETC_DIR = SMASH_ETC_DIR
 SMASH_EDITOR_CONFIG = opj(SMASH_ETC_DIR, 'editor.json')
 smashlib._meta['editor_config'] = SMASH_EDITOR_CONFIG
 plugins = smashlib.PluginManager()
-plugins.install()
 
 # removes various common namespace collisions between py-modules / shell commands
 clean_namespace()
@@ -90,14 +89,12 @@ with open(SMASH_EDITOR_CONFIG) as fhandle:
     pre_magic('ed', parameter_s_mutator)
     pre_magic('edit', parameter_s_mutator)
 
-try: opts, args = SmashParser().parse_args(sys.argv)
+try: opts, args = SmashParser(strict=False).parse_args(sys.argv)
 except SystemExit, e: die()
 else:
     VERBOSE = VERBOSE or opts.verbose
     import smashlib
     smashlib.VERBOSE = VERBOSE
-    #if VERBOSE:
-    #report.smash('parsed opts: ' + str(eval(str(opts)).items()))
     if opts.install:
         plugins.cmdline_install_new_plugin(opts.install, opts.enable);
         die()
@@ -106,16 +103,24 @@ else:
     elif opts.list:    plugins.cmdline_list();                die()
     elif opts.panic:  panic();
 
-    else:
-        # parse any command-line options which are added by plugins
-        for args,kargs,handler in SmashParser.extra_options:
-            if getattr(opts, kargs['dest']):
-                handler(opts)
+    # install the plugins and then perform command line parsing
+    # all over again, because the plugins may have modified the
+    # cli parser and they need a chance to act on it.
+    installed_plugins = plugins.install()
+    #report.bootstrap('installing plugins: ')
+    #report.bootstrap('  '+str(installed_plugins))
+    #report.boostrap('second-tier arg-parsing')
+    parser = SmashParser(strict=True)
+    opts, args = parser.parse_args(sys.argv)
+    # parse any command-line options which are added by plugins
+    for args,kargs,handler in SmashParser.extra_options:
+        if getattr(opts, kargs['dest']):
+            handler(opts)
 
 
-# NOTE: a custom importer will become necessary at some point, if venv-switching
-#  support is going to be totally clean.  in practice it is often not a problem,
-#  but technically one venv may a different version of a package  than another
+# NOTE: a custom importer will become necessary at some point, if project-switching and
+#  venv-switching support is going to be completely clean.  in practice it is often not
+#   a problem, but technically one venv may a different version of a package than another
 #  does, so sys.modules needs to be scrubbed as well as sys.path
 """
 import imp
