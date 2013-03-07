@@ -28,8 +28,8 @@ _meta = dict( config_dir = opj(opd(opd(__file__)), 'etc'),
 _meta.update(smash_rc=opj(_meta['config_dir'], 'smash.rc'))
 
 def fac(m):
-    from smashlib.util import report
-    return lambda bus, *args, **kargs: getattr(report, m)(str(kargs) )
+    from smashlib.util import report_if_verbose
+    return lambda bus, *args, **kargs: getattr(report_if_verbose, m)(str(kargs) )
 
 
 bus = Bus()
