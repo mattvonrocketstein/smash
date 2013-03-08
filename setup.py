@@ -7,8 +7,10 @@
 
 """
 import os, sys
+import fnmatch
 from glob import glob
 from os.path import expanduser
+from collections import defaultdict
 from distutils.core import setup
 from distutils.file_util import copy_file
 from distutils.command.install import install as _install
@@ -75,6 +77,9 @@ def run_pip():
     return error
 
 def venv_gen_ipython():
+    """ this if for creating the ipython directory, etc, just
+        in the event case $USER has never tried it before at all.
+    """
     if not ope(expanduser('~/.ipython')):
         cmd = ("import os; "
                " from IPython.genutils import get_ipython_dir;"
@@ -102,9 +107,12 @@ def _from(*args, **kargs):
              for x in glob(opj(*(args + tuple([suffix])))) ]
 
 def _from2(*args, **kargs):
-    from collections import defaultdict
-    import fnmatch
-    import os
+    """ generates lists of files in the style that setup() expects.
+        only python files!  no emacs tmp files or vcs junk allowed.
+
+        this version IS a recursive walker.
+        TODO: deprecate _from() to just use this
+    """
     matches = defaultdict(lambda:[])
     suffix = kargs.pop('suffix', '*.py')
     for root, dirnames, filenames in os.walk(opj(*args)):
@@ -148,8 +156,7 @@ if initialize_ipy_error:
 else:
     print 'Finished initializing ~/.ipython.\n'
 
-LIB      = _from('lib', 'smashlib')
-LIB2      = _from2('lib','smashlib')
+LIB      = _from2('lib','smashlib')
 PLUGINS  = _from('lib','plugins')
 CONFIG   = [ opj('config', 'smash.rc'),
              opj('config', 'plugins.json'),
@@ -188,14 +195,13 @@ kargs = dict(
         ( HOME_BIN,                SCRIPTS ),
         ( SMASH_CONFIG_DIR,        CONFIG ),
         ( SMASH_BIN_DIR,        [SMASH_ACTUAL_SHELL] ),
-        #( SMASH_LIB_DST_DIR,       LIB ),
         ])
 
-for smashlib_sub_pkg_dir in LIB2:
+for smashlib_sub_pkg_dir in LIB:
     kargs['data_files'].append(
           ( opj(SMASH_INSTALLATION_HOME,
                 smashlib_sub_pkg_dir),
-            LIB2[smashlib_sub_pkg_dir]))
+            LIB[smashlib_sub_pkg_dir]))
 
 IPY_BASE = []
 for x in _from('ipython_base', suffix='*'):
@@ -205,8 +211,4 @@ for x in _from('ipython_base', suffix='*'):
 kargs['data_files'] += [ ( HOME_IPY, IPY_BASE), ]
 
 kargs.update(long_description=kargs['description']+'. Read more: '+kargs['url'])
-raise Exception,[LIB2==LIB,
-                 '....................',
-                 LIB,'....................',
-                 LIB2]
 setup(**kargs)
