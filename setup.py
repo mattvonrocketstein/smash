@@ -101,6 +101,16 @@ def _from(*args, **kargs):
     return [ opj(*(args + tuple([ ops(x)[-1] ]))) \
              for x in glob(opj(*(args + tuple([suffix])))) ]
 
+def _from2(*args, **kargs):
+    from collections import defaultdict
+    import fnmatch
+    import os
+    matches = defaultdict(lambda:[])
+    suffix = kargs.pop('suffix', '*.py')
+    for root, dirnames, filenames in os.walk(opj(*args)):
+        for filename in fnmatch.filter(filenames, suffix):
+            matches[root[root.find('smashlib'):]].append(os.path.join(root, filename))
+    return matches
 
 ## entry point
 ################################################################################
@@ -138,7 +148,8 @@ if initialize_ipy_error:
 else:
     print 'Finished initializing ~/.ipython.\n'
 
-LIB      = _from('lib','smashlib')
+LIB      = _from('lib', 'smashlib')
+LIB2      = _from2('lib','smashlib')
 PLUGINS  = _from('lib','plugins')
 CONFIG   = [ opj('config', 'smash.rc'),
              opj('config', 'plugins.json'),
@@ -177,7 +188,14 @@ kargs = dict(
         ( HOME_BIN,                SCRIPTS ),
         ( SMASH_CONFIG_DIR,        CONFIG ),
         ( SMASH_BIN_DIR,        [SMASH_ACTUAL_SHELL] ),
-        ( SMASH_LIB_DST_DIR,       LIB ),])
+        #( SMASH_LIB_DST_DIR,       LIB ),
+        ])
+
+for smashlib_sub_pkg_dir in LIB2:
+    kargs['data_files'].append(
+          ( opj(SMASH_INSTALLATION_HOME,
+                smashlib_sub_pkg_dir),
+            LIB2[smashlib_sub_pkg_dir]))
 
 IPY_BASE = []
 for x in _from('ipython_base', suffix='*'):
@@ -187,4 +205,8 @@ for x in _from('ipython_base', suffix='*'):
 kargs['data_files'] += [ ( HOME_IPY, IPY_BASE), ]
 
 kargs.update(long_description=kargs['description']+'. Read more: '+kargs['url'])
+raise Exception,[LIB2==LIB,
+                 '....................',
+                 LIB,'....................',
+                 LIB2]
 setup(**kargs)
