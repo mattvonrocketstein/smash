@@ -252,6 +252,7 @@ class PluginManager(CommandLineAspect, EnumeratingAspect):
             report.ERROR(err)
             die()
             return None
+        rel_fname = os.path.split(abs_path_to_plugin)[-1]
         plugin = G['Plugin']()
         if not isinstance(plugin,SmashPlugin):
             report.ERROR('problem with plugin @ "{0}".'.format(abs_path_to_plugin))
@@ -260,10 +261,9 @@ class PluginManager(CommandLineAspect, EnumeratingAspect):
                 rel_fname))
             die()
             return None
-        rel_fname = os.path.split(abs_path_to_plugin)[-1]
-        if not getattr(plugin, 'name', None):
-            plugin.name = rel_fname
+
         plugin.filename = rel_fname
+        plugin.name = getattr(plugin, 'name', rel_fname )
         #plugin.pre_install()
         plugin.install()
         from smashlib import active_plugins

@@ -1,11 +1,13 @@
  improvements
 --------------
  use jsonschema
+ completion based on history and ngrams
  reread aliases/bookmarks/etc constantly
- warn is a typo is introduced but dont die?
+ warn is a typo is introduced to conf, but dont die?
 
  bugfixes
 ----------
+ ?? automatically translate "export foo=bar" style commands to use os.environ[]
 
  broken 'git checkout<tab>' completion and e.g. "git checkout origin/master <tab>"
 
@@ -29,17 +31,19 @@
  apt-completer is already available-
    node/lib/python2.6/site-packages/IPython/Extensions/ipy_completers.py
 
- github plugin
-
- wmctrl integration for desktop switching, etc
+ ?? wmctrl integration for desktop switching, etc
 
  completer for "git add<tab>" (dont need fs if not rebase)
  use standard ipython completers for apt-get
 
- reddit?
+ ?? reddit
 
  multiple integrations along the lines of emacs .recentf,
  with and without project-manager
 
+ git plugin
+-----------
+ github plugin
+
  nice addition for the git-plugin:
- http://stackoverflow.com/questions/4468361/search-all-of-git-history-for-string
+   http://stackoverflow.com/questions/4468361/search-all-of-git-history-for-string

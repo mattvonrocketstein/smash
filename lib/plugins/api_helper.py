@@ -13,7 +13,12 @@ def get_data(url):
 class API(object):
     @property
     def _config(self):
-        return read_config(self._config_file)
+        if ope(self._config_file):
+            return read_config(self._config_file)
+        else:
+            report.ERROR('could not load configuration for the API plugin.')
+            report.ERROR('  fix this or disable the plugin.')
+            return {}
 
     def _populate(self):
         for x in self._config:
