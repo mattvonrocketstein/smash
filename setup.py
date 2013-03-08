@@ -205,8 +205,4 @@ for x in _from('ipython_base', suffix='*'):
 kargs['data_files'] += [ ( HOME_IPY, IPY_BASE), ]
 
 kargs.update(long_description=kargs['description']+'. Read more: '+kargs['url'])
-raise Exception,[LIB2==LIB,
-                 '....................',
-                 LIB,'....................',
-                 LIB2]
 setup(**kargs)
