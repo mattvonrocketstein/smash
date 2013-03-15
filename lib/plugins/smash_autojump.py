@@ -5,10 +5,16 @@ import os
 import smashlib
 from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import post_hook_for_magic
-from smashlib.util import report, report_if_verbose, _ip
+from smashlib.util import report, report_if_verbose, _ip, set_complete
 
 DEFAULT_DATA_FILE = 'autojump.dat'
 
+def j_completer(db, himself, event):
+    path_elements = [ ]
+    for x in db.data.keys():
+        path_elements += x.split(os.path.sep)
+    path_elements = list(set(filter(None, path_elements)))
+    return path_elements
 
 class Plugin(SmashPlugin):
 
@@ -59,6 +65,9 @@ class Plugin(SmashPlugin):
                     report.autojump("no matches found.")
         self.contribute_magic('j', j)
         self.contribute_magic('jump', j)
+        self.contribute('db', self.db)
 
         # turns on the automatic weight-updating.
         self.is_updating = True
+        fxn = lambda himself,event: j_completer(self.db, himself, event)
+        set_complete(fxn, 'j')
