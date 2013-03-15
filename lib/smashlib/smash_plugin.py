@@ -1,5 +1,6 @@
 """ smashlib.smash_plugin
 """
+import os
 from IPython import ipapi
 
 from smashlib.util import report
@@ -30,6 +31,11 @@ class SmashPlugin(object):
                       # 'delete_magic'
                       contribute_magic=NotImplemented,
                       )
+
+    @track_changes
+    def set_env(self, name, val):
+        os.environ[name] = val
+
     @track_changes
     def add_hook(self, *args,**kargs):
         from smashlib.util import add_hook
@@ -98,7 +104,7 @@ class SmashPlugin(object):
         return val
 
     def pre_install(self):
-        """ TODO: not used yet """
+        """ FIXME: not used yet """
         self.verify_requirements()
 
     @track_changes

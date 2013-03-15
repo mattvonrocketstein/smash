@@ -24,7 +24,10 @@ opd, opj    = os.path.dirname, os.path.join
 active_plugins = sys.modules['smashlib.active_plugins'] = ModuleType('smashlib.active_plugins')
 
 _meta = dict( config_dir = opj(opd(opd(__file__)), 'etc'),
-              bin_dir = opj(opd(opd(__file__)), 'bin'),)
+              bin_dir = opj(opd(opd(__file__)), 'bin'),
+              tmp_dir = opj(opd(opd(__file__)), 'tmp'),)
+if not os.path.exists(_meta['tmp_dir']):
+    os.mkdir(_meta['tmp_dir'])
 _meta.update(smash_rc=opj(_meta['config_dir'], 'smash.rc'))
 
 def fac(m):
