@@ -76,7 +76,8 @@ class magic_fabric(object):
 
 def look_for_fabfile():
     if 'fabfile.py' in os.listdir(os.getcwd()):
-        report('Discovered fabfile.  Type "_fabric?" to list commands')
+        report.fabric_support('Discovered fabfile.  '
+                              'Type "_fabric?" to list commands')
         __IPYTHON__.shell.user_ns.update(_fabric=magic_fabric(lazy=False))
 
 
