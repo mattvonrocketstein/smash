@@ -10,7 +10,7 @@ import demjson
 import asciitable
 
 import IPython
-from IPython import ColorANSI
+from IPython.utils import coloransi as ColorANSI
 from IPython.core import ipapi
 from IPython.core.ipapi import TryNext
 
