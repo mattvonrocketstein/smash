@@ -32,7 +32,10 @@ def main():
     smashlib.util.report.bootstrap("launching with rc-file: " + smashlib._meta['smash_rc'])
     from IPython.frontend.terminal.embed import InteractiveShellEmbed
     #InteractiveShellEmbed(argv=['-rcfile={0}'.format(smashlib._meta['smash_rc'])])()
-    InteractiveShellEmbed(config=config)()
+    from smashlib.contrib import InterpreterExec
+    InteractiveShellEmbed(config=config,
+                          banner1 = 'Dropping into SmaSh',
+                          )()
     #IPython.embed()
     #Shell.IPShellEmbed(argv=['-rcfile={0}'.format(smashlib._meta['smash_rc'])])()
 
