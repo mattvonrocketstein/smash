@@ -1,3 +1,5 @@
+local user completion with ~<tab>
+
 githubbed issues
 -----------------
  make 'ed' work better for instances (not just classes)
