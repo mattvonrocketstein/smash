@@ -15,7 +15,9 @@ def main():
     sys.path.append(os.path.expanduser('~/.smash/plugins'))
     import smashlib
     smashlib.util.report.bootstrap("launching with rc-file: " + smashlib._meta['smash_rc'])
-    IPython.embed()
+    from IPython.frontend.terminal.embed import InteractiveShellEmbed
+    InteractiveShellEmbed(argv=['-rcfile={0}'.format(smashlib._meta['smash_rc'])])()
+    #IPython.embed()
     #Shell.IPShellEmbed(argv=['-rcfile={0}'.format(smashlib._meta['smash_rc'])])()
 
 if __name__=='__main__':
