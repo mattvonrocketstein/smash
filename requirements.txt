@@ -1,5 +1,5 @@
 argparse
-IPython==0.10
+IPython
 psutil
 demjson
 pyflakes
