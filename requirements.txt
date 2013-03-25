@@ -1,3 +1,4 @@
+argparse
 IPython==0.10
 psutil
 demjson
@@ -6,4 +7,3 @@ cyrusbus
 asciitable
 #pynotify
 #dulwhich
-
