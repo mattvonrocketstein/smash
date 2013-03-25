@@ -17,16 +17,11 @@ import sys
 
 # TODO: this is overwritten anyway right?  see if i can remove it
 from IPython.config.loader import Config
-config = Config(
-    dict(
-        prompt_in1='\C_LightGreen\u@\h\C_LightBlue[\C_LightCyan\Y1\C_LightBlue]\C_Green|\#> ',
-        prompt_in2='\C_Green|\C_LightGreen\D\C_Green> ',
-        prompt_out= '<\#> ',
-        prompts_pad_left=1,
-        separate_in = 0,
-        separate_out = 0,
-        separate_out2=0,
-        multi_line_specials=1))
+config = Config()
+prompt_config=config.PromptManager
+prompt_config.in_template = '\C_LightGreen\u@\h\C_LightBlue[\C_LightCyan\Y1\C_LightBlue]\C_Green|\#> '
+prompt_config.in2_template = '\C_Green|\C_LightGreen\D\C_Green> '
+prompt_config.out_template = '<\#> '
 
 def main():
     import os
@@ -37,7 +32,7 @@ def main():
     smashlib.util.report.bootstrap("launching with rc-file: " + smashlib._meta['smash_rc'])
     from IPython.frontend.terminal.embed import InteractiveShellEmbed
     #InteractiveShellEmbed(argv=['-rcfile={0}'.format(smashlib._meta['smash_rc'])])()
-    InteractiveShellEmbed(config=config)
+    InteractiveShellEmbed(config=config)()
     #IPython.embed()
     #Shell.IPShellEmbed(argv=['-rcfile={0}'.format(smashlib._meta['smash_rc'])])()
 
