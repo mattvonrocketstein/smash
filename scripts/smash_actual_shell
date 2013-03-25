@@ -6,6 +6,8 @@
 # venv's potentially using multiple python versions?
 #
 
+import sys
+
 def main():
     import os
     import sys
@@ -13,16 +15,18 @@ def main():
     sys.path.append(os.path.expanduser('~/.smash/plugins'))
     import smashlib
     smashlib.util.report.bootstrap("launching with rc-file: " + smashlib._meta['smash_rc'])
-    Shell.IPShellEmbed(argv=['-rcfile={0}'.format(smashlib._meta['smash_rc'])])()
+    IPython.embed()
+    #Shell.IPShellEmbed(argv=['-rcfile={0}'.format(smashlib._meta['smash_rc'])])()
 
 if __name__=='__main__':
+
     try:
-        from IPython import Shell
+        import IPython
     except:
         print ("\nFATAL: cannot run SmaSh.\n"
                "  IPython lib is not available.  \n"
                "    To reproduce this error, try running:\n"
-               "      /usr/bin/env python -c\"from IPython import Shell\"\n")
+               "      /usr/bin/env python -c\"import IPython\"\n")
         sys.exit(1)
     else:
         main()
