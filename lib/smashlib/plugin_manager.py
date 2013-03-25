@@ -10,7 +10,7 @@ import demjson
 import urlparse, urllib
 from types import ModuleType
 
-from IPython import ipapi
+from IPython.core import ipapi
 
 import smashlib
 from smashlib.util import die

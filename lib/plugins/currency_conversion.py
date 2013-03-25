@@ -12,7 +12,6 @@ import urllib
 import demjson
 
 import IPython
-import IPython.ipapi
 
 from smashlib.util import report, do_it_later, _ip
 from smashlib.smash_plugin import SmashPlugin

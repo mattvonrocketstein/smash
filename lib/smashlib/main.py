@@ -9,7 +9,7 @@ import psutil,os
 
 import demjson
 
-from IPython import ipapi
+from IPython.core import ipapi
 
 import smashlib
 from smashlib.parser import SmashParser

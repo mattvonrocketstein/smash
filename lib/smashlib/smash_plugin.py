@@ -1,7 +1,7 @@
 """ smashlib.smash_plugin
 """
 import os
-from IPython import ipapi
+from IPython.core import ipapi
 
 from smashlib.util import report
 from smashlib.reflect import namedAny

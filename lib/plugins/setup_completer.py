@@ -12,9 +12,8 @@
     is invoked
 """
 
-from smashlib.util import set_complete, add_hook
+from smashlib.util import set_complete, add_hook, TryNext
 from smashlib.smash_plugin import SmashPlugin
-from IPython.ipapi import TryNext
 
 setup_re = 'python.*setup.py'
 

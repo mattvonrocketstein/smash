@@ -11,7 +11,8 @@ import asciitable
 
 import IPython
 from IPython import ColorANSI
-from IPython import ipapi
+from IPython.core import ipapi
+from IPython.core.ipapi import TryNext
 
 opd = os.path.dirname
 ops = os.path.split
@@ -117,7 +118,7 @@ def post_hook_for_magic(original_magic_name, new_func):
                 f()
             return out
         new_magic.__doc__=old_magic.__doc__
-        IPython.ipapi.get().expose_magic(original_magic_name, new_magic)
+        ipapi.get().expose_magic(original_magic_name, new_magic)
     chain += [new_func]
     setattr(__IPYTHON__, '_magic_{0}_chain'.format(original_magic_name), chain)
 
@@ -143,7 +144,7 @@ def colorize(msg):
     return msg.replace('{red}',tc.Red).replace('{normal}',tc.Normal)
 
 def set_complete(func, key):
-    ip = IPython.ipapi.get()
+    ip = IPython.core.ipapi.get()
     ip.set_hook('complete_command', func, re_key=key)
 
 class Reporter(object):
@@ -175,7 +176,6 @@ report = Reporter()
 def add_shutdown_hook(f):
     def newf(*args, **kargs):
         f(*args,**kargs)
-        from IPython.ipapi import TryNext
         raise TryNext()
     __IPYTHON__.hooks['shutdown_hook'].add(newf)
 

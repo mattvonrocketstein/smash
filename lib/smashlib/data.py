@@ -1,7 +1,7 @@
 """ smash.data
 """
 
-from IPython import ipapi
+from IPython.core import ipapi
 ip = ipapi.get()
 
 

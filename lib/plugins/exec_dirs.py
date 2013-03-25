@@ -5,7 +5,7 @@
      you came from.
 """
 
-from IPython.ipapi import TryNext
+from smashlib.util import TryNext
 from smashlib.smash_plugin import SmashPlugin
 
 def executable_dirs_hook(cmd):
