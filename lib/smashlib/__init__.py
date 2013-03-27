@@ -10,24 +10,25 @@
          paths to various configuration files, etc.
 """
 from __future__ import print_function
-import os, sys
-from types import ModuleType
+import sys, types
+
 
 from cyrusbus import Bus
 
 from smashlib.plugin_manager import PluginManager
 from smashlib.aliases import Aliases
+from smashlib.python import opd, opj, ope, mkdir
 
 VERBOSE     = True
 ALIASES     = Aliases()
-opd, opj    = os.path.dirname, os.path.join
-active_plugins = sys.modules['smashlib.active_plugins'] = ModuleType('smashlib.active_plugins')
+
+active_plugins = sys.modules['smashlib.active_plugins'] = types.ModuleType('smashlib.active_plugins')
 
 _meta = dict( config_dir = opj(opd(opd(__file__)), 'etc'),
-              bin_dir = opj(opd(opd(__file__)), 'bin'),
-              tmp_dir = opj(opd(opd(__file__)), 'tmp'),)
-if not os.path.exists(_meta['tmp_dir']):
-    os.mkdir(_meta['tmp_dir'])
+              bin_dir    = opj(opd(opd(__file__)), 'bin'),
+              tmp_dir    = opj(opd(opd(__file__)), 'tmp'), )
+if not ope(_meta['tmp_dir']):
+    mkdir(_meta['tmp_dir'])
 _meta.update(smash_rc=opj(_meta['config_dir'], 'smash.rc'))
 
 def fac(m):

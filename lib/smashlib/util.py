@@ -91,17 +91,27 @@ class Prompt(object):
     template = property(_get_template, _set_template)
 prompt = Prompt()
 
+def replace_magic(original_magic_name, new_magic_function):
+    """ """
+    if not original_magic_name.startswith('magic_'):
+        original_magic_name = 'magic_' + original_magic_name
+    if not hasattr(__IPYTHON__, original_magic_name):
+        raise RuntimeError('cannot replace magic that does not exist')
+    setattr(__IPYTHON__, original_magic_name, new_magic_function)
+
 def pre_magic(original_magic_name, parameter_s_mutator):
     """ mechanism for mutating parameters that go into magic functions
         before they are called.  for example, this is used so that
         editor.json can support "never_execute_code" (see smashlib.main)
     """
-    old_magic = getattr(__IPYTHON__,'magic_' + original_magic_name)
+    if not original_magic_name.startswith('magic_'):
+        original_magic_name = 'magic_' + original_magic_name
+    old_magic = getattr(__IPYTHON__,original_magic_name)
     def new_magic(parameter_s, *args, **kargs):
         parameter_s = parameter_s_mutator(parameter_s)
         return old_magic(parameter_s, *args, **kargs)
     new_magic.__doc__ = old_magic.__doc__
-    setattr(__IPYTHON__, 'magic_' + original_magic_name, new_magic)
+    replace_magic(original_magic_name, new_magic)
 
 def post_hook_for_magic(original_magic_name, new_func):
     """ attach a new post-run hook for an existing magic function """
@@ -117,7 +127,7 @@ def post_hook_for_magic(original_magic_name, new_func):
                 f()
             return out
         new_magic.__doc__=old_magic.__doc__
-        IPython.ipapi.get().expose_magic(original_magic_name, new_magic)
+        _ip().expose_magic(original_magic_name, new_magic)
     chain += [new_func]
     setattr(__IPYTHON__, '_magic_{0}_chain'.format(original_magic_name), chain)
 
@@ -143,8 +153,7 @@ def colorize(msg):
     return msg.replace('{red}',tc.Red).replace('{normal}',tc.Normal)
 
 def set_complete(func, key):
-    ip = IPython.ipapi.get()
-    ip.set_hook('complete_command', func, re_key=key)
+    _ip().set_hook('complete_command', func, re_key=key)
 
 class Reporter(object):
     """ syntactic sugar for reporting """
@@ -208,9 +217,9 @@ def list2table(dat, header=[], indent=''):
     return out
 
 def do_it_later(func, delay=1):
-    """ this is ugly, but sometimes using
-        __IPYTHON__.hooks['late_startup_hook']
-        just doesnt work.  cry me a river
+    """ this is ugly, but sometimes using the
+        "late_startup_hook" just doesnt work.
+        cry me a river..
     """
     def tmp():
         time.sleep(1)

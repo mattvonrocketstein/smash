@@ -4,8 +4,8 @@
 """
 
 import new
-
-from smashlib.util import do_it_later
+from smashlib.util import (report, report_if_verbose,
+                           do_it_later, replace_magic)
 
 # copied and modified from IPython.completer
 def global_matches(self, text):
@@ -37,3 +37,28 @@ def replace_global_matcher():
                                 new.instancemethod(global_matches,
                                                    __IPYTHON__.shell.Completer,
                                                    __IPYTHON__.shell.Completer.__class__)))
+
+def replace_help_magic():
+    """ patch that allows __qmark__(self) methods to answer "obj?" stlye
+        requests from the command line interface.
+    """
+    original_pinfo = __IPYTHON__.shell.magic_pinfo
+    def my_magic_pinfo(self, parameter_s='', namespaces=None):
+        """ """
+        call_original_pinfo = lambda: original_pinfo(parameter_s, namespaces)
+        try: tmp = getattr(eval(parameter_s,__IPYTHON__.user_ns), '__qmark__')
+        except Exception,e: pass
+        else:
+            report_if_verbose.help_magic('found __qmark__!'+str(tmp))
+            try:
+                tmp()
+            except Exception,e:
+                report.help_magic('__qmark__ defined but error encountered while calling it.')
+                report.help_magic('   :: '+str(e))
+            return
+        call_original_pinfo()
+    report_if_verbose('replacing magic')
+    replace_magic('magic_pinfo',
+                  new.instancemethod(my_magic_pinfo,
+                                     __IPYTHON__.shell,
+                                     __IPYTHON__.shell.__class__))
