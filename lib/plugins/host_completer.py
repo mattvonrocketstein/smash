@@ -1,10 +1,11 @@
 """ host completion for SmaSh.
 
-    Should always work when typing urls, or emails, but other
+    Should always work when typing urls or emails, but other
     than that you'll have to be using one of the known programs
     (see HOST_REGEXES for a list).
 """
 import smashlib
+from smashlib.python import ope, opj
 from smashlib.util import report, set_complete
 from smashlib.smash_plugin import SmashPlugin
 
@@ -12,17 +13,16 @@ from smashlib.smash_plugin import SmashPlugin
 # is missing just add an extra re to the HOST_REGEXES list.
 HOST_REGEXES = [
     'wget .*$',
-    'ssh .*$',
-    'ssh .*@$', ]
+    'ssh .*@$', 'ssh .*$',
+    'mosh .*@$', 'mosh .*$',
+    ]
 
 URL_REGEXES = [
     '.*http://.*$',
     '.*https://.*$', ]
 
 def get_hosts():
-    from smashlib.python import ope, opj
-    hosts = []
-    hosts_file = '/etc/hosts'
+    hosts, hosts_file = [], '/etc/hosts'
     if ope(hosts_file):
         with open(hosts_file) as fhandle:
             for line in fhandle.readlines():
@@ -42,10 +42,10 @@ def get_hosts():
     return hosts
 
 def uri_completer(self, event):
-    """ uri's are treated a bit differently
-        (evidently ipython's internals split on `:`)
+    """ uri's are treated a bit differently because
+        evidently ipython's internals split on `:`
     """
-    return ['//'+h for h in get_hosts()]
+    return [ '//' + h for h in get_hosts() ]
 
 def host_completer(self, event):
     return get_hosts()

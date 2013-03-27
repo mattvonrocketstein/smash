@@ -20,11 +20,6 @@ class PluginInspector(PluginManager):
         for x in smashlib.PLUGINS:
             yield x
 
-    #@property
-    #def disabled_plugins
-    # this doesnt work as advertised with 'plugins.disabled_plugins?'
-    # can properties call super?
-
     @property
     def plugins(self):
         return smashlib.PLUGINS
@@ -57,7 +52,7 @@ class Plugin(SmashPlugin):
         plugins_i = PluginInspector()
         self.contribute('aliases', ALIASES)
         self.contribute('plugins', plugins_i)
-        # TODO: this plugin should really be loaded last
+        # FIXME: this plugin should really be loaded last
         #       so that this is guaranteed to be accurate.
         for x in dir(smashlib.active_plugins):
             if not x.startswith('__'):
