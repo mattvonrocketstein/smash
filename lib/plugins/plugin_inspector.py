@@ -29,8 +29,7 @@ class PluginInspector(PluginManager):
     def plugins(self):
         return smashlib.PLUGINS
 
-    @property
-    def __doc__(self):
+    def __qmark__(self):
         """ lists all plugins """
         dat = [ ]
         fnames = [x.filename for x in smashlib.PLUGINS]
@@ -39,12 +38,18 @@ class PluginInspector(PluginManager):
                         p in self.enabled_plugins,
                         str(0)])
         dat = sorted(dat,key=lambda x:x[0])
-        report(("Smash-plugin information:\n"
-                "  config-file: {0}\n").format(self.plugins_json_file) + \
-                '  for subsets of this info, type:\n' + \
-                '    plugins.enabled._plugins?\n' + \
-                '    plugins.disabled_plugins?\n\n'+\
-                list2table(dat, header=['name', 'enabled', 'errors']))
+        hdr = "{red}SmaSh-plugins{normal}:\n\n"
+        _help = [
+            "config-file: "+ self.plugins_json_file,
+            'to see enabled plugins type: {red}plugins.enabled._plugins?{normal}',
+            'to see disabled plugins type: {red}plugins.disabled_plugins?{normal}',
+            'to interact with plugin-objects in this runtime, use {red}plugins.plugins{normal}',
+            'to enable a disabled plugin type: {red}smash --enable=plugin_name.py{normal}',
+            'to disable a enabled plugin type: {red}smash --disable=plugin_name.py{normal}',
+            ]
+        _help = ''.join([' '*4 + x + '\n' for x in _help])
+        report(hdr+_help)
+               #list2table(dat, header=['name', 'enabled', 'errors']))
 
 class Plugin(SmashPlugin):
     def install(self):
