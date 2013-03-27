@@ -53,8 +53,9 @@ def replace_help_magic():
             try:
                 tmp()
             except Exception,e:
-                report.help_magic('__qmark__ defined but error encountered while calling it.')
-                report.help_magic('   :: '+str(e))
+                raise
+                #report.help_magic('__qmark__ defined but error encountered while calling it.')
+                #report.help_magic('   :: '+str(e))
             return
         call_original_pinfo()
     report_if_verbose('replacing magic')

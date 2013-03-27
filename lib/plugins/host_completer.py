@@ -43,8 +43,7 @@ def get_hosts():
 
 def uri_completer(self, event):
     """ uri's are treated a bit differently because
-        evidently ipython's internals split on `:`
-    """
+        evidently ipython's internals split on `:` """
     return [ '//' + h for h in get_hosts() ]
 
 def host_completer(self, event):
