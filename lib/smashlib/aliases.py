@@ -3,8 +3,9 @@
 from types import StringTypes
 from collections import defaultdict, namedtuple
 
-from smashlib.util import list2table, colorize, report
 from smashlib.smash_plugin import SmashPlugin
+from smashlib.util import (list2table, colorize,
+                           report, report_if_verbose)
 
 def add_new_aliases(bus, name=None):
     """ this function will be attached to the post-activation signal """
@@ -71,8 +72,7 @@ class Aliases(RegistrationList):
             t1 = cmp(x.alias, y.alias)
         return t1
 
-    @property
-    def __doc__(self):
+    def __qmark__(self):
         from smashlib import ALIASES as aliases
         lst = [x for x in aliases]
         lst.sort(self._sort_aliases)
@@ -82,7 +82,7 @@ class Aliases(RegistrationList):
             nick = alias.alias.split(' ')[0]
             cmd = ' '.join(alias.alias.split(' ')[1:])
             dat.append([alias.affiliation, nick, cmd])
-        return colorize("{red}Aliases:{normal}\n\n") + list2table(dat, headers)
+        report(colorize("{red}SmaSh aliases:{normal}\n\n") + list2table(dat, headers))
 
     def install(self):
         """ install known all known aliases into this IPython instance """
@@ -90,10 +90,10 @@ class Aliases(RegistrationList):
 
     def uninstall(self, alias):
         """ uninstall known all known aliases into this IPython instance """
-        #print 'uninstalling,',alias
+        report_if_verbose.alias_manager('uninstalling, ' + str(alias))
         if isinstance(alias, StringTypes):
             return __IPYTHON__.magic_unalias(alias.split()[0])
-        raise Exception,'niy'+str(alias)
+        raise NotImplemented('niy' + str(alias))
 
     def full_alias_to_item(self, full_alias):
         return [x for x in self if x.alias==full_alias][0]
