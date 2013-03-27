@@ -21,8 +21,6 @@ from smashlib.reflect import namedAny
 
 ip = ipapi.get()
 
-
-
 # plugins can define their own persistent settings, and they
 # should be stored here. by default the schema only consists in
 # answering whether a plugin is enabled.

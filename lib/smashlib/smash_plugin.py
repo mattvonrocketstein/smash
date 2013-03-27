@@ -1,17 +1,15 @@
 """ smashlib.smash_plugin
 """
 import os
-from IPython import ipapi
+from collections import defaultdict
 
 from smashlib.util import report
 from smashlib.reflect import namedAny
 
-ip = ipapi.get()
-
 def track_changes(fxn):
-    def newf(*args, **kargs):
-        SmashPlugin.changes[fxn.__name__] = args, kargs
-        return fxn(*args, **kargs)
+    def newf(self, *args, **kargs):
+        self.changes[fxn.__name__].append([args, kargs])
+        return fxn(self, *args, **kargs)
     return newf
 
 class SmashPlugin(object):
@@ -22,15 +20,16 @@ class SmashPlugin(object):
     requires = []
     requires_plugins = []
 
-    # track any changes made by this
-    #  plugin so we can invert them
-    changes = {}
-
-    inversions = dict(alias='unlias',
-                      contribute=NotImplemented,
+    # track any changes made by this plugin
+    # so we can (theoretically) invert them later
+    inversions = dict(alias = 'unlias',
+                      contribute = NotImplemented,
                       # 'delete_magic'
-                      contribute_magic=NotImplemented,
+                      contribute_magic = NotImplemented,
                       )
+
+    def __init__(self):
+        self.changes = defaultdict(lambda:[])
 
     @track_changes
     def set_env(self, name, val):
