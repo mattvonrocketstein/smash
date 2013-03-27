@@ -26,6 +26,16 @@ def set_editor(editor):
     _ip().options['editor'] = editor
     return editor
 
+def do_it_later(func, delay=1):
+    """ this is ugly, but sometimes using the
+        "late_startup_hook" just doesnt work.
+        cry me a river..
+    """
+    def tmp():
+        time.sleep(1)
+        func()
+    threading.Thread(target=tmp).start()
+
 def add_hook(hook_name, new_hook, priority):
     hook_obj = getattr(__IPYTHON__.hooks, hook_name)
     return hook_obj.add(new_hook, priority)
@@ -66,30 +76,6 @@ def home():
 
 def truncate_fpath(fpath):
     return fpath.replace(home(), '~')
-
-class Prompt(object):
-    """ wrapping ipython internals """
-
-    def get_parts(self):
-        return self.template.split()
-    def set_parts(self, parts):
-        self.template = ' '.join(parts)
-    parts = property(get_parts, set_parts)
-
-    def _get_template(self):
-        """ get the current prompt template """
-        opc = getattr(__IPYTHON__.shell, 'outputcache', None)
-        if opc:
-            return opc.prompt1.p_template
-        else:
-            return 'error-getting-output-prompt'
-    def _set_template(self, t):
-        """ set the current prompt template """
-        opc = getattr(__IPYTHON__.shell, 'outputcache', None)
-        if opc:
-            opc.prompt1.p_template = t
-    template = property(_get_template, _set_template)
-prompt = Prompt()
 
 def replace_magic(original_magic_name, new_magic_function):
     """ """
@@ -215,13 +201,3 @@ def list2table(dat, header=[], indent=''):
         out = [indent+line for line in out]
         out = '\n'.join(out)
     return out
-
-def do_it_later(func, delay=1):
-    """ this is ugly, but sometimes using the
-        "late_startup_hook" just doesnt work.
-        cry me a river..
-    """
-    def tmp():
-        time.sleep(1)
-        func()
-    threading.Thread(target=tmp).start()

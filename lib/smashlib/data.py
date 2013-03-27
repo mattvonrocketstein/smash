@@ -2,6 +2,8 @@
 """
 
 from IPython import ipapi
+from smashlib.util import _ip
+PROMPT_DEFAULT = '\C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>'
 ip = ipapi.get()
 
 
@@ -19,7 +21,7 @@ OVERRIDE_OPTIONS = dict(
 
     # TODO: this should really be part of the git plugin.
     # TODO: see smash.util.set_prompt_t for changing prompt on the fly
-    prompt_in1= ''' \C_Red${getattr(__IPYTHON__,'_cgb',lambda:'')()} \C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>''',
+    prompt_in1= PROMPT_DEFAULT,
 
     include = list(set(ip.options.include + ['ipythonrc-pysh',
                                              'ipythonrc-git-aliases',

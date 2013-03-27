@@ -27,6 +27,7 @@
 import os
 from IPython.macro import Macro
 
+from smashlib.prompt import prompt
 from smashlib.python import expanduser
 from smashlib.util import report, set_complete
 from smashlib.smash_plugin import SmashPlugin
@@ -138,6 +139,7 @@ class Plugin(SmashPlugin):
         report.git_completer('setting prompt to use git vcs')
         cgb_path = expanduser(opj('~','bin',"current_git_branch"))
         __IPYTHON__._cgb = lambda: os.popen(cgb_path).read().strip()
+        prompt['git_branch'] =[2,'''\C_Red${getattr(__IPYTHON__,'_cgb',lambda:'')()}''']
         set_complete(local_branches, 'git checkout [\S]*$')
         set_complete(fsc2, 'git checkout [\S]* ')
         set_complete(fsc2, 'git rm')
