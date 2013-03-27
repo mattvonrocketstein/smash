@@ -68,21 +68,18 @@ class Project(VenvMixin, Hooks):
         header = ['name', 'path', 'virtualenv', 'vcs']
         return header, dat
 
-    @property
-    def __doc__(self):
+    def __qmark__(self):
         header, dat = self._doc_helper(self._paths)
-        return "Smash-Projects:\n  config-file: {0}\n\n".format(self._config_file) + \
-               list2table(dat, header=header)
-
-    #@property
-    #def CURRENT_PROJECT(self):
-    #    """ FIXME: makes no distinction for whether it's activated, though """
-    #    _dir = os.getcwd()
-    #    _venv = get_venv()
-    #    for name,path in self._paths.items():
-    #        if _venv and _venv.startswith(path): return name
-    #        if path == _dir: return name
-    #    return None
+        hdr = "{red}SmaSh Project-Manager{normal}"
+        _help = ["\n\tconfig-file: {red}" +self._config_file + "{normal}",
+                 "for summary of available projects type: {red}proj.summary{normal}",
+                 "to cd to a project's home-dir type: {red}proj.project_name{normal}",
+                 "to activate a project type: {red}proj.project_name.activate{normal}",
+                 ]
+        _help = '\n\t'.join(_help)
+        report(hdr + _help)
+        #report.project_manager(
+        #    list2table(dat, header=header))
 
     def __init__(self, name):
         """ """

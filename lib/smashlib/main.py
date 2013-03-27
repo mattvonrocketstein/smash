@@ -5,17 +5,14 @@
     TODO: move to hook-based prompt generation if 0.10 supports it
 """
 import os, sys
-import psutil,os
-
+import psutil
 import demjson
-
-from IPython import ipapi
 
 import smashlib
 from smashlib.parser import SmashParser
 from smashlib.data import OVERRIDE_OPTIONS
 from smashlib.util import clean_namespace, report, die, panic
-from smashlib.util import post_hook_for_magic, opj, opd
+from smashlib.util import post_hook_for_magic, opj, opd, _ip
 from smashlib.usage import __doc__ as usage
 from smashlib.util import colorize
 
@@ -31,7 +28,7 @@ def reinstall_aliases():
 VERBOSE   = False
 smashlib._meta['SMASH_DIR'] = opd(opd(__file__))
 SMASH_ETC_DIR = opj(smashlib._meta['SMASH_DIR'], 'etc')
-ip        = ipapi.get()
+ip        = _ip()
 
 for option, val in OVERRIDE_OPTIONS.items():
     setattr(ip.options, option, val)
@@ -53,6 +50,7 @@ clean_namespace()
 post_hook_for_magic('rehashx', reinstall_aliases)
 __IPYTHON__.usage = colorize(usage)
 from smashlib.util import report, pre_magic, set_editor
+
 with open(SMASH_EDITOR_CONFIG) as fhandle:
     editor_config = demjson.decode(fhandle.read())
     try:
@@ -67,8 +65,10 @@ with open(SMASH_EDITOR_CONFIG) as fhandle:
     else:
         report.bootstrap("Your editor is set to: " + set_editor(editor))
 
-    def parameter_s_mutator(parameter_s):
+    import re
+    ACK_RESULT_RE = re.compile('.*[:]\d+[:]')
 
+    def parameter_s_mutator(parameter_s):
         # as long as it evaluates to something that works as a string,
         # allow for things like "edit dictionary['foo']".  note that this
         # gets weird if you edit a filename="foo" and you type "edit filename",
@@ -80,6 +80,11 @@ with open(SMASH_EDITOR_CONFIG) as fhandle:
             if isinstance(tmp, basestring):
                 parameter_s = tmp
 
+        # so that "ed /some/path/here/file.py:225:" works
+        if ACK_RESULT_RE.match(parameter_s):
+            #print 'match!', parameter_s
+            fpath, line_no = filter(None,[x.strip() for x in parameter_s.split(':')])
+            parameter_s = '-n {0} {1}'.format(line_no, fpath)
         # if never_excute_code is set, then "edit foo"
         # will be translated to "edit -x foo"
         if editor_config.get("never_execute_code", False):
@@ -149,5 +154,6 @@ import sys
 sys.meta_path = [SmashImporter()]
 """
 
-from smashlib.patches import replace_global_matcher
+from smashlib.patches import replace_global_matcher, replace_help_magic
 replace_global_matcher()
+replace_help_magic()
