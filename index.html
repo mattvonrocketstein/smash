@@ -1,0 +1,562 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Smash by mattvonrocketstein</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Smash</h1>
+        <p>SMArtSHell: python/bash hybrid shell and other hacks for ipython</p>
+
+        <p class="view"><a href="https://github.com/mattvonrocketstein/smash">View the Project on GitHub <small>mattvonrocketstein/smash</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/mattvonrocketstein/smash/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/mattvonrocketstein/smash/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/mattvonrocketstein/smash">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1></h1>
+
+<h1>About SmaSh</h1>
+
+<p>SmaSh is the smart-shell.  It offers features for project management, a flexible plugin
+architecture that is easy to use, and simple JSON configuration files that try to be as
+sane as possible.  Python developers might be particularly interested because it also
+happens to be a python/bash hybrid which builds on the pysh profile for IPython.  It builds
+on, and offers very sophisticated support for python virtual environments.</p>
+
+<h1></h1>
+
+<h1>The Problem</h1>
+
+<p>Shells are still annoying!::</p>
+
+<ul>
+<li>No one wants to manage zillions of aliases or arcane readline configurations.</li>
+<li>Things like sed / awk are great for quick hacks, but are obscure and not maintainable.</li>
+<li>Shells are not conveniently modular, and do not perform well for things like:
+
+<ul>
+<li>multiple projects,</li>
+<li>multiple use-cases,</li>
+<li>or domain specific languages.</li>
+</ul>
+</li>
+<li>Shells offer only minimal or awkward context-awareness
+
+<ul>
+<li>no triggers for things like pre/post "dir-change"</li>
+<li>no hooks for pre/post processing of IO</li>
+</ul>
+</li>
+</ul><p>"Do what I mean" is a pretty reasonable expectation for a modern computer program..
+that's why we get what we expect when we type "1024*231" into google, namely a numerical
+result instead of just a bunch of matching webpages.</p>
+
+<p>Type <em>/etc/</em> into your shell and what do you see?  Probably something like this:::</p>
+
+<p>bash:/etc/: Is a directory</p>
+
+<p>No kidding.  I even put a "/" at the end, so probably I know it is a directory and, in the
+absence of any other context, I probably want to move into that directory.  Or, if I were
+to type out the name of a non-executable file that ends in .txt, chances are good I want to
+EDIT THE FILE and not see some kind of error about how the file is not executable.</p>
+
+<p>How would you even go about fixing something like this in bash, where the interface comes
+burdened with so many assumptions?</p>
+
+<p>On top of those problems, shells are not at all ideal for software development.  And based
+on that point, maybe you're already thinking <em>"Use emacs/vim/eclipse!"</em>.  But, I also
+personally think that a huge, do-everything IDE is not the True Way.</p>
+
+<p>Still the problems most people solve on a daily basis are similar to the problems from
+yesterday, and shell experiences are often characterized by too much repetition.  We fumble with
+awkward histories with our control-r's and we do things like build one-off aliases or
+scripts and throw them in a <em>.bashrc</em> or <em>~/bin</em> and there they rot, usually because they
+weren't readable a week after they were written, and they weren't quite general enough
+to be used everywhere.  Enough is enough!</p>
+
+<h1></h1>
+
+<h1>IPython+pysh is not quite a solution</h1>
+
+<p>IPython is pretty great, but in many ways is more a framework than a solution.  Even though it does
+basic shell stuff, out of the box it is primarily intended for python developers, and not fit for use
+as a generic shell.  Here are just a few reasons vanilla IPython and pysh+IPython are not usable as
+system shells::</p>
+
+<ul>
+<li>obviously not completely bash-like (nor should it be): 'cd ' works but 'tail -f ' does not</li>
+<li>lack of consistency: profiles vs. rc-files vs straight programmatic api configuration is confusing</li>
+</ul><p>Although IPython is flexible enough to do almost anything in terms of whatever triggers, aliases, macros,
+input pre/post-processing.. adding fancy stuff on to the IPython core to leverage this functionality
+(e.g. via profiles) is <em>still</em> not maintainable.</p>
+
+<h1></h1>
+
+<h1>Vision of a Shell</h1>
+
+<p>Why do you occasionally go to google to type in things like "1024 * 768" or "cos(53)" or
+"current time in zimbabwe"?  And again, why can't it be obvious that typing "/etc/" by itself
+clearly means "cd /etc/"/?  My guess is your shell is just not smart enough, and teaching it
+to be smart is not so much difficult as it is simply disorganized.  It takes effort and in the
+end it doesn't come out quite the way you hoped.  And that's just for the average user.</p>
+
+<p>For developers, what is often needed is an environment that functions simultaneously as a shell
+and a sort of sketchbook for programming.  The <strong>pysh</strong> profile for IPython already functions as
+a sort of Python / Bash chimera, and SmaSh leverages everything it offers:</p>
+
+<ul>
+<li>Simple: all the simplicity of bash when you want it</li>
+<li>Flexible: all the power of a RealProgrammingLanguage(tm) when you need it</li>
+<li>Unsurprising: bashy commands and pythony code both work the way you would expect</li>
+<li>Hybrid: Mixing python and shell code is possible</li>
+</ul><p>SmaSh is also extensible, and actually has very little core functionality.  A big part of what it
+offers is just an organized approach to configuration management and plugins.  In fact, almost
+all of what it does happens through plugins!  Apart from what the bash/python hybrid features
+that come from pysh, SmaSh also inherits all the flexibility of IPython in terms of I/O hooks
+and pre/post processing.  So go nuts with your domain specific language or ruby's pry shell or
+go attach a lisp/lua/node runtime onto this frankenstein bananaphone piano, see if I care.</p>
+
+<h1></h1>
+
+<h1>SmaSh Philosophy</h1>
+
+<p>SmaSh is installed and modified on a per-user basis; nothing is installed at the system level.
+This is important because, as you continue to add plugins to smash, any third-party support
+libraries that are required won't clutter up the rest of your system.  In particular,</p>
+
+<ul>
+<li>Installation, including IPython, is completely inside a python virtual-env located at <em>~/.smash</em>
+</li>
+<li>All configuration is JSON, stored in <em>~/.smash/etc</em>
+</li>
+<li>All plugins are in <em>~/.smash/plugins</em>
+</li>
+<li>Core support libraries live in <em>~/.smash/smashlib</em>
+</li>
+</ul><h1></h1>
+
+<h1>SmaSh Core</h1>
+
+<h2>The Project-management Abstraction:</h2>
+
+<p><strong>Projects</strong> are typically objects that correspond to directories.
+Project names should be kept unique.::</p>
+
+<ul>
+<li>Bind individual directories ("~/myproject") or directories of directories ("~/code/"")</li>
+<li>Project configuration is stored with JSON in "~/.smash/etc/projects.json"
+
+<ul>
+<li>you can manipulate it via the command-line or edit config-files yourself</li>
+</ul>
+</li>
+<li>Projects can be "activated", "invoked", or "deactivated" and each can trigger pre/post actions</li>
+<li>Pre/post actions might mean convenient side-effects such as
+
+<ul>
+<li>activating a virtual environment</li>
+<li>starting a virtual machine</li>
+<li>opening a web page</li>
+<li>whatever else you want..</li>
+</ul>
+</li>
+<li>Projects can have alias groups
+
+<ul>
+<li>alias groups are activated when the project is</li>
+<li>alias groups are deactivated when you leave the project</li>
+</ul>
+</li>
+<li>Projects can be watched for changes, triggers for linters can be added, etc</li>
+<li>Project code can be searched asynchronously, results shown in a way that doesnt clutter the screen</li>
+<li>Project code does not necessarily need to be python, but if it is you get sweet benefits</li>
+</ul><h2>Prompt and Aliases:</h2>
+
+<p>::</p>
+
+<ul>
+<li>Alias configuration is stored with JSON</li>
+<li>Aliases can be global, or stored per project</li>
+<li>Aliases that are project specific do not clutter things up when a project is not activated</li>
+<li>Prompt is split into "components" that can be easily added/substracted on the fly, and</li>
+<li>Prompts can also be project-specific.</li>
+</ul><h2>The Plugin Architecture:</h2>
+
+<p>Lots of plugins are included with SmaSh (read more below).  I don't necessarily claim all these
+are useful to you, and they won't be enabled by default.  The provided plugins are intended to
+provide a wealth of examples for some of the basic things you might want to do.  SmaSh plugins
+can alter all sorts of things about the environment that they run in.  For example::</p>
+
+<ul>
+<li>loading other plugins</li>
+<li>altering prompt behaviour</li>
+<li>altering completion strategies</li>
+<li>contributing methods, macros, or magic to the shell's global namespace</li>
+<li>and even alter/act-on command line arguments that SmaSh itself will use.</li>
+</ul><p>Plugins can be enabled unconditionally, in which case they are loaded when SmaSh bootstraps,
+or they can be loaded conditionally, in which case they are triggered by project activation
+or loaded dynamically by another plugin.</p>
+
+<p>To write a plugin you must extend <code>smashlib.smash_plugin.SmashPlugin</code>, and define an install()
+method.  From the command line you can use <strong>smash --install</strong> to "acquire" plugins and move them
+to <strong>~/.smash/plugins</strong>.  Plugins can be grabbed from disk, or from URLs but the preferred method
+for distributing plugins is via github gist's using <strong>smash --install gist://</strong>.</p>
+
+<p>SmaSh tries to encourage writing small plugins without dependencies, but if you need to reuse
+code from another plugin, every plugin that's enabled can be imported at any time from
+the <code>smashlib.active_plugins</code> module.  If you require a python module that may not be installed
+at the system level, make sure your plugin specifies values in <code>Plugin.requires_modules</code>.</p>
+
+<p>SmaSh plugins can specify any prerequisites they might have in terms of python modules, system
+binaries, or other SmaSh plugins.  At bootstrap, most systems that involve prerequisites use
+"priorities" for loading dependencies, but <em>SmaSh is different and drama free</em>.  You specify
+your prerequisites, and if your configuration is feasible then SmaSh will determine a
+consistent ordering for the bootstrap or tell you if there is a contradiction.</p>
+
+<h1></h1>
+
+<h1>Generic Plugins for SmaSh</h1>
+
+<p>DWIM (Do what I mean)::</p>
+
+<ul>
+<li>typing "/etc/" means "cd /etc/"
+
+<ul>
+<li>actually, this uses pushd so you can popd back to where you came from</li>
+</ul>
+</li>
+<li>typing "/etc/hosts" means "edit /etc/hosts"
+
+<ul>
+<li>only works whenever /etc/hosts/ is not executable</li>
+<li>shows a warning if you will not be able to save the file</li>
+<li>editor preferences are defined in ~/.smash/etc/editor.json</li>
+<li>possible to specify one editor for console, and one for windowing environment</li>
+</ul>
+</li>
+</ul><p>Hostname completion::</p>
+
+<ul>
+<li>works for ssh</li>
+<li>works for any program using standard URIs like ftp://, http://, etc</li>
+<li>uses the contents of "~/.smash/etc/hosts.json" and, if available, contents of /etc/hosts</li>
+</ul><p>Enhanced Bookmarks::</p>
+
+<ul>
+<li>offers sophisticated bookmarks, globally or per-project</li>
+<li>bookmark directories, URLs, macros</li>
+<li>bookmark nonstandard URIs like ssh://person@place</li>
+<li>launching bookmark actions is keyboard-friendly</li>
+</ul><p>Browser Integration::</p>
+
+<ul>
+<li>manage and open bookmarks, (global or per-project)</li>
+<li>performs web searches with <a href="http://duckduckgo.com">http://duckduckgo.com</a> API, allowing for:
+
+<ul>
+<li>direct search of stack-overflow, django docs, pypi, etc</li>
+<li>asynchronous notification that doesnt clutter your display (via growl-style popups)</li>
+</ul>
+</li>
+</ul><p>Git VCS Integration::</p>
+
+<ul>
+<li>If applicable, default prompt includes current branch name</li>
+<li>Tab completion including:
+
+<ul>
+<li>Branch completion in all the right spots</li>
+<li>File-system completion when using 'git mv' or 'git add'</li>
+<li>smart branch/file-system completion when using 'git diff'</li>
+</ul>
+</li>
+<li>Various default aliases and places to put more (making ".git/config" optional)</li>
+<li>Should you be inclined: hopefully enough abstraction here to easily support other VCS's</li>
+</ul><p>Notification support::</p>
+
+<ul>
+<li>Asynchronous notifications via freedesktop</li>
+<li>When this works, it's pretty great, but..
+
+<ul>
+<li>currently no support for osx (growl)</li>
+<li>this may involve extra system-level requirements</li>
+<li>may require some fiddling to get it to work outside of ubuntu/gnome (!)</li>
+</ul>
+</li>
+</ul><h1></h1>
+
+<h1>Python Specific Plugins for SmaSh</h1>
+
+<p>Misc extra completers::</p>
+
+<ul>
+<li>Completers for accessing python dictionaries</li>
+<li>Completers for setup.py</li>
+<li>Pip and easy_install completers
+
+<ul>
+<li>Completion over the standard pip subcommands</li>
+<li>Completion over contents of requirements.txt if it's in the working directory</li>
+</ul>
+</li>
+</ul><p>Virtual-Environments::</p>
+
+<ul>
+<li>Venv's can be activated/deactivated cleanly, and without lasting side-effects</li>
+<li>Close integration with projects such that
+
+<ul>
+<li>if a project is activated and it is a venv, it will be activated</li>
+<li>if a project contains a venv at the top-level, that venv will be activated</li>
+</ul>
+</li>
+</ul><p>Fabric integration::</p>
+
+<ul>
+<li>Completion over fabfile commands</li>
+<li>Programmatic access to the functions themselves</li>
+<li>PS: this plugin is a good example of a minimal "post-dir-change" trigger</li>
+</ul><p>Unit tests::</p>
+
+<ul>
+<li>post-dir-change hook finds <code>tests/</code> or <code>tests.py</code> in working directory</li>
+<li>or, scan everything under this working-directory or a known Project</li>
+<li>attempts to detect what type of unittests these are via static analysis (django/vanilla unittest/etc)</li>
+<li>test files are enumerated and shortcuts for running them quickly are updated</li>
+<li>etc</li>
+</ul><p>Enhanced <strong>which</strong> with cascading search behaviour::</p>
+
+<p>1) for unix shell commands, "which" works as usual
+  2) if the name matches a python obj in the global namespace, show the file that defined it
+  3) if the name matches an importable module, show the path it would be imported from
+  4) if name matches a file, determine file type with file(1)
+  5) if name matches a host, show the IP address according to host files
+  6) if name matches an internet domain, show the IP address according to DNS</p>
+
+<h1></h1>
+
+<h1>Installation and Prerequisites</h1>
+
+<p>SmaSh works well with python 2.6, and 2.7 and possibly earlier.  SmaSh is compatible
+with python3 only insofar as IPython is.  You will need virtualenv installed at the
+system level ( in debian-based distros, use <strong>apt-get install python-virtualenv</strong>),
+but anything else that is required should be installed automatically by the
+following steps.</p>
+
+<p>To install, clone this repository::</p>
+
+<pre><code>$ mkdir ~/code; cd ~/code
+$ git clone git://github.com/mattvonrocketstein/smash.git
+</code></pre>
+
+<p>Install it (development mode obligatory for now, since SmaSh is beta)::</p>
+
+<pre><code>$ python setup.py develop
+</code></pre>
+
+<p>If everything went well, you should be able to run 'smash' now::</p>
+
+<pre><code>$ smash
+</code></pre>
+
+<h1></h1>
+
+<h1>Working with Plugins</h1>
+
+<p>By default, enabled plugins are kept to a minimum.  You can get a list of available,
+enabled, and disabled plugins like this::</p>
+
+<pre><code>$ smash --list
+</code></pre>
+
+<p>If you use git VCS, I suggest enabling support for that.  This will customize your prompt
+to show the current branch, turn on various completers, add convenient aliases.::</p>
+
+<pre><code>$ smash --enable git_completers.py
+  bootstrap: launching with rc-file: /home/testing/.smash/etc/smash.rc
+  git_completer: setting prompt to use git vcs
+  project_manager: loading config: /home/testing/.smash/etc/projects.json
+  plugin_manager: enabling git_completers.py
+</code></pre>
+
+<p>Changes will take affect when you next relaunch the shell.</p>
+
+<p>If you're a python programmer, I suggest turning on a few more:::</p>
+
+<pre><code>$ smash --enable venv_prompt.py
+$ smash --enable pip_completer.py
+$ smash --enable setup_completer.py
+$ smash --enable which.py
+$ smash --enable fabric_support.py
+</code></pre>
+
+<p>From inside SmaSh, you can interact with the plugins via the <strong>plugins</strong> command.
+(This command is actually an object that represents the plugin manager.  If you
+want the plugin objects themselves use <strong>plugins.plugins</strong>.  If you want the
+namespace defined by a given plugin file, import
+<strong>smashlib.active_plugins.some_plugin_name</strong>)::</p>
+
+<pre><code>[~]&gt; plugins?
+
+Smash-plugin information:
+  config-file: /home/matt/.smash/etc/plugins.json
+
+|                       name | enabled | errors |
+-------------------------------------------------
+|          apt_completers.py |    True |      0 |
+|     currency_conversion.py |    True |      0 |
+|              djangoisms.py |   False |      0 |
+|          fabric_support.py |   False |      0 |
+|          git_completers.py |    True |      0 |
+</code></pre>
+
+<h1></h1>
+
+<h1>Working with Projects</h1>
+
+<p>First open <em>~/.smash/etc/projects.json</em> in the editor of your choice.</p>
+
+<p>The simplest thing you can do is add a single directory as a project.  To do that,
+add a line like this to the "instructions" section:::</p>
+
+<p>["bind",     ["~/myproject"], {}]</p>
+
+<p>To add all directories under a certain directory, add an entry like this:::</p>
+
+<p>["bind_all", ["~/code"],          {}],</p>
+
+<p>Note that <strong>bind_all</strong> is not recursive, it only goes one layer deep.
+Once you've added this and restarted SmaSh, then it knows about your projects:::</p>
+
+<p>matt@vagabond:~$ smash
+     bootstrap: launching with rc-file: /home/matt/.smash/etc/smash.rc
+     project_manager: loading config: /home/matt/.smash/etc/projects.json
+     project_manager: binding /home/matt/code (21 projects found)
+   [~]&gt;</p>
+
+<p>The shell's handle for interacting with projects is simple "proj".  It already
+exists there, and you can query it for some simple information like this:::</p>
+
+<p>[~]&gt; proj?</p>
+
+<p>Found Projects:
+   |                 name |                        path | virtualenv |           vcs |</p>
+
+<hr><p>|           robotninja |           ~/code/robotninja |     ./node | GitRepository |
+   | readertray-read-only | ~/code/readertray-read-only |        N/A |    Subversion |
+   |          plurlpicker |          ~/code/plurlpicker |        N/A |           N/A |</p>
+
+<p>Your projects might be registered, but they have not yet declared any post or
+pre-invocation hooks.  Still, you immediately get a simple alias for changing
+directories.  Since I have a project called robotninja in my ~/code directory, I can do this::</p>
+
+<p>[~]&gt; proj.robotninja
+     pre_invoke{'name': u'robotninja'}
+   [~/code/robotninja]&gt;</p>
+
+<p>Useful, but that was kind of boring.  Let's add an alias that means different things
+depending on which project you've activated.  You can see from the table above that
+one project is using subversion for VCS, whereas another is using git.. so how about
+we make one "status" alias that does the right thing in the right place?  Open
+<em>~/.smash/etc/projects.json</em> again, and make your alias section look something like
+this:::</p>
+
+<p>'aliases': {
+    'robotninja': ['status git status',],
+    'readertray-read-only':['status svn status']
+   }</p>
+
+<p>The first time when only "proj.robotninja" was used, the project was "invoked", not
+"activated".  Activation is accomplished like so:::</p>
+
+<p>[~]&gt; proj.robotninja.activate
+     pre_invoke{'name': u'robotninja'}
+     pre_activate: {'name': u'robotninja'}
+     post_activate: {'name': u'robotninja'}
+     alias_manager: adding new aliases for "robotninja"
+     alias_manager:  added 1 aliases for this project
+     project_manager: resetting CURRENT_PROJECT</p>
+
+<p>Note that project "activation" implies "invocation" in the debugging information
+printed above.  Via <em>invocation</em> we changed directories and via <em>activation</em> we
+gained an alias.::</p>
+
+<p>[~/code/robotninja]&gt; status
+     # On branch voltron
+     # Untracked files:
+     #   (use "git add ...</p>
+
+<p>So that 'status' alias works as expected.  Let's try the other one..::</p>
+
+<p>[~/code/robotninja]&gt; proj.readertray_read_only.activate
+     pre_invoke: {'name': u'readertray-read-only'}
+     pre_deactivate: {'name': u'robotninja'}
+     post_deactivate: {'name': u'robotninja'}
+     pre_activate: {'name': u'readertray-read-only'}
+     alias_manager: killing old aliases for "robotninja"
+     alias_manager: removed 1 aliases from the previous project
+     post_activate: {'name': u'readertray-read-only'}
+     alias_manager: adding new aliases for "readertray-read-only"
+     alias_manager:  added 1 aliases for this project
+     project_manager: resetting CURRENT_PROJECT</p>
+
+<p>[~/code/readertray-read-only]&gt; status
+     M       readergui.py</p>
+
+<p>Neato, so shows that the 'status' alias is now attached to subversion rather than git.</p>
+
+<h1></h1>
+
+<h1>Working with Bookmarks</h1>
+
+<p>Bookmarks are very similar to aliases. blah, blah blah</p>
+
+<h1></h1>
+
+<h1>Related Links</h1>
+
+<ul>
+<li>
+<code>ipython</code> <a href="http://ipython.org/ipython-doc/dev/interactive/shell.html">http://ipython.org/ipython-doc/dev/interactive/shell.html</a>
+</li>
+<li>
+<code>pysh</code> <a href="http://faculty.washington.edu/rjl/clawpack-4.x/python/ipythondir/i">http://faculty.washington.edu/rjl/clawpack-4.x/python/ipythondir/i</a>
+</li>
+<li>
+<code>virtualenv for python</code> http://some-link-here</li>
+</ul><h1></h1>
+
+<h1>Other Shells</h1>
+
+<ul>
+<li>
+<code>xiki</code> (a wiki inspired gui shell) <a href="http://xiki.org/">http://xiki.org/</a>
+</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/mattvonrocketstein">mattvonrocketstein</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
