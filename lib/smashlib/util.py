@@ -1,23 +1,21 @@
 # -*- coding: utf-8
 """ smashlib.util
 """
-import os
-import time
-import StringIO
-import threading
-
-import demjson
-import asciitable
+import os, time
+import StringIO, threading
+import demjson, asciitable
 
 import IPython
-from IPython import ColorANSI
-from IPython import ipapi
+from IPython import ipapi, ColorANSI
 
-opd = os.path.dirname
-ops = os.path.split
-opj = os.path.join
-ope = os.path.exists
+from smashlib.python import get_env, opd, ops, opj, ope
+
 tc = ColorANSI.TermColors()
+
+# NOTE: might be obsolete.  this was only needed if/when
+#       using the "import all available modules" strategy
+CONFLICTING_NAMES  = ('curl gc git time pwd pip pyflakes '
+                      'easy_install virtualenv py').split()
 
 def _ip():
     return ipapi.get()
@@ -27,9 +25,8 @@ def set_editor(editor):
     return editor
 
 def do_it_later(func, delay=1):
-    """ this is ugly, but sometimes using the
-        "late_startup_hook" just doesnt work.
-        cry me a river..
+    """ this is ugly, but sometimes using the "late_startup_hook"
+        just doesnt work. cry me a river..
     """
     def tmp():
         time.sleep(1)
@@ -43,7 +40,7 @@ def add_hook(hook_name, new_hook, priority):
 def panic():
     ("kill ALL the running instances of smash.\n"
      "useful when you have a misbehaving plugin..")
-    import psutil,os
+    import psutil, os
     matches = [ x for x in psutil.process_iter() \
                 if 'smash' in ' '.join(x.cmdline) ]
     proc = [ x for x in matches if x.pid==os.getpid() ][0]
@@ -72,7 +69,7 @@ def bus():
     return bus
 
 def home():
-    return os.environ['HOME']
+    return get_env('HOME')
 
 def truncate_fpath(fpath):
     return fpath.replace(home(), '~')
@@ -116,11 +113,6 @@ def post_hook_for_magic(original_magic_name, new_func):
         _ip().expose_magic(original_magic_name, new_magic)
     chain += [new_func]
     setattr(__IPYTHON__, '_magic_{0}_chain'.format(original_magic_name), chain)
-
-# NOTE: might be obsolete.  this was only needed if/when
-#       using the "import all available modules" strategy
-CONFLICTING_NAMES  = ('curl gc git time pwd pip pyflakes '
-                      'easy_install virtualenv py').split()
 
 def clean_namespace():
     """ clean python namespace in a few places where it shadows unix,
@@ -179,14 +171,14 @@ def die():
     FIXME: this is horrible, but i remember thinking i had no choice..
     TODO:  hahahaha document reason SOB?
     """
-    threading.Thread(target=lambda: \
+    threading.Thread(target = lambda: \
                      os.system('kill -KILL ' + str(os.getpid()))).start()
 
 def list2table(dat, header=[], indent=''):
     """ using asciitable, this function can return
         strings of neatly formated tabular data
     """
-    if header: dat=[header] + dat
+    if header: dat = [header] + dat
     s = StringIO.StringIO()
     out = asciitable.write(dat, output=s, Writer=asciitable.FixedWidthNoHeader)
     s.seek(0)
@@ -194,10 +186,10 @@ def list2table(dat, header=[], indent=''):
     if header:
         out = out.split('\n')
         line1 = out[0]
-        out.insert(1,'-'*len(line1))
+        out.insert(1, '-'*len(line1))
         out = '\n'.join(out)
     if indent:
         out = out.split('\n')
-        out = [indent+line for line in out]
+        out = [ indent+line for line in out ]
         out = '\n'.join(out)
     return out
