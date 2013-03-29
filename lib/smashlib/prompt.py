@@ -1,19 +1,37 @@
 """ smash.prompt """
+from collections import namedtuple
 from smashlib.data import PROMPT_DEFAULT as DEFAULT
+
+class PromptComponent(object):
+    def __init__(self, name=None, template=None,
+                 priority=1, lazy=False, contributor=None):
+        REQUIRED = 'name template'.split()
+        for x in REQUIRED:
+            assert eval(x), x + ' is required'
+        self.name = name
+        self.template = template
+        self.priority=priority
+        self.lazy=lazy
+        self.contributor = contributor
 
 class Prompt(dict):
 
     def __setitem__(self, k, v, update=True):
         if k in self:
             raise Exception,'prompt component is already present: ' + str(k)
+        if not isinstance(v, PromptComponent):
+            raise Exception,'expected prompt component'
         super(Prompt, self).__setitem__(k, v)
         if update:
             self.update_prompt()
 
+    def add(self, pc):
+        self.__setitem__(pc.name, pc)
+
     def update_prompt(self):
         parts = self.values()
-        parts.sort()
-        parts = [part[1] for part in parts]
+        parts.sort(lambda x,y: cmp(x.priority,y.priority))
+        parts = [ pc.template for pc in parts]
         self.template = ' '.join(parts)
 
     def _get_template(self):
@@ -31,5 +49,6 @@ class Prompt(dict):
     template = property(_get_template, _set_template)
 
 prompt = Prompt()
-prompt.__setitem__('working_dir', [100, DEFAULT], update=False)
+working_dir = PromptComponent(name='working_dir', priority=100, template=DEFAULT)
+prompt.__setitem__(working_dir.name, working_dir, update=False)
 prompt.template = DEFAULT

@@ -4,13 +4,13 @@
 """
 import os
 from threading import Thread
-from smashlib.util import do_it_later
-from smashlib.prompt import prompt
+from smashlib.util import do_it_later, truncate_fpath
+from smashlib.prompt import prompt, PromptComponent
 from smashlib.smash_plugin import SmashPlugin
 
 def this_venv():
     result = os.environ.get('VIRTUAL_ENV','')
-    result = result.replace(os.environ['HOME'],'~')
+    result = truncate_fpath(result)
     result = os.path.sep.join(result.split(os.path.sep)[-2:])
     return '({0})'.format(result)
 
@@ -26,5 +26,6 @@ class Plugin(SmashPlugin):
             """
             __IPYTHON__._this_venv = this_venv
             t = '''${getattr(__IPYTHON__, '_this_venv', lambda: "")()}'''
-            prompt['venv_path'] = [DEFAULT_SORT_ORDER, t]
+            prompt.add(PromptComponent(name='venv_path',
+                                       priority=DEFAULT_SORT_ORDER, template=t))
         do_it_later(adjust_prompt, delay=2)
