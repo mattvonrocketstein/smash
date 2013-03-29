@@ -5,6 +5,9 @@
 
     When this plugin is enabled, type "plugins?" or "aliases?"
     at the prompt for more information.
+
+    TODO: finish 'enabled_plugins' interactive docs, and make
+          disabled_plugins work like enabled_plugins does.
 """
 import asciitable
 
@@ -13,6 +16,23 @@ from smashlib.plugin_manager import PluginManager
 from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import list2table, colorize
 from smashlib.aliases import Aliases
+class PromptInspector(object):
+    def __qmark__(self):
+        """ help menu for SmaSh prompt """
+        hdr = "{red}SmaSh-prompt{normal}:\n\n"
+        _help = []
+        from smashlib.prompt import prompt
+        report(hdr)#+_help)
+        for pc in prompt:
+            report(pc.name)
+            
+            #"config-file: "+ self.plugins_json_file,
+            #': {red}plugins.enabled_plugins?{normal}',
+            #'to see disabled plugins type: {red}plugins.disabled_plugins?{normal}',
+            #'to interact with plugin-objects in this runtime, use {red}plugins.plugins{normal}',
+            #]
+        #_help = ''.join([' '*4 + x + '\n' for x in _help])
+        
 
 class PluginInspector(PluginManager):
     """ """
@@ -27,10 +47,12 @@ class PluginInspector(PluginManager):
     @property
     def enabled_plugins(self):
         class tmp(list):
+            """ tmp object so that 'plugins.disabled_plugins?' uses qmark protocol """
             def __qmark__(himself):
                 report.plugin_inspector('enabled plugins:')
                 dat = []
                 for p in self: # plugin objs
+                    if p.filename not in himself: continue
                     change_types = p.changes.keys()
                     change_types = ' (' + '/'.join(change_types) + ')' \
                                    if change_types else ''
@@ -40,9 +62,17 @@ class PluginInspector(PluginManager):
                     if contributions:
                         contributions = ', '.join(contributions)
                         report('    contributions: '+contributions)
-        return tmp(
-            self._get_some_plugins('enabled', 1) # plugin names
-            )
+        return tmp(self._get_some_plugins('enabled', 1))
+
+    @property
+    def disabled_plugins(self):
+        class tmp(list):
+            """ tmp object so that 'plugins.disabled_plugins?' uses qmark protocol """
+            def __qmark__(himself):
+                report.plugin_inspector('disabled plugins:')
+                for p in himself: # plugin objs
+                    report('  plugin: {red}'+ p +'{normal}')
+        return tmp(self._get_some_plugins('enabled', 0))
 
     def __qmark__(self):
         """ help menu for SmaSh plugins """
@@ -57,14 +87,15 @@ class PluginInspector(PluginManager):
             ]
         _help = ''.join([' '*4 + x + '\n' for x in _help])
         report(hdr+_help)
-               #
 
 class Plugin(SmashPlugin):
     def install(self):
         from smashlib import ALIASES
         plugins_i = PluginInspector()
+        prompt_i = PromptInspector()
         self.contribute('aliases', ALIASES)
         self.contribute('plugins', plugins_i)
+        self.contribute('prompt', prompt_i)
         # FIXME: this plugin should really be loaded last
         #       so that this is guaranteed to be accurate.
         for x in dir(smashlib.active_plugins):
