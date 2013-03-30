@@ -25,14 +25,6 @@ class PromptInspector(object):
         report(hdr)#+_help)
         for pc in prompt:
             report(pc.name)
-            
-            #"config-file: "+ self.plugins_json_file,
-            #': {red}plugins.enabled_plugins?{normal}',
-            #'to see disabled plugins type: {red}plugins.disabled_plugins?{normal}',
-            #'to interact with plugin-objects in this runtime, use {red}plugins.plugins{normal}',
-            #]
-        #_help = ''.join([' '*4 + x + '\n' for x in _help])
-        
 
 class PluginInspector(PluginManager):
     """ """
@@ -79,6 +71,7 @@ class PluginInspector(PluginManager):
         hdr = "{red}SmaSh-plugins{normal}:\n\n"
         _help = [
             "config-file: "+ self.plugins_json_file,
+            'to edit config-file: {red}ed plugins.plugins_json_file{normal}',
             'to see enabled plugins type: {red}plugins.enabled_plugins?{normal}',
             'to see disabled plugins type: {red}plugins.disabled_plugins?{normal}',
             'to interact with plugin-objects in this runtime, use {red}plugins.plugins{normal}',

@@ -195,7 +195,7 @@ class Project(VenvMixin, Hooks):
             bus().publish('post_invoke.' + name)
             return p
 
-        setattr(kls, name.replace('-','_'), invoke)
+        setattr(kls, name.replace('-','_').replace('.','_'), invoke)
 
     @classmethod
     def report(kls, *args):

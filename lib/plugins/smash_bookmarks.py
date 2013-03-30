@@ -70,8 +70,7 @@ class Bookmarks(object):
         self._get_config(force=True)
     _config = property(_get_config, _set_config)
 
-    @property
-    def __doc__(self):
+    def __qmark__(self):
         out = colorize(
             '\n{red}Hints:{normal} (try typing these)\n'
             '  bookmarks[index]         launches the bookmark at `index`\n'
@@ -84,9 +83,9 @@ class Bookmarks(object):
             dat, headers = self._doc_helper(self._relevant_context())
             tmp = list2table(dat, header=headers, indent='  ')
         except Exception,e:
-            return "Error building bookmark summary: "+str(e)
+            report("Error building bookmark summary: "+str(e))
         else:
-            return out+tmp
+            report(out+tmp)
 
     def _sorted_bookmarks(self, keys):
         bookmarks = [b for b in self if b.affiliation in keys]
