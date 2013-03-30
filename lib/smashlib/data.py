@@ -4,8 +4,7 @@
 from IPython import ipapi
 from smashlib.util import _ip
 PROMPT_DEFAULT = '\C_LightBlue[\C_LightCyan\Y3\C_LightBlue]>'
-ip = ipapi.get()
-
+ip = _ip()
 
 ## various overrides for patching ip.options. doing it here puts as much code as
 ## possible actually in pure python instead of in ipython's weird rc format file

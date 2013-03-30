@@ -15,7 +15,7 @@ abspath    = os.path.abspath
 expanduser = os.path.expanduser
 getcwd     = os.getcwd
 glob       = glob.glob
-
+get_env    = os.environ.get
 def only_py_files(dir, rel=False):
     """ """
     result = glob(opj(dir, '*.py'))
