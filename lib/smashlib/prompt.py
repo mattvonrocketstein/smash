@@ -20,7 +20,7 @@ class Prompt(dict):
         if k in self:
             raise Exception,'prompt component is already present: ' + str(k)
         if not isinstance(v, PromptComponent):
-            raise Exception,'expected prompt component'
+            raise Exception,'expected prompt component, got: '+str(v)
         super(Prompt, self).__setitem__(k, v)
         if update:
             self.update_prompt()
