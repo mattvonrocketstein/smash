@@ -90,7 +90,6 @@ with open(SMASH_EDITOR_CONFIG) as fhandle:
         if editor_config.get("never_execute_code", False):
             parameter_s = '-x ' + parameter_s
         return parameter_s
-
     pre_magic('ed', parameter_s_mutator)
     pre_magic('edit', parameter_s_mutator)
 

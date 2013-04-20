@@ -39,7 +39,7 @@ class ConvertComments(object):
         lines[index] = peek
 
     def is_func_def(self, line):
-        func_def = re.compile('\s*def .*')
+        func_def = re.compile('\s*def test_.*')
         return func_def.match(line)
 
     def doit(self, S):

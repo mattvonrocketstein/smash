@@ -18,15 +18,14 @@ from smashlib.plugin_manager import PluginManager
 from smashlib.aliases import Aliases
 from smashlib.python import opd, opj, ope, mkdir
 
-VERBOSE     = True
-ALIASES     = Aliases()
+VERBOSE = True
+ALIASES = Aliases()
 
-active_plugins = sys.modules['smashlib.active_plugins'] = types.ModuleType('smashlib.active_plugins')
+active_plugins = sys.modules['smashlib.active_plugins'] = \
+                 types.ModuleType('smashlib.active_plugins')
 
 _meta = dict( config_dir = opj(opd(opd(__file__)), 'etc'),
               bin_dir    = opj(opd(opd(__file__)), 'bin'),
               tmp_dir    = opj(opd(opd(__file__)), 'tmp'), )
-
-if not ope(_meta['tmp_dir']):
-    mkdir(_meta['tmp_dir'])
 _meta.update(smash_rc=opj(_meta['config_dir'], 'smash.rc'))
+if not ope(_meta['tmp_dir']): mkdir(_meta['tmp_dir'])
