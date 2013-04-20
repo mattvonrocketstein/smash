@@ -34,7 +34,7 @@ class Bookmark(namedtuple('Bookmark', 'affiliation nickname uri'.split())):
         elif parsed.scheme in 'http https ftp file'.split():
             return webbrowser.open_new_tab(self.uri)
         else:
-            report('dont know how to work with {0} scheme yet'.format(parsed.scheme))
+            report.bookmarks('dont know how to work with {0} scheme yet'.format(parsed.scheme))
 
 class Bookmarks(object):
 
@@ -83,9 +83,9 @@ class Bookmarks(object):
             dat, headers = self._doc_helper(self._relevant_context())
             tmp = list2table(dat, header=headers, indent='  ')
         except Exception,e:
-            report("Error building bookmark summary: "+str(e))
+            report.bookmarks("Error building bookmark summary: "+str(e))
         else:
-            report(out+tmp)
+            report.bookmarks(out+tmp)
 
     def _sorted_bookmarks(self, keys):
         bookmarks = [b for b in self if b.affiliation in keys]
@@ -97,14 +97,14 @@ class Bookmarks(object):
 
     def __getitem__(self, index_or_name):
         context = self._relevant_bookmarks()
-        error = lambda: report("no such bookmark.  type {red}bookmarks?{normal} for help")
+        error = lambda: report.bookmarks("no such bookmark.  type {red}bookmarks?{normal} for help")
         try:
             return context[index_or_name].launch()
         except TypeError:
             choice = [ bookmark for bookmark in context if bookmark.nickname==index_or_name ]
             if not choice: return error()
             elif len(choice)>1:
-                report('multiple bookmarks match that name.  check your configuration')
+                report.bookmark('multiple bookmarks match that name.  check your configuration')
             else:
                 choice = choice[0]
                 choice.launch()
@@ -135,7 +135,7 @@ class Bookmarks(object):
 
     def _maybe_update(self, *args, **kargs):
         """ proof of concept.. """
-        report('updating bookmarks ' + str(kargs))
+        report.bookmarks('updating ' + str(kargs))
         return
 
 class Plugin(SmashPlugin):
