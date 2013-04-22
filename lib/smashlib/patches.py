@@ -46,7 +46,13 @@ def replace_help_magic():
     def my_magic_pinfo(self, parameter_s='', namespaces=None):
         """ """
         call_original_pinfo = lambda: original_pinfo(parameter_s, namespaces)
-        try: tmp = getattr(eval(parameter_s,__IPYTHON__.user_ns), '__qmark__')
+
+        try:
+            if parameter_s.startswith('%'):
+                tmp = getattr(eval('__IPYTHON__.magic_'+parameter_s[1:]),
+                              '__qmark__')
+            else:
+                tmp = getattr(eval(parameter_s, __IPYTHON__.user_ns), '__qmark__')
         except Exception,e: pass
         else:
             report_if_verbose.help_magic('found __qmark__!'+str(tmp))
