@@ -8,7 +8,8 @@
 
 import os
 
-from smashlib.util import report, post_hook_for_magic
+from smashlib.smash_plugin import SmashPlugin
+from smashlib.util import report, set_complete, post_hook_for_magic
 
 class magic_fabric(object):
     def __init__(self, lazy=True):
@@ -81,9 +82,6 @@ def look_for_fabfile():
         __IPYTHON__.shell.user_ns.update(_fabric=magic_fabric(lazy=False))
 
 
-from smashlib.smash_plugin import SmashPlugin
-from smashlib.util import set_complete
-
 def fab_completer(self, event):
     data = event.line.split()[1:] # e.g. 'git',' mv', './<tab>'
     names = magic_fabric()._published_methods
@@ -93,12 +91,8 @@ def fab_completer(self, event):
     else:
         return [x for x in names if x.startswith(data[-1])]
 
-    #if not data:
-    #    return os.listdir(os.getcwd())
 
 class Plugin(SmashPlugin):
-
     def install(self):
-        #from ipy_fabric_support import magic_fabric
         magic_fabric.install_into_ipython()
         set_complete(fab_completer, 'fab')
