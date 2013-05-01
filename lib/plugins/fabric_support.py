@@ -98,8 +98,6 @@ def fab_completer(self, event):
 
 class Plugin(SmashPlugin):
 
-    requires = ['fabric']
-
     def install(self):
         #from ipy_fabric_support import magic_fabric
         magic_fabric.install_into_ipython()

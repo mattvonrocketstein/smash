@@ -1,28 +1,31 @@
-""" host completion for SmaSh.
+""" host_completer
 
-    Should always work when typing urls or emails, but other
+    Provides host completion for SmaSh.
+
+    This should always work when typing urls or emails, but other
     than that you'll have to be using one of the known programs
     (see HOST_REGEXES for a list).
 """
 import smashlib
 from smashlib.python import ope, opj
 from smashlib.util import report, set_complete
-from smashlib.smash_plugin import SmashPlugin
 
-# This doesn't work with many programs right now, but, if something
-# is missing just add an extra re to the HOST_REGEXES list.
+from smashlib.smash_plugin import SmashPlugin
+DEFAULT_HOSTS_FILE = '/etc/hosts'
+
+# This doesn't work with many programs right now, but if
+# something is missing just add to the HOST_REGEXES list.
 HOST_REGEXES = [
     'wget .*$',
     'ssh .*@$', 'ssh .*$',
-    'mosh .*@$', 'mosh .*$',
-    ]
+    'mosh .*@$', 'mosh .*$', ]
 
 URL_REGEXES = [
     '.*http://.*$',
     '.*https://.*$', ]
 
 def get_hosts():
-    hosts, hosts_file = [], '/etc/hosts'
+    hosts, hosts_file = [], DEFAULT_HOSTS_FILE
     if ope(hosts_file):
         with open(hosts_file) as fhandle:
             for line in fhandle.readlines():
@@ -33,7 +36,7 @@ def get_hosts():
                     if all(['::' not in host,
                             'ip6-' not in host]):
                         hosts.append(host.strip())
-    hosts_json = opj(smashlib._meta['config_dir'],'hosts.json')
+    hosts_json = opj(smashlib._meta['config_dir'], 'hosts.json')
     if ope(hosts_json):
         with open(hosts_json) as fhandle:
             hosts_json = demjson.decode(fhandle.read())
