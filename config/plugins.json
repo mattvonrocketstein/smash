@@ -23,9 +23,6 @@
   "host_prompt.py": {
     "enabled": 1
   },
-  "ipy_venv_support.py": {
-    "enabled": 0
-  },
   "notifier.py": {
     "enabled": 0
   },

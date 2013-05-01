@@ -92,7 +92,7 @@ class SearchSite(object):
             __IPYTHON__.system(line)
 
 class Plugin(SmashPlugin):
-    requires = ['ack']
+    requires = ['which']
 
     def install(self):
         self.contribute_magic('search_site', SearchSite())
