@@ -3,7 +3,7 @@
 import os
 from collections import defaultdict
 
-from smashlib.util import report
+from smashlib.util import report, list2table
 from smashlib.reflect import namedAny
 
 def track_changes(fxn):
@@ -22,14 +22,53 @@ class SmashPlugin(object):
 
     # track any changes made by this plugin
     # so we can (theoretically) invert them later
-    inversions = dict(alias = 'unlias',
+    inversions = dict(alias = 'unalias',
                       contribute = NotImplemented,
                       # 'delete_magic'
                       contribute_magic = NotImplemented,
                       )
 
+    def __qmark__(self):
+        my_report = getattr(report, self.name)
+        _help = defaultdict(lambda:'')
+        _help.update({
+            'Macro': '\n  Type "{cmd}.value" to see macro definition.\n',
+            'python function': '\n  Type "{cmd}??" to see fxn definition.\n',
+            # next is wrong because ipy says "[source file open failed]"
+            'python class': '\n  Type "{cmd}??" to see kls definition.\n',
+            })
+
+        def get_type_info(x):
+            try:
+                x.__name__
+            except AttributeError:
+                tmp = x.__class__.__name__
+                tmp = tmp if tmp=='Macro' else 'python class'
+                return tmp
+            else:
+                tmp = type(x).__name__
+                if tmp=='function':
+                    tmp='python function'
+                return tmp
+
+        if not self.changes:
+            my_report("this is a plugin, it's not installed yet.")
+            # nitpick, but actually it might just have no side-effects..
+        else:
+            my_report("This plugin is installed, and has modified the interpretter.")
+            my_report("What follows is a summary of this plugin contributions:")
+            for contribution in self.changes['contribute']:
+                cargs, ckargs = contribution
+                cname, cvalue = cargs
+                ty = get_type_info(cvalue)
+                report(''.join([
+                    '  {red}',cname,
+                    '{normal} is a {red}',
+                    ty+'{normal}.'+_help[ty].format(cmd=cname)]))
+
+
     def __init__(self):
-        self.changes = defaultdict(lambda:[])
+        self.changes = defaultdict(list)
 
     @track_changes
     def set_env(self, name, val):
