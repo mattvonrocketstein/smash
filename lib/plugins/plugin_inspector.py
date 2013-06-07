@@ -65,6 +65,16 @@ class PluginInspector(PluginManager):
                 for p in himself: # plugin objs
                     report('  plugin: {red}'+ p +'{normal}')
         return tmp(self._get_some_plugins('enabled', 0))
+    def __getitem__(self, plugin_name):
+        matches = [x for x in self.plugins if x.name.startswith(plugin_name)]
+        if len(matches)==1:
+            return matches[0]
+        else:
+            report.plugin_inspector(
+                'plugin "{0}" not found.'.format(plugin_name))
+            if len(matches)>1:
+                report.plugin_inspector(
+                    '  were you looking for one of these?: {1}'+str(matches))
 
     def __qmark__(self):
         """ help menu for SmaSh plugins """
@@ -77,6 +87,7 @@ class PluginInspector(PluginManager):
             'to interact with plugin-objects in this runtime, use {red}plugins.plugins{normal}',
             'to enable a disabled plugin type: {red}smash --enable=plugin_name.py{normal}',
             'to disable a enabled plugin type: {red}smash --disable=plugin_name.py{normal}',
+            'to get a certain plugin instance by name: {red}plugins["name"]{normal}',
             ]
         _help = ''.join([' '*4 + x + '\n' for x in _help])
         report(hdr+_help)
