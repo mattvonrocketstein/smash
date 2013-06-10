@@ -9,13 +9,16 @@ import IPython
 from IPython import ipapi, ColorANSI
 
 from smashlib.python import get_env, opd, ops, opj, ope
-
+LATE_STARTUP_DELAY = 2
 tc = ColorANSI.TermColors()
+from .text_proc import split_on_unquoted_semicolons
 
 # NOTE: might be obsolete.  this was only needed if/when
 #       using the "import all available modules" strategy
 CONFLICTING_NAMES  = ('curl gc git time pwd pip pyflakes '
                       'easy_install virtualenv py').split()
+def _user_ns():
+    return __IPYTHON__.user_ns
 
 def _ip():
     return ipapi.get()
@@ -24,9 +27,9 @@ def set_editor(editor):
     _ip().options['editor'] = editor
     return editor
 
-def do_it_later(func, delay=1):
-    """ this is ugly, but sometimes using the "late_startup_hook"
-        just doesnt work. cry me a river..
+def do_it_later(func, delay=LATE_STARTUP_DELAY):
+    """ HACK: yeah, this is ugly, but sometimes using the "late_startup_hook"
+              ipython provides just doesnt work. cry me a river..
     """
     def tmp():
         time.sleep(1)

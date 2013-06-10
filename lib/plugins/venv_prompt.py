@@ -16,7 +16,11 @@ def this_venv():
 
 DEFAULT_SORT_ORDER = 2
 
-class Plugin(SmashPlugin):
+class PromptPlugin(SmashPlugin):
+    # TODO: ....
+    pass
+
+class Plugin(PromptPlugin):
     """ Adds the path for the currently activated venv to the main prompt """
     def install(self):
         def adjust_prompt():

@@ -2,9 +2,7 @@
 #
 # you would think that "env python" would work everywhere, but due
 # due to interaction with sourced venv's this is actually a tricky
-# business.  is it possible for this shell to mess around in multiple
-# venv's potentially using multiple python versions?
-#
+# business..
 
 def main():
     import os
@@ -12,8 +10,9 @@ def main():
     sys.path.append(os.path.expanduser('~/.smash/'))
     sys.path.append(os.path.expanduser('~/.smash/plugins'))
     import smashlib
+    from smashlib.embed import SmashEmbed
     smashlib.util.report.bootstrap("launching with rc-file: " + smashlib._meta['smash_rc'])
-    Shell.IPShellEmbed(argv=['-rcfile={0}'.format(smashlib._meta['smash_rc'])])()
+    SmashEmbed()()
 
 if __name__=='__main__':
     try:
