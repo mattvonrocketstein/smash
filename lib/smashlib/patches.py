@@ -1,11 +1,17 @@
 """ smashlib.patches
 
-    yup, this means I need to use IPython.ipmaker.make_IPython..
+    TODO: integrate these patches with smashlib.embed
 """
 
 import new
-from smashlib.util import (report, report_if_verbose,
+from smashlib.util import (_user_ns, report, report_if_verbose,
                            do_it_later, replace_magic)
+from IPython import ultraTB
+class TopLevelEHook(ultraTB.VerboseTB):
+    def __call__(self, etype=None, evalue=None, etb=None):
+        report('toplevel! '+str([etype,evalue,etb]))
+        super(TopLevelEHook,self).__call__(
+            etype=etype, evalue=evalue, etb=etb)
 
 # copied and modified from IPython.completer
 def global_matches(self, text):
