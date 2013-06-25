@@ -1,6 +1,6 @@
 """ smashlib.venv
 """
-
+import unipath
 import types
 import os, sys, glob
 
@@ -15,16 +15,7 @@ def is_venv(dir):
     """ naive.. seems to work
         TODO: find a canonical version of this function or refine it
     """
-    dir_names = 'lib bin include'.split()
-    try:
-        x = os.listdir(dir)
-    except OSError:
-        # permission denied or something?
-        return False
-    else:
-        if all([y1 in x for y1 in dir_names]):
-            return True
-    return False
+    return unipath.FSPath( opj(dir, 'bin', 'activate_this.py')).exists()
 
 def _contains_venv(_dir):
     """ ascertain whether _dir is, or if it contains, a venv.
@@ -33,12 +24,17 @@ def _contains_venv(_dir):
     """
     if is_venv(_dir):
         return _dir
-    searchsub = 'venv node'.split() # FIXME: abstract
-    searchsub = [ opj(_dir, name) for name in searchsub ]
-    searchsub = [ name for name in searchsub if os.path.exists(name) ]
-    for name in searchsub:
-        if is_venv(name):
-            return name
+    else:
+        for x in unipath.FSPath(_dir).walk():
+            if x.isdir() and is_venv(x):
+                return x
+    #Project.
+    #searchsub = 'venv node'.split() # FIXME: abstract
+    #searchsub = [ opj(_dir, name) for name in searchsub ]
+    #searchsub = [ name for name in searchsub if os.path.exists(name) ]
+    #for name in searchsub:
+    #    if is_venv(name):
+    #        return name
 
 class VenvMixin(object):
 
@@ -135,6 +131,7 @@ class VenvMixin(object):
             msg = '\ttoplevel@"{0}" is not a venv, looking elsewhere'
             report.venv_mixin(msg.format(truncate_fpath(obj)))
             path = _contains_venv(obj)
+            print 'decided path'
             if path:
                 return self._activate_str(path)
 
