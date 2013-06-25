@@ -47,9 +47,6 @@
   "setup_completer.py": {
     "enabled": 1,
   },
-  "smart_cat.py": {
-    "enabled": 1
-  },
   "smash_aliases.py": {
     "enabled": 1,
   },
