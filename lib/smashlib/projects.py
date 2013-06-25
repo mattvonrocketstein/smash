@@ -203,6 +203,12 @@ class Project(VenvMixin, Hooks):
         report(*args)
 
     @classmethod
+    def set_venv_search_path(kls, *args):
+        err = 'venv-search-path should be a list of strings'
+        assert all([isinstance(x, basestring) for x in args]), err
+        self.venv_search_path = args
+
+    @classmethod
     def bind_all(kls, _dir, **kargs):
         """ binds every directory in _dir as a project """
         N = 0
