@@ -78,8 +78,6 @@ class Project(VenvMixin, Hooks):
                  ]
         _help = '\n\t'.join(_help)
         report(hdr + _help)
-        #report.project_manager(
-        #    list2table(dat, header=header))
 
     def __init__(self, name):
         """ """
@@ -147,7 +145,7 @@ class Project(VenvMixin, Hooks):
                         func = namedAny(x)
                     except ObjectNotFound,e:
                         report("There is an error in your configuration "
-                                    "file.  Could not import name \"{0}\"".format(x))
+                               "file.  Could not import name \"{0}\"".format(x))
                         return
             else:
                 raise Exception,('post-activation entries should be callable'
@@ -187,9 +185,8 @@ class Project(VenvMixin, Hooks):
             from smashlib import ALIASES as aliases
             new_aliases = self._config.get('aliases', {}).get(name, [])
             [ aliases.add(a, name) for a in new_aliases]
-            p = Project(name)
+            p = Project(name)#, config=self._config)
             p.dir = _dir
-            p._config = self._config
             [ f() for f in self._pre_invokage[name] ]
             os.chdir(p.dir)
             bus().publish('post_invoke.' + name)
@@ -201,12 +198,6 @@ class Project(VenvMixin, Hooks):
     def report(kls, *args):
         """ FIXME: use default smash report """
         report(*args)
-
-    @classmethod
-    def set_venv_search_path(kls, *args):
-        err = 'venv-search-path should be a list of strings'
-        assert all([isinstance(x, basestring) for x in args]), err
-        self.venv_search_path = args
 
     @classmethod
     def bind_all(kls, _dir, **kargs):

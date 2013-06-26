@@ -6,7 +6,6 @@
 import os
 import demjson
 
-
 from smashlib.util import die, read_config
 from smashlib.util import report, list2table, bus
 from smashlib.python import opd, opj, ope
@@ -19,6 +18,7 @@ CONFIG_FILE_NAME = 'projects.json'
 
 class CurrentProject(object):
     """ """
+
     @property
     def wd(self):
         return os.getcwd()
@@ -48,7 +48,6 @@ class CurrentProject(object):
         return out
 
 
-
 class Plugin(SmashPlugin):
 
     @staticmethod
@@ -69,6 +68,7 @@ class Plugin(SmashPlugin):
         default_aliases = [ aliases.add(alias) for alias in default_aliases ]
         #report.project_manager('adding aliases: ' + str(default_aliases))
         aliases.install()
+
     @property
     def config_filename(self):
         import smashlib
@@ -76,8 +76,8 @@ class Plugin(SmashPlugin):
 
     def _manager(self):
         """ HACK """
+        Project._config = self.config
         manager = Project(ROOT_PROJECT_NAME)
-        manager._config = self.config
         return manager
 
     def install(self):
@@ -97,10 +97,9 @@ class Plugin(SmashPlugin):
         self.load_instructions(manager, config)
         self.load_aliases(config)
         post_hook_for_magic('cd', manager._announce_if_project)
-
         add_shutdown_hook(lambda: manager.shutdown())
         smashlib.PROJECTS = manager
-        self.contribute('this',CurrentProject())
+        self.contribute('this', CurrentProject())
 
         self._add_option_parsing(manager)
 
@@ -108,12 +107,15 @@ class Plugin(SmashPlugin):
         ('specify a project to inialize.\n'
          '(the project should already be recognized '
          'by the project manager)')
-        manager=self._manager()
+        manager = self._manager()
         project = getattr(manager, opts.project, None)
         if project is None:
             report("nonexistant project: {0}".format(opts.project))
             die()
-        manager._activate(project)
+        else:
+            print project
+            return manager._activate(project)#project.activate()#manager._activate(opts.project)
+
     def _add_option_parsing(self, manager):
         # add option parsing for project-manager
         from smashlib.parser import SmashParser

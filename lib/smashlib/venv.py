@@ -3,8 +3,8 @@
 import unipath
 import types
 import os, sys, glob
-
-from smashlib.util import opj, bus, report,truncate_fpath
+from smashlib.python import opj, ope, expanduser
+from smashlib.util import bus, report, truncate_fpath
 
 get_path   = lambda: os.environ['PATH']
 get_venv   = lambda: os.environ['VIRTUAL_ENV']
@@ -34,7 +34,9 @@ def _contains_venv(_dir):
                 subdir = opj(dirpath, subdir)
                 if is_venv(subdir):
                     return subdir
-        report("searched {0} subdirectories.. found no python venv's".format(count))
+        msg = "\searched {0} subdirectories: found no python venv's"
+        msg = msg.format(count)
+        report.venv_mixin(msg)
 
 class VenvMixin(object):
 
@@ -42,7 +44,10 @@ class VenvMixin(object):
     def deactivate(self):
         """ TODO: move this to ipy_venv_support """
         from smashlib.projects import Project
-        bus().publish('pre_deactivate',name=Project('__smash__').CURRENT_PROJECT)
+        bus().publish(
+            'pre_deactivate',
+            name = self.CURRENT_PROJECT)
+#Project('__smash__', self._config).CURRENT_PROJECT)
         try:
             venv = get_venv()
         except KeyError:
@@ -85,11 +90,33 @@ class VenvMixin(object):
             # TODO: clean sys.modules?
             bus().publish(
                 'post_deactivate',
-                name=Project('__smash__').CURRENT_PROJECT)
+                #name=Project('__smash__').CURRENT_PROJECT)
+                name=self.CURRENT_PROJECT)
             return True
 
     @classmethod
-    def _activate_str(self, obj):
+    def _activate_str(kls, obj):
+        config = kls._config
+        absfpath = obj
+        name = os.path.split(absfpath)[-1]
+
+        default_venv = config.get('default_venv', {}).get(name, None)
+        if default_venv is not None:
+            default_venv = expanduser(default_venv)
+            default_venv2 = opj(obj, default_venv) \
+                            if not default_venv.startswith(os.path.sep) else \
+                            default_venv
+
+            verdict = ope(default_venv2)
+            report.venv_mixin(
+                '"{0}" is specified as the default venv for this project'.format(
+                    default_venv2))
+            report.venv_mixin(
+                '\t.. but does it exist? {0}'.format(verdict))
+            if verdict and not absfpath.endswith(default_venv):
+                return kls._activate_str(default_venv2)
+        #else:
+        #    report("no entry in default_venv for this project.")
         if is_venv(obj):
             vbin = to_vbin(obj)
             vlib = to_vlib(obj)
@@ -134,9 +161,8 @@ class VenvMixin(object):
             msg = '\ttoplevel@"{0}" is not a venv, looking elsewhere'
             report.venv_mixin(msg.format(truncate_fpath(obj)))
             path = _contains_venv(obj)
-            print 'decided path'
             if path:
-                return self._activate_str(path)
+                return kls._activate_str(path)
 
     @classmethod
     def _activate_project(self, obj):
@@ -150,7 +176,7 @@ class VenvMixin(object):
         return self._activate(self)
 
     @classmethod
-    def _activate(self, obj):
+    def _activate(kls, obj):
         """
             activating a project (referred to instead as "invoking" is
             different than activating a venv (but it might include
@@ -160,13 +186,13 @@ class VenvMixin(object):
         # FIXME: get rid of Project-dep ?
         from smashlib.projects import Project as ProjectClass
 
-        self.deactivate()
+        kls.deactivate()
         if isinstance(obj, types.StringTypes):
-            result = self._activate_str(obj)
+            result = kls._activate_str(obj)
         #elif type(obj).__name__ == ProjectClass.__name__:
         elif isinstance(obj, ProjectClass):
             bus().publish('pre_activate', name=obj.name, )
-            result = self._activate_project(obj)
+            result = kls._activate_project(obj)
             bus().publish('post_activate', name=obj.name, )
         else:
             err = "Don't know how to activate an object like '" + \

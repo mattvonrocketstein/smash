@@ -1,3 +1,10 @@
+//
+// "default_venv" maps a project-name to a path which should be considered the
+// canonical venv for that project.  this venv will be used during normal
+// project-activation.  the venv-path may be absolute or relative.  when it is
+// relative it will be evaluated with-respect-to the project root.  any entries
+// for unused/unrecognized project names will be silently ignored.
+//
 {
 "default_venv": {},
 //
