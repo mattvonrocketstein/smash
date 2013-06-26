@@ -83,7 +83,9 @@ class VenvMixin(object):
 
             sys.path = new_path
             # TODO: clean sys.modules?
-            bus().publish('post_deactivate',name=Project('__smash__').CURRENT_PROJECT)
+            bus().publish(
+                'post_deactivate',
+                name=Project('__smash__').CURRENT_PROJECT)
             return True
 
     @classmethod
@@ -97,7 +99,8 @@ class VenvMixin(object):
             # it might be a chroot but i dont think it's a venv
             python_dir = glob.glob(opj(vlib, 'python*/'))
             if not 0 < len(python_dir) < 2:
-                err = 'Not sure how to handle this; zero or 1+ dirs matching "python*"'
+                err = ('Not sure how to handle this; '
+                       'zero or 1+ dirs matching "python*"')
                 raise RuntimeError, err
             python_dir = python_dir[0]
 
