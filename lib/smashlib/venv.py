@@ -25,16 +25,16 @@ def _contains_venv(_dir):
     if is_venv(_dir):
         return _dir
     else:
-        for x in unipath.FSPath(_dir).walk():
-            if x.isdir() and is_venv(x):
-                return x
-    #Project.
-    #searchsub = 'venv node'.split() # FIXME: abstract
-    #searchsub = [ opj(_dir, name) for name in searchsub ]
-    #searchsub = [ name for name in searchsub if os.path.exists(name) ]
-    #for name in searchsub:
-    #    if is_venv(name):
-    #        return name
+        count = 1
+        for dirpath,dirnames,filenames in os.walk(_dir):#).walk(top_down=False):
+            # trick to make sure we dont process .git/.tox first, etc
+            dirnames = [x for x in reversed(sorted(dirnames))]
+            for subdir in dirnames:
+                count+=1
+                subdir = opj(dirpath, subdir)
+                if is_venv(subdir):
+                    return subdir
+        report("searched {0} subdirectories.. found no python venv's".format(count))
 
 class VenvMixin(object):
 
