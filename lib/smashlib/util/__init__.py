@@ -9,9 +9,14 @@ import IPython
 from IPython import ipapi, ColorANSI
 
 from smashlib.python import get_env, opd, ops, opj, ope
-LATE_STARTUP_DELAY = 2
-tc = ColorANSI.TermColors()
 from .text_proc import split_on_unquoted_semicolons
+
+LATE_STARTUP_DELAY = 2
+
+def get_term_colors():
+    return ColorANSI.TermColors()
+
+tc = get_term_colors()
 
 # NOTE: might be obsolete.  this was only needed if/when
 #       using the "import all available modules" strategy
@@ -127,11 +132,12 @@ def clean_namespace():
 
     [ wipe(x) for x in CONFLICTING_NAMES ]
 
+
 def colorize(msg):
     """ """
     # .format() is not used because KeyError might happen
     # when using report(msg+str(some_dictionary))
-    return msg.replace('{red}',tc.Red).replace('{normal}',tc.Normal)
+    return msg.replace('{red}', tc.Red).replace('{normal}', tc.Normal)
 
 def set_complete(func, key):
     _ip().set_hook('complete_command', func, re_key=key)
