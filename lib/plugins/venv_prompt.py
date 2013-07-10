@@ -5,16 +5,9 @@
 import os
 from threading import Thread
 from smashlib.util import do_it_later, truncate_fpath
-from smashlib.prompt import prompt, PromptComponent
+from smashlib.prompt import prompt, PromptComponent, showVenv
 from smashlib.smash_plugin import SmashPlugin
-
-def this_venv():
-    result = os.environ.get('VIRTUAL_ENV','')
-    result = truncate_fpath(result)
-    result = os.path.sep.join(result.split(os.path.sep)[-2:])
-    return '({0})'.format(result)
-
-DEFAULT_SORT_ORDER = 2
+from smashlib.util import this_venv
 
 class PromptPlugin(SmashPlugin):
     # TODO: ....
@@ -28,8 +21,5 @@ class Plugin(PromptPlugin):
                 ipython is not fully initialized when this
                 plugin is installed.
             """
-            __IPYTHON__._this_venv = this_venv
-            t = '''${getattr(__IPYTHON__, '_this_venv', lambda: "")()}'''
-            prompt.add(PromptComponent(name='venv_path',
-                                       priority=DEFAULT_SORT_ORDER, template=t))
+            prompt.add(showVenv)
         do_it_later(adjust_prompt, delay=2)

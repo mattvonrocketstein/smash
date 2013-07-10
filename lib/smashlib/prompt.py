@@ -1,9 +1,14 @@
+# -*- coding: utf-8
 """ smash.prompt """
 
+import os
 from collections import namedtuple
-from smashlib.data import PROMPT_DEFAULT as DEFAULT
-from smashlib.util import get_term_colors
+from smashlib.util import get_term_colors, this_venv
+
 tc = get_term_colors()
+DEFAULT_SORT_ORDER = 2
+__IPYTHON__._this_venv = this_venv
+__IPYTHON__._this_wd = lambda: os.getcwd()
 
 class PromptComponent(object):
     """
@@ -20,7 +25,10 @@ class PromptComponent(object):
     def render(self):
         result = self.template
         if self.color:
-            color = getattr(tc, self.color.title())
+            try:
+                color = getattr(tc, self.color)
+            except AttributeError:
+                color = getattr(tc, self.color.title())
             result = ''.join([color, result, tc.Normal])
         return result
 
@@ -31,7 +39,7 @@ class Prompt(dict):
         if k in self:
             raise Exception,'prompt component is already present: ' + str(k)
         if not isinstance(v, PromptComponent):
-            raise Exception,'expected prompt component, got: '+str(v)
+            raise Exception,'expected prompt component, got: ' + str(v)
         super(Prompt, self).__setitem__(k, v)
         if update:
             self.update_prompt()
@@ -59,7 +67,21 @@ class Prompt(dict):
             opc.prompt1.p_template = t
     template = property(_get_template, _set_template)
 
-prompt = Prompt()
-working_dir = PromptComponent(name='working_dir', priority=100, template=DEFAULT)
-prompt.__setitem__(working_dir.name, working_dir, update=False)
-prompt.template = DEFAULT
+showVenv = PromptComponent(
+    name='venv_path',
+    priority=DEFAULT_SORT_ORDER, color='yellow',
+    template='''${getattr(__IPYTHON__, '_this_venv', lambda: "")()}''')
+
+showWorkingDir = PromptComponent(name='working_dir',
+                                 priority=100,
+                                 #template=u'\Y3',
+                                 template='''${getattr(__IPYTHON__, '_this_wd', lambda: "")()}''',
+                                 color='green')
+
+showBase =PromptComponent(name='prompt_base',
+                          priority=10000, template=u'\n┕> ', color='green')
+
+prompt  = Prompt()
+#prompt.__setitem__(showWorkingDir.name, showWorkingDir, update=False)
+prompt[showWorkingDir.name]= showWorkingDir
+prompt[showBase.name]= showBase

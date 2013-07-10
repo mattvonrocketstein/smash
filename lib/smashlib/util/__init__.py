@@ -202,3 +202,11 @@ def list2table(dat, header=[], indent=''):
         out = [ indent+line for line in out ]
         out = '\n'.join(out)
     return out
+
+def this_venv():
+    import os
+    from smashlib.util import do_it_later, truncate_fpath
+    result = os.environ.get('VIRTUAL_ENV','')
+    result = truncate_fpath(result)
+    result = os.path.sep.join(result.split(os.path.sep)[-2:])
+    return '({0})'.format(result)
