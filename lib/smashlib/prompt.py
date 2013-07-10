@@ -1,21 +1,32 @@
 """ smash.prompt """
+
 from collections import namedtuple
 from smashlib.data import PROMPT_DEFAULT as DEFAULT
+from smashlib.util import get_term_colors
+tc = get_term_colors()
 
 class PromptComponent(object):
-    def __init__(self, name=None, template=None,
+    """
+    """
+    def __init__(self, name=None, template=None, color=None,
                  priority=1, lazy=False, contributor=None):
         REQUIRED = 'name template'.split()
+        OPTIONAL = 'priority lazy contributor color'.split()
         for x in REQUIRED:
             assert eval(x), x + ' is required'
-        self.name = name
-        self.template = template
-        self.priority=priority
-        self.lazy=lazy
-        self.contributor = contributor
+        for x in OPTIONAL+REQUIRED:
+            setattr(self, x, eval(x))
+
+    def render(self):
+        result = self.template
+        if self.color:
+            color = getattr(tc, self.color.title())
+            result = ''.join([color, result, tc.Normal])
+        return result
 
 class Prompt(dict):
-
+    """
+    """
     def __setitem__(self, k, v, update=True):
         if k in self:
             raise Exception,'prompt component is already present: ' + str(k)
@@ -31,7 +42,7 @@ class Prompt(dict):
     def update_prompt(self):
         parts = self.values()
         parts.sort(lambda x,y: cmp(x.priority,y.priority))
-        parts = [ pc.template for pc in parts]
+        parts = [ pc.render() for pc in parts]
         self.template = ' '.join(parts)
 
     def _get_template(self):

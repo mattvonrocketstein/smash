@@ -8,6 +8,6 @@ class Plugin(SmashPlugin):
     """ """
     def install(self):
         report.host_prompt('installing')
-        prompt.add(
-            PromptComponent(name='host',priority=1,
-                            template=platform.node()))
+        prompt['host'] = PromptComponent(
+            name='host', priority=1, color='red',
+            template=platform.node())

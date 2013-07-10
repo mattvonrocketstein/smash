@@ -16,22 +16,12 @@ from smashlib.plugin_manager import PluginManager
 from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import list2table, colorize
 from smashlib.aliases import Aliases
-class PromptInspector(object):
-    def __qmark__(self):
-        """ help menu for SmaSh prompt """
-        hdr = "{red}SmaSh-prompt{normal}:\n\n"
-        _help = []
-        from smashlib.prompt import prompt
-        report(hdr)#+_help)
-        for pc in prompt:
-            report(pc.name)
+from smashlib.prompt import Prompt
 
 class PluginInspector(PluginManager):
     """ """
     def __iter__(self):
-        for x in smashlib.PLUGINS:
-            yield x
-
+        return iter(smashlib.PLUGINS)
     @property
     def plugins(self):
         return smashlib.PLUGINS
@@ -65,6 +55,7 @@ class PluginInspector(PluginManager):
                 for p in himself: # plugin objs
                     report('  plugin: {red}'+ p +'{normal}')
         return tmp(self._get_some_plugins('enabled', 0))
+
     def __getitem__(self, plugin_name):
         matches = [x for x in self.plugins if x.name.startswith(plugin_name)]
         if len(matches)==1:
@@ -96,10 +87,10 @@ class Plugin(SmashPlugin):
     def install(self):
         from smashlib import ALIASES
         plugins_i = PluginInspector()
-        prompt_i = PromptInspector()
+        #prompt_i = PromptInspector()
         self.contribute('aliases', ALIASES)
         self.contribute('plugins', plugins_i)
-        self.contribute('prompt', prompt_i)
+        self.contribute('prompt', smashlib.prompt.prompt)#prompt_i)
         # FIXME: this plugin should really be loaded last
         #       so that this is guaranteed to be accurate.
         for x in dir(smashlib.active_plugins):
