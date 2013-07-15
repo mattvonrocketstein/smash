@@ -169,7 +169,7 @@ CONFIG   = [ opj('config', 'smash.rc'),
              opj('config', 'editor.json'),
              opj('config', 'hosts.json'),
              opj('config', 'bookmarks.json'),
-             opj('ipython_base', 'ipython_user_conf.py'),
+             opj('ipython_base', 'ipy_user_conf.py'),
              #opj('ipython_base', ''),
         ]
 SCRIPTS = [ opj('scripts', 'smash'),

@@ -1,7 +1,8 @@
 """ smashlib.embed
 """
-import sys
+import os, sys
 import smashlib
+from smashlib.python import ope, expanduser, opj
 from smashlib.util import report, report_if_verbose
 
 from IPython import Shell
@@ -68,9 +69,13 @@ class SmashEmbed(Shell.IPShellEmbed): # __IPYTHON__?
         """Note that argv here is a string, NOT a list."""
 
         # XXX:  NEXT BLOCK IS OVERRIDDEN FROM IPYTHON ORIGINAL CODE
-        # TODO: run an initialization step in case ~/.ipython is corrupted. like this:
-        #       if not ope(expanduser(opj('~','.ipython','ipy_user_conf.py'))):
-        #          copy_it_from(~/.smash/etc/ipy_user_conf.py)
+
+        # initialization step in case ~/.ipython is corrupted.
+        if not ope(expanduser(opj('~','.ipython','ipy_user_conf.py'))):
+            error = os.system('cp ~/.smash/etc/ipy_user_conf.py ~/.ipython')
+            if error:
+                raise SystemExit("ipy-user-conf not found and copy failed")
+
         assert argv is None, 'argv is implied because rcfile=$smash_rc'
         argv = ['-rcfile={0}'.format(smashlib._meta['smash_rc'])]
         self.set_banner(banner)
