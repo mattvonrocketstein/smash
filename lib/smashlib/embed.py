@@ -8,7 +8,9 @@ from IPython import Shell
 from IPython.ipmaker import make_IPython
 from IPython.iplib import InteractiveShell
 from IPython import ultraTB, ipapi
-kill_embedded=Shell.kill_embedded
+
+kill_embedded = Shell.kill_embedded
+
 class SmashInteractiveShell(InteractiveShell):
 
     def runsource(self, source, filename="<input>", symbol="single"):
@@ -24,9 +26,10 @@ class SmashInteractiveShell(InteractiveShell):
         #   shell.runsource('asdasdasdasd')
         #
         # in the first case, it's called with "<ipython console>"
-        report.SmaSh('caught error in {0}.  SyntaxError, CommandNotFound?'.format(
-            filename))
-        default_call = lambda: super(SmashInteractiveShell,self).showsyntaxerror(filename=filename)
+        msg = 'caught error in {0}.  SyntaxError, CommandNotFound?'
+        report.SmaSh(msg.format(filename))
+        sooper = super(SmashInteractiveShell, self)
+        default_call = lambda: sooper.showsyntaxerror(filename=filename)
         if filename=='<ipython console>':
             return self.smashlib_handle_syntaxerror()
         elif filename=='<smashlib_handle_syntax_error>':
@@ -106,3 +109,7 @@ class SmashEmbed(Shell.IPShellEmbed): # __IPYTHON__?
         self.restore_system_completer()
 
     # Now self.shell exists
+    def __call__(self, *args, **kargs):
+        msg = "launching with rc-file: " + smashlib._meta['smash_rc']
+        report.bootstrap(msg)
+        return Shell.IPShellEmbed.__call__(self, *args, **kargs)

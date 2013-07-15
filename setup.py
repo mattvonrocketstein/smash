@@ -209,6 +209,5 @@ for x in _from('ipython_base', suffix='*'):
     if not ope(opj(expanduser('~/.ipython'), rel)):
         IPY_BASE.append(x)
 kargs['data_files'] += [ ( HOME_IPY, IPY_BASE), ]
-
 kargs.update(long_description=kargs['description']+'. Read more: '+kargs['url'])
 setup(**kargs)

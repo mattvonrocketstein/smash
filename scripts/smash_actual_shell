@@ -5,13 +5,17 @@
 # business..
 
 def main():
-    import os
-    import sys
-    sys.path.append(os.path.expanduser('~/.smash/'))
-    sys.path.append(os.path.expanduser('~/.smash/plugins'))
+    """ essentially this is like calling smashlib.util.embed(), but,
+        we might not actually be able to import smashlib yet.
+    """
+    import os, sys
+    _smashlib, _smashplugins = (os.path.expanduser('~/.smash/'),
+                                os.path.expanduser('~/.smash/plugins'))
+    for p in [_smashlib,_smashplugins]:
+        if p not in sys.path:
+            sys.path.append(p)
     import smashlib
     from smashlib.embed import SmashEmbed
-    smashlib.util.report.bootstrap("launching with rc-file: " + smashlib._meta['smash_rc'])
     SmashEmbed()()
 
 if __name__=='__main__':

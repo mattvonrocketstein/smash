@@ -31,7 +31,8 @@ OVERRIDE_OPTIONS = dict(
     readline_parse_and_bind = list(set(ip.options.readline_parse_and_bind + \
                               ['tab: complete',
                                '"\C-l": clear-screen',      # control+L
-                               '"\b": backward-kill-word',  # control+delete
+                               #'"\b": backward-kill-word',  # control+delete
+                               '"\C-?": backward-kill-word',  # control+delete
                                ])),
 
     # readline_omit__names 1: omit showing any names starting with two __

@@ -18,6 +18,20 @@ def get_term_colors():
 
 tc = get_term_colors()
 
+def embed():
+    """ essentially this is like calling smashlib.util.embed(), but,
+        we might not actually be able to import smashlib yet.
+    """
+    import os, sys
+    _smashlib, _smashplugins = (os.path.expanduser('~/.smash/'),
+                                os.path.expanduser('~/.smash/plugins'))
+    for p in [_smashlib,_smashplugins]:
+        if p not in sys.path:
+            sys.path.append(p)
+    import smashlib
+    from smashlib.embed import SmashEmbed
+    SmashEmbed()()
+
 # NOTE: might be obsolete.  this was only needed if/when
 #       using the "import all available modules" strategy
 CONFLICTING_NAMES  = ('curl gc git time pwd pip pyflakes '

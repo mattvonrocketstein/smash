@@ -1,85 +1,97 @@
 {
+  "api_helper.py": {
+    "enabled": 0
+  }, 
+  "apt_completers.py": {
+    "enabled": 0
+  }, 
   "currency_conversion.py": {
     "enabled": 1
-  },
+  }, 
   "djangoisms.py": {
     "enabled": 0
-  },
+  }, 
   "exec_dirs.py": {
     "enabled": 1
-  },
+  }, 
   "fabric_support.py": {
     "enabled": 0
-  },
+  }, 
   "git_completers.py": {
     "enabled": 0
-  },
+  }, 
   "host_completer.py": {
     "enabled": 1
-  },
+  }, 
   "host_prompt.py": {
     "enabled": 1
-  },
+  }, 
   "ipy_venv_support.py": {
     "enabled": 0
-  },
+  }, 
   "notifier.py": {
     "enabled": 0
-  },
+  }, 
   "pip_completer.py": {
     "enabled": 1
-  },
+  }, 
   "pkill_completer.py": {
     "enabled": 1
-  },
+  }, 
   "plugin_inspector.py": {
     "enabled": 1
-  },
+  }, 
   "project_manager.py": {
     "enabled": 1
-  },
+  }, 
   "py_dictionary_completer.py": {
     "enabled": 0
-  },
+  }, 
   "pyflakes_helper.py": {
     "enabled": 0
-  },
+  }, 
   "quacker.py": {
     "enabled": 0
-  },
+  }, 
+  "recentfiles.py": {
+    "enabled": 0
+  }, 
+  "setup_completer.py": {
+    "enabled": 0
+  }, 
   "smash_aliases.py": {
     "enabled": 1
-  },
+  }, 
   "smash_autojump.py": {
     "enabled": 1
-  },
+  }, 
   "smash_bookmarks.py": {
     "enabled": 1
-  },
+  }, 
   "smash_cmgd.py": {
-    "enabled": 0
-  },
+    "enabled": 1
+  }, 
   "smash_env_completer.py": {
     "enabled": 1
-  },
+  }, 
   "smash_git.py": {
     "enabled": 1
-  },
+  }, 
   "smash_hudson.py": {
     "enabled": 0
-  },
+  }, 
   "smash_misc_python.py": {
     "enabled": 1
-  },
+  }, 
   "tests_dir_hook.py": {
     "enabled": 1
-  },
+  }, 
   "venv_prompt.py": {
     "enabled": 1
-  },
+  }, 
   "which.py": {
     "enabled": 1
-  },
+  }, 
   "ytdl.py": {
     "enabled": 0
   }

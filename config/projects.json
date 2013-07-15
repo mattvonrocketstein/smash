@@ -12,7 +12,9 @@
 //  project manager.  the expected format is basically ['function_name', args, kwargs ]
 //
 "instructions":
-    [ ["bind_all", ["~/code"],          {}] ],
+    [ ["bind_all", ["~/code"],          {}],
+      ["bind_all", ["~/devel"],          {}]
+      ],
 //
 // "aliases" section represents per-project alias entries.
 // the format is {"project_name": ["cmd_alias the_real --command goes_here", .. ] }
