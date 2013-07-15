@@ -67,7 +67,10 @@ class SmashEmbed(Shell.IPShellEmbed): # __IPYTHON__?
                  user_ns=None):
         """Note that argv here is a string, NOT a list."""
 
-        # XXX: NEXT BLOCK IS OVERRIDDEN FROM IPYTHON ORIGINAL CODE
+        # XXX:  NEXT BLOCK IS OVERRIDDEN FROM IPYTHON ORIGINAL CODE
+        # TODO: run an initialization step in case ~/.ipython is corrupted. like this:
+        #       if not ope(expanduser(opj('~','.ipython','ipy_user_conf.py'))):
+        #          copy_it_from(~/.smash/etc/ipy_user_conf.py)
         assert argv is None, 'argv is implied because rcfile=$smash_rc'
         argv = ['-rcfile={0}'.format(smashlib._meta['smash_rc'])]
         self.set_banner(banner)

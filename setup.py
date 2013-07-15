@@ -78,7 +78,7 @@ def run_pip():
 
 def venv_gen_ipython():
     """ this if for creating the ipython directory, etc, just
-        in the event case $USER has never tried it before at all.
+        in the event $USER has never tried it before at all.
     """
     if not ope(expanduser('~/.ipython')):
         cmd = ("import os; "
@@ -87,7 +87,10 @@ def venv_gen_ipython():
                " rc_suffix = '' if os.name == 'posix' else '.ini';"
                "user_setup(get_ipython_dir(), rc_suffix, mode='install', interactive=False)")
         t = '{python} -c "{cmd}"'.format(python=VENV_PY,cmd=cmd)
+        print 'running:',cmd
         return os.system(t)
+    else:
+        print '.ipython already exists, decided not to mess with it.'
 
 def create_virtualenv(abspath):
     print "Creating virtual-environment: {0}".format(abspath)
@@ -146,10 +149,12 @@ if not ope(HOME_IPY):
     error = create_virtualenv(HOME_IPY)
     if error: raise SystemExit('Error creating virtual-environment for shell')
     print 'Finished creating virtual-environment.\n'
+
 pip_error = run_pip()
 if pip_error:
     raise SystemExit('Failed to install requirements into virtual-environment')
 else: print 'Finished installing requirements.\n'
+
 initialize_ipy_error = venv_gen_ipython()
 if initialize_ipy_error:
     raise SystemExit('Failed to init ipython using virtual-environment')
@@ -164,6 +169,8 @@ CONFIG   = [ opj('config', 'smash.rc'),
              opj('config', 'editor.json'),
              opj('config', 'hosts.json'),
              opj('config', 'bookmarks.json'),
+             opj('ipython_base', 'ipython_user_conf.py'),
+             #opj('ipython_base', ''),
         ]
 SCRIPTS = [ opj('scripts', 'smash'),
             opj('scripts', 'current_git_branch'),
