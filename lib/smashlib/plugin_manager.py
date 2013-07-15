@@ -160,7 +160,8 @@ class CommandLineAspect(object):
 class EnumeratingAspect(object):
     @property
     def possible_plugins(self):
-        return [ fname for fname in os.listdir(self.PLUGINS_DIR) if fname.endswith('.py') ]
+        return [ fname for fname in os.listdir(self.PLUGINS_DIR) if \
+                 fname.endswith('.py') ]
     all_plugins = possible_plugins
 
     @property
@@ -220,8 +221,10 @@ class PluginManager(CommandLineAspect, EnumeratingAspect):
         """ helper """
         data = self.plugin_data
         if name not in data:
-            print "Bad plugin? {0}".format(name)
-            from IPython import Shell; Shell.IPShellEmbed(argv=['-noconfirm_exit'])()
+            raise SystemExit(("Consult {0} about a bad plugin"
+                   ' "{1}".  (File is not present in {2})').format(
+                                 self.plugins_json_file,
+                                 name, self.PLUGINS_DIR))
         data[name].update(enabled=val)
         self._update_file(data)
 
