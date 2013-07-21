@@ -42,10 +42,13 @@ class SmashInteractiveShell(InteractiveShell):
             return default_call()
 
     def showtraceback(self, exc_tuple = None,
-                          filename=None,tb_offset=None,
+                          filename=None, tb_offset=None,
                           exception_only=False):
-        msg = 'intercepted showtraceback: '
-        msg += str([filename, exc_tuple, tb_offset, exception_only])
+        msg = 'intercepted showtraceback: \n    '
+        msg += str(dict(filename=filename,
+                        exc_tuple=exc_tuple,
+                        tb_offset=tb_offset,
+                        exception_only=exception_only))
         report_if_verbose(msg)
         default_call = lambda: super(SmashInteractiveShell, self).showtraceback(
             exc_tuple = exc_tuple, filename=filename, tb_offset=tb_offset,)
