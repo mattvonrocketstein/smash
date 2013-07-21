@@ -16,6 +16,9 @@ from smashlib.util import post_hook_for_magic, opj, opd, _ip
 from smashlib.usage import __doc__ as usage
 from smashlib.util import colorize
 
+import re
+ACK_RESULT_RE = re.compile('.*[:]\d+[:]')
+
 def reinstall_aliases():
     """ this is here because 'rehash' normally kills
         aliases. this is better than nothing, because
@@ -64,9 +67,6 @@ with open(SMASH_EDITOR_CONFIG) as fhandle:
 
     else:
         report.bootstrap("Your editor is set to: " + set_editor(editor))
-
-    import re
-    ACK_RESULT_RE = re.compile('.*[:]\d+[:]')
 
     def parameter_s_mutator(parameter_s):
         # as long as it evaluates to something that works as a string,
