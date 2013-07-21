@@ -12,7 +12,7 @@ to_vbin    = lambda venv: opj(venv, 'bin')
 to_vlib    = lambda venv: opj(venv, 'lib')
 
 def is_venv(dir):
-    """ naive.. seems to work
+    """ naive.. but seems to work
         TODO: find a canonical version of this function or refine it
     """
     return unipath.FSPath( opj(dir, 'bin', 'activate_this.py')).exists()
@@ -34,7 +34,7 @@ def _contains_venv(_dir):
                 subdir = opj(dirpath, subdir)
                 if is_venv(subdir):
                     return subdir
-        msg = "\searched {0} subdirectories: found no python venv's"
+        msg = "\t  searched {0} subdirectories: found no python venv's"
         msg = msg.format(count)
         report.venv_mixin(msg)
 
