@@ -1,36 +1,19 @@
 # -*- coding: utf-8
 """ smashlib.util
 """
-import os, time
+import os, sys, time
 import StringIO, threading
 import demjson, asciitable
 
-import IPython
 from IPython import ipapi, ColorANSI
 
 from smashlib.python import get_env, opd, ops, opj, ope
-from .text_proc import split_on_unquoted_semicolons
+from smashlib.util.text_proc import split_on_unquoted_semicolons, truncate_fpath
 
 LATE_STARTUP_DELAY = 2
 
-def get_term_colors():
-    return ColorANSI.TermColors()
-
-tc = get_term_colors()
-
-def embed():
-    """ essentially this is like calling smashlib.util.embed(), but,
-        we might not actually be able to import smashlib yet.
-    """
-    import os, sys
-    _smashlib, _smashplugins = (os.path.expanduser('~/.smash/'),
-                                os.path.expanduser('~/.smash/plugins'))
-    for p in [_smashlib,_smashplugins]:
-        if p not in sys.path:
-            sys.path.append(p)
-    import smashlib
-    from smashlib.embed import SmashEmbed
-    SmashEmbed()()
+# TODO: use pygment here instead of IPython
+TERM_COLORS = tc = ColorANSI.TermColors()
 
 # NOTE: might be obsolete.  this was only needed if/when
 #       using the "import all available modules" strategy
@@ -38,10 +21,23 @@ CONFLICTING_NAMES  = ('curl gc git time pwd pip pyflakes '
                       'easy_install virtualenv py').split()
 def _user_ns():
     return __IPYTHON__.user_ns
-
 def _ip():
     return ipapi.get()
+def bus():
+    """ get the main bus.  this is used instead of a direct import,
+        because the later may not be safe (depends on exactly when it's
+        called and how much of the bootstrap has already finished)
+    """
+    from smashlib import bus
+    return bus
+def home():
+    return get_env('HOME')
 
+def add_hook(hook_name, new_hook, priority):
+    hook_obj = getattr(__IPYTHON__.hooks, hook_name)
+    return hook_obj.add(new_hook, priority)
+def set_complete(func, key):
+    _ip().set_hook('complete_command', func, re_key=key)
 def set_editor(editor):
     _ip().options['editor'] = editor
     return editor
@@ -55,10 +51,6 @@ def do_it_later(func, delay=LATE_STARTUP_DELAY):
         func()
     threading.Thread(target=tmp).start()
 
-def add_hook(hook_name, new_hook, priority):
-    hook_obj = getattr(__IPYTHON__.hooks, hook_name)
-    return hook_obj.add(new_hook, priority)
-
 def panic():
     ("kill ALL the running instances of smash.\n"
      "useful when you have a misbehaving plugin..")
@@ -70,9 +62,6 @@ def panic():
     [ m.kill() for m in matches ]
     proc.kill()
 
-def watch(*args, **kargs):
-    print 'placeholder for watch', args, kargs
-
 def read_config(config_file):
     """ TODO: parameter for wheter errors are fatal? """
     with open(config_file, 'r') as fhandle:
@@ -82,19 +71,6 @@ def read_config(config_file):
             report.ERROR(err+'\n\n\t' + str(e))
             return die()
         return config
-
-def bus():
-    """ get the main bus.  this is used instead of a direct import,
-        because the later is usually not safe
-    """
-    from smashlib import bus
-    return bus
-
-def home():
-    return get_env('HOME')
-
-def truncate_fpath(fpath):
-    return fpath.replace(home(), '~')
 
 def replace_magic(original_magic_name, new_magic_function):
     """ """
@@ -153,9 +129,6 @@ def colorize(msg):
     # when using report(msg+str(some_dictionary))
     return msg.replace('{red}', tc.Red).replace('{normal}', tc.Normal)
 
-def set_complete(func, key):
-    _ip().set_hook('complete_command', func, re_key=key)
-
 class Reporter(object):
     """ syntactic sugar for reporting """
     def __init__(self, label=u'>>'):
@@ -185,14 +158,12 @@ report = Reporter()
 def add_shutdown_hook(f):
     def newf(*args, **kargs):
         f(*args,**kargs)
-        from IPython.ipapi import TryNext
-        raise TryNext()
+        raise ipapi.TryNext()
     __IPYTHON__.hooks['shutdown_hook'].add(newf)
 
 def die():
     """
     FIXME: this is horrible, but i remember thinking i had no choice..
-    TODO:  hahahaha document reason SOB?
     """
     threading.Thread(target = lambda: \
                      os.system('kill -KILL ' + str(os.getpid()))).start()
@@ -224,3 +195,33 @@ def this_venv():
     result = truncate_fpath(result)
     result = os.path.sep.join(result.split(os.path.sep)[-2:])
     return '({0})'.format(result)
+
+def which_vcs(fpath):
+    """ very primitive VCS detector.
+
+        TODO: there are various pypi modules that will
+              do this, but some are pretty big.  probably
+              need to review the options a little before
+              adding a dependency
+    """
+    files = os.listdir(fpath)
+    if '.svn' in files:
+        # why doesnt vcs do this..
+        return 'Subversion'
+    elif '.git' in files:
+        return 'git'
+    else:
+        return 'N/A'
+
+def embed():
+    """ essentially this is like calling smashlib.util.embed(), but,
+        we might not actually be able to import smashlib yet.
+    """
+    _smashlib, _smashplugins = (os.path.expanduser('~/.smash/'),
+                                os.path.expanduser('~/.smash/plugins'))
+    for p in [_smashlib,_smashplugins]:
+        if p not in sys.path:
+            sys.path.append(p)
+    import smashlib
+    from smashlib.embed import SmashEmbed
+    SmashEmbed()()
