@@ -1,4 +1,4 @@
-""" smash_misc_python
+""" plugins/smash_misc_python
 """
 
 import os, glob
