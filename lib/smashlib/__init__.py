@@ -4,11 +4,13 @@
 
       * smashlib.PLUGINS
          a list of all installed plugins
-
+      * smashlib.ALIASES
+         a list of aliases and their project affiliations
       * smashlib._meta
          a dictionary with the smash installation dir,
          paths to various configuration files, etc.
 """
+
 from __future__ import print_function
 import sys, types
 
