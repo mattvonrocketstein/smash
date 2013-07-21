@@ -4,6 +4,7 @@ import os, sys
 import smashlib
 from smashlib.python import ope, expanduser, opj
 from smashlib.util import report, report_if_verbose
+from smashlib.util import split_on_unquoted_semicolons
 
 from IPython import Shell
 from IPython.ipmaker import make_IPython
@@ -41,22 +42,50 @@ class SmashInteractiveShell(InteractiveShell):
         else:
             return default_call()
 
+    def show_name_error(self, **kargs):
+        # NOTE: not an override; ipy does not provide this
+        line = __IPYTHON__._last_input_line
+        bits = line.split()
+        if len(bits) == 1:
+            fname = bits[0]
+            these_files = os.listdir(os.getcwd())
+            if fname in these_files:
+                report.intercepted_nameError("you meant ./{0}".format(fname))
+                # this might mean they want to run the file, edit it, or just
+                # know about it.  need to inspect it and subject it to various
+                # heuristics in order to make an informed decision here.
+                return True
+            elif '.' in fname:
+                # this might be an attempt to write python code,
+                # OR trying to access a file that doesn't exist
+                report.intercepted_nameError(".. no such filename in working dir")
+
     def showtraceback(self, exc_tuple = None,
                           filename=None, tb_offset=None,
                           exception_only=False):
+        if exc_tuple is None:
+            etype, value, tb = sys.exc_info()
+        else:
+            etype, value, tb = exc_tuple
         msg = 'intercepted showtraceback: \n    '
         msg += str(dict(filename=filename,
                         exc_tuple=exc_tuple,
+                        etype=[etype, value, tb],
                         tb_offset=tb_offset,
                         exception_only=exception_only))
-        report_if_verbose(msg)
+        report_if_verbose.showtraceback(msg)
         default_call = lambda: super(SmashInteractiveShell, self).showtraceback(
             exc_tuple = exc_tuple, filename=filename, tb_offset=tb_offset,)
+        if etype==NameError:
+            tmp = locals()
+            tmp.pop('msg'); tmp.pop('self');
+            answered = self.show_name_error(**tmp)
+            if answered:
+                return answered
         return default_call()
 
     def smashlib_handle_syntaxerror(self):
         last_line = self._smash_last_line
-        from smashlib.util import split_on_unquoted_semicolons
         tmp = split_on_unquoted_semicolons(last_line)
         if len(tmp) > 1:
             report('Treating input as mixed python/shell: {0}'.format(tmp))

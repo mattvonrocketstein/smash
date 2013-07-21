@@ -3,10 +3,11 @@
 
 import os
 from collections import namedtuple
-from smashlib.util import get_term_colors, this_venv
+from smashlib.util import TERM_COLORS, this_venv
 
-tc = get_term_colors()
 DEFAULT_SORT_ORDER = 2
+
+# HACK
 __IPYTHON__._this_venv = this_venv
 __IPYTHON__._this_wd = lambda: os.getcwd()
 
@@ -26,20 +27,25 @@ class PromptComponent(object):
         result = self.template
         if self.color:
             try:
-                color = getattr(tc, self.color)
+                color = getattr(TERM_COLORS, self.color)
             except AttributeError:
-                color = getattr(tc, self.color.title())
-            result = ''.join([color, result, tc.Normal])
+                color = getattr(TERM_COLORS, self.color.title())
+            result = ''.join([color, result, TERM_COLORS.Normal])
         return result
 
+# TODO: use ordered dict here
 class Prompt(dict):
-    """
+    """ main abstraction representing the prompt.
+        this is where promptcomponents are tracked,
+        ordered, added, and removed.
     """
     def __setitem__(self, k, v, update=True):
         if k in self:
-            raise Exception,'prompt component is already present: ' + str(k)
+            err = 'prompt component is already present: ' + str(k)
+            raise Exception, err
         if not isinstance(v, PromptComponent):
-            raise Exception,'expected prompt component, got: ' + str(v)
+            err = 'expected prompt component, got: ' + str(v)
+            raise Exception, err
         super(Prompt, self).__setitem__(k, v)
         if update:
             self.update_prompt()
@@ -67,21 +73,31 @@ class Prompt(dict):
             opc.prompt1.p_template = t
     template = property(_get_template, _set_template)
 
-showVenv = PromptComponent(
+def dynamic_component_template(fxn_name):
+    return '''${getattr(__IPYTHON__, \''''+fxn_name+'''\', lambda: "")()}'''
+
+showVenv = dict(
+    color='yellow',
     name='venv_path',
-    priority=DEFAULT_SORT_ORDER, color='yellow',
-    template='''${getattr(__IPYTHON__, '_this_venv', lambda: "")()}''')
+    priority=DEFAULT_SORT_ORDER,
+    template=dynamic_component_template('_this_venv'),)
+showBase = dict(
+    color='green',
+    priority=10000,
+    template=u'\n┕> ',
+    name='prompt_base',)
+showWorkingDir = dict(
+    priority=100,
+    color='green',
+    name='working_dir',
+    template=dynamic_component_template('_this_wd'),)
 
-showWorkingDir = PromptComponent(name='working_dir',
-                                 priority=100,
-                                 #template=u'\Y3',
-                                 template='''${getattr(__IPYTHON__, '_this_wd', lambda: "")()}''',
-                                 color='green')
+showWorkingDir = PromptComponent(**showWorkingDir)
+showBase       = PromptComponent(**showBase)
+showVenv       = PromptComponent(**showVenv)
 
-showBase =PromptComponent(name='prompt_base',
-                          priority=10000, template=u'\n┕> ', color='green')
-
+# declare the default prompt. most SmaSh users
+# will want plugins that override or add to this
 prompt  = Prompt()
-#prompt.__setitem__(showWorkingDir.name, showWorkingDir, update=False)
-prompt[showWorkingDir.name]= showWorkingDir
-prompt[showBase.name]= showBase
+prompt.add(showWorkingDir)
+prompt.add(showBase)

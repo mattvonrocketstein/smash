@@ -4,10 +4,10 @@
 """
 
 from new import instancemethod
+from IPython import ultraTB
 from smashlib.util import (\
     _user_ns, report, report_if_verbose,
     do_it_later, replace_magic)
-from IPython import ultraTB
 
 class Patch(object):
     # TODO: probably use PatchGroup or mock for this eventually
@@ -15,7 +15,7 @@ class Patch(object):
 
 class TopLevelEHook(ultraTB.VerboseTB):
     def __call__(self, etype=None, evalue=None, etb=None):
-        report('toplevel! '+str([etype,evalue,etb]))
+        report('toplevel! '+str([etype, evalue, etb]))
         super(TopLevelEHook,self).__call__(
             etype=etype, evalue=evalue, etb=etb)
 

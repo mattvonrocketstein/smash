@@ -1,8 +1,9 @@
 """ smashlib.venv
 """
-import unipath
 import types
 import os, sys, glob
+from unipath import FSPath
+
 from smashlib.python import opj, ope, expanduser
 from smashlib.util import bus, report, truncate_fpath
 
@@ -15,7 +16,7 @@ def is_venv(dir):
     """ naive.. but seems to work
         TODO: find a canonical version of this function or refine it
     """
-    return unipath.FSPath( opj(dir, 'bin', 'activate_this.py')).exists()
+    return FSPath( opj(dir, 'bin', 'activate_this.py')).exists()
 
 def _contains_venv(_dir):
     """ ascertain whether _dir is, or if it contains, a venv.
