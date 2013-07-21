@@ -3,10 +3,16 @@
     TODO: integrate these patches with smashlib.embed
 """
 
-import new
-from smashlib.util import (_user_ns, report, report_if_verbose,
-                           do_it_later, replace_magic)
+from new import instancemethod
+from smashlib.util import (\
+    _user_ns, report, report_if_verbose,
+    do_it_later, replace_magic)
 from IPython import ultraTB
+
+class Patch(object):
+    # TODO: probably use PatchGroup or mock for this eventually
+    pass
+
 class TopLevelEHook(ultraTB.VerboseTB):
     def __call__(self, etype=None, evalue=None, etb=None):
         report('toplevel! '+str([etype,evalue,etb]))
@@ -40,38 +46,44 @@ def replace_global_matcher():
     """
     do_it_later(lambda: setattr(__IPYTHON__.shell.Completer,
                                 'global_matches',
-                                new.instancemethod(global_matches,
-                                                   __IPYTHON__.shell.Completer,
-                                                   __IPYTHON__.shell.Completer.__class__)))
+                                instancemethod(global_matches,
+                                               __IPYTHON__.shell.Completer,
+                                               __IPYTHON__.shell.Completer.__class__)))
 
-def replace_help_magic():
-    """ patch that allows __qmark__(self) methods to answer "obj?" stlye
-        requests from the command line interface.
-    """
-    original_pinfo = __IPYTHON__.shell.magic_pinfo
-    def my_magic_pinfo(self, parameter_s='', namespaces=None):
-        """ """
-        call_original_pinfo = lambda: original_pinfo(parameter_s, namespaces)
+class ReplaceHelpMagic(Patch):
+    report = report_if_verbose.PatchHelpMagic
+    def __call__(self):
+        """ patch that allows __qmark__(self) methods to answer "obj?" stlye
+            requests from the command line interface.
+        """
+        original_pinfo = __IPYTHON__.shell.magic_pinfo
+        def my_magic_pinfo(self, parameter_s='', namespaces=None):
+            """ """
+            call_original_pinfo = lambda: original_pinfo(parameter_s, namespaces)
 
-        try:
-            if parameter_s.startswith('%'):
-                tmp = getattr(eval('__IPYTHON__.magic_'+parameter_s[1:]),
-                              '__qmark__')
-            else:
-                tmp = getattr(eval(parameter_s, __IPYTHON__.user_ns), '__qmark__')
-        except Exception,e: pass
-        else:
-            report_if_verbose.help_magic('found __qmark__!'+str(tmp))
             try:
-                tmp()
-            except Exception,e:
-                raise
-                #report.help_magic('__qmark__ defined but error encountered while calling it.')
-                #report.help_magic('   :: '+str(e))
-            return
-        call_original_pinfo()
-    report_if_verbose('replacing magic')
-    replace_magic('magic_pinfo',
-                  new.instancemethod(my_magic_pinfo,
-                                     __IPYTHON__.shell,
-                                     __IPYTHON__.shell.__class__))
+                if parameter_s.startswith('%'):
+                    tmp = getattr(eval('__IPYTHON__.magic_' + parameter_s[1:]),
+                                  '__qmark__')
+                else:
+                    tmp = getattr(eval(parameter_s, __IPYTHON__.user_ns), '__qmark__')
+            except Exception, e:
+                pass
+            else:
+                report_if_verbose.help_magic('found __qmark__!' + str(tmp))
+                try:
+                    tmp()
+                except Exception,e:
+                    raise
+                    #report.help_magic('__qmark__ defined, but error '
+                    #                  'encountered while calling it.\n'
+                    #                  '   :: '+str(e))
+                return
+            call_original_pinfo()
+        self.report('replacing magic')
+        replace_magic('magic_pinfo',
+                      instancemethod(
+                          my_magic_pinfo,
+                          __IPYTHON__.shell,
+                          __IPYTHON__.shell.__class__))
+replace_help_magic = ReplaceHelpMagic()
