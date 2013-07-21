@@ -1,30 +1,22 @@
 """ smashlib.projects
 """
-
 import os
-
 from collections import defaultdict
 
 import smashlib
 from smashlib.python import expanduser
 from smashlib.reflect import namedAny, ObjectNotFound
-from smashlib.util import colorize, report, list2table
-from smashlib.util import truncate_fpath
-from smashlib.venv import VenvMixin, _contains_venv,get_venv
-from smashlib.util import report, bus
+from smashlib.venv import VenvMixin, _contains_venv, get_venv
+from smashlib.util import (\
+    report, bus, which_vcs, colorize,
+    report, list2table, truncate_fpath)
+from smashlib.aliases import (\
+    kill_old_aliases, add_new_aliases,
+    rehash_aliases)
 
+NO_ACTIVE_PROJECT = '__not_set__'
 COMMAND_NAME = 'proj'
 ROOT_PROJECT_NAME = '__smash__'
-
-def which_vcs(fpath):
-    files = os.listdir(fpath)
-    if '.svn' in files:
-        # why doesnt vcs do this..
-        return 'Subversion'
-    elif '.git' in files:
-        return 'git'
-    else:
-        return 'N/A'
 
 class Hooks(object):
 
@@ -33,10 +25,6 @@ class Hooks(object):
         report.project_manager('shutting down')
         [ x.stop() for x in self.watchlist ]
         #raise ipapi.TryNext()
-
-from smashlib.aliases import kill_old_aliases, add_new_aliases, rehash_aliases
-
-NO_ACTIVE_PROJECT = '__not_set__'
 
 class Project(VenvMixin, Hooks):
     #   class for holding Project abstractions. in the simplest case,
@@ -155,7 +143,7 @@ class Project(VenvMixin, Hooks):
                 kls._post_activate[name] += [func]
     @property
     def files(self):
-        """ TODO: allow globbing """
+        """ TODO: refactor, probably allow globbing """
         return [x.strip() for x in os.popen('find '+self.dir).readlines()]
 
     @classmethod
@@ -205,7 +193,7 @@ class Project(VenvMixin, Hooks):
         N = 0
         _dir = os.path.expanduser(_dir)
         if not os.path.exists(_dir):
-            # FIXME: make this red
+            # FIXME: adding "WARNING" event to bus, make this red
             msg = '\tCannot bind nonexistant directory @ "{0}".  '
             report.WARNING(msg.format(_dir))
             msg = '\tCheck your configuration @ "{0}".'
