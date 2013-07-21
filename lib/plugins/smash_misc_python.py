@@ -4,18 +4,18 @@
 import os, glob
 from types import ModuleType
 
-import smashlib
 from smashlib.smash_plugin import SmashPlugin
-from smashlib.util import post_hook_for_magic
-from smashlib.util import report, report_if_verbose, _ip, set_complete
-from smashlib.util import truncate_fpath
+from smashlib.util import (\
+    post_hook_for_magic, truncate_fpath,
+    report, report_if_verbose, _ip, set_complete)
 from smashlib.python import opj, opd
 from smashlib.reflect import namedAny, ModuleNotFound, ObjectNotFound
 
 
 class PyToPackage(object):
     def __qmark__(self):
-        report.search_site("converts an individual .py file (or python dotpath) into a package.")
+        report.py2package("converts an individual .py file "
+                          "(or python dotpath) into a package.")
 
     def report(self, *args, **kargs):
         report.py2package(*args, **kargs)
@@ -66,15 +66,19 @@ class PyToPackage(object):
 class SearchSite(object):
     def __qmark__(self):
         report.search_site("based on your environment I will look here:")
-        report.search_site("  "+truncate_fpath(self.lib_py))
+        report.search_site("  " + truncate_fpath(self.lib_py))
 
     @property
     def lib_py(self):
-        return opj(os.environ['VIRTUAL_ENV'],'lib','python*','site-packages')
+        return opj(
+            os.environ['VIRTUAL_ENV'],'lib',
+            'python*','site-packages')
 
     def __call__(self, query):
         lib_py = self.lib_py
-        lib_py = glob.glob(lib_py) # potentially one dir for 2.6, one for 2.7, etc
+        # globbing because there is potentially
+        # one dir for 2.6, one for 2.7, etc etc
+        lib_py = glob.glob(lib_py)
         report.misc_python('searching: ' + str(lib_py))
         if '|' in query:
             parts = [x.strip() for x in query.split('|')]
@@ -92,6 +96,7 @@ class SearchSite(object):
             __IPYTHON__.system(line)
 
 class Plugin(SmashPlugin):
+
     requires = ['which']
 
     def install(self):

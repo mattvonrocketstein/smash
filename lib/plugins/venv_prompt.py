@@ -1,4 +1,4 @@
-""" venv_prompt
+""" smash_prompt_venv
 
     Adds the path for the currently activated venv to the main prompt
 """

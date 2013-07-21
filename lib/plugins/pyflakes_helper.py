@@ -1,4 +1,4 @@
-""" ipy_pyflakes_helper
+""" plugins/pyflakes_helper
 
     (stolen) Implementation of the command-line I{pyflakes} tool.
 """
