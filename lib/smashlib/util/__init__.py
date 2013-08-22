@@ -36,8 +36,9 @@ def home():
 def add_hook(hook_name, new_hook, priority):
     hook_obj = getattr(__IPYTHON__.hooks, hook_name)
     return hook_obj.add(new_hook, priority)
-def set_complete(func, key):
-    _ip().set_hook('complete_command', func, re_key=key)
+def set_complete(func, key, **kargs):
+    return _ip().set_hook('complete_command',
+                          func, re_key=key, **kargs)
 def set_editor(editor):
     _ip().options['editor'] = editor
     return editor
