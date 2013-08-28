@@ -104,7 +104,7 @@ def subcommands(*args, **kargs):
     # this doesn't work if you take GIT_SUBCOMMANDS out of the function.
     # ipython is somehow, for some reason, mangling scope for the handlers
     # this is particularly nasty because it seems it fails totally silently
-    GIT_SUBCOMMANDS = ['add', 'bisect', 'branch', 'checkout',
+    GIT_SUBCOMMANDS = ['add', 'bisect', 'blame', 'branch', 'checkout',
                        'cherry-pick', 'clone', 'commit', 'diff',
                        'fetch', 'grep', 'init', 'log', 'merge',
                        'mv', 'pull', 'push', 'rebase',
