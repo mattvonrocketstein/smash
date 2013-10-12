@@ -226,3 +226,22 @@ def embed():
     import smashlib
     from smashlib.embed import SmashEmbed
     SmashEmbed()()
+
+get_last_line  = lambda: __IPYTHON__.user_ns['In'][-1]
+
+class LastCommandHook(object):
+    def __init__(self, fxn):
+        self.fxn = fxn
+
+    def __call__(self, *args, **kargs):
+        last_line = get_last_line()
+        sys_call_start = '_ip.system('
+        if last_line.startswith(sys_call_start):
+            # might be " or '.  TODO: regex
+            quote_char = last_line[len(sys_call_start):][0]
+            # get the thing inbetween the quotes
+            sys_cmd = last_line.split(quote_char)[1]
+            sys_cmd = sys_cmd.strip()
+            self.fxn(sys_cmd)
+        raise ipapi.TryNext()
+last_command_hook = LastCommandHook
