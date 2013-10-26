@@ -11,6 +11,7 @@ get_path   = lambda: os.environ['PATH']
 get_venv   = lambda: os.environ['VIRTUAL_ENV']
 to_vbin    = lambda venv: opj(venv, 'bin')
 to_vlib    = lambda venv: opj(venv, 'lib')
+venv_bin   = lambda cmd: opj(to_vbin(get_venv()), cmd)
 
 def is_venv(dir):
     """ naive.. but seems to work
