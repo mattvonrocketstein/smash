@@ -28,11 +28,15 @@ def pip_hook(sys_cmd):
 
 def requirements_complete(self, event):
     """ TODO: even smarter.. check $event and maybe use filesystem completer """
+    data = event.line.split()
+    data = data[-1]
+    base = __IPYTHON__.complete(data)
+    r = [ x for x in base if os.path.exists(x) ]
     if 'requirements.txt' in os.listdir(os.getcwd()):
         reqs = [x.strip() for x in open('requirements.txt').readlines() ]
         reqs = [x for x in reqs if not x.startswith('#')]
-        return reqs
-    return []
+        r+=reqs+['-r requirements.txt']
+    return r
 
 
 class Plugin(SmashPlugin):
