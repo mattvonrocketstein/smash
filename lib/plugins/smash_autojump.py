@@ -46,8 +46,9 @@ class Plugin(SmashPlugin):
         if self.is_updating:
             path = os.getcwd()
             self.db.add(path)
-            report.autojump("incremented jump-weight for '{0}' to {1}".format(
-                path,self.db.data[path]))
+            report_if_verbose.autojump(
+                "incremented jump-weight for '{0}' to {1}".format(
+                    path,self.db.data[path]))
 
     def install(self):
         self.set_env('AUTOJUMP_DATA_DIR', smashlib._meta['tmp_dir'])
