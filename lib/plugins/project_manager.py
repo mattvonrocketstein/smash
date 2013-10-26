@@ -6,8 +6,9 @@
 import os
 import demjson
 
+from smashlib.bus import bus
 from smashlib.util import die, read_config
-from smashlib.util import report, list2table, bus
+from smashlib.util import report, list2table
 from smashlib.python import opd, opj, ope
 from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import post_hook_for_magic, add_shutdown_hook
@@ -93,7 +94,7 @@ class Plugin(SmashPlugin):
         # dont move this next line.  post_activate/post_invoke things might want the manager.
         self.contribute(COMMAND_NAME, manager)
         for name, val in config.get('post_activate', {}).items():
-            bus().subscribe('post_activate.' + name, val)
+            bus.subscribe('post_activate.' + name, val)
         self.load_instructions(manager, config)
         self.load_aliases(config)
         post_hook_for_magic('cd', manager._announce_if_project)

@@ -4,11 +4,12 @@ import os
 from collections import defaultdict
 
 import smashlib
+from smashlib.bus import bus
 from smashlib.python import expanduser
 from smashlib.reflect import namedAny, ObjectNotFound
 from smashlib.venv import VenvMixin, _contains_venv, get_venv
 from smashlib.util import (\
-    report, bus, which_vcs, colorize,
+    report, which_vcs, colorize,
     report, list2table, truncate_fpath)
 from smashlib.aliases import (\
     kill_old_aliases, add_new_aliases,
@@ -72,9 +73,9 @@ class Project(VenvMixin, Hooks):
         self.name = name
         self._pre_invokage  = defaultdict(lambda: [])
         self._post_invokage = defaultdict(lambda: [])
-        bus().subscribe('pre_activate', kill_old_aliases)
-        bus().subscribe('post_activate', add_new_aliases)
-        bus().subscribe('post_activate', rehash_aliases)
+        bus.subscribe('pre_activate', kill_old_aliases)
+        bus.subscribe('post_activate', add_new_aliases)
+        bus.subscribe('post_activate', rehash_aliases)
 
     @property
     def watched(self):
@@ -138,7 +139,7 @@ class Project(VenvMixin, Hooks):
             else:
                 raise Exception,('post-activation entries should be callable'
                                  ' or strings that point to callables: ') + str(x)
-            bus().subscribe('post_activate.'+name, func)
+            bus.subscribe('post_activate.'+name, func)
             if func not in kls._post_activate[name]:
                 kls._post_activate[name] += [func]
     @property
@@ -163,13 +164,13 @@ class Project(VenvMixin, Hooks):
                        "file.  Could not import name \"{0}\"".format(x))
                 return
             tmp.append(x)
-            bus().subscribe('post_invoke.'+name, x)
+            bus.subscribe('post_invoke.'+name, x)
         kls._paths[name] = _dir
 
         @property
         def invoke(self):
             """ FIXME: yeah this is a pretty awful hack.. """
-            bus().publish('pre_invoke',name=name)
+            bus.publish('pre_invoke',name=name)
             from smashlib import ALIASES as aliases
             new_aliases = self._config.get('aliases', {}).get(name, [])
             [ aliases.add(a, name) for a in new_aliases]
@@ -177,7 +178,7 @@ class Project(VenvMixin, Hooks):
             p.dir = _dir
             [ f() for f in self._pre_invokage[name] ]
             os.chdir(p.dir)
-            bus().publish('post_invoke.' + name)
+            bus.publish('post_invoke.' + name)
             return p
 
         setattr(kls, name.replace('-','_').replace('.','_'), invoke)
@@ -195,9 +196,11 @@ class Project(VenvMixin, Hooks):
         if not os.path.exists(_dir):
             # FIXME: adding "WARNING" event to bus, make this red
             msg = '\tCannot bind nonexistant directory @ "{0}".  '
-            report.WARNING(msg.format(_dir))
+            msg = msg.format(_dir)
+            bus.warning(msg)
             msg = '\tCheck your configuration @ "{0}".'
-            report.WARNING(msg.format(smashlib._meta['project_config']))
+            msg = msg.format(smashlib._meta['project_config'])
+            report.WARNING(msg)
             return
         listing = os.listdir(_dir)
         for name in listing:

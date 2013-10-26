@@ -7,7 +7,7 @@ from collections import defaultdict, namedtuple
 
 import smashlib
 from smashlib.projects import Project
-from smashlib.util import bus
+from smashlib.bus import bus
 from smashlib.util import report, ope, opj, list2table,colorize
 from smashlib.util import add_shutdown_hook, post_hook_for_magic
 from smashlib.smash_plugin import SmashPlugin
@@ -151,4 +151,4 @@ class Plugin(SmashPlugin):
             self.contribute('bookmarks', bookmarks)
             post_hook_for_magic('cd', bookmarks._maybe_update)
 
-            bus().subscribe('post_activate', bookmarks._maybe_update)
+            bus.subscribe('post_activate', bookmarks._maybe_update)

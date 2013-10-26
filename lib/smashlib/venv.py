@@ -5,7 +5,8 @@ import os, sys, glob
 from unipath import FSPath
 
 from smashlib.python import opj, ope, expanduser
-from smashlib.util import bus, report, truncate_fpath
+from smashlib.util import report, truncate_fpath
+from smashlib.bus import bus
 
 get_path   = lambda: os.environ['PATH']
 get_venv   = lambda: os.environ['VIRTUAL_ENV']
@@ -46,7 +47,7 @@ class VenvMixin(object):
     def deactivate(self):
         """ TODO: move this to ipy_venv_support """
         from smashlib.projects import Project
-        bus().publish(
+        bus.publish(
             'pre_deactivate',
             name = self.CURRENT_PROJECT)
 #Project('__smash__', self._config).CURRENT_PROJECT)
@@ -90,7 +91,7 @@ class VenvMixin(object):
 
             sys.path = new_path
             # TODO: clean sys.modules?
-            bus().publish(
+            bus.publish(
                 'post_deactivate',
                 #name=Project('__smash__').CURRENT_PROJECT)
                 name=self.CURRENT_PROJECT)
@@ -170,7 +171,7 @@ class VenvMixin(object):
     def _activate_project(self, obj):
         """ #FIXME: this is in the wrong file.. """
         result = self._activate_str(obj.dir)
-        bus().publish('post_activate.' + obj.name)
+        bus.publish('post_activate.' + obj.name)
         return result
 
     @property
@@ -193,9 +194,9 @@ class VenvMixin(object):
             result = kls._activate_str(obj)
         #elif type(obj).__name__ == ProjectClass.__name__:
         elif isinstance(obj, ProjectClass):
-            bus().publish('pre_activate', name=obj.name, )
+            bus.publish('pre_activate', name=obj.name, )
             result = kls._activate_project(obj)
-            bus().publish('post_activate', name=obj.name, )
+            bus.publish('post_activate', name=obj.name, )
         else:
             err = "Don't know how to activate an object like '" + \
                   str(type(obj)) + '"'

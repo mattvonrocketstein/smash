@@ -7,12 +7,12 @@ import demjson, asciitable
 
 from IPython import ipapi, ColorANSI
 
-from smashlib.python import get_env, opd, ops, opj, ope
+from smashlib.python import get_env, opd, ops, opj, ope, expanduser
 from smashlib.util.text_proc import split_on_unquoted_semicolons, truncate_fpath
 
 LATE_STARTUP_DELAY = 2
 
-# TODO: use pygment here instead of IPython
+# TODO: use pygments here instead of IPython
 TERM_COLORS = tc = ColorANSI.TermColors()
 
 # NOTE: might be obsolete.  this was only needed if/when
@@ -21,15 +21,18 @@ CONFLICTING_NAMES  = ('curl gc git time pwd pip pyflakes '
                       'easy_install virtualenv py').split()
 def _user_ns():
     return __IPYTHON__.user_ns
+
 def _ip():
     return ipapi.get()
-def bus():
-    """ get the main bus.  this is used instead of a direct import,
-        because the later may not be safe (depends on exactly when it's
-        called and how much of the bootstrap has already finished)
-    """
-    from smashlib import bus
-    return bus
+
+#def bus():
+#    """ get the main bus.  this is used instead of a direct import,
+#        because the later may not be safe (depends on exactly when it's
+#        called and how much of the bootstrap has already finished)
+#    """
+#    from smashlib import bus
+#    return bus
+
 def home():
     return get_env('HOME')
 
@@ -215,11 +218,9 @@ def which_vcs(fpath):
         return 'N/A'
 
 def embed():
-    """ essentially this is like calling smashlib.util.embed(), but,
-        we might not actually be able to import smashlib yet.
-    """
-    _smashlib, _smashplugins = (os.path.expanduser('~/.smash/'),
-                                os.path.expanduser('~/.smash/plugins'))
+    """ DEPRECATED? """
+    _smashlib, _smashplugins = (expanduser('~/.smash/'),
+                                expanduser('~/.smash/plugins'))
     for p in [_smashlib,_smashplugins]:
         if p not in sys.path:
             sys.path.append(p)
