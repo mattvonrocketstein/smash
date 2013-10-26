@@ -8,7 +8,7 @@
       .. etc
 
     additionally, because setup.py might add new scripts to
-    bin directories, always trigger a rehash after setup.py
+    bin directories, always trigger alias rehash after setup.py
     is invoked
 """
 
@@ -29,8 +29,8 @@ def setup_py_hook(sys_cmd):
 
 class Plugin(SmashPlugin):
     def install(self):
-        completer = lambda *args,**kargs: ['build', 'develop','install']
+        completer = lambda *args, **kargs: ['build', 'develop','install']
         set_complete(completer, setup_re)
-        # the specific hook choice and priority here is pretty
-        # arbitrary.. whatever it seems to work.
+        # the specific hook choice and priority here is
+        # pretty arbitrary, but, it seems to work.
         self.add_hook('generate_prompt', setup_py_hook, 0)

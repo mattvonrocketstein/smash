@@ -24,11 +24,15 @@ class magic_fabric(object):
                     temporarily kill ipython's responsiveness
                 """
                 tmp = dict(__file__= fabf)
-                execfile(fabf, tmp)
-                z = self._published_methods
-                tmp = [ [k, tmp[k]] for k in tmp if k in z ]
-                for k,v in tmp:
-                    setattr(self, k, v)
+                try:
+                   execfile(fabf, tmp)
+                except Exception,e:
+                    report.magic_fabric("error working with {0}, there may be a fabric version mismatch".format(fabf))
+                else:
+                   z = self._published_methods
+                   tmp = [ [k, tmp[k]] for k in tmp if k in z ]
+                   for k,v in tmp:
+                       setattr(self, k, v)
             import threading
             threading.Thread(target=thinkaboutit).start()
 
