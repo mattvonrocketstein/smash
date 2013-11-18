@@ -1,8 +1,13 @@
 """ smash_dwim:
 
-     SmaSh do-what-i-mean plugin allows "execution" of directories by
-     changing directory to them.  In fact 'pushd' is used, so you can
-     use 'popd' to get back to where you came from.
+     SmaSh do-what-i-mean plugin allows:
+
+      *  directory-execution: (by cd'ing there)
+         In fact 'pushd' is used, so you can always use
+        'popd' to get back to where you came from.
+
+      * auto-edit for filenames:
+        if you type in the name of a file which
 
 """
 
@@ -10,8 +15,8 @@ import os
 import commands
 
 from IPython.ipapi import TryNext
-from smashlib.smash_plugin import SmashPlugin
 from smashlib.util import report
+from smashlib.smash_plugin import SmashPlugin
 from smashlib.python import isdir
 
 EDITABLE_FILE_SIZE_THRESH = 32768
@@ -31,19 +36,19 @@ def is_small(fname):
     return os.path.getsize(fname) < EDITABLE_FILE_SIZE_THRESH
 
 def editable_file_hook(cmd):
-    report('yo trying')
     cmd = cmd.strip()
     if cmd and cmd[0] in './' and os.path.isfile(cmd):
-        report('still')
         if not is_executable(cmd):
-            report('still2')
             report.smash_dwim("file is not executable; attempting edit")
             if not is_small(cmd):
                 report.smash_dwim("file too large, refusing to edit")
             else:
                 return __IPYTHON__.magic_ed(cmd)
         else:
-            pass #
+            # this file is executable.  the user might want to
+            # edit it, but we can't assume that because they
+            # might want to execute it.  so, we do nothing.
+            pass
     raise TryNext()
 
 class Plugin(SmashPlugin):
