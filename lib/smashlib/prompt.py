@@ -3,17 +3,33 @@
 
 import os
 from collections import namedtuple
-from smashlib.util import TERM_COLORS, this_venv
-
+from smashlib.util import TERM_COLORS, this_venv, truncate_fpath
+from smashlib.python import ops
 DEFAULT_SORT_ORDER = 2
+
+def this_wd():
+    """ computes how the working directory will be displayed.
+        directories under /home/$USER will be truncated to
+        display tilda-style, and "%" is used as a shortcut for
+        the root of any known project.
+
+        TODO: "cd %/lib/foo/bar" should work like "~/lib/foo/bar"
+    """
+    from smashlib.util import this_project
+    tmp = os.getcwd()
+    proj = this_project()
+    if proj is not None:
+        if tmp.startswith(proj.dir):
+            tmp = '%'+tmp[len(proj.dir):]
+    return truncate_fpath(tmp)
 
 # HACK
 __IPYTHON__._this_venv = this_venv
-__IPYTHON__._this_wd = lambda: os.getcwd()
+__IPYTHON__._this_wd = this_wd
 
 class PromptComponent(object):
-    """
-    """
+    """ """
+
     def __init__(self, name=None, template=None, color=None,
                  priority=1, lazy=False, contributor=None):
         REQUIRED = 'name template'.split()

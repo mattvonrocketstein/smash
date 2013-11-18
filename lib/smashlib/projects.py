@@ -5,7 +5,7 @@ from collections import defaultdict
 
 import smashlib
 from smashlib.bus import bus
-from smashlib.python import expanduser
+from smashlib.python import ope, expanduser, listdir, isdir
 from smashlib.reflect import namedAny, ObjectNotFound
 from smashlib.venv import VenvMixin, _contains_venv, get_venv
 from smashlib.util import (\
@@ -147,14 +147,23 @@ class Project(VenvMixin, Hooks):
         """ TODO: refactor, probably allow globbing """
         return [x.strip() for x in os.popen('find '+self.dir).readlines()]
 
+    _proj_cache = {}
+
+    @classmethod
+    def get_proj(kls, name):
+        return kls._proj_cache.get(name, None)
+
     @classmethod
     def bind(kls, _dir, name=None, post_activate=[], post_invoke=[]):
         """ installs a named alias for changing directory to "_dir". """
         _dir = expanduser(_dir)
         if name is None:
             name = os.path.split(_dir)[1]
-        if not isinstance(post_invoke, list):   post_invoke   = [ post_invoke   ]
+
+        if not isinstance(post_invoke, list):
+            post_invoke   = [ post_invoke   ]
         kls._add_post_activate(name, post_activate)
+
         tmp = []
         for x in post_invoke:
             try:
@@ -166,22 +175,29 @@ class Project(VenvMixin, Hooks):
             tmp.append(x)
             bus.subscribe('post_invoke.'+name, x)
         kls._paths[name] = _dir
+        p = Project(name)#, config=self._config)
+        p.dir = _dir
+        kls._proj_cache[name] = p
 
         @property
         def invoke(self):
             """ FIXME: yeah this is a pretty awful hack.. """
-            bus.publish('pre_invoke',name=name)
+            bus.publish('pre_invoke', name=name)
             from smashlib import ALIASES as aliases
             new_aliases = self._config.get('aliases', {}).get(name, [])
             [ aliases.add(a, name) for a in new_aliases]
-            p = Project(name)#, config=self._config)
-            p.dir = _dir
             [ f() for f in self._pre_invokage[name] ]
             os.chdir(p.dir)
             bus.publish('post_invoke.' + name)
             return p
 
         setattr(kls, name.replace('-','_').replace('.','_'), invoke)
+
+    def __getitem__(self, name):
+        return name
+        tmp = Project(name)
+        #p.dir =
+        return
 
     @classmethod
     def report(kls, *args):
@@ -192,8 +208,8 @@ class Project(VenvMixin, Hooks):
     def bind_all(kls, _dir, **kargs):
         """ binds every directory in _dir as a project """
         N = 0
-        _dir = os.path.expanduser(_dir)
-        if not os.path.exists(_dir):
+        _dir = expanduser(_dir)
+        if not ope(_dir):
             # FIXME: adding "WARNING" event to bus, make this red
             msg = '\tCannot bind nonexistant directory @ "{0}".  '
             msg = msg.format(_dir)
@@ -202,10 +218,10 @@ class Project(VenvMixin, Hooks):
             msg = msg.format(smashlib._meta['project_config'])
             report.WARNING(msg)
             return
-        listing = os.listdir(_dir)
+        listing = listdir(_dir)
         for name in listing:
-            tmp = os.path.join(_dir,name)
-            if os.path.isdir(tmp):
+            tmp = os.path.join(_dir, name)
+            if isdir(tmp):
                 N += 1
                 kls.bind(tmp, name, **kargs)
         report.project_manager('binding {0} ({1} projects found)'.format(_dir,N))

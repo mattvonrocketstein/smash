@@ -192,6 +192,14 @@ def list2table(dat, header=[], indent=''):
         out = '\n'.join(out)
     return out
 
+def this_project():
+    """ returns current project object (not name) """
+    from smashlib import PROJECTS as proj
+    wd = os.getcwd()
+    for name, path in proj._paths.items():
+        if wd.startswith(path):
+            return proj.get_proj(name)
+
 def this_venv():
     import os
     from smashlib.util import do_it_later, truncate_fpath
