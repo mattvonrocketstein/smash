@@ -2,12 +2,16 @@
 
      SmaSh do-what-i-mean plugin allows:
 
-      *  directory-execution: (by cd'ing there)
-         In fact 'pushd' is used, so you can always use
-        'popd' to get back to where you came from.
+      *  directory-execution:
+           Enter in a filepath which is actually a directory, and you
+           will be cd'd into that directory.  In fact 'pushd' is used,
+           so you can always use 'popd' to get back to where you came
+           from.
 
       * auto-edit for filenames:
-        if you type in the name of a file which
+          Enter in a filepath which is an editable file but not
+          executable, and that file will be opened in the SmaSh
+          environment's default editor (provided it isn't too large).
 
 """
 
