@@ -17,7 +17,7 @@ class SmashInteractiveShell(InteractiveShell):
 
     def runsource(self, source, filename="<input>", symbol="single"):
         self._smash_last_line = source
-        return super(SmashInteractiveShell,self).runsource(
+        return super(SmashInteractiveShell, self).runsource(
             source, filename=filename, symbol=symbol)
 
     def showsyntaxerror(self, filename=None):

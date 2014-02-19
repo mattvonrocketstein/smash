@@ -57,17 +57,19 @@ to be used everywhere.  Enough is enough!
 IPython+pysh is not quite a solution
 ====================================
 
-IPython is pretty great, but in many ways is more a framework than a solution.  Even though it does
-basic shell stuff, out of the box it is primarily intended for python developers, and not fit for use
-as a generic shell.  Here are just a few reasons vanilla IPython and pysh+IPython are not usable as
-system shells::
+IPython is pretty great, but in many ways is more a framework than a solution.
+Even though it does basic shell stuff, out of the box it is primarily intended
+for python developers, and not fit for use as a generic shell.  Here are just
+a few reasons vanilla IPython and pysh+IPython is not usable as a system
+shell:
 
   - obviously not completely bash-like (nor should it be): 'cd <dir>' works but 'tail -f <file>' does not
-  - lack of consistency: profiles vs. rc-files vs straight programmatic api configuration is confusing
+  - configuration is too confusing: profiles vs. rc-files vs programmatic api
 
-Although IPython is flexible enough to do almost anything in terms of whatever triggers, aliases, macros,
-input pre/post-processing.. adding fancy stuff on to the IPython core to leverage this functionality
-(e.g. via profiles) is *still* not maintainable.
+Although IPython is flexible enough to do almost anything in terms of whatever
+triggers, aliases, macros, input pre/post-processing.. adding fancy stuff on to
+the IPython core to leverage this functionality (e.g. via profiles) is *still*
+not maintainable.
 
 
 =================
@@ -148,8 +150,8 @@ The editor is invoked by the "ed" magic command.  Editing a file will trigger th
 "edit" signal on the SmaSh bus, in case plugins want to trigger on the event.
 Arguments to "ed" may be python objects, or files.
 
-    - editor preferences are defined in ~/.smash/etc/editor.json
-    - possible to specify one editor for console, and one for windowing environment
+    - editor preferences are defined in *~/.smash/etc/editor.json*
+    - you can specify one editor for console, and one for windowing environment
 
 
 Prompt and Aliases:
@@ -206,7 +208,12 @@ for the bootstrap (or tell you if there is a contradiction).
 Generic Plugins for SmaSh
 =========================
 
+Misc environment completion(via smash_env_completer.py)::
+
+  - Bash-compatability: typing "echo $US<tab> completes to $USER, etc
+
 Do what I mean (via smash_dwim.py)::
+
   - typing "/etc/" means "cd /etc/"
     - actually, this uses pushd so you can popd back to where you came from
   - typing "/etc/hosts" means "edit /etc/hosts"
@@ -245,7 +252,7 @@ Git VCS Integration (via smash_git.py)::
   - Various default aliases and places to put more (making ".git/config" optional)
   - Should you be inclined: hopefully enough abstraction here to easily support other VCS's
 
-Notification support::
+Notification support (experimental)::
 
   - Asynchronous notifications via freedesktop
   - When this works, it's pretty great, but..
@@ -391,7 +398,7 @@ Once you've added this and restarted SmaSh, then it knows about your projects:::
      project_manager: binding /home/matt/code (21 projects found)
    [~]>
 
-The shell's handle for interacting with projects is simple "proj".  It already
+The shell's handle for interacting with projects is simply "proj".  It already
 exists there, and you can query it for some simple information like this:::
 
    [~]> proj?
@@ -406,7 +413,9 @@ exists there, and you can query it for some simple information like this:::
 
 Your projects might be registered, but they have not yet declared any post or
 pre-invocation hooks.  Still, you immediately get a simple alias for changing
-directories.  Since I have a project called robotninja in my ~/code directory, I can do this::
+directories.  (From this point on, debugging-messages are turned on so that the
+reader can get a better idea of what's happening.) Since I have a project called
+robotninja in my ~/code directory, I can do this ::
 
    [~]> proj.robotninja
      pre_invoke{'name': u'robotninja'}
