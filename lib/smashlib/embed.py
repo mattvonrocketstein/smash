@@ -49,7 +49,7 @@ class SmashInteractiveShell(InteractiveShell):
         if len(bits) == 1:
             fname = bits[0]
             these_files = os.listdir(os.getcwd())
-            if fname in these_files:
+            if not fname.startswith('./') and ope('./'+fname):
                 report.intercepted_nameError("you meant ./{0}".format(fname))
                 # this might mean they want to run the file, edit it, or just
                 # know about it.  need to inspect it and subject it to various
@@ -58,7 +58,8 @@ class SmashInteractiveShell(InteractiveShell):
             elif '.' in fname:
                 # this might be an attempt to write python code,
                 # OR trying to access a file that doesn't exist
-                report.intercepted_nameError(".. no such filename in working dir")
+                report.intercepted_nameError(
+                    "tryng to write code?  no such filename in working dir")
 
     def showtraceback(self, exc_tuple = None,
                           filename=None, tb_offset=None,

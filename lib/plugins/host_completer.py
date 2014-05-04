@@ -17,7 +17,8 @@ DEFAULT_HOSTS_FILE = '/etc/hosts'
 # something is missing just add to the HOST_REGEXES list.
 HOST_REGEXES = [
     'wget .*$',
-    'ssh .*@$', 'ssh .*$',
+    'ssh .*@$',
+    'ssh .*$',
     'mosh .*@$', 'mosh .*$', ]
 
 URL_REGEXES = [

@@ -31,7 +31,7 @@ OVERRIDE_OPTIONS = dict(
     readline_parse_and_bind = list(set(ip.options.readline_parse_and_bind + \
                               ['tab: complete',
                                '"\C-l": clear-screen',      # control+L
-                               #'"\b": backward-kill-word',  # control+delete
+                               #'"\H": backward-kill-word',  # control+delete
                                '"\C-?": backward-kill-word',  # control+delete
                                ])),
 
