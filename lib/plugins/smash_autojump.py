@@ -83,5 +83,5 @@ class Plugin(SmashPlugin):
 
         # turns on the automatic weight-updating.
         self.is_updating = True
-        fxn = lambda himself,event: j_completer(self.db, himself, event)
+        fxn = lambda himself, event: j_completer(self.db, himself, event)
         set_complete(fxn, 'j')

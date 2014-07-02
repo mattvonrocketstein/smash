@@ -216,7 +216,10 @@ def which_vcs(fpath):
               need to review the options a little before
               adding a dependency
     """
-    files = os.listdir(fpath)
+    try:
+        files = os.listdir(fpath)
+    except OSError:
+        return "N/A"
     if '.svn' in files:
         # why doesnt vcs do this..
         return 'Subversion'

@@ -179,9 +179,10 @@ SCRIPTS = [ opj('scripts', 'smash'),
 
 kargs = dict(
     name         = 'smash',
-    author       = 'mattvonrocketstein, in the gmails',
+    author       = 'mattvonrocketstein',
+    author_email = '$author@gmail',
     version      = '0.1',
-    description  = 'smaSh: a smarter shell',
+    description  = 'SmaSh: a smart(er) shell',
     url          = 'http://github.com/mattvonrocketstein/smash',
     license      = 'MIT',
     keywords     = 'system shell',
