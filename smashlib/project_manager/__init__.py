@@ -4,8 +4,6 @@ import os
 import inspect
 from IPython.utils.traitlets import EventfulDict, EventfulList
 
-from goulash.venv import find_venvs
-
 from smashlib.ipy_cd_hooks import CD_EVENT
 from smashlib.project_manager.util import (
     clean_project_name, UnknownProjectError)
@@ -15,33 +13,25 @@ from smashlib.util.events import receives_event
 from smashlib.util.ipy import green
 from smashlib.v2 import Reporter
 
+from smashlib.project_manager.magics import ProjectMagics
+from .interface import ProjectManagerInterface
 from .operation import OperationStep,NullOperationStep
 from .activate import Activation, NullActivation
-from .check import Check, NullCheck, python_flakes
-from .activate import activate_vagrant, activate_python_venv
+from .check import Check, NullCheck
+from .test import Test, NullTest
 from .deactivate import Deactivation, NullDeactivation
-from .deactivate import deactivate_python_venv
+from .defaults import ACTIVATE, CHECK, TEST, DEACTIVATE
 
-ACTIVATE = dict(
-    python=[activate_python_venv],
-    vagrant=[activate_vagrant],
-    )
-
-CHECK = dict(
-    python=[python_flakes])
-
-TEST = dict(
-    python=[python_flakes])
-
-DEACTIVATE = dict(
-    python=[deactivate_python_venv])
 
 class ProjectManager(Reporter):
+    """ """
+
     search_dirs      = EventfulList(default_value=[], config=True)
     project_map      = EventfulDict(default_value={}, config=True)
     alias_map        = EventfulDict(default_value={}, config=True)
     activation_map   = EventfulDict(default_value={}, config=True)
     check_map        = EventfulDict(default_value={}, config=True)
+    test_map         = EventfulDict(default_value={}, config=True)
     deactivation_map = EventfulDict(default_value={}, config=True)
     venv_map         = EventfulDict(default_value={}, config=True)
 
@@ -63,7 +53,6 @@ class ProjectManager(Reporter):
         self.smash.shell.user_ns['proj'] = pmi
 
     def init_magics(self):
-        from smashlib.project_manager.magics import ProjectMagics
         ProjectMagics.project_manager = self
         self.smash.shell.register_magics(ProjectMagics)
 
@@ -83,7 +72,7 @@ class ProjectManager(Reporter):
     def cd_hook(self, new_dir, old_dir):
         if new_dir in self.project_map.values():
             project_name = self.reverse_project_map[new_dir]
-            _help='this directory is a project.  to activate it, type {0}'
+            _help = 'this directory is a project.  to activate it, type {0}'
             _help = _help.format(green('proj.'+project_name))
             self.info(_help)
 
@@ -154,6 +143,7 @@ class ProjectManager(Reporter):
             self.shell.magic('pushd {0}'.format(_dir))
 
     def build_argparser(self):
+        """ """
         parser = super(ProjectManager, self).build_argparser()
         parser.add_argument('-p','--project', default='')
         return parser
@@ -213,13 +203,6 @@ class ProjectManager(Reporter):
             steps.append(default_step(self))
         return steps
 
-    def deactivate(self):
-        name = self._current_project
-        if name is None:
-            return
-        self.perform_operation(name, 'deactivation')
-        self._current_project = None
-
     def perform_operation(self, name, op_name):
         self.report("{0}: {1}".format(op_name,name))
         self._require_project(name)
@@ -229,6 +212,13 @@ class ProjectManager(Reporter):
         op_steps = getattr(self,'{0}_map'.format(op_name)).get(name, default)
         results = [fxn() for fxn in op_steps]
         return results
+
+    def deactivate(self):
+        name = self._current_project
+        if name is None:
+            return
+        self.perform_operation(name, 'deactivation')
+        self._current_project = None
 
     def activate_project(self, name):
         self.deactivate()
@@ -247,72 +237,3 @@ class ProjectManager(Reporter):
 
     def check(self, pname):
         return self.perform_operation(pname, 'check')
-
-
-class ProjectManagerInterface(object):
-    """ This object should be a singleton and will be assigned to
-        that main namespace as "proj".  In addition to the methods
-        you see below, The ProjectManager extension
-        will dynamically add/remove properties on to this
-    """
-    _project_manager = None
-
-    @property
-    def _type(self):
-        return self._project_manager.guess_project_type(
-            self._project_manager._current_project)
-
-    @property
-    def _venvs(self):
-        pname = self._project_manager._current_project
-        return find_venvs(
-            self._project_manager.project_map[pname])
-
-    @property
-    def _recent(self):
-        """ return a list of the top 10 most recently changed files in the
-            current project's directory, where list[0] was changed most
-            recently.  this automatically takes into account ignoring dotfiles
-            and .gitignore contents.
-        """
-        gitignore = os.path.join(
-            self._project_manager._project_dir,
-            '.gitignore')
-        from smashlib.python import ope
-        patterns = ['*/.*/*']
-        if ope(gitignore):
-            with open(gitignore) as fhandle:
-                patterns += [x.strip() for x in fhandle.readlines()]
-        patterns = ' -and '.join( ['! -wholename "{0}"'.format(p) \
-                                   for p in patterns ] )
-        if patterns:
-            patterns = '\\( {0} \\)'.format(patterns)
-        # find . -type f \( -iname "*.c" -or -iname "*.asm" \)
-        sed = """| sed 's/[^[:space:]]\+ //';"""
-        base_find = 'find {0} -type f {1}'.format(
-            self._project_manager._project_dir, patterns)
-        cmd = '{0} -printf "%T+ %p\n" | sort -n {1}'.format(base_find, sed)
-        filenames = self._project_manager.smash.system(cmd, quiet=True)
-        filenames = filenames.split('\n')
-        filenames.reverse()
-        return filenames[:10]
-
-    def _ack(self, pat):
-        """ TODO: should really be some kind of magic """
-        from smashlib.util._fabric import require_bin
-        require_bin('ack-grep')
-        venvs = self._venvs
-        cmd = 'ack-grep "{0}" "{1}" {2}'
-        pdir = self._project_manager.project_map[
-            self._project_manager._current_project]
-        ignores = ['--ignore-dir="{0}"'.format(venv) for venv in venvs]
-        ignores = ' '.join(ignores)
-        cmd = cmd.format(pat, pdir, ignores)
-        results = self._project_manager.smash.system(cmd)
-        print results
-
-    @property
-    def _check(self):
-        pm = self._project_manager
-        project_name = pm._current_project
-        pm.check(project_name)
