@@ -9,14 +9,14 @@ features: [overview](#overview) | [project manager](#pm)
 <a name="about"/>
 ABOUT
 =====
-SmaSh is the smart-shell.  It offers features for project management, a flexible plugin architecture that is easy to use, and simple JSON configuration files that try to be as sane as possible.  Python developers will be particularly interested because it also happens to be a python/bash hybrid which builds on the pysh profile for IPython.  It leverages all existing system tab completion setup, apart from IPython's completion in python namespaces.  It builds on, and offers very sophisticated support for python virtual environments.
+SmaSh is the smart-shell.  It offers features for project management, a flexible plugin architecture that is easy to use, and simple JSON configuration files that try to be as sane as possible.  Python developers will be particularly interested because it also happens to be a python/bash hybrid which builds on the pysh profile for IPython.  It leverages all existing system tab completion setup, apart from IPython completion in python namespaces.  It builds on, and offers very sophisticated support for python virtual environments.
 
 
 <a name="quickstart"/>
 QUICKSTART
 ==========
 
-The smash installation gets it's own sandbox, does not require root, and will not interefere with existing versions of IPython.  The cost of this is that setup is a little bit nonstandard and `setup.py` should not be used directly unless you only want to install the support libraries.
+The smash installation happens in a sandbox, does not require root, and will not interefere with existing versions of IPython.  The cost of this is that setup is a little bit nonstandard and `setup.py` should not be used directly unless you only want to install the support libraries.
 
 ```shell
   $ git clone https://github.com/mattvonrocketstein/smashlib.git ~/.smash
@@ -51,12 +51,12 @@ Overview
 SmaSh functions seamlessly as a normal system shell, but it also a full fledged python interpretter.  It does shell stuff in the shell places, and python stuff in the python places.  If you're a bash user or an ipython user, your existing configuration efforts can also be [inherited automatically](#TODO-config-inheritance).
 
 ####Prompts
-By default smash ships with the wonderfully dynamic [liquidprompt tool](#https://github.com/nojhan/liquidprompt).  Liquidprompt has it's own rich options for configuration and it's recommended that you [configure it in the normal way](https://github.com/nojhan/liquidprompt#features-configuration), but, some of these options can be overridden from `~/.smash/config.py`.  The default liquidprompt configuration features a prompt that shows activated python virtual environments, as well as VCS branch and commit/stash status, etc.  Other options include everything from cpu/battery status to write-permissions for the current directory.
+By default smash ships with the wonderfully dynamic [liquidprompt tool](#https://github.com/nojhan/liquidprompt).  Liquidprompt has rich options for configuration and it's recommended that you [configure it in the normal way](https://github.com/nojhan/liquidprompt#features-configuration), but, some of these options can be overridden from `~/.smash/config.py`.  The default liquidprompt configuration features a prompt that shows activated python virtual environments, as well as VCS branch and commit/stash status, etc.  Other options include everything from cpu/battery status to write-permissions for the current directory.
 
 ####Tab-completion system
 Depending on the context, tab completion information is derived either from ipython (for python namespaces, ipython aliases, etc) or directly from the system shell (for system commands, VCS subcommands, debian packages, whatever).  A few observations about this setup:
 
-1. smash's completion system is at least as robust as your default shell
+1. the smash completion system is at least as robust as your default shell
 2. complete support for IPython's invaluable completion/readline facilities
 3. if you want to write a new completer you have options: ipython way or the bash way
 
@@ -67,11 +67,11 @@ SmaSh has sophisticated virtualenv support which useful particularly if you're w
 <a name="pm"/>
 Project Manager
 ===============
-Projects are natural abstractions for lots of kinds of work, and will be particularly familiar to anyone who has used an IDE.  In SmaSh, projects are defined by a nickname and associated with a directory.  A project can function as bookmarks that can be jumped to, and a project can have it's own set of command aliases and macros which other projects do not share.  Projects also have *types*, which can either be specified or autodetected based on the contents of the project directory.
+Projects are natural abstractions for lots of kinds of work, and will be particularly familiar to anyone who has used an IDE.  In SmaSh, projects are defined by a nickname and associated with a directory.  A project can function as bookmarks that can be jumped to, and a project can have a set of command aliases and macros which other projects do not share.  Projects also have *types*, which can either be specified or autodetected based on the contents of the project directory.
 
 **Project Types** are simply lists of strings, such as ["python"], or ["python", "docs"].  The type of a project may be provided by the user or autodetected by smash.  New user-defined types are encouraged, but they won't have default operations (see below).
 
-**Project Operations** are things you can do to projects, where the builtin operations are *add*, *activate*, *build*, *check*, *test*, and *deactivate*.  The meaning of an operation varies based on project-type, for instance testing a python project will be different than testing a ruby project.  User defined operations are also possible.  Each operation can be specified per project as a list, where the list contains a sequence of shell commands or python callables.  If a given operation is not defined for a given project, a reasonable default for that operation should be guessed based on that project's type.  For each operation, here are some examples of the type of actions you might like to perform:
+**Project Operations** are things you can do to projects, where the builtin operations are *add*, *activate*, *build*, *check*, *test*, and *deactivate*.  The meaning of an operation varies based on project-type, for instance testing a python project will be different than testing a ruby project.  User defined operations are also possible.  Each operation can be specified per project as a list, where the list contains a sequence of shell commands or python callables.  If a given operation is not defined for a given project, a reasonable default for that operation should be guessed based on the project type.  For each operation, here are some examples of the type of actions you might like to perform:
 
 * *Add*: register new project nickname & directory with the Project Manager
 * *Activate*: pull fresh code, start project-specific database services or system daemons.
@@ -92,8 +92,8 @@ In the sections below, you will find instructions on how to invoke operations an
 * Vagrant projects:
     * run "vagrant up"
 * Python projects:
-    * jump to the project's base directory
-    * if the project contains one or more virtualenv's, the most recent will be activated
+    * jump to the project base directory
+    * if the project contains one or more virtualenvs, the most recent will be activated
 
 -------------------------------------------------------------------------------
 
@@ -101,7 +101,7 @@ In the sections below, you will find instructions on how to invoke operations an
 * Vagrant projects:
     * run "vagrant halt"
 * Python projects:
-    * deactivate any virtual environment's associated with project ([see also](#))
+    * deactivate any virtual environments associated with project ([see also](#))
 
 -------------------------------------------------------------------------------
 
@@ -121,7 +121,7 @@ In the sections below, you will find instructions on how to invoke operations an
 
 -------------------------------------------------------------------------------
 
-**Testing Projects** is done for the current project using `proj._test`, or on an arbitrary project `test_project nickname`.  It's difficult to guess in general how a project's tests should be run, but smash can detect or guess a few different patterns:
+**Testing Projects** is done for the current project using `proj._test`, or on an arbitrary project `test_project nickname`.  It's difficult to guess in general how project tests should be run, but smash can detect or guess a few different patterns:
 * Python projects:
     * try using tox first if tox.ini found
         * runs `tox $TOX_TEST_ARGS` *(set this in the activation rules)*
