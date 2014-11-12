@@ -22,7 +22,6 @@ def python_flakes(project_manager):
         pm.report("No project has been selected.")
         return
     pdir = project_manager.project_map[project_name]
-
     linter = PyLinter(project_manager.smash.shell.config,
                       cmd_exec=project_manager.smash.system,)
     #project_manager.shell.configurables.append(linter)

@@ -1,4 +1,4 @@
-[quickstart](#quickstart) | [installation](#installation) | [testing](#testing) |
+[quickstart](#quickstart) | [installation](#installation) 
 
 -------------------------------------------------------------------------------
 
@@ -42,8 +42,8 @@ There are two parts to SmaSh: smashlib and the smash shell.  The instructions in
 
 
 <a name="overview"/>
-Overview
-=========
+Feature Overview
+================
 
 
 
@@ -67,7 +67,7 @@ SmaSh has sophisticated virtualenv support which useful particularly if you're w
 <a name="pm"/>
 Project Manager
 ===============
-Projects are natural abstractions for lots of kinds of work, and will be particularly familiar to anyone who has used an IDE.  In SmaSh, projects are defined by a nickname and associated with a directory.  A project can function as bookmarks that can be jumped to, and a project can have a set of command aliases and macros which other projects do not share.  Projects also have *types*, which can either be specified or autodetected based on the contents of the project directory.
+Projects are natural abstractions for lots of kinds of work, and will be particularly familiar to anyone who has used an IDE.  In SmaSh, projects are defined by a nickname and associated with a directory.  A project can function as a bookmarks that can be jumped to, and can have a set of command aliases and macros which other projects do not share.  Projects also have *types*, which can either be specified or autodetected based on the contents of the project directory.
 
 **Project Types** are simply lists of strings, such as ["python"], or ["python", "docs"].  The type of a project may be provided by the user or autodetected by smash.  New user-defined types are encouraged, but they won't have default operations (see below).
 
@@ -129,6 +129,3 @@ In the sections below, you will find instructions on how to invoke operations an
         * if found, collect and attempt to run with pytest
 
 -------------------------------------------------------------------------------
-
-<a name="testing"/>
-####TESTING

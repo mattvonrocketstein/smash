@@ -22,8 +22,27 @@ from .test import Test, NullTest
 from .deactivate import Deactivation, NullDeactivation
 from .defaults import ACTIVATE, CHECK, TEST, DEACTIVATE
 
+class AliasMixin(object):
+    """ """
+    def _get_alias_group(self, group_name):
+        return self.alias_map.get(group_name, [])
 
-class ProjectManager(Reporter):
+    def _load_alias_group(self, group_name):
+        aliases = self._get_alias_group(group_name)
+        for alias in aliases:
+            name, cmd=alias
+            self.smash.shell.alias_manager.define_alias(name, cmd)
+
+    def _unload_alias_group(self, group_name):
+        aliases = self._get_alias_group(group_name)
+        for alias in aliases:
+            name, cmd=alias
+            try:
+                self.smash.shell.alias_manager.undefine_alias(name)
+            except ValueError:
+                continue
+
+class ProjectManager(Reporter, AliasMixin):
     """ """
 
     search_dirs      = EventfulList(default_value=[], config=True)
@@ -34,6 +53,7 @@ class ProjectManager(Reporter):
     test_map         = EventfulDict(default_value={}, config=True)
     deactivation_map = EventfulDict(default_value={}, config=True)
     venv_map         = EventfulDict(default_value={}, config=True)
+    alias_map        = EventfulDict(default_value={}, config=True)
 
     _current_project = None
 
@@ -47,8 +67,9 @@ class ProjectManager(Reporter):
         self.project_map.on_set(self._event_set_project_map)
         for x in self.project_map.copy():
             self.project_map[x]=self.project_map[x]
+        self._load_alias_group('__smash__')
 
-    def init_pmi(self, pmi):
+    def init_interface(self, pmi):
         ProjectManagerInterface._project_manager = self
         self.smash.shell.user_ns['proj'] = pmi
 
@@ -68,8 +89,8 @@ class ProjectManager(Reporter):
     def reverse_project_map(self):
         return dict([[v,k] for k,v in self.project_map.items()])
 
-    @receives_event(CD_EVENT)
-    def cd_hook(self, new_dir, old_dir):
+    @receives_event(CD_EVENT, quiet=True)
+    def cd_hook__show_project_help(self, new_dir, old_dir):
         if new_dir in self.project_map.values():
             project_name = self.reverse_project_map[new_dir]
             _help = 'this directory is a project.  to activate it, type {0}'
@@ -211,7 +232,15 @@ class ProjectManager(Reporter):
         default = step_guesser(name, _dir)
         op_steps = getattr(self,'{0}_map'.format(op_name)).get(name, default)
         results = [fxn() for fxn in op_steps]
+        self.publish('post_operation', op_name, name)
         return results
+
+    @receives_event('post_operation')
+    def handle_post_op(self, op_name, project_name):
+        if op_name=='activation':
+            self._load_alias_group(project_name)
+        if op_name=='deactivation':
+            self._unload_alias_group(project_name)
 
     def deactivate(self):
         name = self._current_project

@@ -13,7 +13,7 @@ def load_ipython_extension(ip):
     pmi = ProjectManagerInterface()
     ProjectManager.interface = pmi
     pm = ProjectManager(ip)
-    pm.init_pmi(pmi)
+    pm.init_interface(pmi)
     return pm
 
 

@@ -12,6 +12,7 @@ class Logger(object):
 
     @property
     def ignore_warnings(self):
+        """ shortcut to the value returned by the main smash settings """
         return self.component.smash.ignore_warnings
 
     @property
@@ -31,6 +32,10 @@ class Logger(object):
                 print '  ',args
 
     def warning(self,*args, **kargs):
+        """ simple Logger subclasses get a warning() method,
+            which will honor the main smash setting for
+            "ignore_warnings".
+        """
         if not self.ignore_warnings:
             kargs['force'] = True
             kargs['header'] = 'warning'
