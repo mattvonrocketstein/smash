@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 #
 
-import os, sys
 from smashlib.util import require_ipy
-from smashlib.python import ope
 
 REQUIRE_VERSION = '3.0'
 require_ipy(REQUIRE_VERSION)

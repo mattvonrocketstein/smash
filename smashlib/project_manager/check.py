@@ -1,8 +1,8 @@
 """ smashlib.project_manager.check
 """
-from goulash.venv import contains_venv
 from goulash.util import summarize_fpath
 
+from smashlib.util.linter import PyLinter
 from .operation import OperationStep, NullOperationStep
 
 
@@ -22,8 +22,7 @@ def python_flakes(project_manager):
         pm.report("No project has been selected.")
         return
     pdir = project_manager.project_map[project_name]
-    from smashlib.util.linter import PyLinter
-    cmd_exec = project_manager.smash.system
+
     linter = PyLinter(project_manager.smash.shell.config,
                       cmd_exec=project_manager.smash.system,)
     #project_manager.shell.configurables.append(linter)
