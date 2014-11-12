@@ -1,6 +1,5 @@
 unipath
 argparse
-IPython==0.10
 psutil
 demjson
 pyflakes
@@ -8,3 +7,6 @@ cyrusbus
 asciitable
 #pynotify
 #dulwhich
+fabric
+flake8
+goulash

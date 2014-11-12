@@ -1,7 +1,7 @@
-.#*
 *.pyc
-*.pyo
-\#*\#
-build/
-README.html
-node
+node/*
+*.egg-info/*
+\#*
+*#
+.#*
+.ropeproject/*

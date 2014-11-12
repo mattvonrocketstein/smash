@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-source ~/.smash/bin/activate
-~/.smash/bin/smash_actual_shell $*
