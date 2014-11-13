@@ -10,8 +10,6 @@ from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL
 from IPython.terminal.interactiveshell import \
      TerminalInteractiveShell as BaseTIS
 
-from IPython.core.interactiveshell import StrDispatch
-
 class SmashTerminalInteractiveShell(BaseTIS):
 
     def __init__(self,*args,**kargs):
@@ -48,6 +46,8 @@ class SmashTerminalInteractiveShell(BaseTIS):
                 C_POST_RUN_INPUT,
                 self._smash_last_input)
             self._smash_last_input = ""
+        return out
+
 TerminalInteractiveShell=SmashTerminalInteractiveShell
 
 

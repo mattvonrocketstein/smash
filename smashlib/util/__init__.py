@@ -4,9 +4,8 @@
     Safe, simple packages only (no ipython imports in here)
     Stick to stdlib, or known-safe sections of smashlib
 """
-import os, re
+import os, re, glob
 from smashlib.python import get_env, opd, ops, opj, ope, expanduser
-from smashlib.util.reflect import from_dotpath
 
 def home():
     return get_env('HOME')
@@ -25,8 +24,6 @@ def get_smash():
     except AttributeError:
         raise Exception("load smash first")
 
-
-import glob, os
 def guess_dir_type(_dir, max_depth=3):
     """ given a directory and a depth, find which types of
         files are in the directory.  this implementation

@@ -8,14 +8,12 @@
 import os
 import cyrusbus
 
-from IPython.utils.traitlets import EventfulList, List, Bool
+from IPython.utils.traitlets import List, Bool
 
 from smashlib.v2 import Reporter
-from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL
-from smashlib.util.reflect import from_dotpath, ObjectNotFound
-from smashlib.util.events import receives_event
+from smashlib.channels import C_POST_RUN_INPUT
+from smashlib.util.reflect import from_dotpath
 from smashlib.util import bash
-from smashlib import logging
 
 from IPython.core.magic import Magics, magics_class, line_magic
 
@@ -91,6 +89,10 @@ class Smash(Reporter):
         smash_bin = os.path.expanduser('~/.smash/bin')
         if smash_bin not in os.environ['PATH']:
             os.environ['PATH'] =smash_bin + ':' + os.environ['PATH']
+
+        from smashlib.patches.edit import PatchEdit
+        PatchEdit(self).install()
+        self.publish('smash_init_complete',None)
 
     def init_bus(self):
         """ note: it is a special case that due to bootstrap ordering,

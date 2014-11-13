@@ -1,4 +1,4 @@
-[quickstart](#quickstart) | [installation](#installation) 
+[quickstart](#quickstart) | [installation](#installation)
 
 -------------------------------------------------------------------------------
 
@@ -46,12 +46,19 @@ Feature Overview
 ================
 
 
-
 ####Shell & Python Support
 SmaSh functions seamlessly as a normal system shell, but it also a full fledged python interpretter.  It does shell stuff in the shell places, and python stuff in the python places.  If you're a bash user or an ipython user, your existing configuration efforts can also be [inherited automatically](#TODO-config-inheritance).
 
+![screenshot1](/docs/screenshots/demo-python-bash.png?raw=true "screenshot1")
+
+-------------------------------------------------------------------------------
+
 ####Prompts
 By default smash ships with the wonderfully dynamic [liquidprompt tool](#https://github.com/nojhan/liquidprompt).  Liquidprompt has rich options for configuration and it's recommended that you [configure it in the normal way](https://github.com/nojhan/liquidprompt#features-configuration), but, some of these options can be overridden from `~/.smash/config.py`.  The default liquidprompt configuration features a prompt that shows activated python virtual environments, as well as VCS branch and commit/stash status, etc.  Other options include everything from cpu/battery status to write-permissions for the current directory.
+
+![screenshot1](/docs/screenshots/demo-liquidprompt.png?raw=true "screenshot1")
+
+-------------------------------------------------------------------------------
 
 ####Tab-completion system
 Depending on the context, tab completion information is derived either from ipython (for python namespaces, ipython aliases, etc) or directly from the system shell (for system commands, VCS subcommands, debian packages, whatever).  A few observations about this setup:

@@ -7,18 +7,19 @@
 import inspect
 import os, sys, glob
 
-from IPython.utils.traitlets import Bool
 from IPython.core.magic import Magics, magics_class, line_magic
 
 from goulash.util import summarize_fpath
-from smashlib.data import SMASH_DIR
+from goulash.venv import get_venv, to_vbin, to_vlib, get_path
+
 from smashlib.v2 import Reporter
-
-from smashlib.python import opj, ope, abspath, expanduser
-from smashlib.util.events import receives_event
 from smashlib.util import get_smash
+from smashlib.data import SMASH_DIR
+from smashlib.python import opj, ope, abspath, expanduser
 
-from goulash.venv import get_venv, is_venv, to_vbin, to_vlib, get_path
+
+# "real_prefix" is set by virtualenv itself
+REAL_PREFIX = getattr(sys, 'real_prefix', sys.prefix)
 
 # channel names for use with the smash bus
 C_POST_ACTIVATE = 'post_activate_venv'

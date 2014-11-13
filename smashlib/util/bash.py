@@ -3,11 +3,12 @@
 """
 
 import re
-import unicodedata
 from subprocess import Popen, PIPE
 
 from smashlib.bin.pybcompgen import remove_control_characters
+
 r_alias=re.compile('alias \w+=.*')
+
 def get_aliases():
     cmd = 'bash -c "echo alias|bash -i"'
     p1 = Popen(cmd, shell=True, stdout=PIPE, stdin=PIPE, stderr=PIPE)

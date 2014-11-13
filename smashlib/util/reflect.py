@@ -15,7 +15,7 @@ import traceback
 import weakref
 import re
 import warnings
-import new
+
 try:
     from collections import deque
 except ImportError:

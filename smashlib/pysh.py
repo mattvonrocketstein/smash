@@ -5,7 +5,7 @@ IPython extension to fix pysh profile
 from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
 
 HANDLER_NAME = 'ShellHandler'
- 
+
 
 class ShellChecker(PrefilterChecker):
     """ shell checker should really run before anything else """

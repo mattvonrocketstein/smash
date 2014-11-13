@@ -1,6 +1,5 @@
 """
 """
-from smashlib.util.linter import PyLinter
 from .operation import OperationStep, NullOperationStep
 
 class Test(OperationStep):

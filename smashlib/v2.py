@@ -1,10 +1,9 @@
 """ smashlib.v2
 """
-
-from IPython.config.configurable import Configurable
-from IPython.utils.coloransi import TermColors
 from IPython.utils.traitlets import Bool
-from IPython.utils.traitlets import EventfulList, EventfulDict
+from IPython.utils.traitlets import EventfulList
+from IPython.config.configurable import Configurable
+
 from smashlib.logging import Logger
 
 class SmashComponent(object):

@@ -10,11 +10,10 @@ from subprocess import PIPE
 from IPython.utils.traitlets import Bool
 
 from smashlib.v2 import Reporter
-from smashlib.ipy_cd_hooks import CD_EVENT
 from smashlib.util.events import receives_event
 
 lp_f = os.path.join(os.path.dirname(__file__), 'liquidprompt')
-C_UPDATE_PROMPT_REQUEST = 'udpate_prompt_request'
+from smashlib.channels import C_UPDATE_PROMPT_REQUEST
 
 class LiquidPrompt(Reporter):
     """ this extension requires ipy_cd_hook """

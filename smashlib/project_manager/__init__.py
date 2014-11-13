@@ -4,7 +4,8 @@ import os
 import inspect
 from IPython.utils.traitlets import EventfulDict, EventfulList
 
-from smashlib.ipy_cd_hooks import CD_EVENT
+from smashlib.channels import C_SMASH_INIT_COMPLETE, C_CD_EVENT
+
 from smashlib.project_manager.util import (
     clean_project_name, UnknownProjectError)
 from smashlib.python import abspath, expanduser
@@ -89,13 +90,13 @@ class ProjectManager(Reporter, AliasMixin):
     def reverse_project_map(self):
         return dict([[v,k] for k,v in self.project_map.items()])
 
-    @receives_event(CD_EVENT, quiet=True)
-    def cd_hook__show_project_help(self, new_dir, old_dir):
+    @receives_event(C_CD_EVENT, quiet=True)
+    def show_project_help(self, new_dir, old_dir):
         if new_dir in self.project_map.values():
             project_name = self.reverse_project_map[new_dir]
             _help = 'this directory is a project.  to activate it, type {0}'
             _help = _help.format(green('proj.'+project_name))
-            self.info(_help)
+            #self.info(_help)
 
     def _event_set_project_map(self, key, val):
         """ final word in cleaning/verifying/binding
@@ -172,12 +173,22 @@ class ProjectManager(Reporter, AliasMixin):
     def parse_argv(self):
         args, unknown = super(ProjectManager,self).parse_argv()
         if args.project:
-            try:
-                self.activate_project(args.project)
-            except UnknownProjectError:
-                msg = 'unknown project: {0}'.format(args.project)
-                self.warning(msg)
+            # cannot effect the change here due to some race condition.
+            # smash will send a signal when it's initialization is complete
+            # and we just store a variable that the signal handler can use.
+            self.use_project = args.project
+
         return args, unknown
+
+    @receives_event(C_SMASH_INIT_COMPLETE)
+    def use_requested_project(self,none):
+        try:
+            #self.activate_project(args.project)
+            getattr(self.interface,self.use_project)
+            self.use_project = None
+        except UnknownProjectError:
+            msg = 'unknown project: {0}'.format(self.use_project)
+            self.warning(msg)
 
     def _guess_deactivation_steps(self, name, dir):
         operation_dict = DEACTIVATE

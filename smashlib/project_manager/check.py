@@ -1,6 +1,5 @@
 """ smashlib.project_manager.check
 """
-from goulash.util import summarize_fpath
 
 from smashlib.util.linter import PyLinter
 from .operation import OperationStep, NullOperationStep
@@ -24,5 +23,4 @@ def python_flakes(project_manager):
     pdir = project_manager.project_map[project_name]
     linter = PyLinter(project_manager.smash.shell.config,
                       cmd_exec=project_manager.smash.system,)
-    #project_manager.shell.configurables.append(linter)
     return linter(pdir)

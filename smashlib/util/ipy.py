@@ -8,7 +8,7 @@ from smashlib.data import SMASH_DIR, SMASHLIB_DIR, main_profile_name
 from smashlib.python import ope
 from IPython.core.profiledir import ProfileDir
 from IPython.utils.coloransi import TermColors
-from smashlib.data import user_config_name, USER_CONFIG_PATH
+from smashlib.data import USER_CONFIG_PATH
 
 def green(txt):
     return TermColors.Green + txt + TermColors.Normal
@@ -34,7 +34,7 @@ class SmashConfig(object):
     def ensure():
         smash_dir = SmashConfig.ensure_base_dir()
         smash_prof = SmashConfig.ensure_profile()
-        return smash_prof
+        return dict(profile=smash_prof,dir=smash_dir)
 
 class SmashUserConfig(object):
     @staticmethod
