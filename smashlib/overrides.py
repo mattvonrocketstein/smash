@@ -5,10 +5,13 @@
     is here because smash wants a separate message bus from the main
     ipython event system (IPython.core.events).
 """
-from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL
-
+from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 from IPython.terminal.interactiveshell import \
      TerminalInteractiveShell as BaseTIS
+
+from smashlib.bin.pybcompgen import complete
+from smashlib.pysh import have_command_alias
+from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL
 
 class SmashTerminalInteractiveShell(BaseTIS):
 
@@ -47,14 +50,8 @@ class SmashTerminalInteractiveShell(BaseTIS):
                 self._smash_last_input)
             self._smash_last_input = ""
         return out
-
 TerminalInteractiveShell=SmashTerminalInteractiveShell
 
-
-from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
-
-from smashlib.bin.pybcompgen import complete
-from smashlib.pysh import have_command_alias
 class SmashTerminalIPythonApp(BaseTIA):
     @classmethod
     def launch_instance(cls, argv=None, **kwargs):
