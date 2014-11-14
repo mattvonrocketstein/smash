@@ -53,6 +53,8 @@ TerminalInteractiveShell=SmashTerminalInteractiveShell
 
 from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 
+from smashlib.bin.pybcompgen import complete
+from smashlib.pysh import have_command_alias
 class SmashTerminalIPythonApp(BaseTIA):
     @classmethod
     def launch_instance(cls, argv=None, **kwargs):
@@ -68,12 +70,16 @@ class SmashTerminalIPythonApp(BaseTIA):
             ipython_dir=self.ipython_dir,
             user_ns=self.user_ns)
         self.shell.configurables.append(self)
-        from smashlib.bin.pybcompgen import complete
-        from smashlib.pysh import have_command_alias
         def my_matcher(text):
             line = self.shell.Completer.readline.get_line_buffer()
-            if have_command_alias(line.split()[0]):
+            first_word = line.split()[0]
+            magic_command_alias = first_word.startswith('%') and \
+                                  have_command_alias(first_word[1:])
+            naked_command_alias = have_command_alias(first_word)
+            if naked_command_alias:
                 return complete(line)
+            if magic_command_alias:
+                return complete(line[1:])
             return []
         self.shell.Completer.matchers=[my_matcher] + \
                                        self.shell.Completer.matchers
