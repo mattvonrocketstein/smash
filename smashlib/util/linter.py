@@ -9,7 +9,7 @@ from IPython.utils.traitlets import Bool
 from goulash.venv import find_venvs
 from smashlib.util._fabric import require_bin
 from smashlib.v2 import Reporter
-
+import re
 class Linter(Reporter):
     """ """
     def __init__(self, config, cmd_exec=None):
@@ -23,7 +23,7 @@ class Linter(Reporter):
         raise Exception("abstract")
 
 class PyLinter(Linter):
-
+    ignore_unused_imports_in_init_files = True
     ignore_pep8 = Bool(False, config=True)
 
     def __call__(self, _dir):
@@ -40,15 +40,19 @@ class PyLinter(Linter):
         exclude = ','.join(exclude)
         exclude = ' --exclude='+exclude
         ignore = ' --ignore='+ignore
-        cmd = cmd.format(_dir) +  (exclude or '')
+        cmd = cmd.format(_dir) +  exclude
         output = self.cmd_exec(cmd)
-        bad_lines = output.split('\n')
+        output_lines = output.split('\n')
         if self.ignore_pep8:
-            import re
-            r = re.compile('.* E\d\d\d .*')
-            bad_lines = filter(lambda x:not r.match(x), bad_lines)
-            output= '\n'.join(bad_lines)
-        bad_files = [x.split(':')[0] for x in bad_lines]
+            r1 = re.compile('.* E\d\d\d .*')
+            output_lines = filter(lambda x: not r1.match(x), output_lines)
+            output= '\n'.join(output_lines)
+        if self.ignore_unused_imports_in_init_files:
+            r2 = re.compile('.*__init__.py.* F401 .*')
+            output_lines = filter(lambda x: not r2.match(x), output_lines)
+            output= '\n'.join(output_lines)
+
+        bad_files = [x.split(':')[0] for x in output_lines]
         err_counter = defaultdict(lambda:0)
         for x in bad_files:
             err_counter[x] += 1

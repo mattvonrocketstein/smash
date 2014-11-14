@@ -184,11 +184,14 @@ class ProjectManager(Reporter, AliasMixin):
     def use_requested_project(self,none):
         try:
             #self.activate_project(args.project)
-            getattr(self.interface,self.use_project)
+            getattr(self.interface, self.use_project)
             self.use_project = None
         except UnknownProjectError:
             msg = 'unknown project: {0}'.format(self.use_project)
             self.warning(msg)
+        except AttributeError:
+            pass
+
 
     def _guess_deactivation_steps(self, name, dir):
         operation_dict = DEACTIVATE
