@@ -10,18 +10,16 @@ ABOUT
 =====
 SmaSh is the smart-shell.  It offers features for project management, a flexible plugin architecture that is easy to use, and simple configuration files that try to be as sane as possible.  [Python developers](#smash-for-python-devs) will be particularly interested because it also happens to be a python/bash hybrid which builds on the pysh profile for IPython.  It leverages all existing system [tab completion](#tab-completion) setup, apart from IPython completion in python namespaces.  It builds on, and offers very sophisticated support for python virtual environments.
 
-
 <a name="quickstart"/>
 QUICKSTART
 ==========
-
-You'll need at least git and virtualenv (debian packages "git-core" and "python-virtualenv", respectively).  There are other python libraries you need but smash should install them itself.
 
 The smash installation happens in a sandbox, does not require root, and will not interefere with existing versions of IPython.  The cost of this is that setup is a little bit nonstandard and `setup.py` should not be used directly unless you only want to develop against the support libraries (for that see: [dev installation](#dev-installation))
 
 
 
 ```shell
+  $ sudo apt-get install git-core python-virtualenv python-dev
   $ bootstrap=https://raw.githubusercontent.com/mattvonrocketstein/smash/master/bootstrap.sh
   $ curl $bootstrap | bash
   $ ~/bin/smash
