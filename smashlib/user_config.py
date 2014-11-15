@@ -10,34 +10,47 @@
 # cannot be edited, you can make any overrides you would like to make there
 # in here instead.
 #
+
 c = get_config()
-
-# add custom directory hooks here
-c.ChangeDirHooks.change_dir_hooks.append(
-    "smashlib.ipy_cd_hooks.ChangeDirHooks.test_change_message")
-
-c.Smash.ignore_warnings = True
 
 # every smash component gets it's own verbosity setting.
 # this mostly controls the printing of debugging info
+c.Smash.ignore_warnings = True
 c.Smash.verbose = False
-c.Smash.verbose_events = False
+c.Smash.verbose_events = True
 c.LiquidPrompt.verbose = False
 c.ProjectManager.verbose = False
 c.ChangeDirHooks.verbose = False
-c.VirtualEnvSupport.verbose = False
-c.PyLinter.verbose = True
-c.PyLinter.ignore_pep8 = True
+c.VirtualEnvSupport.verbose = True
 
+c.PyLinter.verbose=True
+c.PyLinter.ignore_pep8 = True
+c.PyLinter.ignore_undefined_names='get_ipython'.split()
+
+# add custom directory hooks here
+#c.ChangeDirHooks.change_dir_hooks.append(
+#    "smashlib.ipy_cd_hooks.ChangeDirHooks.test_change_message")
 
 # everything below this line should not ultimately be in this file..
 #
 c.TerminalInteractiveShell.editor = 'emacsclient -n'
 
+# project manager configuration
+projects = c.ProjectManager
+projects.search_dirs.append('~/code')
+projects.project_map.update(dict(toybox='/vagrant'))
+projects.venv_map.update(dict(robotninja='~/code/hammock/'))
+projects.venv_map.update(dict(emax='~/.emax'))
+projects.venv_map.update(dict(toybox='/vagrant/guest_venv'))
+
 # TODO: SmashAliasManager, which respects project settings
-c.AliasManager.user_aliases.append(('ack', 'ack-grep'))
-c.AliasManager.user_aliases.append(('st', 'git status'))
-c.AliasManager.user_aliases.append(('gds', 'git diff --stat'))
-c.AliasManager.user_aliases.append(('gd', 'git diff'))
-c.AliasManager.user_aliases.append(
-    ('irc','xchat -d ~/code/dotfiles/xchat_default&'))
+projects.alias_map.update(dict(
+    __smash__ = [
+        ('ack', 'ack-grep'),
+        ('st', 'git status'),
+        ('gds', 'git diff --stat'),
+        ('gd', 'git diff'),
+        ('irc','xchat -d ~/code/dotfiles/xchat_default&'),
+        ],
+
+    ))
