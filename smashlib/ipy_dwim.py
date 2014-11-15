@@ -3,6 +3,7 @@
     DoWhatIMean
 """
 import os
+
 from IPython.utils.traitlets import Bool
 
 from smashlib.v2 import Reporter
@@ -27,6 +28,10 @@ class DoWhatIMean(Reporter):
         help="open automatically if input looks like webpage")
 
     def init(self):
+        def smash_open(x):
+            import webbrowser
+            webbrowser.open(x)
+        self.contribute_magic(smash_open)
         if self.automatic_cd or self.automatic_edit:
             self.smash.error_handlers.append(self.handle_NameError)
 
