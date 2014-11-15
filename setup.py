@@ -4,9 +4,12 @@
 
 import os
 from setuptools import setup
-this_dir = os.path.dirname(__file__)
+
+# __file__ is not set when running from tox
+this_dir = os.path.dirname(os.path.abspath(__file__))
 if not os.getcwd()==this_dir:
     os.chdir(this_dir)
+
 setup(
     name         = 'smashlib',
     author       = 'mattvonrocketstein',
