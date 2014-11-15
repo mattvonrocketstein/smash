@@ -4,7 +4,7 @@ import os
 
 from collections import defaultdict
 from IPython.config.configurable import Configurable
-from IPython.utils.traitlets import Bool
+from IPython.utils.traitlets import Bool, List
 
 from goulash.venv import find_venvs
 from smashlib.util._fabric import require_bin
@@ -25,6 +25,7 @@ class Linter(Reporter):
 class PyLinter(Linter):
     ignore_unused_imports_in_init_files = True
     ignore_pep8 = Bool(False, config=True)
+    ignore_undefined_names = List([], config=True)
 
     def __call__(self, _dir):
         require_bin('flake8')
@@ -51,7 +52,12 @@ class PyLinter(Linter):
             r2 = re.compile('.*__init__.py.* F401 .*')
             output_lines = filter(lambda x: not r2.match(x), output_lines)
             output= '\n'.join(output_lines)
-
+        if self.ignore_undefined_names:
+            res = re.compile(".*F821 undefined name '(" + \
+                             '|'.join(self.ignore_undefined_names) + \
+                             ")'")
+            output_lines = filter(lambda x: not res.match(x), output_lines)
+            output= '\n'.join(output_lines)
         bad_files = [x.split(':')[0] for x in output_lines]
         err_counter = defaultdict(lambda:0)
         for x in bad_files:
