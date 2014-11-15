@@ -2,8 +2,11 @@
 """ setup.py for smashlib
 """
 
+import os
 from setuptools import setup
-
+this_dir = os.path.dirname(__file__)
+if not os.getcwd()==this_dir:
+    os.chdir(this_dir)
 setup(
     name         = 'smashlib',
     author       = 'mattvonrocketstein',
