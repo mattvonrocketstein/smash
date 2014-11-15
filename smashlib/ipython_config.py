@@ -17,6 +17,7 @@ c.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
 # this mostly controls the printing of debugging info
 c.Smash.verbose = True
 c.LiquidPrompt.verbose = True
+c.DoWhatIMean.verbose = True
 c.ProjectManager.verbose = True
 c.ChangeDirHooks.verbose = True
 c.VirtualEnvSupport.verbose = True
@@ -43,7 +44,7 @@ c.Smash.extensions.append('smashlib.ipy_liquidprompt')
 c.Smash.extensions.append('smashlib.ipy_cd_hooks')
 c.Smash.extensions.append('smashlib.ipy_venv')
 c.Smash.extensions.append('smashlib.ipy_project_manager')
-
+c.Smash.extensions.append("smashlib.ipy_dwim")
 
 ## configure the liquidprompt extension
 ################################################################################

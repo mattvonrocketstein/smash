@@ -29,6 +29,7 @@ class Smash(Reporter):
     verbose_events = Bool(False, config=True)
     ignore_warnings = Bool(False, config=True)
     load_bash_aliases = Bool(False, config=True)
+    error_handlers = []
 
     def system(self, cmd, quiet=False):
         from smashlib.util._fabric import qlocal

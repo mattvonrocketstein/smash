@@ -1,10 +1,13 @@
-""" smash.overrides
+""" smashlib.overrides
 
     Things that are not only subclassed from ipython, but intended to
-    be used instead of their ipython equivalents.  So far a lot of this
-    is here because smash wants a separate message bus from the main
-    ipython event system (IPython.core.events).
+    be used instead of their ipython equivalents.  Similar to
+    smashlib.patches, but things in this file are core IPython abstractions.
+
+    So far a lot of this is here mostly because smash wants a separate message
+    bus from the main ipython event system (IPython.core.events).
 """
+
 from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 from IPython.terminal.interactiveshell import \
      TerminalInteractiveShell as BaseTIS
@@ -34,9 +37,21 @@ class SmashTerminalInteractiveShell(BaseTIS):
         self._smash_last_input += out
         return out
 
+
+    def _showtraceback(self, etype, evalue, stb):
+        sooper = super(SmashTerminalInteractiveShell, self)
+        if self.smash is not None:
+            for handler in self.smash.error_handlers:
+                handled = handler(
+                    self._smash_last_input, etype, evalue)
+                if handled:
+                    return
+        return sooper._showtraceback(etype,evalue,stb)
+
     # NOTE: when run-cell runs, input is finished
     def run_cell(self, raw_cell, store_history=False,
                  silent=False, shell_futures=True):
+
         sooper = super(SmashTerminalInteractiveShell, self)
         out = sooper.run_cell(
             raw_cell, store_history=store_history,
@@ -78,7 +93,7 @@ class SmashTerminalIPythonApp(BaseTIA):
             if magic_command_alias:
                 return complete(line[1:])
             return []
-        self.shell.Completer.matchers=[my_matcher] + \
-                                       self.shell.Completer.matchers
+        self.shell.Completer.matchers = [my_matcher] + \
+                                        self.shell.Completer.matchers
 TerminalIPythonApp = SmashTerminalIPythonApp
 launch_new_instance = TerminalIPythonApp.launch_instance
