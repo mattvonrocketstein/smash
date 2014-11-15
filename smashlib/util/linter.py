@@ -22,6 +22,8 @@ class Linter(Reporter):
     def __call__(self):
         raise Exception("abstract")
 
+r_pep8_error = re.compile('.* E\d\d\d .*')
+
 class PyLinter(Linter):
     ignore_unused_imports_in_init_files = True
     ignore_pep8 = Bool(False, config=True)
@@ -45,8 +47,8 @@ class PyLinter(Linter):
         output = self.cmd_exec(cmd)
         output_lines = output.split('\n')
         if self.ignore_pep8:
-            r1 = re.compile('.* E\d\d\d .*')
-            output_lines = filter(lambda x: not r1.match(x), output_lines)
+            output_lines = filter(
+                lambda x: not r_pep8_error.match(x), output_lines)
             output= '\n'.join(output_lines)
         if self.ignore_unused_imports_in_init_files:
             r2 = re.compile('.*__init__.py.* F401 .*')
