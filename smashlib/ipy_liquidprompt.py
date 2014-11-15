@@ -15,10 +15,11 @@ from smashlib.channels import C_UPDATE_PROMPT_REQUEST
 
 lp_f = os.path.join(os.path.dirname(__file__), 'liquidprompt')
 
-def prompt_tag(x):
-    """ TODO: add this as magic for liquidprompt docs compat
-    """
-    os.environ['LP_PS1_PREFIX'] = ' '+x
+def prompt_tag(parameter_s=''):
+    """ set prompt tag prefix """
+    if parameter_s:
+        parameter_s=' '+parameter_s
+    os.environ['LP_PS1_PREFIX'] = parameter_s
 
 class LiquidPrompt(Reporter):
     """ this extension requires ipy_cd_hook """
@@ -31,6 +32,9 @@ class LiquidPrompt(Reporter):
         "NOTE: really need to update prompt every time anything has run.."
         #self.update_prompt()
         pass
+
+    def init_magics(self):
+        self.contribute_magic(prompt_tag)
 
     def init(self):
         self.update_prompt()

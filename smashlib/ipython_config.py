@@ -53,6 +53,7 @@ c.Smash.extensions.append("smashlib.ipy_dwim")
 c.LiquidPrompt.float   = True
 c.LiquidPrompt.prompt_append   = "\n> "
 c.PromptManager.justify = False
+
 # configure the project manager extension
 ################################################################################
 projects = c.ProjectManager
