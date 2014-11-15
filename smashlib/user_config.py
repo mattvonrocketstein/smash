@@ -1,5 +1,6 @@
 # -*- coding: utf-8
-# User-configuration file for SmaSh.
+#
+# DEFAULT USER-CONFIGURATION FILE FOR SMASH.
 #
 # For examples of stuff you might like to do in here, check out:
 #
@@ -12,6 +13,8 @@
 #
 
 c = get_config()
+
+get_config = eval('get_config') # shut up the linter
 
 # every smash component gets it's own verbosity setting.
 # this mostly controls the printing of debugging info

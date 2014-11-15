@@ -20,7 +20,6 @@ class ChangeDirHooks(Reporter):
         print 'test_change_message got "cd" event:', dict(new=new, old=old)
 
     def init(self):
-        shell = self.shell
         # FIXME: reregister it properly instead of patching it?
         if not getattr(self, '_already_patched', False):
             mycd = PatchCDMagic(self)

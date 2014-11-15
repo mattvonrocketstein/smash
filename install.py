@@ -8,12 +8,14 @@ from setuptools.command.install import install
 
 try:
     import goulash
+    print 'goulash', goulash.__version__
 except ImportError:
     err = ('Smash-shell installer requires goulash.  '
            '"pip install goulash==0.2" and try again')
     raise SystemExit(err)
 try:
     import fabric
+    print 'fabric',fabric.version.__version__
 except ImportError:
     err = ('Smash-shell installer requires fabric.  '
            '"pip install goulash==1.10.0" and try again')

@@ -6,6 +6,9 @@
 # To override these values, edit ~/.smash/config.py instead.
 #
 print '..loading system config', __file__
+
+get_config = eval('get_config') # shut up the linter
+
 c = get_config()
 
 # load toplevel extensions

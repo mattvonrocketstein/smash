@@ -1,20 +1,17 @@
 """ smashlib.patches.edit
 """
 import re
-from IPython.core.magics.code import CodeMagics
-from .base import PatchMagic
+from smashlib.patches.base import PatchMagic
 
 r_file_and_line = re.compile('.+[:](\d+)[:]?(\d*)$')
 
 
 class PatchEdit(PatchMagic):
-    """ patches the builtin ipython cd magic so that a post-dir-change
-        event can be sent to anyone who wants to subscribe, and so that
-        the "cd" command is quiet by default.
+    """ patches the builtin ipython edit magic so that filenames like
+        "a/b/c:<row>:<col>" will be rewritten to use -n <lineno>, as
+        ipython expects
     """
     name = 'edit'
-    original2 = staticmethod(CodeMagics._find_edit_target)
-
 
     def install(self):
         super(PatchEdit,self).install()

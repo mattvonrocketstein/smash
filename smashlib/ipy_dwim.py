@@ -4,7 +4,6 @@
 """
 import os
 from IPython.utils.traitlets import Bool
-from IPython.config.configurable import Configurable
 
 from smashlib.v2 import Reporter
 

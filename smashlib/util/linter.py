@@ -55,6 +55,7 @@ class PyLinter(Linter):
             output_lines = filter(lambda x: not r2.match(x), output_lines)
             output= '\n'.join(output_lines)
         if self.ignore_undefined_names:
+            #raise Exception,self.ignore_undefined_names
             res = re.compile(".*F821 undefined name '(" + \
                              '|'.join(self.ignore_undefined_names) + \
                              ")'")

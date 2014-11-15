@@ -16,5 +16,5 @@ def python_test(project_manager):
     if project_name is None:
         pm.report("No project has been selected.")
         return
-    pdir = project_manager.project_map[project_name]
+    #pdir = project_manager.project_map[project_name]
     pm.report("python_test niy")

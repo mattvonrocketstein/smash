@@ -105,7 +105,7 @@ def complete(to_complete):
         # ie bash is asking something like this:
         #   Display all 103 possibilities? (y or n)
         # Pagination indicators like '--More--'must be removed
-        lines = [line for line in lines if not line.startswith('--More')]
+        lines = [x for x in lines if not line.startswith('--More')]
         last_marker = len(lines) - 3
         first_marker+=1
 
