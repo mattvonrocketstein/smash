@@ -43,7 +43,36 @@ class AliasMixin(object):
             except ValueError:
                 continue
 
-class ProjectManager(Reporter, AliasMixin):
+class CommandLineMixin(object):
+    def build_argparser(self):
+        """ """
+        parser = Reporter.build_argparser(self)
+        parser.add_argument('-p','--project', default='')
+        return parser
+
+    def parse_argv(self):
+        args, unknown = Reporter.parse_argv(self)
+        if args.project:
+            # cannot effect the change here due to some race condition.
+            # smash will send a signal when it's initialization is complete
+            # and we just store a variable that the signal handler can use.
+            self.use_project = args.project
+
+        return args, unknown
+
+    @receives_event(C_SMASH_INIT_COMPLETE)
+    def use_requested_project(self,none):
+        try:
+            #self.activate_project(args.project)
+            getattr(self.interface, self.use_project)
+            self.use_project = None
+        except UnknownProjectError:
+            msg = 'unknown project: {0}'.format(self.use_project)
+            self.warning(msg)
+        except AttributeError:
+            pass
+
+class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
     """ """
 
     search_dirs      = EventfulList(default_value=[], config=True)
@@ -163,35 +192,6 @@ class ProjectManager(Reporter, AliasMixin):
             self.report("Not found: {0}".format(_dir))
         else:
             self.shell.magic('pushd {0}'.format(_dir))
-
-    def build_argparser(self):
-        """ """
-        parser = super(ProjectManager, self).build_argparser()
-        parser.add_argument('-p','--project', default='')
-        return parser
-
-    def parse_argv(self):
-        args, unknown = super(ProjectManager,self).parse_argv()
-        if args.project:
-            # cannot effect the change here due to some race condition.
-            # smash will send a signal when it's initialization is complete
-            # and we just store a variable that the signal handler can use.
-            self.use_project = args.project
-
-        return args, unknown
-
-    @receives_event(C_SMASH_INIT_COMPLETE)
-    def use_requested_project(self,none):
-        try:
-            #self.activate_project(args.project)
-            getattr(self.interface, self.use_project)
-            self.use_project = None
-        except UnknownProjectError:
-            msg = 'unknown project: {0}'.format(self.use_project)
-            self.warning(msg)
-        except AttributeError:
-            pass
-
 
     def _guess_deactivation_steps(self, name, dir):
         operation_dict = DEACTIVATE
