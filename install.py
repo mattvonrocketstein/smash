@@ -127,10 +127,14 @@ class InstallCommand(install):
     def add_smashlib(self):
         python = self.smash_python
         self.add_smashlib_reqs()
+        this_dir = os.path.dirname(__file__)
         if self.__class__==InstallCommand:
-            cmd = '{0} {1} install'.format(python, SMASH_SETUP_PY)
+            cmd = 'cd {0} && {1} {2} install'.format(
+                this_dir, python, SMASH_SETUP_PY)
         elif self.__class__==DevelopCommand:
-            cmd = '{0} {1} develop'.format(python, SMASH_SETUP_PY)
+            cmd = 'cd {0} && {1} {2} develop'.format(
+                this_dir,
+                python, SMASH_SETUP_PY)
 
 
         fab_api.local(cmd)
