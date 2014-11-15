@@ -26,6 +26,8 @@ setup(
     entry_points = \
     { 'console_scripts': \
       [ 'run_smash = smashlib.bin.smash:entry',
-        'pybcompgen = smashlib.bin.pybcompgen:main', ]
+        'pybcompgen = smashlib.bin.pybcompgen:main',
+        'pyack = smashlib.bin.pyack:main',
+        ]
     }
 )
