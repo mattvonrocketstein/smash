@@ -14,7 +14,7 @@ except ImportError:
            '"pip install goulash==0.2" and try again')
     raise SystemExit(err)
 try:
-    import fabric
+    import fabric.version
     print 'fabric',fabric.version.__version__
 except ImportError:
     err = ('Smash-shell installer requires fabric.  '
@@ -89,7 +89,7 @@ class InstallCommand(install):
         if not os.path.exists(ipy_clone_path):
             with fab_api.settings(warn_only=True):
                 cmd = ('cd {0} && '
-                       'git clone --branch master '
+                       'git clone --verbose --branch master '
                        '--single-branch --depth 1 {1}')
                 result = fab_api.local(
                     cmd.format(DOT_SMASH, url),
@@ -103,7 +103,7 @@ class InstallCommand(install):
             self.report('official repo is already already cloned..')
             self.report('.. will not update it')
 
-    def report(self,msg):
+    def report(self, msg):
         red(msg)
 
     def _require_bin(self, name, deb_pkg_name=None):
