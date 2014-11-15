@@ -18,14 +18,9 @@ QUICKSTART
 The smash installation happens in a sandbox, does not require root, and will not interefere with existing versions of IPython.  The cost of this is that setup is a little bit nonstandard and `setup.py` should not be used directly unless you only want to develop against the support libraries (for that see: [dev installation](#dev-installation))
 
 ```shell
-  $ git clone https://github.com/mattvonrocketstein/smashlib.git ~/.smash
-  $ cd ~/.smash
-  $ virtualenv --no-site-packages .
-  $ ./bin/pip install -r install_requirements.txt
-  $ ./bin/python install.py
+  $ curl https://raw.githubusercontent.com/mattvonrocketstein/smash/master/bootstrap.sh | bash
   $ ~/bin/smash
 ```
-
 
 <a name="philosophy"/>
 PHILOSOPHY

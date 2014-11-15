@@ -2,13 +2,6 @@
 #
 #
 #
-#set -e
-#$ git clone https://github.com/mattvonrocketstein/smashlib.git ~/.smash
-#$ cd ~/.smash
-#$ virtualenv --no-site-packages .
-#$ ./bin/pip install -r install_requirements.txt
-#$ ./bin/python install.py
-#$ ~/bin/smash
 set -e
 SMASH_HOME="$HOME/.smash"
 GOT_SMASH_REPO=0
@@ -50,3 +43,6 @@ fi
 
 $SMASH_HOME/bin/pip install -r $SMASH_INST_REQ
 $SMASH_HOME/bin/python $SMASH_INST_PROG
+echo
+echo
+echo "Installation complete.  Run it with ~/bin/smash"
