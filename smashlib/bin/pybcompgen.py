@@ -120,7 +120,7 @@ def complete(to_complete):
         #   the line, and we have to clean those up for the output
         the_line = lines[first_marker+1:last_marker][0]
         the_line = remove_control_characters(the_line)
-        tmp = the_line[the_line.find(to_complete)+len(to_complete):]
+        tmp = the_line[the_line.rfind(to_complete)+len(to_complete):]
         result = to_complete.split()[-1]+tmp
 
         if '#' in result:
