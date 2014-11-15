@@ -15,10 +15,15 @@ SmaSh is the smart-shell.  It offers features for project management, a flexible
 QUICKSTART
 ==========
 
+You'll need at least git and virtualenv (debian packages "git-core" and "python-virtualenv", respectively).  There are other python libraries you need but smash should install them itself.
+
 The smash installation happens in a sandbox, does not require root, and will not interefere with existing versions of IPython.  The cost of this is that setup is a little bit nonstandard and `setup.py` should not be used directly unless you only want to develop against the support libraries (for that see: [dev installation](#dev-installation))
 
+
+
 ```shell
-  $ curl https://raw.githubusercontent.com/mattvonrocketstein/smash/master/bootstrap.sh | bash
+  $ bootstrap=https://raw.githubusercontent.com/mattvonrocketstein/smash/master/bootstrap.sh
+  $ curl $bootstrap | bash
   $ ~/bin/smash
 ```
 
