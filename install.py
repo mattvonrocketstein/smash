@@ -133,8 +133,7 @@ class InstallCommand(install):
                 this_dir, python, SMASH_SETUP_PY)
         elif self.__class__==DevelopCommand:
             cmd = 'cd {0} && {1} {2} develop'.format(
-                this_dir,
-                python, SMASH_SETUP_PY)
+                this_dir, python, SMASH_SETUP_PY)
 
 
         fab_api.local(cmd)
