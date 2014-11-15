@@ -11,9 +11,14 @@ from IPython.utils.traitlets import Bool
 
 from smashlib.v2 import Reporter
 from smashlib.util.events import receives_event
+from smashlib.channels import C_UPDATE_PROMPT_REQUEST
 
 lp_f = os.path.join(os.path.dirname(__file__), 'liquidprompt')
-from smashlib.channels import C_UPDATE_PROMPT_REQUEST
+
+def prompt_tag(x):
+    """ TODO: add this as magic for liquidprompt docs compat
+    """
+    os.environ['LP_PS1_PREFIX'] = ' '+x
 
 class LiquidPrompt(Reporter):
     """ this extension requires ipy_cd_hook """
@@ -33,10 +38,9 @@ class LiquidPrompt(Reporter):
             lambda himself: self.update_prompt())
 
     def update_prompt(self):
-        tmp = self.get_prompt().strip()
+        tmp = self.get_prompt().strip()+' '
         if self.float==True:
             tmp = '\n' + tmp
-        tmp = tmp + '\n>'
         self.shell.prompt_manager.in_template = tmp
 
     def get_prompt(self):

@@ -14,22 +14,17 @@ from smashlib.v2 import Reporter
 from smashlib.channels import C_POST_RUN_INPUT
 from smashlib.util.reflect import from_dotpath
 from smashlib.util import bash
+from smashlib.magics import SmashMagics
 
-from IPython.core.magic import Magics, magics_class, line_magic
-
-@magics_class
-class SmashMagics(Magics):
-    @line_magic
-    def ed_config(self, parameter_s=''):
-        from smashlib.data import USER_CONFIG_PATH
-        self.shell.magic('ed {0}'.format(USER_CONFIG_PATH))
 
 class Smash(Reporter):
     extensions = List(default_value=[], config=True)
     verbose_events = Bool(False, config=True)
     ignore_warnings = Bool(False, config=True)
     load_bash_aliases = Bool(False, config=True)
+
     error_handlers = []
+    loaded_extensions = {}
 
     def system(self, cmd, quiet=False):
         from smashlib.util._fabric import qlocal
@@ -52,7 +47,7 @@ class Smash(Reporter):
                 msg = msg.format(dotpath)
                 self.warning(msg)
         self.loaded_extensions = record
-        self.report("loaded extensions:", self.loaded_extensions.keys())
+        self.report("loaded extensions:", record.keys())
 
     def build_argparser(self):
         parser = super(Smash, self).build_argparser()
@@ -82,6 +77,8 @@ class Smash(Reporter):
         self.init_bus()
         self.init_extensions()
         self.parse_argv()
+
+        # TODO: move this to configurable Bool()
         if self.load_bash_aliases:
             for alias, cmd in bash.get_aliases():
                 if alias not in 'ed cd'.split(): #HACK
@@ -93,7 +90,7 @@ class Smash(Reporter):
 
         from smashlib.patches.edit import PatchEdit
         PatchEdit(self).install()
-        self.publish('smash_init_complete',None)
+        self.publish('smash_init_complete', None)
 
     def init_bus(self):
         """ note: it is a special case that due to bootstrap ordering,

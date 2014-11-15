@@ -1,5 +1,6 @@
 """ smashlib
 """
+__version__ = 0.1
 
 def start_ipython(argv=None, **kwargs):
     from smashlib.overrides import launch_new_instance
