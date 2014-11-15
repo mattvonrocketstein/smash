@@ -7,7 +7,7 @@ import os
 import subprocess
 from subprocess import PIPE
 
-from IPython.utils.traitlets import Bool
+from IPython.utils.traitlets import Bool, Unicode
 
 from smashlib.v2 import Reporter
 from smashlib.util.events import receives_event
@@ -24,6 +24,7 @@ class LiquidPrompt(Reporter):
     """ this extension requires ipy_cd_hook """
 
     float    = Bool(True, config=True, help="add more space between prompts")
+    prompt_append = Unicode("", config=True, help="add more space between prompts")
 
     @receives_event(C_UPDATE_PROMPT_REQUEST)
     def update_prompt_on_request(self, request_from):
@@ -38,7 +39,7 @@ class LiquidPrompt(Reporter):
             lambda himself: self.update_prompt())
 
     def update_prompt(self):
-        tmp = self.get_prompt().strip()+' '
+        tmp = self.get_prompt().strip() + self.prompt_append
         if self.float==True:
             tmp = '\n' + tmp
         self.shell.prompt_manager.in_template = tmp

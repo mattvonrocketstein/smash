@@ -51,6 +51,7 @@ c.Smash.extensions.append("smashlib.ipy_dwim")
 
 # insert more space around prompt
 c.LiquidPrompt.float   = True
+c.LiquidPrompt.prompt_append   = "\n> "
 c.PromptManager.justify = False
 # configure the project manager extension
 ################################################################################
