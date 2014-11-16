@@ -18,17 +18,24 @@ c.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
 
 # every smash component gets it's own verbosity setting.
 # this mostly controls the printing of debugging info
-c.Smash.verbose = True
-c.LiquidPrompt.verbose = True
-c.DoWhatIMean.verbose = True
-c.ProjectManager.verbose = True
-c.ChangeDirHooks.verbose = True
+c.Smash.verbose = False
+c.DoWhatIMean.verbose = False
+c.LiquidPrompt.verbose = False
+c.ProjectManager.verbose = False
+c.ChangeDirHooks.verbose = False
 c.VirtualEnvSupport.verbose = True
-# configure smash
-################################################################################
 
-c.Smash.verbose_events = True
-c.Smash.load_bash_aliases = True
+# cross-cutting verbosity configs
+c.Smash.ignore_warnings = True
+c.Smash.verbose_events = False
+
+# configuration for the linter
+# which is used by project_manager
+c.PyLinter.verbose = True
+c.PyLinter.ignore_pep8 = True
+c.PyLinter.ignore_undefined_names = [
+    'get_ipython', # used in ipython_config.py files
+    ]
 
 # include various things that used to be
 # done in profile_pysh/ipython_config.py
@@ -54,7 +61,7 @@ c.Smash.extensions.append("smashlib.ipy_dwim")
 
 # insert more space around prompt
 c.LiquidPrompt.float   = True
-c.LiquidPrompt.prompt_append   = "\n> "
+c.LiquidPrompt.prompt_append   = "> "
 c.PromptManager.justify = False
 
 # configure the project manager extension
