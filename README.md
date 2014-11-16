@@ -57,11 +57,11 @@ By default smash ships with the wonderfully dynamic [liquidprompt tool](#https:/
 
 <a name="tab-completion"/>
 ####Tab-completion system
-Depending on the context, tab completion information is derived either from ipython (for python namespaces, ipython aliases, etc) or directly from the system shell (for system commands, VCS subcommands, debian packages, whatever).  A few observations about this setup:
+Depending on the context, tab completion information is derived either from ipython (for python namespaces, ipython aliases, etc) or directly from bash (for system commands/paths, hostnames, VCS subcommands, debian packages, whatever your system supports).  Thus if you now use bash exclusively<sup>**</sup> then this means that no effort at all goes into porting old completers into smash shell.  For building new completion mechanisms, you have the option of writing them inside or outside of smash, based on your preference.
 
-1. the smash completion system is at least as robust as your system shell
-2. complete support for IPython's invaluable completion/readline facilities
-3. you have choices now when writing new completers: ipython way or the shell way
+![screenshot1](/docs/screenshots/demo-completion.png?raw=true "screenshot3")
+
+<sub>**: if you are a zsh wizard, please help fix [issue 11](https://github.com/mattvonrocketstein/smash/issues/11)!</sub>
 
 -------------------------------------------------------------------------------
 
