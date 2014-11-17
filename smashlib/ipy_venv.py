@@ -44,6 +44,7 @@ class VirtualEnvMagics(Magics):
 
 
 class VirtualEnvSupport(Reporter):
+    sys_path_changes = []
 
     def deactivate(self):
         try:
@@ -77,17 +78,10 @@ class VirtualEnvSupport(Reporter):
 
             # clean sys.path according to python..
             # stupid, but this seems to work
-            self.report('cleaning sys.path')
-            new_path = []
-            for entry in sys.path:
-                if entry and not entry.startswith(venv):
-                    new_path.append(entry)
-                elif entry:
-                    self.report(" del: "+summarize_fpath(entry))
-            sys.path = new_path
+            self.report('resetting sys.path')#,sys.path_changes)
+            sys.path = self.reset_path
 
             self._clean_user_namespace(venv)
-            # TODO: clean sys.modules?
             self.publish(C_POST_DEACTIVATE, venv)
             return True
 
@@ -121,6 +115,12 @@ class VirtualEnvSupport(Reporter):
 
     def activate(self, path):
         self.deactivate()
+        #old_sys_path = [x for x in sys.path]
+        self._activate(path)
+        #sys.path_changes = set(sys.path) - set(old_sys_path)
+        #print 'that added',sys.path_changes
+
+    def _activate(self,path):
         absfpath = abspath(expanduser(path))
         self.smash.bus.publish(C_PRE_ACTIVATE, name=absfpath)
         if True:
@@ -138,30 +138,36 @@ class VirtualEnvSupport(Reporter):
                 raise RuntimeError(err)
             python_dir = python_dir[0]
 
-            # this bit enables switching between two venv's
-            # that might be "no-global-site" vs "use-global-site"
-            site_file = opj(python_dir, 'site.py')
-            assert ope(site_file)
-            tmp = dict(__file__=site_file)
-            execfile(site_file, tmp)
-            tmp['main']()
+            # this bit might enable switching between two venv's
+            # that are be "no-global-site" vs "use-global-site"
+            # tabling it for now
+            #site_file = opj(python_dir, 'site.py')
+            #assert ope(site_file)
+            #tmp = dict(__file__=site_file)
+            #execfile(site_file, tmp)
+            #tmp['main']()
 
             # some environment variable manipulation that would
             # normally be done by 'source bin/activate', but is
             # not handled by activate_this.py
-            path = get_path().split(':')
+            #path = get_path().split(':')
             os.environ['VIRTUAL_ENV'] = absfpath
-            msg = '$PATH was adjusted; rehashing aliases'
-            self.report(msg)
+
             sandbox = dict(__file__ = opj(vbin, 'activate_this.py'))
             execfile(opj(vbin, 'activate_this.py'), sandbox)
+            self.reset_path = sandbox['prev_sys_path']
 
-            # libraries like 'datetime' can fail on import if this isnt done,
-            # i'm not sure why activate_this.py doesnt accomplish it.
-            dynload = opj(python_dir, 'lib-dynload')
-            sys.path.append(dynload)
+            # libraries like 'datetime' can very occasionally fail on import
+            # if this isnt done, and i'm not sure why activate_this.py doesnt
+            # accomplish it.  it might have something to do with venv's using
+            # mixed pythons (different versions) or mixed --no-site-packages
+            # tabling it for now
+            # dynload = opj(python_dir, 'lib-dynload')
+            # sys.path.append(dynload)
 
-            # NB: this updates bins but kills other aliases!
+            # NB: this rehash will update bins but iirc kills aliases!
+            msg = '$PATH was adjusted; rehashing aliases'
+            self.report(msg)
             self.shell.magic('rehashx')
             self.smash.bus.publish(C_POST_ACTIVATE, absfpath)
 
