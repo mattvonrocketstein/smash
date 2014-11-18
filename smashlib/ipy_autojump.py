@@ -15,7 +15,7 @@ from smashlib.util.events import receives_event
 from smashlib.python import ope, opj
 from smashlib.channels import C_CD_EVENT
 from smashlib.data import SMASH_DIR
-
+from smashlib.util import get_smash
 DEFAULT_DATA_FILE = 'autojump.dat'
 
 from smashlib.contrib.autojump import main as _main
@@ -101,10 +101,10 @@ class AutojumpPlugin(Reporter):
                 matches = find_matches(self.db, [_dir])
                 if matches:
                     chose = matches[0]
-                    report.autojump('from {0} matches, chose "{1}"'.format(
+                    self.report('from {0} matches, chose "{1}"'.format(
                         len(matches),chose))
                     self.is_updating = False
-                    __IPYTHON__.ipmagic('pushd ' + chose)
+                    get_ipython().ipmagic('pushd ' + chose)
                     self.is_updating = True
                 else:
                     report.autojump("no matches found.")

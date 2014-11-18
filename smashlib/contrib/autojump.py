@@ -45,7 +45,7 @@ else:
 import copy as _copy
 import os as _os
 import re as _re
-import sys as _sys
+
 import textwrap as _textwrap
 
 from gettext import gettext as _
@@ -1109,9 +1109,9 @@ class FileType(object):
         # the special argument "-" means sys.std{in,out}
         if string == '-':
             if 'r' in self._mode:
-                return _sys.stdin
+                return sys.stdin
             elif 'w' in self._mode:
-                return _sys.stdout
+                return sys.stdout
             else:
                 msg = _('argument "-" with mode %r' % self._mode)
                 raise ValueError(msg)
@@ -1554,7 +1554,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
 
         # default setting for prog
         if prog is None:
-            prog = _os.path.basename(_sys.argv[0])
+            prog = _os.path.basename(sys.argv[0])
 
         self.prog = prog
         self.usage = usage
@@ -1681,7 +1681,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
     def parse_known_args(self, args=None, namespace=None):
         # args default to the system args
         if args is None:
-            args = _sys.argv[1:]
+            args = sys.argv[1:]
 
         # default Namespace built from parser defaults
         if namespace is None:
@@ -1710,7 +1710,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
                 delattr(namespace, _UNRECOGNIZED_ARGS_ATTR)
             return namespace, args
         except ArgumentError:
-            err = _sys.exc_info()[1]
+            err = sys.exc_info()[1]
             self.error(str(err))
 
     def _parse_known_args(self, arg_strings, namespace):
@@ -1971,7 +1971,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
                     finally:
                         args_file.close()
                 except IOError:
-                    err = _sys.exc_info()[1]
+                    err = sys.exc_info()[1]
                     self.error(str(err))
 
         # return the modified argument list
@@ -2222,7 +2222,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         # ArgumentTypeErrors indicate errors
         except ArgumentTypeError:
             name = getattr(action.type, '__name__', repr(action.type))
-            msg = str(_sys.exc_info()[1])
+            msg = str(sys.exc_info()[1])
             raise ArgumentError(action, msg)
 
         # TypeErrors or ValueErrors also indicate errors
@@ -2291,12 +2291,12 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
     # =====================
     def print_usage(self, file=None):
         if file is None:
-            file = _sys.stdout
+            file = sys.stdout
         self._print_message(self.format_usage(), file)
 
     def print_help(self, file=None):
         if file is None:
-            file = _sys.stdout
+            file = sys.stdout
         self._print_message(self.format_help(), file)
 
     def print_version(self, file=None):
@@ -2310,7 +2310,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
     def _print_message(self, message, file=None):
         if message:
             if file is None:
-                file = _sys.stderr
+                file = sys.stderr
             file.write(message)
 
     # ===============
@@ -2318,8 +2318,8 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
     # ===============
     def exit(self, status=0, message=None):
         if message:
-            self._print_message(message, _sys.stderr)
-        _sys.exit(status)
+            self._print_message(message, sys.stderr)
+        sys.exit(status)
 
     def error(self, message):
         """error(message: string)
@@ -2330,39 +2330,21 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         If you override this in a subclass, it should not return -- it
         should either exit or raise an exception.
         """
-        self.print_usage(_sys.stderr)
+        self.print_usage(sys.stderr)
         self.exit(2, _('%s: error: %s\n') % (self.prog, message))
 
 
 from codecs import open
 from collections import namedtuple
-import os
 import shutil
-import sys
 from tempfile import NamedTemporaryFile
 from time import time
-
-if sys.version_info[0] == 3:
-    ifilter = filter
-    imap = map
-else:
-    from itertools import ifilter
-    from itertools import imap
-
 import errno
 from itertools import islice
-import os
 import platform
-import re
-import shutil
-import sys
+
 import unicodedata
 
-if sys.version_info[0] == 3:
-    imap = map
-    os.getcwdu = os.getcwd
-else:
-    from itertools import imap
 
 
 def create_dir(path):
