@@ -89,7 +89,9 @@ class Smash(Reporter):
             os.environ['PATH'] =smash_bin + ':' + os.environ['PATH']
 
         from smashlib.patches.edit import PatchEdit
+        from smashlib.patches.rehashx import PatchRehashX
         PatchEdit(self).install()
+        PatchRehashX(self).install()
         self.publish('smash_init_complete', None)
 
     def init_bus(self):

@@ -4,7 +4,7 @@ import os
 import inspect
 from IPython.utils.traitlets import EventfulDict, EventfulList
 
-from smashlib.channels import C_SMASH_INIT_COMPLETE, C_CD_EVENT
+from smashlib.channels import C_SMASH_INIT_COMPLETE, C_CD_EVENT, C_REHASH_EVENT
 
 from smashlib.project_manager.util import (
     clean_project_name, UnknownProjectError)
@@ -162,11 +162,26 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
 
 
     def _event_set_search_dirs(self, slice_or_index, base_dir):
+        if isinstance(slice_or_index,slice):
+            assert isinstance(base_dir,list) #refresh, ie rehashx
+            self.refresh()
+            return
         base_dir = os.path.abspath(os.path.expanduser(base_dir))
+        #if base_dir in self.search_dirs:
         if not os.path.exists(base_dir):
             msg = "new search_dir doesnt exist: {0}"
             self.warning(msg.format(base_dir))
+            return
         else:
+            self._bind_one(base_dir)
+
+    @receives_event(C_REHASH_EVENT)
+    def refresh(self, none):
+        [ self._bind_one(x) for x in set(self.search_dirs)]
+        #[self._bind_one(x) for x in set(self.search_dirs)]
+
+    def _bind_one(self, base_dir):
+            base_dir = os.path.abspath(os.path.expanduser(base_dir))
             contents = os.listdir(unicode(base_dir))
             bind_list = []
             for name in contents:
@@ -177,7 +192,7 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
                 self.project_map[name] = path
             self.report("discovered {0} projects under '{1}'".format(
                 len(bind_list), base_dir))
-        self.update_interface()
+            self.update_interface()
 
     def update_interface(self):
         """ so that tab-completion works on any bound projects, the
