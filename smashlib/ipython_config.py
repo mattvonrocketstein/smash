@@ -57,6 +57,7 @@ c.Smash.extensions.append('smashlib.ipy_cd_hooks')
 c.Smash.extensions.append('smashlib.ipy_venv')
 c.Smash.extensions.append('smashlib.ipy_project_manager')
 c.Smash.extensions.append("smashlib.ipy_dwim")
+c.Smash.extensions.append("smashlib.ipy_autojump")
 #c.Smash.extensions.append('smashlib.ipy_powerline')
 
 ## configure the liquidprompt extension

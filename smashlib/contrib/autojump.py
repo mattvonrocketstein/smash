@@ -1,87 +1,46 @@
-# Author: Steven J. Bethard <steven.bethard@gmail.com>.
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# flake8: noqa
-"""Command-line parsing library
+#
+# adapted from the original code at https://github.com/kennethreitz/autoenv
+#
 
-This module is an optparse-inspired command-line parsing library that:
+"""
+  Copyright © 2008-2012 Joel Schaerer
+  Copyright © 2012-2014 William Ting
 
-    - handles both optional and positional arguments
-    - produces highly informative usage messages
-    - supports parsers that dispatch to sub-parsers
+  * This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3, or (at your option)
+  any later version.
 
-The following is a simple usage example that sums integers from the
-command-line and writes the result to a file::
+  * This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    parser = argparse.ArgumentParser(
-        description='sum the integers at the command line')
-    parser.add_argument(
-        'integers', metavar='int', nargs='+', type=int,
-        help='an integer to be summed')
-    parser.add_argument(
-        '--log', default=sys.stdout, type=argparse.FileType('w'),
-        help='the file where the sum should be written')
-    args = parser.parse_args()
-    args.log.write('%s' % sum(args.integers))
-    args.log.close()
-
-The module contains the following public classes:
-
-    - ArgumentParser -- The main entry point for command-line parsing. As the
-        example above shows, the add_argument() method is used to populate
-        the parser with actions for optional and positional arguments. Then
-        the parse_args() method is invoked to convert the args at the
-        command-line into an object with attributes.
-
-    - ArgumentError -- The exception raised by ArgumentParser objects when
-        there are errors with the parser's actions. Errors raised while
-        parsing the command-line are caught by ArgumentParser and emitted
-        as command-line messages.
-
-    - FileType -- A factory for defining types of files to be created. As the
-        example above shows, instances of FileType are typically passed as
-        the type= argument of add_argument() calls.
-
-    - Action -- The base class for parser actions. Typically actions are
-        selected by passing strings like 'store_true' or 'append_const' to
-        the action= argument of add_argument(). However, for greater
-        customization of ArgumentParser actions, subclasses of Action may
-        be defined and passed as the action= argument.
-
-    - HelpFormatter, RawDescriptionHelpFormatter, RawTextHelpFormatter,
-        ArgumentDefaultsHelpFormatter -- Formatter classes which
-        may be passed as the formatter_class= argument to the
-        ArgumentParser constructor. HelpFormatter is the default,
-        RawDescriptionHelpFormatter and RawTextHelpFormatter tell the parser
-        not to change the formatting for help text, and
-        ArgumentDefaultsHelpFormatter adds information about argument defaults
-        to the help.
-
-All other classes in this module are considered implementation details.
-(Also note that HelpFormatter and RawDescriptionHelpFormatter are only
-considered public as object names -- the API of the formatter objects is
-still considered an implementation detail.)
+  * You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software Foundation, Inc.,
+  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
 
-__version__ = '1.2.1'
-__all__ = [
-    'ArgumentParser',
-    'ArgumentError',
-    'ArgumentTypeError',
-    'FileType',
-    'HelpFormatter',
-    'ArgumentDefaultsHelpFormatter',
-    'RawDescriptionHelpFormatter',
-    'RawTextHelpFormatter',
-    'Namespace',
-    'Action',
-    'ONE_OR_MORE',
-    'OPTIONAL',
-    'PARSER',
-    'REMAINDER',
-    'SUPPRESS',
-    'ZERO_OR_MORE',
-]
+from __future__ import print_function
 
+from difflib import SequenceMatcher
+from itertools import chain
+from math import sqrt
+from operator import attrgetter
+from operator import itemgetter
+import os
+import re
+import sys
+
+if sys.version_info[0] == 3:
+    ifilter = filter
+    imap = map
+    os.getcwdu = os.getcwd
+else:
+    from itertools import ifilter
+    from itertools import imap
 
 import copy as _copy
 import os as _os
@@ -2373,3 +2332,679 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         """
         self.print_usage(_sys.stderr)
         self.exit(2, _('%s: error: %s\n') % (self.prog, message))
+
+
+from codecs import open
+from collections import namedtuple
+import os
+import shutil
+import sys
+from tempfile import NamedTemporaryFile
+from time import time
+
+if sys.version_info[0] == 3:
+    ifilter = filter
+    imap = map
+else:
+    from itertools import ifilter
+    from itertools import imap
+
+import errno
+from itertools import islice
+import os
+import platform
+import re
+import shutil
+import sys
+import unicodedata
+
+if sys.version_info[0] == 3:
+    imap = map
+    os.getcwdu = os.getcwd
+else:
+    from itertools import imap
+
+
+def create_dir(path):
+    """Creates a directory atomically."""
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+
+
+def encode_local(string):
+    """Converts string into user's preferred encoding."""
+    if is_python3():
+        return string
+    return string.encode(sys.getfilesystemencoding() or 'utf-8')
+
+
+def first(xs):
+    it = iter(xs)
+    try:
+        if is_python3():
+            return it.__next__()
+        return it.next()
+    except StopIteration:
+        return None
+
+
+def get_tab_entry_info(entry, separator):
+    """
+    Given a tab entry in the following format return needle, index, and path:
+
+        [needle]__[index]__[path]
+    """
+    needle, index, path = None, None, None
+
+    match_needle = re.search(r'(.*?)' + separator, entry)
+    match_index = re.search(separator + r'([0-9]{1})', entry)
+    match_path = re.search(
+        separator + r'[0-9]{1}' + separator + r'(.*)',
+        entry)
+
+    if match_needle:
+        needle = match_needle.group(1)
+
+    if match_index:
+        index = int(match_index.group(1))
+
+    if match_path:
+        path = match_path.group(1)
+
+    return needle, index, path
+
+
+def get_pwd():
+    try:
+        return os.getcwdu()
+    except OSError:
+        print("Current directory no longer exists.", file=sys.stderr)
+        raise
+
+
+def has_uppercase(string):
+    if is_python3():
+        return any(ch.isupper() for ch in string)
+    return any(unicodedata.category(c) == 'Lu' for c in unicode(string))
+
+
+def in_bash():
+    return 'bash' in os.getenv('SHELL')
+
+
+def is_autojump_sourced():
+    return '1' == os.getenv('AUTOJUMP_SOURCED')
+
+
+def is_python2():
+    return sys.version_info[0] == 2
+
+
+def is_python3():
+    return sys.version_info[0] == 3
+
+
+def is_linux():
+    return platform.system() == 'Linux'
+
+
+def is_osx():
+    return platform.system() == 'Darwin'
+
+
+def is_windows():
+    return platform.system() == 'Windows'
+
+
+def last(xs):
+    it = iter(xs)
+    tmp = None
+    try:
+        if is_python3():
+            while True:
+                tmp = it.__next__()
+        else:
+            while True:
+                tmp = it.next()
+    except StopIteration:
+        return tmp
+
+
+def move_file(src, dst):
+    """
+    Atomically move file.
+
+    Windows does not allow for atomic file renaming (which is used by
+    os.rename / shutil.move) so destination paths must first be deleted.
+    """
+    if is_windows() and os.path.exists(dst):
+        # raises exception if file is in use on Windows
+        os.remove(dst)
+    shutil.move(src, dst)
+
+
+def print_entry(entry):
+    print_local("%.1f:\t%s" % (entry.weight, entry.path))
+
+
+def print_local(string):
+    print(encode_local(string))
+
+
+def print_tab_menu(needle, tab_entries, separator):
+    """
+    Prints the tab completion menu according to the following format:
+
+        [needle]__[index]__[possible_match]
+
+    The needle (search pattern) and index are necessary to recreate the results
+    on subsequent calls.
+    """
+    for i, entry in enumerate(tab_entries):
+        print_local(
+            '%s%s%d%s%s' % (
+                needle,
+                separator,
+                i + 1,
+                separator,
+                entry.path))
+
+
+def sanitize(directories):
+    # edge case to allow '/' as a valid path
+    clean = lambda x: unico(x) if x == os.sep else unico(x).rstrip(os.sep)
+    return list(imap(clean, directories))
+
+
+def second(xs):
+    it = iter(xs)
+    try:
+        if is_python2():
+            it.next()
+            return it.next()
+        elif is_python3():
+            next(it)
+            return next(it)
+    except StopIteration:
+        return None
+
+
+def surround_quotes(string):
+    """
+    Bash has problems dealing with certain paths so we're surrounding all
+    path outputs with quotes.
+    """
+    if in_bash() and string:
+        # Python 2.6 requres field numbers
+        return '"{0}"'.format(string)
+    return string
+
+
+def take(n, iterable):
+    """Return first n items of an iterable."""
+    return islice(iterable, n)
+
+
+def unico(string):
+    """Converts into Unicode string."""
+    if is_python2() and not isinstance(string, unicode):
+        return unicode(string, encoding='utf-8', errors='replace')
+    return string
+
+
+BACKUP_THRESHOLD = 24 * 60 * 60
+Entry = namedtuple('Entry', ['path', 'weight'])
+
+
+def dictify(entries):
+    """
+    Converts a list of entries into a dictionary where
+        key = path
+        value = weight
+    """
+    result = {}
+    for entry in entries:
+        result[entry.path] = entry.weight
+    return result
+
+
+def entriefy(data):
+    """Converts a dictionary into an iterator of entries."""
+    convert = lambda tup: Entry(*tup)
+    if is_python3():
+        return map(convert, data.items())
+    return imap(convert, data.iteritems())
+
+
+def load(config):
+    """Returns a dictonary (key=path, value=weight) loaded from data file."""
+    xdg_aj_home = os.path.join(
+        os.path.expanduser('~'),
+        '.local',
+        'share',
+        'autojump')
+
+    if is_osx() and os.path.exists(xdg_aj_home):
+        migrate_osx_xdg_data(config)
+
+    if not os.path.exists(config['data_path']):
+        return {}
+
+    # example: u'10.0\t/home/user\n' -> ['10.0', u'/home/user']
+    parse = lambda line: line.strip().split('\t')
+
+    correct_length = lambda x: len(x) == 2
+
+    # example: ['10.0', u'/home/user'] -> (u'/home/user', 10.0)
+    tupleize = lambda x: (x[1], float(x[0]))
+
+    try:
+        with open(
+                config['data_path'],
+                'r', encoding='utf-8',
+                errors='replace') as f:
+            return dict(
+                imap(
+                    tupleize,
+                    ifilter(correct_length, imap(parse, f))))
+    except (IOError, EOFError):
+        return load_backup(config)
+
+
+def load_backup(config):
+    if os.path.exists(config['backup_path']):
+        move_file(config['backup_path'], config['data_path'])
+        return load(config)
+    return {}
+
+
+def migrate_osx_xdg_data(config):
+    """
+    Older versions incorrectly used Linux XDG_DATA_HOME paths on OS X. This
+    migrates autojump files from ~/.local/share/autojump to ~/Library/autojump
+    """
+    assert is_osx(), "This function should only be run on OS X."
+
+    xdg_data_home = os.path.join(os.path.expanduser('~'), '.local', 'share')
+    xdg_aj_home = os.path.join(xdg_data_home, 'autojump')
+    data_path = os.path.join(xdg_aj_home, 'autojump.txt')
+    backup_path = os.path.join(xdg_aj_home, 'autojump.txt.bak')
+
+    if os.path.exists(data_path):
+        move_file(data_path, config['data_path'])
+    if os.path.exists(backup_path):
+        move_file(backup_path, config['backup_path'])
+
+    # cleanup
+    shutil.rmtree(xdg_aj_home)
+    if len(os.listdir(xdg_data_home)) == 0:
+        shutil.rmtree(xdg_data_home)
+
+
+def save(config, data):
+    """Save data and create backup, creating a new data file if necessary."""
+    create_dir(os.path.dirname(config['data_path']))
+
+    # atomically save by writing to temporary file and moving to destination
+    try:
+        temp = NamedTemporaryFile(delete=False)
+        # Windows cannot reuse the same open file name
+        temp.close()
+
+        with open(temp.name, 'w', encoding='utf-8', errors='replace') as f:
+            for path, weight in data.items():
+                f.write(unico("%s\t%s\n" % (weight, path)))
+
+            f.flush()
+            os.fsync(f)
+    except IOError as ex:
+        print("Error saving autojump data (disk full?)" % ex, file=sys.stderr)
+        sys.exit(1)
+
+    # move temp_file -> autojump.txt
+    move_file(temp.name, config['data_path'])
+
+    # create backup file if it doesn't exist or is older than BACKUP_THRESHOLD
+    if not os.path.exists(config['backup_path']) or \
+            (time() - os.path.getmtime(config['backup_path']) > BACKUP_THRESHOLD):  # noqa
+        shutil.copy(config['data_path'], config['backup_path'])
+
+VERSION = '22.2.1-beta'
+FUZZY_MATCH_THRESHOLD = 0.6
+TAB_ENTRIES_COUNT = 9
+TAB_SEPARATOR = '__'
+
+
+from smashlib.data import SMASH_DIR
+def set_defaults():
+    config = {}
+    data_home=SMASH_DIR
+    config['data_path'] = os.path.join(data_home, 'autojump.txt')
+    config['backup_path'] = os.path.join(data_home, 'autojump.txt.bak')
+    return config
+
+
+def parse_arguments(**kargs):
+    parser = ArgumentParser(
+        description='Automatically jump to directory passed as an argument.',
+        epilog="Please see autojump(1) man pages for full documentation.")
+    parser.add_argument(
+        'directory', metavar='DIRECTORY', nargs='*', default='',
+        help='directory to jump to')
+    parser.add_argument(
+        '-a', '--add', metavar='DIRECTORY',
+        help='add path')
+    parser.add_argument(
+        '-i', '--increase', metavar='WEIGHT', nargs='?', type=int,
+        const=10, default=False,
+        help='increase current directory weight')
+    parser.add_argument(
+        '-d', '--decrease', metavar='WEIGHT', nargs='?', type=int,
+        const=15, default=False,
+        help='decrease current directory weight')
+    parser.add_argument(
+        '--complete', action="store_true", default=False,
+        help='used for tab completion')
+    parser.add_argument(
+        '--purge', action="store_true", default=False,
+        help='remove non-existent paths from database')
+    parser.add_argument(
+        '-s', '--stat', action="store_true", default=False,
+        help='show database entries and their key weights')
+    parser.add_argument(
+        '-v', '--version', action="version", version="%(prog)s v" +
+        VERSION, help='show version information')
+    return parser.parse_args(**kargs)
+
+
+def add_path(data, path, weight=10):
+    """
+    Add a new path or increment an existing one.
+
+    os.path.realpath() is not used because it's preferable to use symlinks
+    with resulting duplicate entries in the database than a single canonical
+    path.
+    """
+    path = unico(path).rstrip(os.sep)
+    if path == os.path.expanduser('~'):
+        return data, Entry(path, 0)
+
+    data[path] = sqrt((data.get(path, 0) ** 2) + (weight ** 2))
+
+    return data, Entry(path, data[path])
+
+
+def decrease_path(data, path, weight=15):
+    """Decrease or zero out a path."""
+    path = unico(path).rstrip(os.sep)
+    data[path] = max(0, data.get(path, 0) - weight)
+    return data, Entry(path, data[path])
+
+
+def detect_smartcase(needles):
+    """
+    If any needles contain an uppercase letter then use case sensitive
+    searching. Otherwise use case insensitive searching.
+    """
+    return not any(imap(has_uppercase, needles))
+
+
+def find_matches(entries, needles, check_entries=True):
+    """Return an iterator to matching entries."""
+    # TODO(wting|2014-02-24): replace assertion with unit test
+    assert isinstance(needles, list), "Needles must be a list."
+    ignore_case = detect_smartcase(needles)
+
+    try:
+        pwd = os.getcwdu()
+    except OSError:
+        pwd = None
+
+    # using closure to prevent constantly hitting hdd
+    def is_cwd(entry):
+        return os.path.realpath(entry.path) == pwd
+
+    if check_entries:
+        path_exists = lambda entry: os.path.exists(entry.path)
+    else:
+        path_exists = lambda _: True
+
+    data = sorted(
+        entries,
+        key=attrgetter('weight'),
+        reverse=True)
+
+    return ifilter(
+        lambda entry: not is_cwd(entry) and path_exists(entry),
+        chain(
+            match_consecutive(needles, data, ignore_case),
+            match_fuzzy(needles, data, ignore_case),
+            match_anywhere(needles, data, ignore_case)))
+
+
+def handle_tab_completion(needle, entries):
+    tab_needle, tab_index, tab_path = get_tab_entry_info(needle, TAB_SEPARATOR)
+
+    if tab_path:
+        print_local(tab_path)
+    elif tab_index:
+        get_ith_path = lambda i, iterable: last(take(i, iterable)).path
+        print_local(get_ith_path(
+            tab_index,
+            find_matches(entries, [tab_needle], check_entries=False)))
+    elif tab_needle:
+        # found partial tab completion entry
+        print_tab_menu(
+            tab_needle,
+            take(TAB_ENTRIES_COUNT, find_matches(
+                entries,
+                [tab_needle],
+                check_entries=False)),
+            TAB_SEPARATOR)
+    else:
+        print_tab_menu(
+            needle,
+            take(TAB_ENTRIES_COUNT, find_matches(
+                entries,
+                [needle],
+                check_entries=False)),
+            TAB_SEPARATOR)
+
+
+def match_anywhere(needles, haystack, ignore_case=False):
+    """
+    Matches needles anywhere in the path as long as they're in the same (but
+    not necessary consecutive) order.
+
+    For example:
+        needles = ['foo', 'baz']
+        regex needle = r'.*foo.*baz.*'
+        haystack = [
+            (path="/foo/bar/baz", weight=10),
+            (path="/baz/foo/bar", weight=10),
+            (path="/foo/baz", weight=10)]
+
+        result = [
+            (path="/moo/foo/baz", weight=10),
+            (path="/foo/baz", weight=10)]
+    """
+    regex_needle = '.*' + '.*'.join(needles).replace('\\', '\\\\') + '.*'
+    regex_flags = re.IGNORECASE | re.UNICODE if ignore_case else re.UNICODE
+    found = lambda haystack: re.search(
+        regex_needle,
+        haystack.path,
+        flags=regex_flags)
+    return ifilter(found, haystack)
+
+
+def match_consecutive(needles, haystack, ignore_case=False):
+    """
+    Matches consecutive needles at the end of a path.
+
+    For example:
+        needles = ['foo', 'baz']
+        haystack = [
+            (path="/foo/bar/baz", weight=10),
+            (path="/foo/baz/moo", weight=10),
+            (path="/moo/foo/baz", weight=10),
+            (path="/foo/baz", weight=10)]
+
+        regex_needle = re.compile(r'''
+            foo     # needle #1
+            [^/]*   # all characters except os.sep zero or more times
+            /       # os.sep
+            [^/]*   # all characters except os.sep zero or more times
+            baz     # needle #2
+            [^/]*   # all characters except os.sep zero or more times
+            $       # end of string
+            ''')
+
+        result = [
+            (path="/moo/foo/baz", weight=10),
+            (path="/foo/baz", weight=10)]
+    """
+    # The normal \\ separator needs to be escaped again for use in regex.
+    sep = '\\\\' if is_windows() else os.sep
+    regex_no_sep = '[^' + sep + ']*'
+    regex_no_sep_end = regex_no_sep + '$'
+    regex_one_sep = regex_no_sep + sep + regex_no_sep
+    # can't use compiled regex because of flags
+    regex_needle = regex_one_sep.join(needles).replace('\\', '\\\\') + regex_no_sep_end  # noqa
+    regex_flags = re.IGNORECASE | re.UNICODE if ignore_case else re.UNICODE
+    found = lambda entry: re.search(
+        regex_needle,
+        entry.path,
+        flags=regex_flags)
+    return ifilter(found, haystack)
+
+
+def match_fuzzy(needles, haystack, ignore_case=False):
+    """
+    Performs an approximate match with the last needle against the end of
+    every path past an acceptable threshold (FUZZY_MATCH_THRESHOLD).
+
+    For example:
+        needles = ['foo', 'bar']
+        haystack = [
+            (path="/foo/bar/baz", weight=11),
+            (path="/foo/baz/moo", weight=10),
+            (path="/moo/foo/baz", weight=10),
+            (path="/foo/baz", weight=10),
+            (path="/foo/bar", weight=10)]
+
+    result = [
+            (path="/foo/bar/baz", weight=11),
+            (path="/moo/foo/baz", weight=10),
+            (path="/foo/baz", weight=10),
+            (path="/foo/bar", weight=10)]
+
+    This is a weak heuristic and used as a last resort to find matches.
+    """
+    end_dir = lambda path: last(os.path.split(path))
+    if ignore_case:
+        needle = last(needles).lower()
+        match_percent = lambda entry: SequenceMatcher(
+            a=needle,
+            b=end_dir(entry.path.lower())).ratio()
+    else:
+        needle = last(needles)
+        match_percent = lambda entry: SequenceMatcher(
+            a=needle,
+            b=end_dir(entry.path)).ratio()
+    meets_threshold = lambda entry: match_percent(entry) >= \
+        FUZZY_MATCH_THRESHOLD
+    return ifilter(meets_threshold, haystack)
+
+
+def purge_missing_paths(entries):
+    """Remove non-existent paths from a list of entries."""
+    exists = lambda entry: os.path.exists(entry.path)
+    return ifilter(exists, entries)
+
+
+def print_stats(data, data_path):
+    for path, weight in sorted(data.items(), key=itemgetter(1)):
+        print_entry(Entry(path, weight))
+
+    print("________________________________________\n")
+    print("%d:\t total weight" % sum(data.values()))
+    print("%d:\t number of entries" % len(data))
+
+    try:
+        print_local(
+            "%.2f:\t current directory weight" % data.get(os.getcwdu(), 0))
+    except OSError:
+        # current directory no longer exists
+        pass
+
+    print("\ndata:\t %s" % data_path)
+
+
+def main(args):  # noqa
+    #if not is_autojump_sourced() and not is_windows():
+    #    print("Please source the correct autojump file in your shell's")
+    #    print("startup file. For more information, please reinstall autojump")
+    #    print("and read the post installation instructions.")
+    #    return 1
+
+    config = set_defaults()
+
+    # all arguments are mutually exclusive
+    if args.add:
+        save(config, first(add_path(load(config), args.add)))
+    elif args.complete:
+        handle_tab_completion(
+            needle=first(chain(sanitize(args.directory), [''])),
+            entries=entriefy(load(config)))
+    elif args.decrease:
+        data, entry = decrease_path(load(config), get_pwd(), args.decrease)
+        save(config, data)
+        print_entry(entry)
+    elif args.increase:
+        data, entry = add_path(load(config), get_pwd(), args.increase)
+        save(config, data)
+        print_entry(entry)
+    elif args.purge:
+        old_data = load(config)
+        new_data = dictify(purge_missing_paths(entriefy(old_data)))
+        save(config, new_data)
+        print("Purged %d entries." % (len(old_data) - len(new_data)))
+    elif args.stat:
+        print_stats(load(config), config['data_path'])
+    elif not args.directory:
+        # Return best match.
+        entries = entriefy(load(config))
+        print_local(first(chain(
+            imap(attrgetter('path'), find_matches(entries, [''])),
+            # always return a path to calling shell functions
+            ['.'])))
+    else:
+        entries = entriefy(load(config))
+        needles = sanitize(args.directory)
+        tab_needle, tab_index, tab_path = \
+            get_tab_entry_info(first(needles), TAB_SEPARATOR)
+
+        # Handle `j foo__`, assuming first index.
+        if not tab_path and not tab_index \
+                and tab_needle and needles[0] == tab_needle + TAB_SEPARATOR:
+            tab_index = 1
+
+        if tab_path:
+            return (tab_path)
+        elif tab_index:
+            get_ith_path = lambda i, iterable: last(take(i, iterable)).path
+            return (
+                get_ith_path(
+                    tab_index,
+                    find_matches(entries, [tab_needle])))
+        else:
+            return (first(chain(
+                imap(attrgetter('path'), find_matches(entries, needles)),
+                # always return a path to calling shell functions
+                ['.'])))
+
+if __name__ == "__main__":
+    sys.exit(main(parse_arguments()))
