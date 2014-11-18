@@ -50,11 +50,14 @@ c.TerminalInteractiveShell.confirm_exit = False
 c.IPCompleter.merge_completions = False
 
 # load optional smash extensions
+#c.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
 c.Smash.extensions.append('smashlib.ipy_liquidprompt')
+
 c.Smash.extensions.append('smashlib.ipy_cd_hooks')
 c.Smash.extensions.append('smashlib.ipy_venv')
 c.Smash.extensions.append('smashlib.ipy_project_manager')
 c.Smash.extensions.append("smashlib.ipy_dwim")
+#c.Smash.extensions.append('smashlib.ipy_powerline')
 
 ## configure the liquidprompt extension
 ################################################################################
