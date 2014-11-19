@@ -25,18 +25,14 @@ from IPython.core.magic import Magics, magics_class, line_magic
 
 DEFAULT_DATA_FILE = 'autojump.dat'
 
-
-
 mine = lambda x: _main(parse_arguments(args=x))
 
-def j_completer(db, himself, event):
-    """ TODO: longest-common-substring algorithm
-              etc for even smarter completions """
-    path_elements = [ ]
-    for x in db.data.keys():
-        path_elements += x.split(os.path.sep)
-    path_elements = list(set(filter(None, path_elements)))
-    return path_elements
+def j_completer(self,event):
+    tmp = event.line.split()[1:]
+    options = mine(['--complete']+\
+                event.line.split()[1:])
+    return [os.path.split(x.split('__')[-1])[-1] for x in options]
+
 
 @magics_class
 class AutojumpMagics(Magics):
@@ -45,6 +41,8 @@ class AutojumpMagics(Magics):
     @line_magic
     def j(self, parameter_s=''):
         tmp = parameter_s.split()
+        if not tmp:
+            return
         if not tmp[0].startswith('-'):
             result = mine(tmp)
             get_ipython().magic('pushd '+result)
@@ -85,6 +83,8 @@ class AutojumpPlugin(Reporter):
 
     def install(self):
         self.is_updating = True
+        get_ipython().set_hook('complete_command', j_completer, str_key = 'j')
+        #quick_completer('j',)
         #fxn = lambda himself, event: j_completer(self.db, himself, event)
         #set_complete(fxn, 'j')
 

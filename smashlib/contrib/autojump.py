@@ -2475,8 +2475,10 @@ def print_entry(entry):
 def print_local(string):
     print(encode_local(string))
 
+def _local(string):
+    return (encode_local(string))
 
-def print_tab_menu(needle, tab_entries, separator):
+def tab_menu(needle, tab_entries, separator):
     """
     Prints the tab completion menu according to the following format:
 
@@ -2485,15 +2487,16 @@ def print_tab_menu(needle, tab_entries, separator):
     The needle (search pattern) and index are necessary to recreate the results
     on subsequent calls.
     """
+    out = []
     for i, entry in enumerate(tab_entries):
-        print_local(
+        out.append(_local(
             '%s%s%d%s%s' % (
                 needle,
                 separator,
                 i + 1,
                 separator,
-                entry.path))
-
+                entry.path)))
+    return out
 
 def sanitize(directories):
     # edge case to allow '/' as a valid path
@@ -2771,15 +2774,15 @@ def handle_tab_completion(needle, entries):
     tab_needle, tab_index, tab_path = get_tab_entry_info(needle, TAB_SEPARATOR)
 
     if tab_path:
-        print_local(tab_path)
+        return (tab_path)
     elif tab_index:
         get_ith_path = lambda i, iterable: last(take(i, iterable)).path
-        print_local(get_ith_path(
+        return (get_ith_path(
             tab_index,
             find_matches(entries, [tab_needle], check_entries=False)))
     elif tab_needle:
         # found partial tab completion entry
-        print_tab_menu(
+        return tab_menu(
             tab_needle,
             take(TAB_ENTRIES_COUNT, find_matches(
                 entries,
@@ -2787,7 +2790,7 @@ def handle_tab_completion(needle, entries):
                 check_entries=False)),
             TAB_SEPARATOR)
     else:
-        print_tab_menu(
+        return tab_menu(
             needle,
             take(TAB_ENTRIES_COUNT, find_matches(
                 entries,
@@ -2938,9 +2941,10 @@ def main(args):  # noqa
     if args.add:
         save(config, first(add_path(load(config), args.add)))
     elif args.complete:
-        handle_tab_completion(
+        out=handle_tab_completion(
             needle=first(chain(sanitize(args.directory), [''])),
             entries=entriefy(load(config)))
+        return out
     elif args.decrease:
         data, entry = decrease_path(load(config), get_pwd(), args.decrease)
         save(config, data)

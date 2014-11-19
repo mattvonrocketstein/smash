@@ -11,8 +11,9 @@ class ProjectMagics(Magics):
             op(parameter_s)
 
     @line_magic
-    def project_ack(self, parameter_s):
+    def search(self, parameter_s):
         return self.project_manager._ack(parameter_s)
+    search_project = search
 
     @line_magic
     def activate_project(self, parameter_s=''):
@@ -29,7 +30,6 @@ class ProjectMagics(Magics):
     @line_magic
     def check_project(self, parameter_s=''):
         self._run_op('check', parameter_s)
-
 
     @line_magic
     def build_project(self, parameter_s=''):
