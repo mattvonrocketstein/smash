@@ -10,6 +10,11 @@ from smashlib.python import get_env, opd, ops, opj, ope, expanduser
 def home():
     return get_env('HOME')
 
+def touch_file(_file):
+    """ TODO: move to goulash """
+    with open(_file, 'w') as handle:
+        pass
+
 def require_ipy(require_version):
     import IPython
     ipy_version = IPython.__version__

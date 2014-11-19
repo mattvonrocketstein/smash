@@ -10,19 +10,22 @@
 
 import os
 import smashlib
+
 from smashlib.v2 import Reporter
 from smashlib.util.events import receives_event
 from smashlib.python import ope, opj
 from smashlib.channels import C_CD_EVENT
 from smashlib.data import SMASH_DIR
-from smashlib.util import get_smash
-DEFAULT_DATA_FILE = 'autojump.dat'
-
+from smashlib.util import get_smash, touch_file
 from smashlib.contrib.autojump import main as _main
 from smashlib.contrib.autojump import parse_arguments
+from smashlib.data import USER_CONFIG_PATH
+
 from IPython.core.magic import Magics, magics_class, line_magic
 
-from smashlib.data import USER_CONFIG_PATH
+DEFAULT_DATA_FILE = 'autojump.dat'
+
+
 
 mine = lambda x: _main(parse_arguments(args=x))
 
@@ -35,26 +38,23 @@ def j_completer(db, himself, event):
     path_elements = list(set(filter(None, path_elements)))
     return path_elements
 
-def touch_file(_file):
-    with open(_file, 'w') as handle:
-        pass
-
-
 @magics_class
 class AutojumpMagics(Magics):
     """ main magics for smash """
 
     @line_magic
-    def aj(self, parameter_s=''):
+    def j(self, parameter_s=''):
         tmp = parameter_s.split()
         if not tmp[0].startswith('-'):
             result = mine(tmp)
-            get_ipython().magic('cd '+result)
+            get_ipython().magic('pushd '+result)
         else:
             try:
                 return mine(tmp)
             except SystemExit:
                 pass
+
+    jump = j
 
 
 class AutojumpPlugin(Reporter):
@@ -84,35 +84,6 @@ class AutojumpPlugin(Reporter):
                             new_dir,'?'))
 
     def install(self):
-        #self.smash.set_env('AUTOJUMP_DATA_DIR', SMASH_DIR)
-        #from smashlib.contrib.autojump import Database, find_matches
-        self.is_updating = True
-        return
-        # do not move this import (it relies on the set_senv() call)
-        #if not ope(self.datafile):
-        #    self.touch_datafile()
-
-        # define and bind the "j" command (short for jump)
-        # TODO: refactor and use a partial here
-        def j(_dir):
-            if not _dir:
-                print self.db.data
-            else:
-                matches = find_matches(self.db, [_dir])
-                if matches:
-                    chose = matches[0]
-                    self.report('from {0} matches, chose "{1}"'.format(
-                        len(matches),chose))
-                    self.is_updating = False
-                    get_ipython().ipmagic('pushd ' + chose)
-                    self.is_updating = True
-                else:
-                    report.autojump("no matches found.")
-        self.contribute_magic('j', j)
-        self.contribute_magic('jump', j)
-        self.contribute('db', self.db)
-
-        # turns on the automatic weight-updating.
         self.is_updating = True
         #fxn = lambda himself, event: j_completer(self.db, himself, event)
         #set_complete(fxn, 'j')

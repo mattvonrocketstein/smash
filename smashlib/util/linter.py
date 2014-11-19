@@ -1,15 +1,18 @@
 """ smashlib.util.linter
 """
 import os
-
+import re
 from collections import defaultdict
+
+from goulash.venv import find_venvs
 from IPython.config.configurable import Configurable
 from IPython.utils.traitlets import Bool, List
 
-from goulash.venv import find_venvs
 from smashlib.util._fabric import require_bin
 from smashlib.v2 import Reporter
-import re
+
+r_pep8_error = re.compile('.* E\d\d\d .*')
+
 class Linter(Reporter):
     """ """
     def __init__(self, config, cmd_exec=None):
@@ -22,7 +25,6 @@ class Linter(Reporter):
     def __call__(self):
         raise Exception("abstract")
 
-r_pep8_error = re.compile('.* E\d\d\d .*')
 
 class PyLinter(Linter):
     ignore_unused_imports_in_init_files = True
@@ -55,11 +57,19 @@ class PyLinter(Linter):
             output_lines = filter(lambda x: not r2.match(x), output_lines)
             output= '\n'.join(output_lines)
         if self.ignore_undefined_names:
-            #raise Exception,self.ignore_undefined_names
+            always_ignore_names = [x for x in self.ignore_undefined_names \
+                                   if isinstance(x, basestring) ]
+            patterns = []
             res = re.compile(".*F821 undefined name '(" + \
-                             '|'.join(self.ignore_undefined_names) + \
+                             '|'.join(always_ignore_names) + \
                              ")'")
-            output_lines = filter(lambda x: not res.match(x), output_lines)
+            patterns.append(res)
+            sometimes_ignore_names = [ x for x in self.ignore_undefined_names \
+                                       if not isinstance(x, basestring) ]
+            for name, pattern in sometimes_ignore_names:
+                res2  = re.compile(pattern + ".*F821 undefined name '" + name + "'")
+                patterns.append(res2)
+            output_lines = filter(lambda x: not any([y.match(x) for y in patterns]), output_lines)
             output= '\n'.join(output_lines)
         bad_files = [x.split(':')[0] for x in output_lines]
         err_counter = defaultdict(lambda:0)

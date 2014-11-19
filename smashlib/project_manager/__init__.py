@@ -162,8 +162,8 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
 
 
     def _event_set_search_dirs(self, slice_or_index, base_dir):
-        if isinstance(slice_or_index,slice):
-            assert isinstance(base_dir,list) #refresh, ie rehashx
+        if isinstance(slice_or_index, slice):
+            assert isinstance(base_dir, list) #refresh, ie rehashx
             self.refresh()
             return
         base_dir = os.path.abspath(os.path.expanduser(base_dir))

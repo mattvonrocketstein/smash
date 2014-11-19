@@ -1,4 +1,7 @@
 """ smashlib.patches.rehashx
+
+    TODO: wait actually this is dumb.  send a "refresh"
+          event and have a subscriber that runs rehashx
 """
 import os
 

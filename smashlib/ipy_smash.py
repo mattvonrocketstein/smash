@@ -15,7 +15,7 @@ from smashlib.channels import C_POST_RUN_INPUT
 from smashlib.util.reflect import from_dotpath
 from smashlib.util import bash
 from smashlib.magics import SmashMagics
-
+from smashlib.channels import C_SMASH_INIT_COMPLETE
 
 class Smash(Reporter):
     extensions = List(default_value=[], config=True)
@@ -65,8 +65,10 @@ class Smash(Reporter):
             if obj:
                 args,unknown = obj.parse_argv()
         if main_args.command:
-            self.shell.run_cell(main_args.command)
-            self.shell.run_cell('exit')
+            def run_command(*args, **kargs):
+                self.shell.run_cell(main_args.command)
+                self.shell.run_cell('exit')
+            self.bus.subscribe(C_SMASH_INIT_COMPLETE, run_command)
 
     @property
     def project_manager(self):
@@ -92,7 +94,7 @@ class Smash(Reporter):
         from smashlib.patches.rehashx import PatchRehashX
         PatchEdit(self).install()
         PatchRehashX(self).install()
-        self.publish('smash_init_complete', None)
+        self.publish(C_SMASH_INIT_COMPLETE, None)
 
     def init_bus(self):
         """ note: it is a special case that due to bootstrap ordering,

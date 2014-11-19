@@ -12,48 +12,39 @@
 # in here instead.
 #
 
-c = get_config()
-
+_ = get_config()
 get_config = eval('get_config') # shut up the linter
+from smashlib.config import SmashConfig
+config = SmashConfig(_)
 
 # every smash component gets it's own verbosity setting.
 # this mostly controls the printing of debugging info
-c.Smash.ignore_warnings = True
-c.Smash.verbose = False
-c.Smash.verbose_events = True
-c.LiquidPrompt.verbose = False
-c.ProjectManager.verbose = False
-c.ChangeDirHooks.verbose = False
-c.VirtualEnvSupport.verbose = True
+_.Smash.ignore_warnings = True
+_.Smash.verbose = False
+_.Smash.verbose_events = True
+_.LiquidPrompt.verbose = False
+_.ProjectManager.verbose = False
+_.ChangeDirHooks.verbose = False
+_.VirtualEnvSupport.verbose = True
 
-c.PyLinter.verbose=True
-c.PyLinter.ignore_pep8 = True
-c.PyLinter.ignore_undefined_names='get_ipython'.split()
+_.PyLinter.verbose=True
+_.PyLinter.ignore_pep8 = True
 
-# add custom directory hooks here
-#c.ChangeDirHooks.change_dir_hooks.append(
+# begin Change-Dir-hooks configuration: add any custom hooks here
+#
+#_.ChangeDirHooks.change_dir_hooks.append(
 #    "smashlib.ipy_cd_hooks.ChangeDirHooks.test_change_message")
 
-# everything below this line should not ultimately be in this file..
+
+# begin project manager configuration.
 #
-c.TerminalInteractiveShell.editor = 'emacsclient -n'
-
-# project manager configuration
+# the project manager can be configured either from this file directly,
+# or from ~/.smash/etc, based on json there.  in each case you can consult
+# the corresponding json schema for more information
+#
 projects = c.ProjectManager
-projects.search_dirs.append('~/code')
-projects.project_map.update(dict(toybox='/vagrant'))
-projects.venv_map.update(dict(robotninja='~/code/hammock/'))
-projects.venv_map.update(dict(emax='~/.emax'))
-projects.venv_map.update(dict(toybox='/vagrant/guest_venv'))
-
-# TODO: SmashAliasManager, which respects project settings
-projects.alias_map.update(dict(
-    __smash__ = [
-        ('ack', 'ack-grep'),
-        ('st', 'git status'),
-        ('gds', 'git diff --stat'),
-        ('gd', 'git diff'),
-        ('irc','xchat -d ~/code/dotfiles/xchat_default&'),
-        ],
-
-    ))
+projects.search_dirs.append(config.load_from_etc('search_dirs.json'))
+projects.project_map.update(config.load_from_etc('projects.json'))
+projects.alias_map.update(config.load_from_etc('aliases.json'))
+projects.macro_map.update(config.load_from_etc('macros.json'))
+projects.venv_map.update(config.load_from_etc('venvs.json'))

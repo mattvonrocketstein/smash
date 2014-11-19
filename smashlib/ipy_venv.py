@@ -18,7 +18,8 @@ from smashlib.data import SMASH_DIR
 from smashlib.python import opj, ope, abspath, expanduser
 
 
-# "real_prefix" is set by virtualenv itself
+# "real_prefix" is set by virtualenv itself. this
+# is interesting but maybe not as useful as i thought
 REAL_PREFIX = getattr(sys, 'real_prefix', sys.prefix)
 
 # channel names for use with the smash bus
