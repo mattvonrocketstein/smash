@@ -17,22 +17,24 @@ from smashlib.python import ope, opj
 from smashlib.channels import C_CD_EVENT
 from smashlib.data import SMASH_DIR
 from smashlib.util import get_smash, touch_file
-from smashlib.contrib.autojump import main as _main
-from smashlib.contrib.autojump import parse_arguments
 from smashlib.data import USER_CONFIG_PATH
+from smashlib.contrib import autojump as _autojump
+
+_main = _autojump.main
+parse_arguments = _autojump.parse_arguments
 
 from IPython.core.magic import Magics, magics_class, line_magic
 
 DEFAULT_DATA_FILE = 'autojump.dat'
 
-mine = lambda x: _main(parse_arguments(args=x))
+autojump = lambda x: _main(parse_arguments(args=x))
 
-def j_completer(self,event):
+def j_completer(self, event):
+    """ simple tab completer"""
     tmp = event.line.split()[1:]
-    options = mine(['--complete']+\
+    options = autojump(['--complete']+\
                 event.line.split()[1:])
     return [os.path.split(x.split('__')[-1])[-1] for x in options]
-
 
 @magics_class
 class AutojumpMagics(Magics):
@@ -44,25 +46,15 @@ class AutojumpMagics(Magics):
         if not tmp:
             return
         if not tmp[0].startswith('-'):
-            result = mine(tmp)
+            result = autojump(tmp)
             get_ipython().magic('pushd '+result)
         else:
             try:
-                return mine(tmp)
+                return autojump(tmp)
             except SystemExit:
                 pass
 
-    jump = j
-
-
 class AutojumpPlugin(Reporter):
-
-    @property
-    def datafile(self):
-        return opj(SMASH_DIR, DEFAULT_DATA_FILE)
-
-    def touch_datafile(self):
-        touch_file(self.datafile)
 
     def init_magics(self):
         self.shell.register_magics(AutojumpMagics)
@@ -74,19 +66,18 @@ class AutojumpPlugin(Reporter):
             after "pushd" as well, but that's not implemented.
         """
         if self.is_updating and new_dir is not None:
-            mine(['-a', new_dir])
-            #  increment the weight for that directory
-            mine(['-i', ])
+            autojump(['--add', new_dir])
+            # increment the weight for the current directory.
+            # it must be the case that we are already *in* the
+            #  directory, because we have received the C_CD_EVENT message.
+            autojump(['--increase'])
             self.report('autojump '+\
                         "incremented jump-weight for '{0}' to {1}".format(
-                            new_dir,'?'))
+                            new_dir, '?'))
 
     def install(self):
         self.is_updating = True
         get_ipython().set_hook('complete_command', j_completer, str_key = 'j')
-        #quick_completer('j',)
-        #fxn = lambda himself, event: j_completer(self.db, himself, event)
-        #set_complete(fxn, 'j')
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
