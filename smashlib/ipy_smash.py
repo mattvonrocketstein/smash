@@ -123,6 +123,15 @@ class Smash(Reporter):
                 self.report("detected possible $PATH changes (rehashing)")
                 self.shell.magic('rehashx')
 
+    def add_completer(self, fxn, **kargs):
+        from goulash._inspect import get_caller
+        self.completers[get_caller(2)['class']].append(fxn)
+        get_ipython().set_hook('complete_command', fxn, **kargs)
+
+    from collections import defaultdict
+
+    completers = defaultdict(list)
+
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     ip = get_ipython()

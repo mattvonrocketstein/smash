@@ -77,7 +77,7 @@ class AutojumpPlugin(Reporter):
 
     def install(self):
         self.is_updating = True
-        get_ipython().set_hook('complete_command', j_completer, str_key = 'j')
+        self.smash.add_completer(j_completer, str_key='j')
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""

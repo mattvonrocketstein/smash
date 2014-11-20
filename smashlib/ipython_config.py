@@ -59,6 +59,7 @@ _.Smash.extensions.append('smashlib.ipy_cd_hooks')
 _.Smash.extensions.append('smashlib.ipy_venv')
 _.Smash.extensions.append('smashlib.ipy_project_manager')
 _.Smash.extensions.append("smashlib.ipy_dwim")
+_.Smash.extensions.append("smashlib.ipy_fabric")
 _.Smash.extensions.append("smashlib.ipy_autojump")
 #_.Smash.extensions.append('smashlib.ipy_powerline')
 
