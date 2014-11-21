@@ -53,16 +53,15 @@ _.IPCompleter.merge_completions = False
 
 # load optional smash extensions
 #_.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
-_.Smash.extensions.append('smashlib.ipy_liquidprompt')
-
-_.Smash.extensions.append('smashlib.ipy_cd_hooks')
-_.Smash.extensions.append('smashlib.ipy_venv')
-_.Smash.extensions.append('smashlib.ipy_project_manager')
-_.Smash.extensions.append("smashlib.ipy_dwim")
-_.Smash.extensions.append("smashlib.ipy_fabric")
-_.Smash.extensions.append("smashlib.ipy_tox")
-_.Smash.extensions.append("smashlib.ipy_autojump")
-#_.Smash.extensions.append('smashlib.ipy_powerline')
+_.Smash.plugins.append('smashlib.ipy_liquidprompt')
+_.Smash.plugins.append('smashlib.ipy_cd_hooks')
+_.Smash.plugins.append('smashlib.ipy_venv')
+_.Smash.plugins.append('smashlib.ipy_project_manager')
+_.Smash.plugins.append("smashlib.ipy_dwim")
+_.Smash.plugins.append("smashlib.ipy_fabric")
+_.Smash.plugins.append("smashlib.ipy_tox")
+_.Smash.plugins.append("smashlib.ipy_autojump")
+#_.Smash.plugins.append('smashlib.ipy_powerline')
 
 ## configure the liquidprompt extension with some reasonable defaults.
 ################################################################################

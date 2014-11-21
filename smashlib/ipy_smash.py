@@ -1,9 +1,9 @@
 """ smashlib.ipy_smash
 
-    Defines the main smash extension, which itself loads and
-    allows communications between the other smash extensions.
+    Defines the main smash plugin, which itself loads and
+    allows communications between the other smash plugins.
 
-    TODO: dynamic loading of extensions (use EventfulList)
+    TODO: dynamic loading of plugins (use EventfulList)
 """
 import os
 import cyrusbus
@@ -19,13 +19,13 @@ from smashlib.magics import SmashMagics
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 
 class Smash(Reporter):
-    extensions = List(default_value=[], config=True)
+    plugins = List(default_value=[], config=True)
     verbose_events = Bool(False, config=True)
     ignore_warnings = Bool(False, config=True)
     load_bash_aliases = Bool(False, config=True)
 
     error_handlers = []
-    plugins = {}
+    record = {}
 
     completers = defaultdict(list)
 
@@ -38,9 +38,9 @@ class Smash(Reporter):
     def init_magics(self):
         self.shell.register_magics(SmashMagics)
 
-    def init_extensions(self):
+    def init_plugins(self):
         record = {}
-        for dotpath in self.extensions:
+        for dotpath in self.plugins:
             mod = from_dotpath(dotpath)
             ext_name = dotpath.split('.')[-1]
             ext_obj = mod.load_ipython_extension(self.shell)
@@ -49,8 +49,8 @@ class Smash(Reporter):
                 msg = '{0}.load_ipython_extension should return an object'
                 msg = msg.format(dotpath)
                 self.warning(msg)
-        self.plugins = record
-        self.report("loaded extensions:", record.keys())
+        self.record = record
+        self.report("loaded plugins:", record.keys())
 
     def build_argparser(self):
         parser = super(Smash, self).build_argparser()
@@ -59,11 +59,11 @@ class Smash(Reporter):
 
     def parse_argv(self):
         """ parse arguments recognized by myself,
-            then let all the extensions take a stab
+            then let all the plugins take a stab
             at it.
         """
         main_args, unknown = super(Smash,self).parse_argv()
-        ext_objs = self.plugins.values()
+        ext_objs = self.record.values()
         for obj in ext_objs:
             if obj:
                 args,unknown = obj.parse_argv()
@@ -80,7 +80,7 @@ class Smash(Reporter):
     def init(self):
         self.shell._smash = self
         self.init_bus()
-        self.init_extensions()
+        self.init_plugins()
         self.parse_argv()
 
         # TODO: move this to configurable Bool()
@@ -105,7 +105,7 @@ class Smash(Reporter):
             to register event callbacks you'll have to register everything
             the simple way.
         """
-        super(Smash,self).init_bus()
+        super(Smash, self).init_bus()
         bus = cyrusbus.Bus()
         def warning_dep(*args, **kargs):
             raise Exception("dont send warning that way")
@@ -132,7 +132,7 @@ class Smash(Reporter):
         get_ipython().set_hook('complete_command', fxn, **kargs)
 
 def load_ipython_extension(ip):
-    """ called by %load_ext magic"""
+    """ called by %load_ext magic """
     ip = get_ipython()
     ip._smash = Smash(ip)
     return ip._smash
