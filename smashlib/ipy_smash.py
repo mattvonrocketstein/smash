@@ -7,6 +7,7 @@
 """
 import os
 import cyrusbus
+from collections import defaultdict
 
 from IPython.utils.traitlets import List, Bool
 
@@ -24,7 +25,9 @@ class Smash(Reporter):
     load_bash_aliases = Bool(False, config=True)
 
     error_handlers = []
-    loaded_extensions = {}
+    plugins = {}
+
+    completers = defaultdict(list)
 
     def system(self, cmd, quiet=False):
         from smashlib.util._fabric import qlocal
@@ -46,7 +49,7 @@ class Smash(Reporter):
                 msg = '{0}.load_ipython_extension should return an object'
                 msg = msg.format(dotpath)
                 self.warning(msg)
-        self.loaded_extensions = record
+        self.plugins = record
         self.report("loaded extensions:", record.keys())
 
     def build_argparser(self):
@@ -60,7 +63,7 @@ class Smash(Reporter):
             at it.
         """
         main_args, unknown = super(Smash,self).parse_argv()
-        ext_objs = self.loaded_extensions.values()
+        ext_objs = self.plugins.values()
         for obj in ext_objs:
             if obj:
                 args,unknown = obj.parse_argv()
@@ -72,7 +75,7 @@ class Smash(Reporter):
 
     @property
     def project_manager(self):
-        return self.loaded_extensions['ipy_project_manager']
+        return self.plugins['ipy_project_manager']
 
     def init(self):
         self.shell._smash = self
@@ -127,10 +130,6 @@ class Smash(Reporter):
         from goulash._inspect import get_caller
         self.completers[get_caller(2)['class']].append(fxn)
         get_ipython().set_hook('complete_command', fxn, **kargs)
-
-    from collections import defaultdict
-
-    completers = defaultdict(list)
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""

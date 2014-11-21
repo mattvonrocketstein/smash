@@ -22,13 +22,6 @@ def require_ipy(require_version):
         err = "smash requires ipython {0}, but your version is {1}"
         raise SystemExit(err.format(require_version, ipy_version))
 
-def get_smash():
-    ip = get_ipython()
-    try:
-        return ip._smash
-    except AttributeError:
-        raise Exception("load smash first")
-
 def guess_dir_type(_dir, max_depth=3):
     """ given a directory and a depth, find which types of
         files are in the directory.  this implementation

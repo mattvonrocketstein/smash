@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# adapted from the original code at https://github.com/kennethreitz/autoenv
-#
+# adapted from the original code for programmatic (not cli) usage
+# original code is here: https://github.com/kennethreitz/autoenv
 
 """
   Copyright © 2008-2012 Joel Schaerer
@@ -22,8 +22,9 @@
   along with this program; if not, write to the Free Software Foundation, Inc.,
   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 """
-
 from __future__ import print_function
+
+from smashlib.data import SMASH_DIR
 
 from difflib import SequenceMatcher
 from itertools import chain
@@ -1433,7 +1434,7 @@ class _ActionsContainer(object):
     def _handle_conflict_error(self, action, conflicting_actions):
         message = _('conflicting option string(s): %s')
         conflict_string = ', '.join([option_string
-                                     for option_string, action
+                                     for option_string, caction
                                      in conflicting_actions])
         raise ArgumentError(action, message % conflict_string)
 
@@ -2047,7 +2048,7 @@ class ArgumentParser(_AttributeHolder, _ActionsContainer):
         # if multiple actions match, the option string was ambiguous
         if len(option_tuples) > 1:
             options = ', '.join(
-                [ostring for oaction, ostring, explicit_arg in option_tuples])
+                [ostring for oaction, ostring, earg in option_tuples])
             tup = arg_string, options
             self.error(_('ambiguous option: %s could match %s') % tup)
 
@@ -2663,7 +2664,6 @@ TAB_ENTRIES_COUNT = 9
 TAB_SEPARATOR = '__'
 
 
-from smashlib.data import SMASH_DIR
 def set_defaults():
     config = {}
     data_home=SMASH_DIR

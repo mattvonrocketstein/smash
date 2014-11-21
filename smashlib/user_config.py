@@ -42,7 +42,7 @@ _.PyLinter.ignore_pep8 = True
 # or from ~/.smash/etc, based on json there.  in each case you can consult
 # the corresponding json schema for more information
 #
-projects = c.ProjectManager
+projects = _.ProjectManager
 projects.search_dirs.append(config.load_from_etc('search_dirs.json'))
 projects.project_map.update(config.load_from_etc('projects.json'))
 projects.alias_map.update(config.load_from_etc('aliases.json'))

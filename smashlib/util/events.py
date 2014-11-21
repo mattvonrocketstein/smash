@@ -1,6 +1,6 @@
 """ smashlib.util.events
 """
-from smashlib.util import get_smash
+from smashlib import get_smash
 from smashlib.util.ipy import TermColors
 
 class receives_event(object):

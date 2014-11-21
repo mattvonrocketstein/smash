@@ -9,29 +9,25 @@
 """
 
 import os
-import smashlib
+from IPython.core.magic import Magics, magics_class, line_magic
 
+from smashlib import get_smash
 from smashlib.v2 import Reporter
 from smashlib.util.events import receives_event
-from smashlib.python import ope, opj
 from smashlib.channels import C_CD_EVENT
-from smashlib.data import SMASH_DIR
-from smashlib.util import get_smash, touch_file
-from smashlib.data import USER_CONFIG_PATH
 from smashlib.contrib import autojump as _autojump
 
 _main = _autojump.main
 parse_arguments = _autojump.parse_arguments
 
-from IPython.core.magic import Magics, magics_class, line_magic
 
 DEFAULT_DATA_FILE = 'autojump.dat'
 
 autojump = lambda x: _main(parse_arguments(args=x))
 
 def j_completer(self, event):
-    """ simple tab completer"""
-    tmp = event.line.split()[1:]
+    """ tab completer that queries autojump database"""
+    #tmp = event.line.split()[1:]
     options = autojump(['--complete']+\
                 event.line.split()[1:])
     return [os.path.split(x.split('__')[-1])[-1] for x in options]
@@ -87,5 +83,5 @@ def load_ipython_extension(ip):
     return tmp
 
 def unload_ipython_extension(ip):
-    smash = get_smash()
+    get_smash()
     # not implemented

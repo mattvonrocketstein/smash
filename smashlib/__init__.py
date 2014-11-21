@@ -15,3 +15,10 @@ def embed(argv=tuple(), **kargs):
     context.update(caller_context['globals'])
     context.update(caller_context['locals'])
     start_ipython(argv=argv, user_ns=context, **kargs)
+
+def get_smash():
+    ip = get_ipython()
+    try:
+        return ip._smash
+    except AttributeError:
+        raise Exception("load smash first")

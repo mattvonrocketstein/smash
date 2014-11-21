@@ -1,8 +1,15 @@
 """ smashlib.ipy_venv
 
     Defines the ipy_venv extensions, which (usually) allows dynamically
-    switching virtualenv's without leaving your shell.  Things are going
-    to get hairy if you're using multiple python distributions.
+    switching virtualenv's without leaving your shell.  The implementation
+    tries to clear any and all side-effects from the old virtual environment.
+
+
+    Caveats: Things are going to get hairy if you're using multiple python
+    distributions and possibly if you're mixing global/nonglobal options for
+    use-site-env.
+
+    Also sets up tab completion over virtualenv command line options.
 """
 import inspect
 import os, sys, glob
@@ -12,10 +19,11 @@ from IPython.core.magic import Magics, magics_class, line_magic
 from goulash.util import summarize_fpath
 from goulash.venv import get_venv, to_vbin, to_vlib, get_path
 
+from smashlib import get_smash
 from smashlib.v2 import Reporter
-from smashlib.util import get_smash
 from smashlib.data import SMASH_DIR
 from smashlib.python import opj, ope, abspath, expanduser
+from smashlib.completion  import opt_completer
 
 
 # "real_prefix" is set by virtualenv itself. this
@@ -43,6 +51,9 @@ class VirtualEnvMagics(Magics):
     def report(self):
         return self.vext.report
 
+@opt_completer('virtualenv')
+def virtualenv_completer(self, event):
+    return []
 
 class VirtualEnvSupport(Reporter):
     sys_path_changes = []
@@ -177,6 +188,7 @@ def load_ipython_extension(ip):
     venv = VirtualEnvSupport(ip)
     VirtualEnvMagics.vext = venv
     ip.register_magics(VirtualEnvMagics)
+    get_smash().add_completer(virtualenv_completer, re_key='virtualenv .*')
     return venv
 
 

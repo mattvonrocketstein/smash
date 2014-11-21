@@ -3,13 +3,14 @@
 import os
 import inspect
 
-from smashlib.python import ope,abspath
 from smashlib.v2 import Reporter
+from smashlib.python import abspath, ope
+from smashlib.completion  import opt_completer
+from smashlib import get_smash
 
+@opt_completer('fab')
 def fabric_completer(self, event):
-    line = event.line
-    if line[-1]='-':
-        return ['complete_options']
+    """ """
     if ope('fabfile.py'):
         _fabfile = 'fabfile.py'
     elif ope('Fabfile.py'):
@@ -24,7 +25,7 @@ def fabric_completer(self, event):
 
 class FabricPlugin(Reporter):
     def install(self):
-        self.smash.add_completer(fabric_completer, str_key='fab ')
+        self.smash.add_completer(fabric_completer, re_key='fab .*')
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
@@ -34,5 +35,4 @@ def load_ipython_extension(ip):
     return tmp
 
 def unload_ipython_extension(ip):
-    smash = get_smash()
-    # not implemented
+    get_smash()

@@ -60,6 +60,7 @@ _.Smash.extensions.append('smashlib.ipy_venv')
 _.Smash.extensions.append('smashlib.ipy_project_manager')
 _.Smash.extensions.append("smashlib.ipy_dwim")
 _.Smash.extensions.append("smashlib.ipy_fabric")
+_.Smash.extensions.append("smashlib.ipy_tox")
 _.Smash.extensions.append("smashlib.ipy_autojump")
 #_.Smash.extensions.append('smashlib.ipy_powerline')
 
@@ -80,7 +81,7 @@ app = _.InteractiveShellApp
 app.exec_lines.append("""%rehashx""")
 app.exec_lines.append("""ip = get_ipython()""")
 app.exec_lines.append("""cfg = ip.config""")
-app.exec_lines.append("""_ = ip._smash""")
+app.exec_lines.append("""_smash = ip._smash""")
 
 
 # load smash user config.  this must happen last
