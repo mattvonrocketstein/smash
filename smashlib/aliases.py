@@ -12,18 +12,16 @@ class AliasMixin(object):
     def _load_alias_group(self, group_name):
         aliases, macros = self._get_alias_group(group_name)
         suffix_aliases = []
-        print aliases
         for alias in aliases:
             name, cmd = alias
             self.smash.shell.alias_manager.define_alias(name, cmd)
+        self.report("Loaded {0} aliases".format(len(aliases)))
 
         for m in macros:
             print 'load',m
             name, macro = m
             assert isinstance(macro, basestring)
-            #macro = [macro]
-            macro='get_ipython().run_cell("""{0}""")'.format(macro)
-            #macro='\n'.join(macro)
+            macro = 'get_ipython().run_cell("""{0}""")'.format(macro)
             macro = Macro(macro)
             self.smash.shell.user_ns[name]=macro
 
