@@ -17,7 +17,10 @@ def embed(argv=tuple(), **kargs):
     start_ipython(argv=argv, user_ns=context, **kargs)
 
 def get_smash():
-    ip = get_ipython()
+    try:
+        ip = get_ipython()
+    except NameError:
+        return None
     try:
         return ip._smash
     except AttributeError:

@@ -14,9 +14,11 @@ from IPython.utils.traitlets import List, Bool
 from smashlib.v2 import Reporter
 from smashlib.channels import C_POST_RUN_INPUT
 from smashlib.util.reflect import from_dotpath
+from smashlib.util.events import receives_event
 from smashlib.util import bash
 from smashlib.magics import SmashMagics
-from smashlib.channels import C_SMASH_INIT_COMPLETE
+from smashlib.channels import C_SMASH_INIT_COMPLETE, C_FAIL, C_FILE_INPUT
+from smashlib.plugins.interface import PluginInterface
 
 class Smash(Reporter):
     plugins = List(default_value=[], config=True)
@@ -25,32 +27,35 @@ class Smash(Reporter):
     load_bash_aliases = Bool(False, config=True)
 
     error_handlers = []
-    record = {}
+    _installed_plugins = {}
 
     completers = defaultdict(list)
 
     def system(self, cmd, quiet=False):
         from smashlib.util._fabric import qlocal
-        if not quiet:
-            self.report("run: "+cmd)
+        #if not quiet:
+        self.report("run: "+cmd)
         return qlocal(cmd, capture=True)
-
+    #system_raw=system
     def init_magics(self):
         self.shell.register_magics(SmashMagics)
 
     def init_plugins(self):
-        record = {}
+        _installed_plugins = {}
         for dotpath in self.plugins:
             mod = from_dotpath(dotpath)
             ext_name = dotpath.split('.')[-1]
             ext_obj = mod.load_ipython_extension(self.shell)
-            record[ext_name] = ext_obj
+            _installed_plugins[ext_name] = ext_obj
             if ext_obj is None:
                 msg = '{0}.load_ipython_extension should return an object'
                 msg = msg.format(dotpath)
                 self.warning(msg)
-        self.record = record
-        self.report("loaded plugins:", record.keys())
+        self._installed_plugins = _installed_plugins
+        plugin_iface = PluginInterface(self)
+        plugin_iface.update()
+        get_ipython().user_ns.update(plugins=plugin_iface)
+        self.report("loaded plugins:", _installed_plugins.keys())
 
     def build_argparser(self):
         parser = super(Smash, self).build_argparser()
@@ -63,7 +68,7 @@ class Smash(Reporter):
             at it.
         """
         main_args, unknown = super(Smash,self).parse_argv()
-        ext_objs = self.record.values()
+        ext_objs = self._installed_plugins.values()
         for obj in ext_objs:
             if obj:
                 args,unknown = obj.parse_argv()
@@ -75,7 +80,7 @@ class Smash(Reporter):
 
     @property
     def project_manager(self):
-        return self.plugins['ipy_project_manager']
+        return self._installed_plugins['ipy_project_manager']
 
     def init(self):
         self.shell._smash = self
@@ -94,11 +99,12 @@ class Smash(Reporter):
             os.environ['PATH'] =smash_bin + ':' + os.environ['PATH']
 
         from smashlib.patches.edit import PatchEdit
-        from smashlib.patches.rehashx import PatchRehashX
+
         PatchEdit(self).install()
-        PatchRehashX(self).install()
+        #from smashlib.patches.rehashx import PatchRehashX; PatchRehashX(self).install()
         self.publish(C_SMASH_INIT_COMPLETE, None)
 
+    bus = cyrusbus.Bus()
     def init_bus(self):
         """ note: it is a special case that due to bootstrap ordering,
             @receive_events is not possible for this class.  if you want
@@ -106,12 +112,23 @@ class Smash(Reporter):
             the simple way.
         """
         super(Smash, self).init_bus()
-        bus = cyrusbus.Bus()
+        bus = self.bus
         def warning_dep(*args, **kargs):
             raise Exception("dont send warning that way")
         bus.subscribe('warning', warning_dep)
         bus.subscribe(C_POST_RUN_INPUT, self.input_finished_hook)
-        self.bus = bus
+        bus.subscribe(C_FAIL, self.on_system_fail)
+
+    #@receives_event(C_FAIL)
+    def on_system_fail(self, bus, cmd, error):
+        def is_path(input):
+            if len(input.split())==1 and \
+               (input.startswith('./') or \
+                input.startswith('~/') or \
+                input.startswith('/')):
+                return True
+        if is_path(cmd):
+            self.smash.publish(C_FILE_INPUT, cmd)
 
     def input_finished_hook(self, bus, raw_finished_input):
         if not raw_finished_input.strip():

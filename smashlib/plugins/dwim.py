@@ -7,8 +7,9 @@ import os
 from IPython.utils.traitlets import Bool
 
 from smashlib.v2 import Reporter
-
-
+from smashlib.util.events import receives_event
+from smashlib.channels import C_FAIL, C_FILE_INPUT
+from IPython.utils.traitlets import EventfulDict
 class DoWhatIMean(Reporter):
     """ """
 
@@ -26,6 +27,25 @@ class DoWhatIMean(Reporter):
     automatic_open = Bool(
         True, config=True,
         help="open automatically if input looks like webpage")
+    suffix_aliases = EventfulDict(default_value={}, config=True)
+
+    @receives_event(C_FILE_INPUT)
+    def on_file_input(self, fpath):
+        from smashlib.python import splitext, ope, abspath, expanduser
+        fpath = abspath(expanduser(fpath))
+        suffix = splitext(fpath)[-1][1:].lower()
+        if ope(fpath):
+            opener = self.suffix_aliases.get(
+                suffix, None)
+            if opener is not None:
+                self.report('Using opener "{0}" for "{1}"'.format(opener, suffix))
+                self.smash.shell.run_cell('{0} {1}'.format(opener, fpath))
+            else:
+                msg = "Legit file input, but no suffix alias could be found for "+suffix
+                self.report(msg)
+        else:
+            msg = "Attempted file input, but path {0} does not exist".format(fpath)
+            self.report(msg)
 
     def init(self):
         def smash_open(x):

@@ -1,7 +1,8 @@
-""" smashlib.ipy_tox
+""" smashlib.plugins.python_comp_tools
     This code adds tab completion over tox CLI options,
     and dynamic determination of environments for "tox -e"
 """
+import os
 from smashlib import get_smash
 from smashlib.v2 import Reporter
 from smashlib.util._tox import get_tox_envs

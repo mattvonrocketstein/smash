@@ -1,0 +1,2 @@
+""" smashlib.plugins.base
+"""

@@ -12,9 +12,10 @@ from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 from IPython.terminal.interactiveshell import \
      TerminalInteractiveShell as BaseTIS
 
+from smashlib import get_smash
 from smashlib.bin.pybcompgen import complete
 from smashlib.pysh import have_command_alias
-from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL
+from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_FAIL
 
 class SmashTerminalInteractiveShell(BaseTIS):
 
@@ -57,14 +58,22 @@ class SmashTerminalInteractiveShell(BaseTIS):
             raw_cell, store_history=store_history,
             silent=silent, shell_futures=shell_futures)
         if self.smash is not None:
-            self.smash.bus.publish(
+            self.smash.publish(
                 C_POST_RUN_CELL,
                 self.user_ns['In'][-1].strip())
-            self.smash.bus.publish(
+            self.smash.publish(
                 C_POST_RUN_INPUT,
                 self._smash_last_input)
             self._smash_last_input = ""
         return out
+
+    def system(self, cmd, quiet=False, **kargs):
+        #print 'wrapping system call',cmd
+        from smashlib.util._fabric import qlocal
+        result = super(SmashTerminalInteractiveShell,self).system(cmd,**kargs)
+        error = self.user_ns['_exit_code'] # put exit code into bash for lp?s
+        if error:
+            get_smash().publish(C_FAIL, cmd, error)
 TerminalInteractiveShell=SmashTerminalInteractiveShell
 
 class SmashTerminalIPythonApp(BaseTIA):

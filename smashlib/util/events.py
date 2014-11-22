@@ -27,7 +27,7 @@ class receives_event(object):
     def __call__(self, fxn):
         self.fxn = fxn
         def newf(himself, bus, *args, **kargs):
-            if not self.quiet and get_smash().verbose_events:
+            if not self.quiet and get_smash() and get_smash().verbose_events:
                 self.report(args)
             return fxn(himself, *args, **kargs)
         newf._subscribe_to = self.channel

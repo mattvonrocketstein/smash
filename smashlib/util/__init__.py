@@ -45,17 +45,8 @@ def guess_dir_type(_dir, max_depth=3):
                 break
     return matches
 
-def report(msg, *args, **kargs):
-    from .ipy import TermColors
-    context_name = kargs.pop('context_name','no-context')
-    print "{0}: {1} {2}".format(
-        TermColors.Blue + context_name,
-        TermColors.Red + msg,
-        TermColors.Normal
-        )
-    if args:
-        print '  ',args
 
 def split_on_unquoted_semicolons(txt):
+    # use this in "ed fpath:1:2"?
     PATTERN = re.compile(r'''((?:[^;"']|"[^"]*"|'[^']*')+)''')
     return PATTERN.split(txt)[1::2]

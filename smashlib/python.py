@@ -19,6 +19,7 @@ getcwd     = os.getcwd
 glob       = glob.glob
 get_env    = os.environ.get
 expanduser = os.path.expanduser
+splitext   = os.path.splitext
 
 def create_dir_if_not_exists(apath):
     """ returns a bool for 'created'
