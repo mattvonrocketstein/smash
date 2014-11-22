@@ -16,6 +16,7 @@ from smashlib import get_smash
 from smashlib.bin.pybcompgen import complete
 from smashlib.pysh import have_command_alias
 from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_FAIL
+from smashlib.util import split_on_unquoted_semicolons
 
 class SmashTerminalInteractiveShell(BaseTIS):
 
@@ -52,6 +53,18 @@ class SmashTerminalInteractiveShell(BaseTIS):
     # NOTE: when run-cell runs, input is finished
     def run_cell(self, raw_cell, store_history=False,
                  silent=False, shell_futures=True):
+
+        # this section allows hybrid bash/python expressions
+        # if those expressions are semicolon separated
+        bits = split_on_unquoted_semicolons(raw_cell)
+        if len(bits) > 1:
+            out=[]
+            for x in bits:
+                out.append(
+                    self.run_cell(
+                        x, store_history=store_history,
+                        silent=silent, shell_futures=shell_futures))
+            return out
 
         sooper = super(SmashTerminalInteractiveShell, self)
         out = sooper.run_cell(
