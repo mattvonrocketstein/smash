@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-#
-#
+#!/usr/bin/env bash
 #
 set -e
 SMASH_HOME="$HOME/.smash"

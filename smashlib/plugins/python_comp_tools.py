@@ -8,6 +8,10 @@ from smashlib.v2 import Reporter
 from smashlib.util._tox import get_tox_envs
 from smashlib.completion  import opt_completer
 
+#@opt_completer('python setup.py')
+def setup_completer(self,event):
+    return 'install develop build'.split()
+
 @opt_completer('tox')
 def tox_completer(self, event):
     return []

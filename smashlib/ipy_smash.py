@@ -80,7 +80,7 @@ class Smash(Reporter):
 
     @property
     def project_manager(self):
-        return self._installed_plugins['ipy_project_manager']
+        return self._installed_plugins['project_manager']
 
     def init(self):
         self.shell._smash = self

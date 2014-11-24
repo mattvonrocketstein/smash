@@ -1,2 +1,2 @@
 fabric==1.10
-goulash==0.3
+goulash==0.5
