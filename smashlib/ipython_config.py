@@ -6,7 +6,6 @@
 # To override these values, edit ~/.smash/config.py instead.
 #
 import os
-from report import report
 from smashlib.util import get_editor
 print '..loading system config', __file__
 

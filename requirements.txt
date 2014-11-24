@@ -5,9 +5,10 @@ demjson
 pyflakes
 cyrusbus
 asciitable
-#pynotify
-#dulwhich
 fabric
 flake8
 goulash==0.5
 reporting
+
+# used by reporting
+pygments
