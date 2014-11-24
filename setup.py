@@ -22,7 +22,6 @@ setup(
     version      = __version__,
     author       = 'mattvonrocketstein',
     author_email = '$author@gmail',
-    version      = '0.1',
     description  = 'SmaSh: a smart(er) shell',
     url          = 'http://github.com/mattvonrocketstein/smashlib',
     license      = 'MIT',
