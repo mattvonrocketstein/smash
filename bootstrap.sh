@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-set -e
+set -ex
 SMASH_HOME="$HOME/.smash"
 GOT_SMASH_REPO=0
 SMASH_INST_REQ="$SMASH_HOME/install_requirements.txt"

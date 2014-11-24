@@ -11,7 +11,7 @@ try:
     print 'goulash', goulash.version.__version__
 except ImportError:
     err = ('Smash-shell installer requires goulash.  '
-           '"pip install goulash==0.2" and try again')
+           '"pip install goulash==0.5" and try again')
     raise SystemExit(err)
 try:
     import fabric.version
