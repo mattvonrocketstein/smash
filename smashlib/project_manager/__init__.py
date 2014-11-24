@@ -151,7 +151,6 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
     @receives_event(C_REHASH_EVENT)
     def refresh(self, none):
         [ self._bind_one(x) for x in set(self.search_dirs)]
-        #[self._bind_one(x) for x in set(self.search_dirs)]
 
     def _bind_one(self, base_dir):
             base_dir = os.path.abspath(os.path.expanduser(base_dir))

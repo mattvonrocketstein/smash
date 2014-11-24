@@ -6,6 +6,8 @@
 # To override these values, edit ~/.smash/config.py instead.
 #
 import os
+from report import report
+from smashlib.util import get_editor
 print '..loading system config', __file__
 
 get_config = eval('get_config') # shut up the linter
@@ -13,13 +15,9 @@ get_config = eval('get_config') # shut up the linter
 _ = get_config()
 
 # set editor from $EDITOR if possible
-# NB: this must be done *before* loading the default-profile subconfig
-editor = os.environ.get('EDITOR',None)
-if editor is not None:
-    _.TerminalInteractiveShell.editor = editor
+_.TerminalInteractiveShell.editor = get_editor()
 
-# always inherit the default ipython profile's configuration
-load_subconfig('ipython_config.py', profile='default')
+_.Smash.load_bash_aliases = True
 
 # load toplevel extensions
 ################################################################################
@@ -55,6 +53,7 @@ _.TerminalInteractiveShell.confirm_exit = False
 ################################################################################
 _.IPCompleter.merge_completions = False
 
+
 # load optional smash extensions
 #_.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
 _.Smash.plugins.append('smashlib.plugins.liquidprompt')
@@ -65,6 +64,10 @@ _.Smash.plugins.append("smashlib.plugins.dwim")
 _.Smash.plugins.append("smashlib.plugins.fabric")
 _.Smash.plugins.append("smashlib.plugins.python_comp_tools")
 _.Smash.plugins.append("smashlib.plugins.autojump")
+
+# setup default configuration for the linter (used by "project manager" plugin)
+################################################################################
+
 
 # setup default configuration for the linter (used by "project manager" plugin)
 ################################################################################

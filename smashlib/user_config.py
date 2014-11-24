@@ -14,6 +14,10 @@
 
 _ = get_config()
 get_config = eval('get_config') # shut up the linter
+
+# always inherit the default ipython profile's configuration
+#load_subconfig('ipython_config.py', profile='default')
+
 from smashlib.config import SmashConfig
 config = SmashConfig(_)
 

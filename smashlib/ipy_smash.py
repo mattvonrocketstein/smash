@@ -88,7 +88,6 @@ class Smash(Reporter):
         self.init_plugins()
         self.parse_argv()
 
-        # TODO: move this to configurable Bool()
         if self.load_bash_aliases:
             for alias, cmd in bash.get_aliases():
                 if alias not in 'ed cd'.split(): #HACK

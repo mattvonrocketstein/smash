@@ -5,7 +5,10 @@
     Stick to stdlib, or known-safe sections of smashlib
 """
 import os, re, glob
-from smashlib.python import get_env, opd, ops, opj, ope, expanduser
+
+from smashlib.data import SMASH_ETC, EDITOR_CONFIG_PATH
+from goulash.python import get_env, opd, ops, opj, ope, expanduser
+
 
 def home():
     return get_env('HOME')
@@ -45,6 +48,34 @@ def guess_dir_type(_dir, max_depth=3):
                 break
     return matches
 
+def get_editor():
+    import demjson
+    from report import report
+    from IPython.terminal.interactiveshell import get_default_editor
+    _from = None
+    user_editor = EDITOR_CONFIG_PATH
+    if os.path.exists(user_editor):
+        with open(user_editor) as fhandle:
+            user_editor = fhandle.read().strip()
+        user_editor = [line.strip() for line in user_editor.split('\n')]
+        user_editor = filter(lambda x: x and not x.startswith('#'), user_editor)
+        err = '{0} should have have 1 line that gives the editor invocation'
+        assert len(user_editor)==1, err.format(EDITOR_CONFIG_PATH)
+        user_editor = user_editor[0]
+        if user_editor:
+            print "...found user-specified editor mentioned in "+EDITOR_CONFIG_PATH
+    else:
+        touch_file(user_editor)
+        with open(user_editor,'w') as fhandle:
+            fhandle.write("# place editor invocation here (unquoted).\n"
+                          "# for example: 'vi' or 'nano --softwrap --quiet'")
+        print "... no editor configs are located at '{0}'.".format(user_editor)
+        print ".... created an empty template"
+        user_editor = None
+    sys_editor = get_default_editor()
+    editor = user_editor or sys_editor or 'vi'
+    print ("...using editor: '{0}'".format(editor))
+    return editor
 
 def split_on_unquoted_semicolons(txt):
     # use this in "ed fpath:1:2"?

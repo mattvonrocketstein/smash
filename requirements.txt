@@ -10,3 +10,4 @@ asciitable
 fabric
 flake8
 goulash==0.5
+reporting
