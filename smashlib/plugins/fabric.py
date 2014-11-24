@@ -1,4 +1,5 @@
-""" smashlib.ipy_fabric
+""" smashlib.plugins.fabric
+    documentation: http://mattvonrocketstein.github.io/smash/plugins.html#fabric
 """
 import os
 import inspect

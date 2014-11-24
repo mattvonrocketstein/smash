@@ -1,6 +1,6 @@
-""" ipy_dwim
+""" smashlib.plugins.dwim
 
-    DoWhatIMean
+    documentation: http://mattvonrocketstein.github.io/smash/plugins.html#dwim
 """
 import os
 
