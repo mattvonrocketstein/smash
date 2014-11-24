@@ -35,16 +35,17 @@ _.PyLinter.verbose=True
 _.PyLinter.ignore_pep8 = True
 
 # begin Change-Dir-hooks configuration: add any custom hooks here
+# see docs at: http://mattvonrocketstein.github.io/smash/plugins.html#cd-hooks
 #
-#_.ChangeDirHooks.change_dir_hooks.append(
-#    "smashlib.ipy_cd_hooks.ChangeDirHooks.test_change_message")
+#_.ChangeDirHooks.change_dir_hooks.append("some.python.dotpath.fxn")
 
 
 # begin project manager configuration.
+# see docs at: http://mattvonrocketstein.github.io/smash/project_manager.html
 #
 # the project manager can be configured either from this file directly,
 # or from ~/.smash/etc, based on json there.  in each case you can consult
-# the corresponding json schema for more information
+# the corresponding json schema for more information.
 #
 projects = _.ProjectManager
 projects.search_dirs.append(config.load_from_etc('search_dirs.json'))

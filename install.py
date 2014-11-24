@@ -8,7 +8,7 @@ from setuptools.command.install import install
 
 try:
     import goulash
-    print 'goulash', goulash.__version__
+    print 'goulash', goulash.version.__version__
 except ImportError:
     err = ('Smash-shell installer requires goulash.  '
            '"pip install goulash==0.2" and try again')

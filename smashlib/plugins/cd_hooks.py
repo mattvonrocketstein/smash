@@ -14,11 +14,6 @@ class ChangeDirHooks(Reporter):
     last_dir = None
     change_dir_hooks = EventfulList(default_value=[], config=True)
 
-    @staticmethod
-    def test_change_message(bus, new, old):
-        """ used as a demo in user_config.py """
-        print 'test_change_message got "cd" event:', dict(new=new, old=old)
-
     def init(self):
         # FIXME: reregister it properly instead of patching it?
         if not getattr(self, '_already_patched', False):
