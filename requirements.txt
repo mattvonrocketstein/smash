@@ -9,4 +9,4 @@ asciitable
 #dulwhich
 fabric
 flake8
-goulash==0.3
+goulash==0.5
