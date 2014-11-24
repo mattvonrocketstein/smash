@@ -2,7 +2,7 @@
 """ setup.py for smashlib
 """
 
-import os
+import os, sys
 from setuptools import setup
 
 # __file__ is not set when running from tox
