@@ -86,6 +86,7 @@ _.PromptManager.justify        = False
 ################################################################################
 projects = _.ProjectManager
 projects.search_dirs.append('~/code')
+projects.search_dirs.append('~/projects')
 
 # configure the ipython app
 ################################################################################

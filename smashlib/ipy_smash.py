@@ -99,8 +99,10 @@ class Smash(Reporter):
             os.environ['PATH'] =smash_bin + ':' + os.environ['PATH']
 
         from smashlib.patches.edit import PatchEdit
+        from smashlib.patches.cd import PatchPinfoMagic
 
         PatchEdit(self).install()
+        PatchPinfoMagic(self).install()
         #from smashlib.patches.rehashx import PatchRehashX; PatchRehashX(self).install()
         self.publish(C_SMASH_INIT_COMPLETE, None)
 

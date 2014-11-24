@@ -2,7 +2,7 @@
 """
 import os
 import inspect
-from IPython.utils.traitlets import EventfulDict, EventfulList
+from IPython.utils.traitlets import EventfulDict, EventfulList, Set
 
 from smashlib.channels import C_SMASH_INIT_COMPLETE, C_CD_EVENT, C_REHASH_EVENT
 
@@ -59,6 +59,7 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
     """ """
 
     search_dirs      = EventfulList(default_value=[], config=True)
+    #search_dirs      = Set(default_value=[], config=True)
     project_map      = EventfulDict(default_value={}, config=True)
     alias_map        = EventfulDict(default_value={}, config=True)
     activation_map   = EventfulDict(default_value={}, config=True)

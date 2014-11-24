@@ -77,3 +77,29 @@ class ProjectManagerInterface(object):
         pm = self._project_manager
         project_name = pm._current_project
         pm.test(project_name)
+
+    def __qmark__(self):
+        pmap = self._project_manager.project_map
+        out = ['ProjectManager: ({0} projects)'.format(len(pmap))]
+        #out += ['   projects:']
+
+        #for nick in pmap.keys():
+        #    out += ['       : {0}'.format(nick)]
+        cp = self._project_manager._current_project
+        aliases = self._project_manager.alias_map
+        if cp:
+            out += ['   current_project: {0}'.format(cp)]
+
+        if aliases:
+            lst = [
+                [group,len(cmds)] for group,cmds in \
+                                             aliases.items()]
+            out += ['   alias groupings: ']
+            for g in lst:
+                out+=['       : {0} (with {1} aliases)'.format(*g)]
+        sdirs = self._project_manager.search_dirs
+        if sdirs:
+            out += ['   search_dirs:']
+            for nick in sdirs:
+                out += ['       : {0}'.format(nick)]
+        return '\n'.join(out)
