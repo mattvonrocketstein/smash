@@ -6,7 +6,7 @@
 # To override these values, edit ~/.smash/config.py instead.
 #
 import os
-from smashlib.util import get_editor
+from smashlib.editor import get_editor
 print '..loading system config', __file__
 
 get_config = eval('get_config') # shut up the linter

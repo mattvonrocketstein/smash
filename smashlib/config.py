@@ -25,7 +25,7 @@ class SmashConfig(object):
             data = self.load_from_etc(fname, schema=schema)
         except IOError:
             data = {}
-        config.update(**data)
+        config.update(data)
         return data
 
     def append_from_etc(self, config, fname, schema=None):
