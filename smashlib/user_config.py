@@ -48,8 +48,14 @@ _.PyLinter.ignore_pep8 = True
 # the corresponding json schema for more information.
 #
 projects = _.ProjectManager
-projects.search_dirs.append(config.load_from_etc('search_dirs.json'))
-projects.project_map.update(config.load_from_etc('projects.json'))
-projects.alias_map.update(config.load_from_etc('aliases.json'))
-projects.macro_map.update(config.load_from_etc('macros.json'))
-projects.venv_map.update(config.load_from_etc('venvs.json'))
+config.append_from_etc(projects.search_dirs, 'search_dirs.json')
+config.update_from_etc(projects.project_map, 'projects.json')
+config.update_from_etc(projects.alias_map, 'aliases.json')
+config.update_from_etc(projects.macro_map, 'macros.json')
+config.update_from_etc(projects.venv_map, 'venvs.json')
+
+#projects.search_dirs.append(config.load_from_etc('search_dirs.json'))
+#projects.project_map.update(config.load_from_etc('projects.json'))
+#projects.alias_map.update(config.load_from_etc('aliases.json'))
+#projects.macro_map.update(config.load_from_etc('macros.json'))
+#projects.venv_map.update(config.load_from_etc('venvs.json'))

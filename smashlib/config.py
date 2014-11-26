@@ -20,6 +20,22 @@ class SmashConfig(object):
         with open(opj(SMASH_ETC, fname)) as fhandle:
             return demjson.decode(fhandle.read())
 
+    def update_from_etc(self, config, fname, schema=None):
+        try:
+            data = self.load_from_etc(fname, schema=schema)
+        except IOError:
+            data = {}
+        config.update(**data)
+        return data
+
+    def append_from_etc(self, config, fname, schema=None):
+        try:
+            data = self.load_from_etc(fname, schema=schema)
+        except IOError:
+            data = []
+        [config.append(x) for x in data]
+        return data
+
     @staticmethod
     def ensure_base_dir():
         create_dir_if_not_exists(SMASH_DIR)
