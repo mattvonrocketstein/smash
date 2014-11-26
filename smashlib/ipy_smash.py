@@ -10,6 +10,7 @@ import cyrusbus
 from collections import defaultdict
 
 from IPython.utils.traitlets import List, Bool
+from IPython.core.magic import register_line_magic
 
 from smashlib.v2 import Reporter
 from smashlib.channels import C_POST_RUN_INPUT
@@ -19,24 +20,27 @@ from smashlib.util import bash
 from smashlib.magics import SmashMagics
 from smashlib.channels import C_SMASH_INIT_COMPLETE, C_FAIL, C_FILE_INPUT
 from smashlib.plugins.interface import PluginInterface
+from smashlib.patches.edit import PatchEdit
+from smashlib.patches.cd import PatchPinfoMagic
 
 class Smash(Reporter):
-    plugins = List(default_value=[], config=True)
-    verbose_events = Bool(False, config=True)
-    ignore_warnings = Bool(False, config=True)
-    load_bash_aliases = Bool(False, config=True)
+    plugins             = List(default_value=[], config=True)
+    verbose_events      = Bool(False, config=True)
+    ignore_warnings     = Bool(False, config=True)
+    load_bash_aliases   = Bool(False, config=True)
+    load_bash_functions = Bool(False, config=True)
 
-    error_handlers = []
+    bus                = cyrusbus.Bus()
+    error_handlers     = []
     _installed_plugins = {}
-
-    completers = defaultdict(list)
+    completers         = defaultdict(list)
 
     def system(self, cmd, quiet=False):
         from smashlib.util._fabric import qlocal
-        #if not quiet:
-        self.report("run: "+cmd)
+        if not quiet:
+            self.report("run: " + cmd)
         return qlocal(cmd, capture=True)
-    #system_raw=system
+
     def init_magics(self):
         self.shell.register_magics(SmashMagics)
 
@@ -93,19 +97,23 @@ class Smash(Reporter):
                 if alias not in 'ed cd'.split(): #HACK
                     self.shell.magic("alias {0} {1}".format(alias,cmd))
 
+        if self.load_bash_functions:
+            fxns = bash.get_functions()
+            for fxn_name in fxns:
+                cmd = bash.FunctionMagic(fxn_name)
+                self.shell.magics_manager.register_function(cmd, magic_name=fxn_name)
+            self.report("registered magic for bash functions: ",fxns)
+
         smash_bin = os.path.expanduser('~/.smash/bin')
         if smash_bin not in os.environ['PATH']:
-            os.environ['PATH'] =smash_bin + ':' + os.environ['PATH']
+            os.environ['PATH'] = smash_bin + ':' + os.environ['PATH']
 
-        from smashlib.patches.edit import PatchEdit
-        from smashlib.patches.cd import PatchPinfoMagic
 
         PatchEdit(self).install()
         PatchPinfoMagic(self).install()
         #from smashlib.patches.rehashx import PatchRehashX; PatchRehashX(self).install()
         self.publish(C_SMASH_INIT_COMPLETE, None)
 
-    bus = cyrusbus.Bus()
     def init_bus(self):
         """ note: it is a special case that due to bootstrap ordering,
             @receive_events is not possible for this class.  if you want

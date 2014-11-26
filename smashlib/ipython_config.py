@@ -17,6 +17,7 @@ _ = get_config()
 _.TerminalInteractiveShell.editor = get_editor()
 
 _.Smash.load_bash_aliases = True
+_.Smash.load_bash_functions = True
 
 # load toplevel extensions
 ################################################################################

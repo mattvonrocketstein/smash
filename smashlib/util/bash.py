@@ -41,9 +41,11 @@ def get_functions():
     return function_names
 
 from report import report
-def bash_function(fxn_name, input_string, quiet=False):
+from smashlib import get_smash
+def run_function(fxn_name, input_string, quiet=False):
     """ if you have quoted values in input_string, this will probably break"""
-    report("Running: {0} {1}".format(fxn_name, input_string))
+    if not quiet:
+        report("Running: {0} {1}".format(fxn_name, input_string))
     cmd = '''bash -c "echo 'echo MARKER;{0} {1};echo MARKER'|bash -i"'''
     cmd = cmd.format(fxn_name, input_string)
     p1 = Popen(cmd, shell=True, stdout=PIPE, stdin=PIPE, stderr=PIPE)
@@ -56,7 +58,11 @@ def bash_function(fxn_name, input_string, quiet=False):
         print '\n'.join(lines)
     return lines
 
-if __name__=='__main__':
-    #get_aliases()
-    print get_functions()
-    print bash_function('checkport', '8080')
+class FunctionMagic(object):
+
+    def __init__(self, fxn_name):
+        self.name = fxn_name
+        self.last_result =None
+
+    def __call__(self, parameter_s):
+        self.last_result = run_function(self.name, parameter_s)
