@@ -134,7 +134,7 @@ class VirtualEnvSupport(Reporter):
 
     def _activate(self,path):
         absfpath = abspath(expanduser(path))
-        self.smash.bus.publish(C_PRE_ACTIVATE, name=absfpath)
+        self.publish(C_PRE_ACTIVATE, name=absfpath)
         if True:
             vbin = to_vbin(absfpath)
             vlib = to_vlib(absfpath)
@@ -181,7 +181,7 @@ class VirtualEnvSupport(Reporter):
             msg = '$PATH was adjusted; rehashing aliases'
             self.report(msg)
             self.shell.magic('rehashx')
-            self.smash.bus.publish(C_POST_ACTIVATE, absfpath)
+            self.publish(C_POST_ACTIVATE, absfpath)
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""

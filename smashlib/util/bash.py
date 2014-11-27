@@ -5,9 +5,11 @@
 import re
 from subprocess import Popen, PIPE
 
+from report import report
+from smashlib import get_smash
 from smashlib.bin.pybcompgen import remove_control_characters
 
-r_alias=re.compile('alias \w+=.*')
+r_alias = re.compile('alias \w+=.*')
 
 def get_aliases():
     cmd = 'bash -c "echo alias|bash -i"'
@@ -40,8 +42,6 @@ def get_functions():
     function_names = lines
     return function_names
 
-from report import report
-from smashlib import get_smash
 def run_function(fxn_name, input_string, quiet=False):
     """ if you have quoted values in input_string, this will probably break"""
     if not quiet:

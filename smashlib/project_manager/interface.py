@@ -4,6 +4,16 @@ import os
 
 from goulash.venv import find_venvs
 
+def require_active_project(fxn):
+    def newf(self, *args, **kargs):
+        pname = self._project_manager._current_project
+        if pname is None:
+            self._project_manager.warning("You must activate a project first")
+            return None
+        else:
+            return fxn(self, *args, **kargs)
+    return newf
+
 class ProjectManagerInterface(object):
     """ This object should be a singleton and will be assigned to
         that main namespace as "proj".  In addition to the methods
@@ -18,6 +28,7 @@ class ProjectManagerInterface(object):
             self._project_manager._current_project)
 
     @property
+    @require_active_project
     def _venvs(self):
         pname = self._project_manager._current_project
         return find_venvs(
@@ -52,6 +63,7 @@ class ProjectManagerInterface(object):
         filenames.reverse()
         return filenames[:10]
 
+    @require_active_project
     def _ack(self, pat):
         """ TODO: should really be some kind of magic """
         from smashlib.util._fabric import require_bin
@@ -60,7 +72,8 @@ class ProjectManagerInterface(object):
         cmd = 'ack-grep "{0}" "{1}" {2}'
         pdir = self._project_manager.project_map[
             self._project_manager._current_project]
-        ignores = ['--ignore-dir="{0}"'.format(venv) for venv in venvs]
+        junk = venvs+['.tox']
+        ignores = ['--ignore-dir="{0}"'.format(j) for j in junk]
         ignores = ' '.join(ignores)
         cmd = cmd.format(pat, pdir, ignores)
         results = self._project_manager.smash.system(cmd)
@@ -83,7 +96,6 @@ class ProjectManagerInterface(object):
         out = ['ProjectManager: ({0} projects)'.format(len(pmap))]
         #out += ['   projects:']
 
-        #for nick in pmap.keys():
         #    out += ['       : {0}'.format(nick)]
         cp = self._project_manager._current_project
         aliases = self._project_manager.alias_map

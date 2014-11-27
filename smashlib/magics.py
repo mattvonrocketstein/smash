@@ -15,5 +15,5 @@ class SmashMagics(Magics):
         self.shell.magic('ed {0}'.format(USER_CONFIG_PATH))
 
     @line_magic
-    def ed_ed(self, parameter_s=''):
+    def ed_editor(self, parameter_s=''):
         self.shell.magic('ed {0}'.format(EDITOR_CONFIG_PATH))
