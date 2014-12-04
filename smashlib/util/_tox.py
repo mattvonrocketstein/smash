@@ -7,6 +7,9 @@ import ConfigParser
 
 from smashlib.python import opj, ope
 
+def has_tox(pdir):
+    return ope(opj(pdir, 'tox.ini'))
+
 def get_tox_envs(_dir=None):
     """ """
     ini_file = 'tox.ini' if _dir is None else opj(dir, 'tox.ini')

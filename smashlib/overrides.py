@@ -88,6 +88,8 @@ class SmashTerminalInteractiveShell(BaseTIS):
         error = self.user_ns['_exit_code'] # put exit code into bash for lp?s
         if error:
             get_smash().publish(C_FAIL, cmd, error)
+        if not quiet:
+            print result
 TerminalInteractiveShell=SmashTerminalInteractiveShell
 
 def smash_bash_complete(*args, **kargs):

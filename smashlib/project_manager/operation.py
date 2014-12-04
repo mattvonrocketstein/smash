@@ -45,3 +45,19 @@ class NullOperationStep(OperationStep):
                 self.operation_name, self.project_manager._current_project))
         super(NullOperationStep, self).__init__(
             name, _callable, pm=project_manager)
+
+import os
+def require_active_project(fxn):
+    def newf(project_manager, *args, **kargs):
+        pname = project_manager._current_project
+        if pname is None:
+            project_manager.warning("You must activate a project first")
+            return None
+        else:
+            pdir = project_manager.project_map[pname]
+            if not os.path.exists(pdir):
+                project_manager.warning("require that project dir should exist")
+                return None
+            else:
+                return fxn(project_manager, *args, **kargs)
+    return newf
