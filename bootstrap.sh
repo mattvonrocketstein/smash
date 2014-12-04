@@ -56,7 +56,14 @@ else
     echo "$SMASH_HOME is already a virtualenv, will not create a new one";
     CREATED_SMASH_VENV=0
 fi
-CURRENT_BRANCH=`cd ~/.smash && git rev-parse HEAD`
+
+cd $SMASH_HOME
+CURRENT_BRANCH=`git rev-parse HEAD`
+if [ "$CURRENT_BRANCH" != "$BRANCH" ]; then
+    git checkout $BRANCH
+    git pull
+fi
+
 $SMASH_HOME/bin/pip install -r $SMASH_INST_REQ
 $SMASH_HOME/bin/python $SMASH_INST_PROG
 set +x
