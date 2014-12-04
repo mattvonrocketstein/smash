@@ -59,7 +59,7 @@ fi
 
 $SMASH_HOME/bin/pip install -r $SMASH_INST_REQ
 $SMASH_HOME/bin/python $SMASH_INST_PROG
-set +e
+set +x
 echo
 echo "Summary: "
 echo "SMASH_HOME = $SMASH_HOME"
