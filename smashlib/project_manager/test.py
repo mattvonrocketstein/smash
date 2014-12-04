@@ -1,4 +1,6 @@
-"""
+""" smashlib.project_manager.test
+
+    defines the "test" operation for certain project-types.
 """
 from smashlib import get_smash
 from smashlib.util._tox import has_tox

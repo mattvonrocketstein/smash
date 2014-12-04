@@ -4,7 +4,7 @@ import os
 import inspect
 from IPython.utils.traitlets import EventfulDict, EventfulList, Set
 
-from smashlib.channels import C_SMASH_INIT_COMPLETE, C_CD_EVENT, C_REHASH_EVENT
+from smashlib.channels import C_SMASH_INIT_COMPLETE, C_CD_EVENT, C_REHASH_EVENT, C_DOT_CMD
 
 from smashlib.project_manager.util import (
     clean_project_name, UnknownProjectError)
@@ -43,6 +43,10 @@ class CommandLineMixin(object):
 
         return args, unknown
 
+    @receives_event(C_DOT_CMD)
+    def consider_dot_cmd(self, cmd):
+        self.report(cmd)
+
     @receives_event(C_SMASH_INIT_COMPLETE)
     def use_requested_project(self, none):
         try:
@@ -59,7 +63,6 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
     """ """
 
     search_dirs      = EventfulList(default_value=[], config=True)
-    #search_dirs      = Set(default_value=[], config=True)
     project_map      = EventfulDict(default_value={}, config=True)
     alias_map        = EventfulDict(default_value={}, config=True)
     activation_map   = EventfulDict(default_value={}, config=True)
@@ -150,6 +153,7 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
 
     @receives_event(C_REHASH_EVENT)
     def refresh(self, none):
+        # TODO: deprecate
         [ self._bind_one(x) for x in set(self.search_dirs)]
 
     def _bind_one(self, base_dir):

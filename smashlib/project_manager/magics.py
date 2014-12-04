@@ -12,7 +12,7 @@ class ProjectMagics(Magics):
 
     @line_magic
     def search(self, parameter_s):
-        return self.project_manager._ack(parameter_s)
+        return self.project_manager.interface._ack(parameter_s)
     search_project = search
 
     @line_magic
