@@ -60,8 +60,11 @@ fi
 cd $SMASH_HOME
 CURRENT_BRANCH=`git rev-parse HEAD`
 if [ "$CURRENT_BRANCH" != "$BRANCH" ]; then
-    git checkout $BRANCH
-    git pull
+    git checkout $BRANCH;
+    git pull;
+    UPDATED_CODE=1;
+else
+    UPDATED_CODE=0;
 fi
 
 $SMASH_HOME/bin/pip install -r $SMASH_INST_REQ
@@ -71,6 +74,7 @@ echo
 echo -e "\x1B[31mSummary\x1B[0m"
 echo "  SMASH_HOME = $SMASH_HOME"
 echo "  SMASH_ALREADY_CLONED = $SMASH_ALREADY_CLONED"
+echo "  UPDATED_CODE=$UPDATED_CODE"
 echo "  BRANCH = $BRANCH, $CURRENT_BRANCH"
 echo "  CREATED_SMASH_VENV = $CREATED_SMASH_VENV"
 echo
