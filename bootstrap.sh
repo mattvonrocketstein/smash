@@ -14,21 +14,21 @@
 #  $ bootstrap=https://raw.githubusercontent.com/mattvonrocketstein/smash/master/bootstrap.sh
 #  $ SMASH_BRANCH=master curl bootstrap|bash
 #
-set -ex
+set -x
 SMASH_HOME="$HOME/.smash"
 SMASH_ALREADY_CLONED=0
 SMASH_INST_REQ="$SMASH_HOME/install_requirements.txt"
 SMASH_INST_PROG="$SMASH_HOME/install.py"
 ORIGIN="`git remote show -n origin 2>/dev/null| grep Fetch | cut -d: -f2-`"
 if [ -z "$SMASH_BRANCH" ]; then
-    BRANCH=master;
+    BRANCH="master";
 else
-    BRANCH=$SMASH_BRANCH;
+    BRANCH="$SMASH_BRANCH";
 fi;
 if [ -z "$1" ]; then
-    BRANCH=$BRANCH;
+    BRANCH="$BRANCH";
 else
-    BRANCH=$1;
+    BRANCH="$1";
 fi;
 echo "using branch: $BRANCH"
 if [ ! -z "$ORIGIN" -a "$ORIGIN" != " " ]; then
