@@ -61,9 +61,9 @@ $SMASH_HOME/bin/pip install -r $SMASH_INST_REQ
 $SMASH_HOME/bin/python $SMASH_INST_PROG
 set +x
 echo
-echo "Summary: "
-echo "SMASH_HOME = $SMASH_HOME"
-echo "GOT_SMASH_REPO = $GOT_SMASH_REPO"
-echo "BRANCH = $BRANCH"
+echo -e "\e[31mSummary\e[0m"
+echo "  SMASH_HOME = $SMASH_HOME"
+echo "  GOT_SMASH_REPO = $GOT_SMASH_REPO"
+echo "  BRANCH = $BRANCH"
 echo
-echo "Installation complete.  Run it with ~/bin/smash"
+echo -e "\e[31mInstallation complete.  Run it with ~/bin/smash\e[0m"
