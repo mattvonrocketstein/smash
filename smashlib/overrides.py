@@ -7,17 +7,21 @@
     So far a lot of this is here mostly because smash wants a separate message
     bus from the main ipython event system (IPython.core.events).
 """
-import keyword
 
 from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 from IPython.terminal.interactiveshell import \
      TerminalInteractiveShell as BaseTIS
 
 from smashlib import get_smash
-from smashlib.bin.pybcompgen import complete
 from smashlib.pysh import have_command_alias
 from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_FAIL
 from smashlib.util import split_on_unquoted_semicolons
+
+import keyword
+from smashlib.bin.pybcompgen import complete
+def smash_bash_complete(*args, **kargs):
+    result = complete(*args, **kargs)
+    return [ x for x in result if x not in keyword.kwlist ]
 
 class SmashTerminalInteractiveShell(BaseTIS):
 
@@ -92,9 +96,6 @@ class SmashTerminalInteractiveShell(BaseTIS):
             print result
 TerminalInteractiveShell=SmashTerminalInteractiveShell
 
-def smash_bash_complete(*args, **kargs):
-    result = complete(*args, **kargs)
-    return [ x for x in result if x not in keyword.kwlist ]
 
 class SmashTerminalIPythonApp(BaseTIA):
     @classmethod
