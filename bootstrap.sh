@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 #
+# This bootstraps smash, eventually running smash's install.py and setup.py
+# Why not just run setup.py directly?  Smash should be installed in a private
+# virtual environment (not shared between users).  This venv needs to be setup,
+# and before install.py can actually be used, install_requirements.txt must be
+# installed.
+#
+# The bootstrap command accepts a single argument, which is the smash branch to
+# use.  If the argument is not given, it defaults to master.  Alternatively, you
+# can set the SMASH_BRANCH environment variable, for instance if you're invoking
+# this bootstrap with curl:
+#
+#  $ bootstrap=https://raw.githubusercontent.com/mattvonrocketstein/smash/master/bootstrap.sh
+#  $ SMASH_BRANCH=master curl bootstrap|bash
+#
+
 set -ex
 SMASH_HOME="$HOME/.smash"
 GOT_SMASH_REPO=0
