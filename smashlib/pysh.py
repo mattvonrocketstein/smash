@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 """
-IPython extension to fix pysh profile
+
 """
 import re
 import keyword
 from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
 from smashlib.python import ope
 
-HANDLER_NAME = 'ShellHandler'
-r_whitespace = re.compile('\s')
+DOT_HANDLER_NAME   = 'DotHandler'
+SHELL_HANDLER_NAME = 'ShellHandler'
 
 class ShellChecker(PrefilterChecker):
     """ shell checker should really run before anything else """
+
     priority = 50
 
     def check(self, line_info):
@@ -23,34 +24,40 @@ class ShellChecker(PrefilterChecker):
             return None
         l0 = line_info.line[0]
 
-        doit = lambda:self.prefilter_manager.get_handler_by_name(HANDLER_NAME)
-        dot = lambda:self.prefilter_manager.get_handler_by_name('DotHandler')
+        shandler = self.prefilter_manager.get_handler_by_name(SHELL_HANDLER_NAME)
+        dhandler = self.prefilter_manager.get_handler_by_name(DOT_HANDLER_NAME)
         line = line_info.line
         split_line = line.split()
         if have_alias(split_line[0]):
-            return doit()
+            return shandler
         if l0 in '~/.':
             l1 = line[1]
             # if l1 is whitespace, this is probably some special syntax,
             # not something intended as instructions for the system shell
             # thus we will not mess with the input (perhaps the dot_prefilter
             # is interested in it.  see smashlib.dot_prefilter)
-            if l0=='.' and not ope(split_line[0]):
-                return dot()
+            if l0 == '.' and not ope(split_line[0]):
+                return dhandler
 
+from smashlib import get_smash
+from smashlib.channels import C_DOT_CMD
 class DotHandler(PrefilterHandler):
 
     handler_name = Unicode("DotHandler")
 
     def handle(self, line_info):
-        from smashlib import get_smash
-        from smashlib.channels import C_DOT_CMD
-        get_smash().publish(C_DOT_CMD, line_info.line.strip())
+        """ when the dot handler is engaged, we send a signal
+            and then prefilter the input to empty-string, which is
+            effectively a no-op.  anyone that wants to act on the
+            dot-cmd can receive the signal.
+        """
+        line = line_info.line.strip()[1:]
+        get_smash().publish(C_DOT_CMD, line)
         return ""
 
 class ShellHandler(PrefilterHandler):
     """ ShellHandler changes certain lines to system calls """
-    handler_name = Unicode(HANDLER_NAME)
+    handler_name = Unicode(SHELL_HANDLER_NAME)
 
     def handle(self, line_info):
         cmd = line_info.line.strip()
@@ -86,10 +93,9 @@ def load_ipython_extension(ip):
         config=pm.config)
     checker = ShellChecker(**kargs)
     handler = ShellHandler(**kargs)
-    handler2 = DotHandler(**kargs)
     ip.prefilter_manager.register_checker(checker)
-    ip.prefilter_manager.register_handler(HANDLER_NAME, handler, [])
-    ip.prefilter_manager.register_handler('DotHandler', handler2, [])
+    ip.prefilter_manager.register_handler(SHELL_HANDLER_NAME, handler, [])
+    ip.prefilter_manager.register_handler(DOT_HANDLER_NAME, DotHandler(**kargs), [])
     return checker, handler
 
 
