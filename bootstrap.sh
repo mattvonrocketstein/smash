@@ -16,10 +16,9 @@
 #
 set -ex
 SMASH_HOME="$HOME/.smash"
-GOT_SMASH_REPO=0
+SMASH_ALREADY_CLONED=0
 SMASH_INST_REQ="$SMASH_HOME/install_requirements.txt"
 SMASH_INST_PROG="$SMASH_HOME/install.py"
-BRANCH=
 ORIGIN="`git remote show -n origin 2>/dev/null| grep Fetch | cut -d: -f2-`"
 if [ -z "$SMASH_BRANCH" ]; then BRANCH=master; else BRANCH=$SMASH_BRANCH; fi;
 if [ -z $1 ]; then BRANCH=$BRANCH; else BRANCH=$1; fi;
@@ -29,7 +28,7 @@ if [ ! -z "$ORIGIN" -a "$ORIGIN" != " " ]; then
     if [ $BNAME = "smash.git" ]; then
         SMASH_INST_REQ="`pwd`/install_requirements.txt";
         SMASH_INST_PROG="`pwd`/install.py";
-        GOT_SMASH_REPO=1;
+        SMASH_ALREADY_CLONED=1;
     fi
 fi
 echo "using install_requirements: $SMASH_INST_REQ"
@@ -37,7 +36,7 @@ echo "using install_requirements: $SMASH_INST_REQ"
 
 if [ ! -d "$SMASH_HOME" ]; then
     echo "$SMASH_HOME does not exist";
-    if [ $GOT_SMASH_REPO = 0 ]; then
+    if [ $SMASH_ALREADY_CLONED = 0 ]; then
         echo "You need smash code.  Cloning it to $SMASH_HOME";
         git clone --branch=$BRANCH https://github.com/mattvonrocketstein/smash.git ~/.smash
     else
@@ -52,18 +51,20 @@ fi
 if [ ! -d "$SMASH_HOME/bin" ]; then
     echo "$SMASH_HOME is not a virtualenv yet.  Creating it..";
     virtualenv --no-site-packages $SMASH_HOME;
-
+    CREATED_SMASH_VENV=1;
 else
-    echo "$SMASH_HOME is already a virtualenv, will not create a new one"
+    echo "$SMASH_HOME is already a virtualenv, will not create a new one";
+    CREATED_SMASH_VENV=0
 fi
-
+CURRENT_BRANCH=`cd ~/.smash && git rev-parse HEAD`
 $SMASH_HOME/bin/pip install -r $SMASH_INST_REQ
 $SMASH_HOME/bin/python $SMASH_INST_PROG
 set +x
 echo
 echo -e "\x1B[31mSummary\x1B[0m"
 echo "  SMASH_HOME = $SMASH_HOME"
-echo "  GOT_SMASH_REPO = $GOT_SMASH_REPO"
-echo "  BRANCH = $BRANCH"
+echo "  SMASH_ALREADY_CLONED = $SMASH_ALREADY_CLONED"
+echo "  BRANCH = $BRANCH, $CURRENT_BRANCH"
+echo "  CREATED_SMASH_VENV = $CREATED_SMASH_VENV"
 echo
 echo -e "\x1B[31mInstallation complete.  Run it with ~/bin/smash\x1B[0m"
