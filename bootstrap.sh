@@ -14,7 +14,6 @@
 #  $ bootstrap=https://raw.githubusercontent.com/mattvonrocketstein/smash/master/bootstrap.sh
 #  $ SMASH_BRANCH=master curl bootstrap|bash
 #
-
 set -ex
 SMASH_HOME="$HOME/.smash"
 GOT_SMASH_REPO=0
@@ -24,7 +23,7 @@ BRANCH=
 ORIGIN="`git remote show -n origin 2>/dev/null| grep Fetch | cut -d: -f2-`"
 if [ -z "$SMASH_BRANCH" ]; then BRANCH=master; else BRANCH=$SMASH_BRANCH; fi;
 if [ -z $1 ]; then BRANCH=$BRANCH; else BRANCH=$1; fi;
-
+echo "using branch: $BRANCH"
 if [ ! -z "$ORIGIN" -a "$ORIGIN" != " " ]; then
     BNAME="`basename $ORIGIN`";
     if [ $BNAME = "smash.git" ]; then
