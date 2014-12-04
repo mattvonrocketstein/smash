@@ -44,8 +44,13 @@ class CommandLineMixin(object):
         return args, unknown
 
     @receives_event(C_DOT_CMD)
-    def consider_dot_cmd(self, cmd):
-        self.report(cmd)
+    def consider_dot_cmd(self, line):
+        tmp = line.split()
+        cmd, args = tmp.pop(0), tmp
+        cmd = getattr(self.interface, '_'+cmd, None)
+        if cmd:
+            self.report("found command: {0}".format(cmd))
+            cmd(*args)
 
     @receives_event(C_SMASH_INIT_COMPLETE)
     def use_requested_project(self, none):
