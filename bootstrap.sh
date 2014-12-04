@@ -5,7 +5,11 @@ SMASH_HOME="$HOME/.smash"
 GOT_SMASH_REPO=0
 SMASH_INST_REQ="$SMASH_HOME/install_requirements.txt"
 SMASH_INST_PROG="$SMASH_HOME/install.py"
+BRANCH=
 ORIGIN="`git remote show -n origin 2>/dev/null| grep Fetch | cut -d: -f2-`"
+if [ -z "$SMASH_BRANCH" ]; then BRANCH=master; else BRANCH=$SMASH_BRANCH; fi;
+if [ -z $1 ]; then BRANCH=$BRANCH; else BRANCH=$1; fi;
+
 if [ ! -z "$ORIGIN" -a "$ORIGIN" != " " ]; then
     BNAME="`basename $ORIGIN`";
     if [ $BNAME = "smash.git" ]; then
@@ -21,7 +25,7 @@ if [ ! -d "$SMASH_HOME" ]; then
     echo "$SMASH_HOME does not exist";
     if [ $GOT_SMASH_REPO = 0 ]; then
         echo "You need smash code.  Cloning it to $SMASH_HOME";
-        git clone https://github.com/mattvonrocketstein/smash.git ~/.smash
+        git clone --branch=$BRANCH https://github.com/mattvonrocketstein/smash.git ~/.smash
     else
         echo "Already have smash code, will not clone"
         echo "Creating dir $SMASH_HOME";
