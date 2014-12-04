@@ -1,4 +1,6 @@
 """ smashlib.project_manager.defaults
+
+    Maps for project-types -> operation
 """
 
 from .deactivate import deactivate_python_venv
