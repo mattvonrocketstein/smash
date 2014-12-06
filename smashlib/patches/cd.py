@@ -32,7 +32,6 @@ class PatchCDMagic(PatchMagic):
 class PatchPinfoMagic(PatchMagic):
     name = 'pinfo'
     def __call__(self, parameter_s=''):
-        import re
         tmp = parameter_s.replace('?','').split('.')
         obj = self.component.shell.user_ns.get(tmp.pop(0))
         while tmp:

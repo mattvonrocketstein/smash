@@ -22,7 +22,7 @@ from goulash.venv import get_venv, to_vbin, to_vlib, get_path
 from smashlib import get_smash
 from smashlib.v2 import Reporter
 from smashlib.data import SMASH_DIR
-from smashlib.python import opj, ope, abspath, expanduser
+from goulash.python import opj, ope, abspath, expanduser
 from smashlib.completion  import opt_completer
 
 

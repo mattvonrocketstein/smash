@@ -6,7 +6,7 @@ import demjson
 from IPython.core.profiledir import ProfileDir
 
 from smashlib.data import SMASH_ETC, SMASH_DIR, SMASHLIB_DIR, main_profile_name
-from smashlib.python import create_dir_if_not_exists, ope, opj
+from goulash.python import create_dir_if_not_exists, ope, opj
 from smashlib.data import USER_CONFIG_PATH
 
 class SmashConfig(object):

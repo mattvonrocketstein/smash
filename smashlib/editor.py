@@ -5,11 +5,9 @@ import os
 import demjson
 import jsonschema
 
-from report import report
-
 from IPython.terminal.interactiveshell import get_default_editor
 
-from smashlib.data import SMASH_ETC, EDITOR_CONFIG_PATH
+from smashlib.data import EDITOR_CONFIG_PATH
 from smashlib.util import touch_file
 
 EDITOR_SCHEMA = {
@@ -28,11 +26,10 @@ def get_example(schema):
         if typ=='string':
             out[p] = 'foo'
         else:
-            raise Exception,'niy'
+            raise Exception('niy')
     return str(out)
 
 def get_editor():
-    _from = None
     user_editor = None
     sys_editor = get_default_editor()
     is_windowing_env = lambda: True # placeholder

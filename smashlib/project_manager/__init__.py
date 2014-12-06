@@ -8,7 +8,7 @@ from smashlib.channels import C_SMASH_INIT_COMPLETE, C_CD_EVENT, C_REHASH_EVENT,
 
 from smashlib.project_manager.util import (
     clean_project_name, UnknownProjectError)
-from smashlib.python import abspath, expanduser, getcwd, ope
+from goulash.python import abspath, expanduser, getcwd, ope
 from smashlib.util import guess_dir_type
 from smashlib.util.events import receives_event
 from smashlib.util.ipy import green

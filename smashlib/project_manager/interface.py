@@ -4,7 +4,7 @@ import os
 
 from goulash.venv import find_venvs
 
-from smashlib.python import ope
+from goulash.python import ope
 from smashlib.util._fabric import require_bin
 
 def require_active_project(fxn):

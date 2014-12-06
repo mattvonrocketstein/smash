@@ -2,10 +2,11 @@
 """
 
 """
-import re
 import keyword
+
 from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
-from smashlib.python import ope
+
+from goulash.python import ope
 
 DOT_HANDLER_NAME   = 'DotHandler'
 SHELL_HANDLER_NAME = 'ShellHandler'
@@ -31,7 +32,7 @@ class ShellChecker(PrefilterChecker):
         if have_alias(split_line[0]):
             return shandler
         if l0 in '~/.':
-            l1 = line[1]
+            #l1 = line[1]
             # if l1 is whitespace, this is probably some special syntax,
             # not something intended as instructions for the system shell
             # thus we will not mess with the input (perhaps the dot_prefilter

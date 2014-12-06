@@ -5,7 +5,7 @@ import os
 import inspect
 
 from smashlib.v2 import Reporter
-from smashlib.python import abspath, ope
+from goulash.python import abspath, ope
 from smashlib.completion  import opt_completer
 from smashlib import get_smash
 
