@@ -23,7 +23,14 @@ def smash_bash_complete(*args, **kargs):
     result = complete(*args, **kargs)
     return [ x for x in result if x not in keyword.kwlist ]
 
+from IPython.utils.traitlets import Instance
+
 class SmashTerminalInteractiveShell(BaseTIS):
+
+    # Input splitter, to transform input line by line and detect when a block
+    # is ready to be executed.
+    input_splitter = Instance('smashlib.inputsplitter.SmashInputSplitter',
+                              (), {'line_input_checker': True})
 
     def __init__(self,*args,**kargs):
         sooper = super(SmashTerminalInteractiveShell,self)
