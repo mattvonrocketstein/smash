@@ -6,7 +6,6 @@ import re
 from subprocess import Popen, PIPE
 
 from report import report
-from smashlib import get_smash
 from smashlib.bin.pybcompgen import remove_control_characters
 
 r_alias = re.compile('alias \w+=.*')

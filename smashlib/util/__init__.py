@@ -47,6 +47,13 @@ def guess_dir_type(_dir, max_depth=3):
                 break
     return matches
 
+def is_path(input):
+    if len(input.split())==1 and \
+       (input.startswith('./') or \
+        input.startswith('~/') or \
+        input.startswith('/')):
+        return True
+
 def split_on_unquoted_semicolons(txt):
     # use this in "ed fpath:1:2"?
     PATTERN = re.compile(r'''((?:[^;"']|"[^"]*"|'[^']*')+)''')
