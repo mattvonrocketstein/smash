@@ -7,23 +7,23 @@
     So far a lot of this is here mostly because smash wants a separate message
     bus from the main ipython event system (IPython.core.events).
 """
+import keyword
 
 from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 from IPython.terminal.interactiveshell import \
      TerminalInteractiveShell as BaseTIS
+from IPython.utils.traitlets import Instance
 
 from smashlib import get_smash
 from smashlib.pysh import have_command_alias
-from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_FAIL
-from smashlib.util import split_on_unquoted_semicolons
-
-import keyword
+from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_FAIL, C_FILE_INPUT
+from smashlib.util import split_on_unquoted_semicolons, is_path
+from smashlib.util._fabric import qlocal
 from smashlib.bin.pybcompgen import complete
+
 def smash_bash_complete(*args, **kargs):
     result = complete(*args, **kargs)
     return [ x for x in result if x not in keyword.kwlist ]
-
-from IPython.utils.traitlets import Instance
 
 class SmashTerminalInteractiveShell(BaseTIS):
 
@@ -31,6 +31,15 @@ class SmashTerminalInteractiveShell(BaseTIS):
     # is ready to be executed.
     input_splitter = Instance('smashlib.inputsplitter.SmashInputSplitter',
                               (), {'line_input_checker': True})
+
+    def showsyntaxerror(self, filename=None):
+        lastline = self._smash_last_input
+        clean_line = lastline.strip()
+        if is_path(clean_line):
+            self.smash.publish(C_FILE_INPUT, clean_line)
+            return
+        return super(SmashTerminalInteractiveShell, self).showsyntaxerror(filename=filename)
+
 
     def __init__(self,*args,**kargs):
         sooper = super(SmashTerminalInteractiveShell,self)
@@ -94,7 +103,6 @@ class SmashTerminalInteractiveShell(BaseTIS):
 
     def system(self, cmd, quiet=False, **kargs):
         #print 'wrapping system call',cmd
-        from smashlib.util._fabric import qlocal
         result = super(SmashTerminalInteractiveShell,self).system(cmd,**kargs)
         error = self.user_ns['_exit_code'] # put exit code into bash for lp?s
         if error:
