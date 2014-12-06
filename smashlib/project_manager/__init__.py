@@ -8,7 +8,7 @@ from smashlib.channels import C_SMASH_INIT_COMPLETE, C_CD_EVENT, C_REHASH_EVENT,
 
 from smashlib.project_manager.util import (
     clean_project_name, UnknownProjectError)
-from smashlib.python import abspath, expanduser
+from smashlib.python import abspath, expanduser, getcwd, ope
 from smashlib.util import guess_dir_type
 from smashlib.util.events import receives_event
 from smashlib.util.ipy import green
@@ -30,7 +30,7 @@ class CommandLineMixin(object):
     def build_argparser(self):
         """ """
         parser = Reporter.build_argparser(self)
-        parser.add_argument('-p','--project', default='')
+        parser.add_argument('-p', '--project', default='')
         return parser
 
     def parse_argv(self):
@@ -128,7 +128,7 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
         """
         def _bind_project(name, path):
             """ NOTE: be aware this is also used for re-binding """
-            if not os.path.exists(path):
+            if not ope(path):
                 self.report("bound project {0} to nonexistent {1}".format(
                     name, path))
             self.update_interface()
@@ -275,16 +275,16 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
         self.deactivate()
         self._current_project = name
         self.perform_operation(name, 'activation')
-        if not os.getcwd() == self.project_map[name]:
+        if not getcwd() == self.project_map[name]:
             self.jump_project(name)
     activate = activate_project
 
     def test(self, name):
         self.perform_operation(name, 'test')
 
+    def check(self, pname):
+        return self.perform_operation(pname, 'check')
+
     def guess_project_type(self, project_name):
         pdir = self.project_map[project_name]
         return guess_dir_type(pdir)
-
-    def check(self, pname):
-        return self.perform_operation(pname, 'check')
