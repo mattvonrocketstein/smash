@@ -4,6 +4,9 @@ import os
 
 from goulash.venv import find_venvs
 
+from smashlib.python import ope
+from smashlib.util._fabric import require_bin
+
 def require_active_project(fxn):
     def newf(self, *args, **kargs):
         pname = self._project_manager._current_project
@@ -44,7 +47,6 @@ class ProjectManagerInterface(object):
         gitignore = os.path.join(
             self._project_manager._project_dir,
             '.gitignore')
-        from smashlib.python import ope
         patterns = ['*/.*/*']
         if ope(gitignore):
             with open(gitignore) as fhandle:
@@ -53,7 +55,6 @@ class ProjectManagerInterface(object):
                                    for p in patterns ] )
         if patterns:
             patterns = '\\( {0} \\)'.format(patterns)
-        # find . -type f \( -iname "*.c" -or -iname "*.asm" \)
         sed = """| sed 's/[^[:space:]]\+ //';"""
         base_find = 'find {0} -type f {1}'.format(
             self._project_manager._project_dir, patterns)
@@ -64,9 +65,15 @@ class ProjectManagerInterface(object):
         return filenames[:10]
 
     @require_active_project
-    def _ack(self, pat):
-        """ TODO: should really be some kind of magic """
-        from smashlib.util._fabric import require_bin
+    def _search(self, *pat):
+        """ NOTE: used by magic `search` """
+        pat = ' '.join(pat)
+        if '|' in pat:
+            tmp = pat.split('|')
+            pat = tmp.pop(0)
+            post_process = '|'+'|'.join(tmp)#ie "| grep foo" or whatever
+        else:
+            post_process = ''
         require_bin('ack-grep')
         venvs = self._venvs
         cmd = 'ack-grep "{0}" "{1}" {2}'
@@ -76,6 +83,7 @@ class ProjectManagerInterface(object):
         ignores = ['--ignore-dir="{0}"'.format(j) for j in junk]
         ignores = ' '.join(ignores)
         cmd = cmd.format(pat, pdir, ignores)
+        cmd += post_process
         results = self._project_manager.smash.system(cmd)
         print results
 
