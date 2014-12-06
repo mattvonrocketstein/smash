@@ -24,7 +24,6 @@ def python_test(project_manager):
               treatment should probably be given to django since it's so
               popular and the testing procedure is pretty idiosyncratic.
     """
-    pm = project_manager
     pname = project_manager._current_project
     pdir = project_manager.project_map[pname]
     if has_tox(pdir):
