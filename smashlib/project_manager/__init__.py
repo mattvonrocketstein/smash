@@ -66,7 +66,6 @@ class CommandLineMixin(object):
 
 class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
     """ """
-
     search_dirs      = EventfulList(default_value=[], config=True)
     project_map      = EventfulDict(default_value={}, config=True)
     alias_map        = EventfulDict(default_value={}, config=True)

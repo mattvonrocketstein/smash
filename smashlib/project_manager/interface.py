@@ -66,7 +66,11 @@ class ProjectManagerInterface(object):
 
     @require_active_project
     def _search(self, *pat):
-        """ NOTE: used by magic `search` """
+        """ example usage:
+
+              smash$ .search foo|grep bar
+              smash$ proj._search foo|grep bar
+        """
         pat = ' '.join(pat)
         if '|' in pat:
             tmp = pat.split('|')
