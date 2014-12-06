@@ -3,8 +3,6 @@
 __version__ = 0.1
 
 def start_ipython(argv=None, **kwargs):
-    #from smashlib.python import ModPath
-    #modpath = ModPath.install()
     from smashlib.overrides import launch_new_instance
     return launch_new_instance(argv=argv, **kwargs)
 

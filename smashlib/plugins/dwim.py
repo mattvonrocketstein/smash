@@ -9,7 +9,7 @@ from IPython.utils.traitlets import EventfulDict
 
 from smashlib.v2 import Reporter
 from smashlib.util.events import receives_event
-from smashlib.channels import C_FAIL, C_FILE_INPUT
+from smashlib.channels import C_FILE_INPUT
 from goulash.python import splitext, ope, abspath, expanduser
 
 class DoWhatIMean(Reporter):

@@ -3,7 +3,7 @@
 
 import re
 from IPython.core.inputsplitter import IPythonInputSplitter
-from smashlib.python import ope
+from goulash.python import ope
 
 r_ed = 'ed [^:]*'
 

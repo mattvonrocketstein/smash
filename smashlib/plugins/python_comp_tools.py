@@ -35,5 +35,5 @@ def load_ipython_extension(ip):
 
 def unload_ipython_extension(ip):
     plugin_name = os.path.splitext(os.path.split(__file__)[-1])[0]
-    raise Exception, plugin_name
+    raise Exception(plugin_name)
     get_smash().plugins[plugin_name].uninstall()

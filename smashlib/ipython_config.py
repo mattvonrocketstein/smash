@@ -7,7 +7,6 @@
 # the user configuration file: ~/.smash/config.py (or inside smash
 # type ed_ed).
 #
-import os
 from smashlib.editor import get_editor
 print '..loading system config', __file__
 

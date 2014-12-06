@@ -1,6 +1,6 @@
 """smashlib.data
 """
-from smashlib.python import expanduser, opj, dirname
+from goulash.python import expanduser, opj, dirname
 
 main_profile_name = 'SmaSh'
 user_config_name = 'config.py'

@@ -2,7 +2,6 @@
 
     defines the "test" operation for certain project-types.
 """
-from smashlib import get_smash
 from smashlib.util._tox import has_tox
 from .operation import OperationStep, NullOperationStep, require_active_project
 

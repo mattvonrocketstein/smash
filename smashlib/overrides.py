@@ -18,7 +18,6 @@ from smashlib import get_smash
 from smashlib.pysh import have_command_alias
 from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_FAIL, C_FILE_INPUT
 from smashlib.util import split_on_unquoted_semicolons, is_path
-from smashlib.util._fabric import qlocal
 from smashlib.bin.pybcompgen import complete
 
 def smash_bash_complete(*args, **kargs):
