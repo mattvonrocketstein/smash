@@ -2,8 +2,6 @@
 
     documentation: http://mattvonrocketstein.github.io/smash/plugins.html#dwim
 """
-import os
-
 from IPython.utils.traitlets import Bool
 from IPython.utils.traitlets import EventfulDict
 
