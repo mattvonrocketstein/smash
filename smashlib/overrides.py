@@ -36,6 +36,10 @@ class SmashTerminalInteractiveShell(BaseTIS):
                               (), {'line_input_checker': True})
 
     def showsyntaxerror(self, filename=None):
+        """ when a syntax error is encountered,
+            consider just broadcasting a signal instead
+            of showing a traceback.
+        """
         lastline = self._smash_last_input
         clean_line = lastline.strip()
         if is_path(clean_line):
@@ -57,7 +61,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
         # NOTE: this might not be set during early bootstrap
         return getattr(self, '_smash', None)
 
-    # NOTE: _smash_last_inpute is an accumulator, and input may
+    # NOTE: _smash_last_input is an accumulator, and input may
     # not be finished.  for example if input is a multi-line
     # function definition, pasted stuff, or uses a trailing "\"
     def raw_input(self, *args, **kargs):
@@ -81,8 +85,8 @@ class SmashTerminalInteractiveShell(BaseTIS):
     def run_cell(self, raw_cell, store_history=False,
                  silent=False, shell_futures=True):
 
+        # as long as the expressions are semicolon separated,
         # this section allows hybrid bash/python expressions
-        # if those expressions are semicolon separated
         bits = split_on_unquoted_semicolons(raw_cell)
         if len(bits) > 1:
             out=[]
@@ -114,7 +118,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
         error = self.user_ns['_exit_code'] # put exit code into bash for lp?s
         if error:
             get_smash().publish(C_FAIL, cmd, error)
-        if not quiet:
+        if not quiet and result:
             print result
 TerminalInteractiveShell=SmashTerminalInteractiveShell
 

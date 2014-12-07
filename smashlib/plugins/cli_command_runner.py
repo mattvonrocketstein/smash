@@ -1,9 +1,4 @@
 """ smashlib.plugins.cli_command_runner
-
-    This plugin is responsible for doing the
-    work whenever smash is invoked with "-c".
-    Semantics are the same as "python -c" or
-    "bash -c"
 """
 
 from smashlib.util.events import receives_event
@@ -11,6 +6,11 @@ from smashlib.v2 import Reporter
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 
 class RunCommand(Reporter):
+    """ This plugin is responsible for doing the
+        work whenever smash is invoked with "-c".
+        Semantics are the same as "python -c" or
+        "bash -c"
+    """
     verbose = True
     command = None
 

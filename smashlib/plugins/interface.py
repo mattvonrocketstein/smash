@@ -1,6 +1,9 @@
 """ smashlib.plugins.interface
 """
 
+class myprop(property):
+    pass
+
 class PluginInterface(object):
     def __repr__(self):
         return "plugin interface"
@@ -34,8 +37,13 @@ class PluginInterface(object):
         def fxn(name):
             return self.smash._installed_plugins[name]
         for name in tmp:
-            prop=property(lambda himself: fxn(name))
-            setattr(self.__class__,name,prop)
+            tmp2 = lambda himself: fxn(name)
+            #from smashlib.util.reflect import from_dotpath
+            #tmp3=from_dotpath(self.smash._installed_plugins[name].__class__.__module__).__doc__
+            tmp3 = self.smash._installed_plugins[name].__qmark__()
+            tmp2.__doc__ = tmp3
+            prop = myprop(tmp2)
+            setattr(self.__class__, name, prop)
         whitelist = ['edit','smash', 'update']
         for x in dir(self):
             if not x.startswith('_') and \
