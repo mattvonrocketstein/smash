@@ -85,10 +85,20 @@ class Smash(Reporter):
         self.init_bus()
         self.init_plugins()
         self.parse_argv()
+        self.init_config_inheritance()
+        smash_bin = os.path.expanduser('~/.smash/bin')
+        if smash_bin not in os.environ['PATH']:
+            os.environ['PATH'] = smash_bin + ':' + os.environ['PATH']
 
+        self.init_patches()
+        self.publish(C_SMASH_INIT_COMPLETE)
+
+    def init_config_inheritance(self):
         if self.load_bash_aliases:
             for alias, cmd in bash.get_aliases():
-                if alias not in 'ed cd'.split(): #HACK
+                # this check is a hack, but users will frequently override
+                # cd to pushd which is already done in smash anyway
+                if alias not in 'ed cd'.split():
                     self.shell.magic("alias {0} {1}".format(alias,cmd))
 
         if self.load_bash_functions:
@@ -98,13 +108,10 @@ class Smash(Reporter):
                 self.shell.magics_manager.register_function(cmd, magic_name=fxn_name)
             self.report("registered magic for bash functions: ",fxns)
 
-        smash_bin = os.path.expanduser('~/.smash/bin')
-        if smash_bin not in os.environ['PATH']:
-            os.environ['PATH'] = smash_bin + ':' + os.environ['PATH']
 
+    def init_patches(self):
         PatchEdit(self).install()
         PatchPinfoMagic(self).install()
-        self.publish(C_SMASH_INIT_COMPLETE)
 
     def init_bus(self):
         """ note: it is a special case that due to bootstrap ordering,
