@@ -102,12 +102,11 @@ class DoWhatIMean(Reporter):
             self.smash.error_handlers.append(self.handle_NameError)
 
     def handle_NameError(self, last_line, etype, evalue):
-        if etype!=NameError:
+        if etype != NameError:
             return
-
         line = last_line
-        return self.on_file_input(
-            'fake_bus', last_line)
+        return self.on_file_input('fake_bus', last_line)
+
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
