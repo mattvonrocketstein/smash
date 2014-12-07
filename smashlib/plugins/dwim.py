@@ -10,7 +10,29 @@ from IPython.utils.traitlets import EventfulDict
 from smashlib.v2 import Reporter
 from smashlib.util.events import receives_event
 from smashlib.channels import C_FILE_INPUT
-from goulash.python import splitext, ope, abspath, expanduser
+from smashlib.util._fabric import qlocal
+from smashlib.util._fabric import has_bin
+
+from goulash.python import splitext, ope, abspath, expanduser, isdir
+
+def is_editable(_fpath):
+    """ guess whether _fpath can be edited, based on
+        the output of the file(1) utility.  this function
+        refuses to guess if file(1) is not available.
+
+        FIXME: check if its small
+    """
+    # flimit = 712020
+    # if flimit < os.path.getsize(line):
+    #   msg = ("warning: maybe you wanted to edit"
+    #          " that file but it looks big")
+    #   self.report(msg)
+    if has_bin('file'):
+        file_result = qlocal('file {0}'.format(_fpath), capture=True)
+        if 'ASCII text' in file_result:
+            return True
+        else:
+            return False
 
 class DoWhatIMean(Reporter):
     """ """
@@ -33,6 +55,21 @@ class DoWhatIMean(Reporter):
 
     @receives_event(C_FILE_INPUT)
     def on_file_input(self, fpath):
+        def doit(_fpath, _suffix, _opener, _rest):
+            if ope(_fpath) and not isdir(_fpath):
+                if _opener is not None:
+                    self.report('Using _opener "{0}" for "{1}"'.format(_opener, _suffix))
+                    return '{0} {1}'.format(_opener, _fpath+_rest)
+                else:
+                    msg = "Legit file input, but no _suffix alias could be found for "+_suffix
+                    self.report(msg)
+                    if is_editable(_fpath):
+                        self.report("File looks like ASCII text, assuming I should edit it")
+                        return doit(_fpath, _suffix, 'ed', _rest)
+            else:
+                msg = 'Attempted file input, but path "{0}" does not exist'.format(fpath)
+                self.report(msg)
+
         fpath = abspath(expanduser(fpath))
 
         #isolate file:col:row syntax
@@ -43,31 +80,18 @@ class DoWhatIMean(Reporter):
         else:
             rest = ''
 
-        #isolate file suffix
+        #isolate file suffix, guess an opener
         suffix = splitext(fpath)[-1][1:].lower()
         opener = self.suffix_aliases.get(suffix, None)
-        from smashlib.util._fabric import qlocal
-        def doit(_fpath, _suffix, _opener, _rest):
-            if ope(_fpath):
-                if _opener is not None:
-                    self.report('Using _opener "{0}" for "{1}"'.format(_opener, _suffix))
-                    return '{0} {1}'.format(_opener, _fpath+_rest)
-                else:
-                    msg = "Legit file input, but no _suffix alias could be found for "+_suffix
-                    self.report(msg)
-
-                    # ask the file(1) utility wtf this is
-                    file_result = qlocal('file {0}'.format(_fpath), capture=True)
-                    if 'ASCII text' in file_result:
-                        self.report("File looks like ASCII text, assuming I should edit it")
-                        return doit(_fpath, _suffix, 'ed', _rest)
-            else:
-                msg = 'Attempted file input, but path "{0}" does not exist'.format(fpath)
-                self.report(msg)
+        if isdir(fpath) and self.automatic_cd:
+            self.report('cd '+fpath)
+            self.smash.shell.magic('pushd '+fpath)
+            return True
 
         cmd = doit(fpath, suffix, opener, rest)
         if cmd:
             self.smash.shell.run_cell(cmd)
+            return True
 
     def init(self):
         def smash_open(x):
@@ -82,20 +106,8 @@ class DoWhatIMean(Reporter):
             return
 
         line = last_line
-        if len(line.split())==1 and os.path.exists(line):
-            if self.automatic_cd and os.path.isdir(line):
-                self.report('cd '+line)
-                self.smash.shell.magic('pushd '+line)
-            else:
-                flimit = 712020
-                if flimit < os.path.getsize(line):
-                    msg = ("warning: maybe you wanted to edit"
-                           " that file but it looks big")
-                    self.report(msg)
-                else:
-                    self.report('ed '+line)
-                    self.smash.shell.magic('ed '+line)
-            return True
+        return self.on_file_input(
+            'fake_bus', last_line)
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
