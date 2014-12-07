@@ -98,12 +98,13 @@ class SmashTerminalInteractiveShell(BaseTIS):
             raw_cell, store_history=store_history,
             silent=silent, shell_futures=shell_futures)
         if self.smash is not None:
-            self.smash.publish(
-                C_POST_RUN_CELL,
-                self.user_ns['In'][-1].strip())
-            self.smash.publish(
-                C_POST_RUN_INPUT,
-                self._smash_last_input)
+            if self._smash_last_input:
+                # translated-input
+                this = self.user_ns['In'][-1].strip()
+                # untranslated-input
+                last_input=self._smash_last_input
+                self.smash.publish(C_POST_RUN_CELL, this)
+                self.smash.publish(C_POST_RUN_INPUT, last_input)
             self._smash_last_input = ""
         return out
 

@@ -8,7 +8,7 @@
 
 from smashlib.util.events import receives_event
 from smashlib.v2 import Reporter
-from smashlib.channels import C_SMASH_INIT_COMPLETE, C_FILE_INPUT
+from smashlib.channels import C_SMASH_INIT_COMPLETE
 
 class RunCommand(Reporter):
     verbose = True
@@ -37,8 +37,9 @@ def load_ipython_extension(ip):
     tmp = RunCommand(ip)
     tmp.install()
     return tmp
-
+from smashlib import get_smash
+from goulash.python import splitext,ops
 def unload_ipython_extension(ip):
-    plugin_name = os.path.splitext(os.path.split(__file__)[-1])[0]
+    plugin_name = splitext(ops(__file__)[-1])[0]
     raise Exception(plugin_name)
     get_smash().plugins[plugin_name].uninstall()
