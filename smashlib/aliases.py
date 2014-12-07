@@ -11,7 +11,6 @@ class AliasMixin(object):
 
     def _load_alias_group(self, group_name):
         aliases, macros = self._get_alias_group(group_name)
-        suffix_aliases = []
         for alias in aliases:
             name, cmd = alias
             self.smash.shell.alias_manager.define_alias(name, cmd)
@@ -33,12 +32,3 @@ class AliasMixin(object):
                 self.smash.shell.alias_manager.undefine_alias(name)
             except ValueError:
                 continue
-
-from smashlib.logging import Logger
-from smashlib.v2 import Reporter
-class SmashAliasManager(Reporter):
-    """ """
-    def __init__(self, config):
-        super(Base, self).__init__(config=shell.config, shell=shell)
-    def load_group(self, group):
-        pass
