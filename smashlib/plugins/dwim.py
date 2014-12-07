@@ -9,11 +9,13 @@ from IPython.utils.traitlets import EventfulDict
 
 from smashlib.v2 import Reporter
 from smashlib.util.events import receives_event
-from smashlib.channels import C_FILE_INPUT
+from smashlib.channels import C_FILE_INPUT, C_URL_INPUT
 from smashlib.util._fabric import qlocal
 from smashlib.util._fabric import has_bin
 
 from goulash.python import splitext, ope, abspath, expanduser, isdir
+import webbrowser
+
 
 def is_editable(_fpath):
     """ guess whether _fpath can be edited, based on
@@ -52,6 +54,11 @@ class DoWhatIMean(Reporter):
         True, config=True,
         help="open automatically if input looks like webpage")
     suffix_aliases = EventfulDict(default_value={}, config=True)
+
+    @receives_event(C_URL_INPUT)
+    def on_url_input(self, fpath):
+        webbrowser.open(fpath)
+        self.report("opening input in browser")
 
     @receives_event(C_FILE_INPUT)
     def on_file_input(self, fpath):
@@ -94,10 +101,9 @@ class DoWhatIMean(Reporter):
             return True
 
     def init(self):
-        def smash_open(x):
-            import webbrowser
-            webbrowser.open(x)
-        self.contribute_magic(smash_open)
+        #def smash_open(x):
+        #    webbrowser.open(x)
+        #self.contribute_magic(smash_open)
         if self.automatic_cd or self.automatic_edit:
             self.smash.error_handlers.append(self.handle_NameError)
 
