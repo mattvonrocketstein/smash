@@ -1,5 +1,7 @@
 """ smashlib.v2
 """
+import sys
+import argparse
 from IPython.utils.traitlets import Bool
 from IPython.config.configurable import Configurable
 
@@ -8,9 +10,11 @@ from smashlib.bases.eventful import EventfulMix
 
 class SmashComponent(object):
     def build_argparser(self):
-        import argparse
         parser = argparse.ArgumentParser()
         return parser
+
+    def install(self):
+        pass
 
     def contribute_magic(self, fxn):
         # TODO: verify signature?
@@ -18,7 +22,6 @@ class SmashComponent(object):
         return self.smash.shell.magics_manager.register_function(fxn)
 
     def parse_argv(self):
-        import sys
         parser = self.build_argparser()
         args, unknown = parser.parse_known_args(sys.argv[1:])
         if len(vars(args)):
