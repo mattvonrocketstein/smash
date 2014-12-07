@@ -9,5 +9,5 @@ fabric
 flake8
 goulash==0.5
 reporting
-jsonschema==2.4.0
+voluptuous==0.8.6
 pygments # used by reporting

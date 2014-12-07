@@ -1,38 +1,67 @@
 """ smashlib.config
 """
 import os, shutil
-
-import demjson
+from report import Reporter
+import demjson, voluptuous
 from IPython.core.profiledir import ProfileDir
 
-from smashlib.data import SMASH_ETC, SMASH_DIR, SMASHLIB_DIR, main_profile_name
 from goulash.python import create_dir_if_not_exists, ope, opj
+
 from smashlib.data import USER_CONFIG_PATH
+from smashlib.data import SMASH_ETC, SMASH_DIR, SMASHLIB_DIR, main_profile_name
+from smashlib.config import schemas
+
+report = Reporter("SmashConfig")
+
+def _find_schema(fname):
+    fname = os.path.split(fname)[-1]
+    fname = os.path.splitext(fname)[0]
+    return getattr(schemas, fname)
 
 class SmashConfig(object):
     """
     """
+
     def __init__(self, config=None):
         self.config = config
 
     def load_from_etc(self, fname, schema=None):
         """ if schema is given, validate it.  otherwise just load blindly """
-        with open(opj(SMASH_ETC, fname)) as fhandle:
-            return demjson.decode(fhandle.read())
+        report('loading and validating {0}'.format(fname))
+        schema = schema or _find_schema(fname)
+        absf = opj(SMASH_ETC, fname)
+        try:
+            with open(absf) as fhandle:
+                data = demjson.decode(fhandle.read())
+        except demjson.JSONDecodeError:
+            err = "file is not json: {0}".format(absf)
+            report.ERROR(err)
+            raise SystemExit(err)
+        except IOError:
+            report("{0} does not exist..".format(absf))
+            if getattr(schema, 'default', None) is not None:
+                report("..but a default is defined.  writing file")
+                default = demjson.encode(schema.default)
+                with open(absf,'w') as fhandle:
+                    fhandle.write(default)
+                return self.load_from_etc(fname, schema)
+            else:
+                err = "{0} does not exist, and no default is defined".format(absf)
+                report.ERROR(err)
+                raise SystemExit(err)
+        try:
+            schema(data)
+        except voluptuous.Invalid,e:
+            raise SystemExit("error validating {0}\n\t{1}".format(absf, e))
+        return data
 
     def update_from_etc(self, config, fname, schema=None):
-        try:
-            data = self.load_from_etc(fname, schema=schema)
-        except IOError:
-            data = {}
+        data = self.load_from_etc(fname, schema=schema)
         config.update(data)
         return data
 
     def append_from_etc(self, config, fname, schema=None):
-        try:
-            data = self.load_from_etc(fname, schema=schema)
-        except IOError:
-            data = []
+        data = self.load_from_etc(fname, schema=schema)
         [config.append(x) for x in data]
         return data
 
@@ -68,7 +97,6 @@ class SmashUserConfig(object):
 
     @staticmethod
     def load(env):
-        from smashlib.data import USER_CONFIG_PATH
         print '..loading SmaSh user-config from:', USER_CONFIG_PATH
         sandbox = env.copy();
         sandbox.update(__file__=USER_CONFIG_PATH)
