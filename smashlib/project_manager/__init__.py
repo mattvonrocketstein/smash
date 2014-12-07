@@ -53,7 +53,7 @@ class CommandLineMixin(object):
             cmd(*args)
 
     @receives_event(C_SMASH_INIT_COMPLETE)
-    def use_requested_project(self, none):
+    def use_requested_project(self):
         try:
             #self.activate_project(args.project)
             getattr(self.interface, self.use_project)
