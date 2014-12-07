@@ -8,6 +8,7 @@
     bus from the main ipython event system (IPython.core.events).
 """
 import keyword
+import urlparse
 
 from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 from IPython.terminal.interactiveshell import \
@@ -16,7 +17,10 @@ from IPython.utils.traitlets import Instance
 
 from smashlib import get_smash
 from smashlib.pysh import have_command_alias
-from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_FAIL, C_FILE_INPUT
+
+from smashlib.channels import C_FILE_INPUT, C_URL_INPUT
+from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_FAIL
+
 from smashlib.util import split_on_unquoted_semicolons, is_path
 from smashlib.bin.pybcompgen import complete
 
@@ -36,8 +40,11 @@ class SmashTerminalInteractiveShell(BaseTIS):
         clean_line = lastline.strip()
         if is_path(clean_line):
             self.smash.publish(C_FILE_INPUT, clean_line)
-            return
-        return super(SmashTerminalInteractiveShell, self).showsyntaxerror(filename=filename)
+        elif urlparse.urlparse(clean_line).scheme in 'http https'.split():
+            self.smash.publish(C_URL_INPUT, clean_line)
+        else:
+            sooper = super(SmashTerminalInteractiveShell, self)
+            return sooper.showsyntaxerror(filename=filename)
 
 
     def __init__(self,*args,**kargs):
