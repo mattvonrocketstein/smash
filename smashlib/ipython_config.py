@@ -58,6 +58,7 @@ _.IPCompleter.merge_completions = False
 
 # load optional smash extensions
 #_.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
+_.Smash.plugins.append('smashlib.plugins.cli_command_runner')
 _.Smash.plugins.append('smashlib.plugins.liquidprompt')
 _.Smash.plugins.append('smashlib.plugins.cd_hooks')
 _.Smash.plugins.append('smashlib.plugins.venv')
@@ -84,14 +85,26 @@ _.PyLinter.ignore_undefined_names = [
 ## configure the liquidprompt extension with some reasonable defaults.
 ################################################################################
 _.LiquidPrompt.float           = True # insert more space around prompt
-_.LiquidPrompt.prompt_append   = "> "
+_.LiquidPrompt.prompt_append='\n> '
 _.PromptManager.justify        = False
 
 # configure the project manager extension
 ################################################################################
 projects = _.ProjectManager
+
+# this is safe even when the directories do not exist
 projects.search_dirs.append('~/code')
 projects.search_dirs.append('~/projects')
+
+# load user's project manager configs from the ~/.smash/etc json
+# see docs at: http://mattvonrocketstein.github.io/smash/project_manager.html
+from smashlib.config import SmashConfig
+config = SmashConfig(_)
+config.append_from_etc(projects.search_dirs, 'search_dirs.json')
+config.update_from_etc(projects.project_map, 'projects.json')
+config.update_from_etc(projects.alias_map, 'aliases.json')
+config.update_from_etc(projects.macro_map, 'macros.json')
+config.update_from_etc(projects.venv_map, 'venvs.json')
 
 # configure the ipython app
 ################################################################################

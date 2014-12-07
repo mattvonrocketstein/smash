@@ -61,7 +61,7 @@ class Smash(Reporter):
 
     def build_argparser(self):
         parser = super(Smash, self).build_argparser()
-        parser.add_argument('-c','--command', default='')
+        #parser.add_argument('-c','--command', default='')
         return parser
 
     def parse_argv(self):
@@ -73,12 +73,7 @@ class Smash(Reporter):
         ext_objs = self._installed_plugins.values()
         for obj in ext_objs:
             if obj:
-                args,unknown = obj.parse_argv()
-        if main_args.command:
-            def run_command(*args, **kargs):
-                self.shell.run_cell(main_args.command)
-                self.shell.run_cell('exit')
-            self.bus.subscribe(C_SMASH_INIT_COMPLETE, run_command)
+                args, unknown = obj.parse_argv()
 
     @property
     def project_manager(self):
@@ -109,8 +104,7 @@ class Smash(Reporter):
 
         PatchEdit(self).install()
         PatchPinfoMagic(self).install()
-        #from smashlib.patches.rehashx import PatchRehashX; PatchRehashX(self).install()
-        self.publish(C_SMASH_INIT_COMPLETE, None)
+        self.publish(C_SMASH_INIT_COMPLETE)
 
     def init_bus(self):
         """ note: it is a special case that due to bootstrap ordering,
@@ -120,9 +114,6 @@ class Smash(Reporter):
         """
         super(Smash, self).init_bus()
         bus = self.bus
-        def warning_dep(*args, **kargs):
-            raise Exception("dont send warning that way")
-        bus.subscribe('warning', warning_dep)
         bus.subscribe(C_POST_RUN_INPUT, self.input_finished_hook)
         bus.subscribe(C_FAIL, self.on_system_fail)
 
