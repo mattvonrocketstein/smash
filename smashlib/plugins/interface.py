@@ -18,8 +18,19 @@ class PluginInterface(object):
     def __doc__(self):
         self.update()
 
+    def __qmark__(self):
+
+        out = ['Smash Plugins: ({0} total)'.format(len(self._plugins))]
+        for nick in self._plugins:
+            out += ['   : {0}'.format(nick)]
+        return '\n'.join(out)
+
+    @property
+    def _plugins(self):
+        return self.smash._installed_plugins
+
     def update(self):
-        tmp = self.smash._installed_plugins
+        tmp = self._plugins
         def fxn(name):
             return self.smash._installed_plugins[name]
         for name in tmp:
