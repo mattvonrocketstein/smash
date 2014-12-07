@@ -19,7 +19,7 @@ from smashlib.magics import SmashMagics
 from smashlib.channels import C_SMASH_INIT_COMPLETE, C_FAIL, C_FILE_INPUT
 from smashlib.plugins.interface import PluginInterface
 from smashlib.patches.edit import PatchEdit
-from smashlib.patches.cd import PatchPinfoMagic
+from smashlib.patches.pinfo import PatchPinfoMagic
 from smashlib.util._fabric import qlocal
 
 class Smash(Reporter):
