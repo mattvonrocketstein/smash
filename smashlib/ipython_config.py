@@ -60,6 +60,7 @@ _.IPCompleter.merge_completions = False
 #_.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
 _.Smash.plugins.append('smashlib.plugins.cli_command_runner')
 _.Smash.plugins.append('smashlib.plugins.post_input')
+_.Smash.plugins.append('smashlib.plugins.handle_cmd_failure')
 _.Smash.plugins.append('smashlib.plugins.liquidprompt')
 _.Smash.plugins.append('smashlib.plugins.cd_hooks')
 _.Smash.plugins.append('smashlib.plugins.venv')

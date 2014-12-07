@@ -1,9 +1,10 @@
-""" smashlib.plugins.cli_command_runner
+""" smashlib.plugins.post_input
 
     This plugin is responsible for doing the
     work whenever smash is invoked with "-c".
     Semantics are the same as "python -c" or
     "bash -c"
+
 """
 
 from smashlib.v2 import Reporter
@@ -22,7 +23,7 @@ class PostInput(Reporter):
     verbose = True
     command = None
 
-    @receives_event(C_POST_RUN_INPUT)
+    @receives_event(C_POST_RUN_INPUT, quiet=True)
     def input_finished_hook(self, raw_finished_input):
         for x in REHASH_IF:
             if x in raw_finished_input:

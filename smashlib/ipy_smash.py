@@ -121,18 +121,6 @@ class Smash(Reporter):
         """
         super(Smash, self).init_bus()
         bus = self.bus
-        bus.subscribe(C_FAIL, self.on_system_fail)
-
-    #@receives_event(C_FAIL)
-    def on_system_fail(self, bus, cmd, error):
-        def is_path(input):
-            if len(input.split())==1 and \
-               (input.startswith('./') or \
-                input.startswith('~/') or \
-                input.startswith('/')):
-                return True
-        if is_path(cmd):
-            self.smash.publish(C_FILE_INPUT, cmd)
 
     def add_completer(self, fxn, **kargs):
         from goulash._inspect import get_caller
