@@ -20,6 +20,7 @@ from smashlib.channels import C_SMASH_INIT_COMPLETE, C_FAIL, C_FILE_INPUT
 from smashlib.plugins.interface import PluginInterface
 from smashlib.patches.edit import PatchEdit
 from smashlib.patches.cd import PatchPinfoMagic
+from smashlib.util._fabric import qlocal
 
 class Smash(Reporter):
     plugins             = List(default_value=[], config=True)
@@ -34,7 +35,6 @@ class Smash(Reporter):
     completers         = defaultdict(list)
 
     def system(self, cmd, quiet=False):
-        from smashlib.util._fabric import qlocal
         if not quiet:
             self.report("run: " + cmd)
         return qlocal(cmd, capture=True)
@@ -61,7 +61,8 @@ class Smash(Reporter):
 
     def build_argparser(self):
         parser = super(Smash, self).build_argparser()
-        #parser.add_argument('-c','--command', default='')
+        # thinking of adding extra parsing here?  think twice.
+        # whatever you're doing probably belongs in a plugin..
         return parser
 
     def parse_argv(self):
@@ -101,7 +102,6 @@ class Smash(Reporter):
         if smash_bin not in os.environ['PATH']:
             os.environ['PATH'] = smash_bin + ':' + os.environ['PATH']
 
-
         PatchEdit(self).install()
         PatchPinfoMagic(self).install()
         self.publish(C_SMASH_INIT_COMPLETE)
@@ -114,7 +114,6 @@ class Smash(Reporter):
         """
         super(Smash, self).init_bus()
         bus = self.bus
-        bus.subscribe(C_POST_RUN_INPUT, self.input_finished_hook)
         bus.subscribe(C_FAIL, self.on_system_fail)
 
     #@receives_event(C_FAIL)
@@ -127,19 +126,6 @@ class Smash(Reporter):
                 return True
         if is_path(cmd):
             self.smash.publish(C_FILE_INPUT, cmd)
-
-    def input_finished_hook(self, bus, raw_finished_input):
-        if not raw_finished_input.strip():
-            return
-        rehash_if = [
-            'setup.py develop',
-            'pip install',
-            'setup.py install',
-            'apt-get install']
-        for x in rehash_if:
-            if x in raw_finished_input:
-                self.report("detected possible $PATH changes (rehashing)")
-                self.shell.magic('rehashx')
 
     def add_completer(self, fxn, **kargs):
         from goulash._inspect import get_caller
