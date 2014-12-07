@@ -13,6 +13,9 @@ class SmashComponent(object):
         parser = argparse.ArgumentParser()
         return parser
 
+    def __qmark__(self):
+        return self.__doc__ or '{0} has no __qmark__(), no __doc__()'.format(self)
+
     def install(self):
         pass
 
