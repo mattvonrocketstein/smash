@@ -5,7 +5,7 @@ from IPython.utils.traitlets import EventfulList
 
 from smashlib.v2 import Reporter
 from smashlib.util.reflect import from_dotpath, ObjectNotFound
-from smashlib.channels import C_CD_EVENT
+from smashlib.channels import C_CHANGE_DIR
 from smashlib.patches import PatchCDMagic, PatchPushdMagic
 
 
@@ -33,8 +33,8 @@ class ChangeDirHooks(Reporter):
             err = 'ChangeDirHooks.change_dir_hooks: '
             raise ObjectNotFound(err+e.message)
         self.report("retrieved from dotpath: ", obj)
-        self.report("object will be subscribed to <{0}>".format(C_CD_EVENT))
-        self.smash.bus.subscribe(C_CD_EVENT, obj)
+        self.report("object will be subscribed to <{0}>".format(C_CHANGE_DIR))
+        self.smash.bus.subscribe(C_CHANGE_DIR, obj)
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""

@@ -3,7 +3,7 @@
 import os
 
 from smashlib.patches.base import PatchMagic
-from smashlib.channels import C_CD_EVENT
+from smashlib.channels import C_CHANGE_DIR
 
 
 class PatchCDMagic(PatchMagic):
@@ -23,7 +23,7 @@ class PatchCDMagic(PatchMagic):
         else:
             this_dir = self.smash.system('pwd', quiet=True)
             self.smash.bus.publish(
-                C_CD_EVENT, this_dir,
+                C_CHANGE_DIR, this_dir,
                 self.component.last_dir)
             os.environ['PWD'] = this_dir
             self.component.last_dir = this_dir

@@ -1,7 +1,7 @@
 """ smashlib.channels
 """
 
-C_CD_EVENT = 'cd'
+C_CHANGE_DIR = 'cd'
 C_POST_RUN_CELL = 'post_run_cell'
 C_POST_RUN_INPUT = 'post_run_input'
 C_REHASH_EVENT = 'rehash'

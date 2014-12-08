@@ -4,7 +4,7 @@ import os
 import inspect
 from IPython.utils.traitlets import EventfulDict, EventfulList, Set
 
-from smashlib.channels import C_SMASH_INIT_COMPLETE, C_CD_EVENT, C_REHASH_EVENT, C_DOT_CMD
+from smashlib.channels import C_SMASH_INIT_COMPLETE, C_CHANGE_DIR, C_REHASH_EVENT, C_DOT_CMD
 
 from smashlib.project_manager.util import (
     clean_project_name, UnknownProjectError)
@@ -111,7 +111,7 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
     def reverse_project_map(self):
         return dict([[v,k] for k,v in self.project_map.items()])
 
-    @receives_event(C_CD_EVENT, quiet=True)
+    @receives_event(C_CHANGE_DIR, quiet=True)
     def show_project_help(self, new_dir, old_dir):
         if new_dir in self.project_map.values():
             project_name = self.reverse_project_map[new_dir]

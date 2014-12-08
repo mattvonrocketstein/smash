@@ -34,6 +34,10 @@ class Smash(Reporter):
     _installed_plugins = {}
     completers         = defaultdict(list)
 
+    def _repr_pretty_(self, p, cycle):
+        """ demo that behaves just like repr()"""
+        p.text(repr(self))
+
     def system(self, cmd, quiet=False):
         if not quiet:
             self.report("run: " + cmd)

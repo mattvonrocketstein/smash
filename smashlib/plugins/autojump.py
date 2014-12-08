@@ -14,7 +14,7 @@ from IPython.core.magic import Magics, magics_class, line_magic
 from smashlib import get_smash
 from smashlib.v2 import Reporter
 from smashlib.util.events import receives_event
-from smashlib.channels import C_CD_EVENT
+from smashlib.channels import C_CHANGE_DIR
 from smashlib.contrib import autojump as _autojump
 
 _main = _autojump.main
@@ -55,7 +55,7 @@ class AutojumpPlugin(Reporter):
     def init_magics(self):
         self.shell.register_magics(AutojumpMagics)
 
-    @receives_event(C_CD_EVENT)
+    @receives_event(C_CHANGE_DIR)
     def update_weights(self, new_dir, old_dir):
         """ useful as a post-hook for "cd" commands. it might be
             a good idea to call this after the "jump" command or
@@ -65,7 +65,7 @@ class AutojumpPlugin(Reporter):
             autojump(['--add', new_dir])
             # increment the weight for the current directory.
             # it must be the case that we are already *in* the
-            #  directory, because we have received the C_CD_EVENT message.
+            #  directory, because we have received the C_CHANGE_DIR message.
             autojump(['--increase'])
             self.report('autojump '+\
                         "incremented jump-weight for '{0}' to {1}".format(
