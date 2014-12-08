@@ -16,7 +16,7 @@ from smashlib.channels import C_POST_RUN_INPUT
 from smashlib.util.reflect import from_dotpath
 from smashlib.util import bash
 from smashlib.magics import SmashMagics
-from smashlib.channels import C_SMASH_INIT_COMPLETE, C_FAIL, C_FILE_INPUT
+from smashlib.channels import C_SMASH_INIT_COMPLETE, C_COMMAND_FAIL, C_FILE_INPUT
 from smashlib.plugins.interface import PluginInterface
 from smashlib.patches.edit import PatchEdit
 from smashlib.patches.pinfo import PatchPinfoMagic

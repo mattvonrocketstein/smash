@@ -19,7 +19,7 @@ from smashlib import get_smash
 from smashlib.pysh import have_command_alias
 
 from smashlib.channels import C_FILE_INPUT, C_URL_INPUT
-from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_FAIL
+from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_COMMAND_FAIL
 
 from smashlib.util import split_on_unquoted_semicolons, is_path
 from smashlib.bin.pybcompgen import complete
@@ -117,7 +117,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
         result = super(SmashTerminalInteractiveShell,self).system(cmd,**kargs)
         error = self.user_ns['_exit_code'] # put exit code into bash for lp?s
         if error:
-            get_smash().publish(C_FAIL, cmd, error)
+            get_smash().publish(C_COMMAND_FAIL, cmd, error)
         if not quiet and result:
             print result
 TerminalInteractiveShell=SmashTerminalInteractiveShell

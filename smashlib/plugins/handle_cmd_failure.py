@@ -6,13 +6,13 @@
 
 from smashlib.v2 import Reporter
 from smashlib.util.events import receives_event
-from smashlib.channels import C_FAIL, C_FILE_INPUT
+from smashlib.channels import C_COMMAND_FAIL, C_FILE_INPUT
 from smashlib.util import is_path
 
 class HandleCommandFail(Reporter):
     verbose = True
 
-    @receives_event(C_FAIL)
+    @receives_event(C_COMMAND_FAIL)
     def on_system_fail(self, cmd, error):
         if is_path(cmd):
             self.smash.publish(C_FILE_INPUT, cmd)
