@@ -51,7 +51,8 @@ class LiquidPrompt(Reporter):
     def get_prompt(self):
         cmd = unicode('bash '+lp_f).format(os.getcwd())
         env = os.environ.copy()
-        env.update(LP_HOSTNAME_ALWAYS="true",PS1="",)
+        env.update(dict(LP_HOSTNAME_ALWAYS="true", PS1="",))
+        env.update({'?':str(self.smash.shell.user_ns.get('_exit_code',0))})
         dict(
             TERM='xterm',
             LP_HOST='fakehost',

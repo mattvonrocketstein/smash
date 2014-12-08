@@ -7,6 +7,10 @@ def start_ipython(argv=None, **kwargs):
     return launch_new_instance(argv=argv, **kwargs)
 
 def embed(argv=tuple(), **kargs):
+    import os
+    if os.environ.get('SMASH', None):
+        print "..detected nesting.. this may cause problems"
+
     from goulash._inspect import get_caller
     context = kargs.pop('user_ns', {})
     caller_context = get_caller(2)
