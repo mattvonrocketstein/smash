@@ -39,7 +39,10 @@ def activate_python_venv(project_manager):
             project_manager.report("venv_map specifies to use {0}".format(
                 summarize_fpath(found_venv)))
     else:
-        found_venv = contains_venv(_dir, report=project_manager.report, ignore_dirs='.tox')
+        found_venv = contains_venv(
+            _dir, report=project_manager.report,
+            ignore_dirs=['.tox']
+            )
 
     if found_venv:
         project_manager.shell.magic('venv_activate {0}'.format(found_venv))

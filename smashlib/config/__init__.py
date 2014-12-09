@@ -1,15 +1,16 @@
 """ smashlib.config
 """
 import os, shutil
-from report import Reporter
 import demjson, voluptuous
 from IPython.core.profiledir import ProfileDir
 
+from report import Reporter
 from goulash.python import create_dir_if_not_exists, ope, opj
 
+from smashlib.config import schemas
 from smashlib.data import USER_CONFIG_PATH
 from smashlib.data import SMASH_ETC, SMASH_DIR, SMASHLIB_DIR, main_profile_name
-from smashlib.config import schemas
+
 
 report = Reporter("SmashConfig")
 
@@ -41,8 +42,12 @@ class SmashConfig(object):
             report("{0} does not exist..".format(absf))
             if getattr(schema, 'default', None) is not None:
                 report("..but a default is defined.  writing file")
-                default = demjson.encode(schema.default)
-                with open(absf,'w') as fhandle:
+                default = schema.default
+                if not isinstance(default, basestring):
+                    default = demjson.encode(schema.default)
+
+
+                with open(absf, 'w') as fhandle:
                     fhandle.write(default)
                 return self.load_from_etc(fname, schema)
             else:

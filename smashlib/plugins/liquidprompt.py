@@ -49,7 +49,7 @@ class LiquidPrompt(Reporter):
         self.shell.prompt_manager.in_template = tmp
 
     def get_prompt(self):
-        cmd = unicode('bash '+lp_f).format(os.getcwd())
+        cmd = unicode('bash '+lp_f)#.format(os.getcwd())
         env = os.environ.copy()
         env.update(dict(LP_HOSTNAME_ALWAYS="true", PS1="",))
         env.update({'?':str(self.smash.shell.user_ns.get('_exit_code',0))})

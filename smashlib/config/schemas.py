@@ -5,6 +5,8 @@ from voluptuous import Schema as _Schema
 from voluptuous import Required, Invalid
 from IPython.terminal.interactiveshell import get_default_editor
 
+from smashlib.config import templates
+
 class Schema(_Schema):
     def __init__(self, validator, default=None):
         self.default = default
@@ -30,9 +32,11 @@ def AliasListDict(x):
                        "element is command)").format(k,v.index(i),i)
                 raise Invalid(err)
 
+
+aliases = Schema(AliasListDict, templates.aliases)
+macros = Schema(AliasListDict, templates.macros)
+
 search_dirs = Schema(list, [])
-aliases = Schema(AliasListDict)
-macros = Schema(list, [])
 venvs = Schema(SimpleStringDict, {})
 projects = Schema(SimpleStringDict, {})
 
