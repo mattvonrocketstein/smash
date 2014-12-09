@@ -28,8 +28,8 @@ def is_editable(_fpath):
     #          " that file but it looks big")
     #   self.report(msg)
     if has_bin('file'):
-        file_result = qlocal('file {0}'.format(_fpath), capture=True)
-        if 'ASCII text' in file_result:
+        file_result = qlocal('file {0}'.format(_fpath), capture=True).strip()
+        if 'ASCII text' in file_result or file_result.endswith('empty'):
             return True
         else:
             return False
