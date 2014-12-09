@@ -1,3 +1,6 @@
+#
+# smash/requirements.txt
+#
 unipath
 argparse
 psutil
@@ -10,4 +13,3 @@ flake8
 goulash==0.5
 reporting
 voluptuous==0.8.6
-pygments # used by reporting
