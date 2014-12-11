@@ -24,7 +24,7 @@ class DotHandler(PrefilterHandler):
         return ""
 
 class DotChecker(PrefilterChecker):
-    """ shell checker should really run before anything else """
+    """ shell checker should run before most other checkers! """
 
     priority = 50
 

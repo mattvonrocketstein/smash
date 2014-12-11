@@ -8,7 +8,6 @@
     bus from the main ipython event system (IPython.core.events).
 """
 import keyword
-import urlparse
 
 from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 from IPython.terminal.interactiveshell import \
@@ -44,8 +43,6 @@ class SmashTerminalInteractiveShell(BaseTIS):
         clean_line = lastline.strip()
         if is_path(clean_line):
             self.smash.publish(C_FILE_INPUT, clean_line)
-        elif urlparse.urlparse(clean_line).scheme in 'http https'.split():
-            self.smash.publish(C_URL_INPUT, clean_line)
         else:
             sooper = super(SmashTerminalInteractiveShell, self)
             return sooper.showsyntaxerror(filename=filename)

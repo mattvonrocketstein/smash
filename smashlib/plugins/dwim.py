@@ -57,9 +57,14 @@ class DoWhatIMean(Reporter):
     suffix_aliases = EventfulDict(default_value={}, config=True)
 
     @receives_event(C_URL_INPUT)
-    def on_url_input(self, fpath):
-        webbrowser.open(fpath)
-        self.report("opening input in browser")
+    def on_url_input(self, url, parsed_url):
+        if parsed_url.scheme in 'http https ftp'.split():
+            webbrowser.open(fpath)
+            self.report("opening input in browser")
+        elif parsed_url.scheme in 'mosh sftp ssh'.split():
+            cmd_t = '{0} {1}'.format(
+                parsed_url.scheme, parsed_url.netloc)
+            self.smash.system(cmd_t)
 
     @receives_event(C_FILE_INPUT)
     def on_file_input(self, fpath):
