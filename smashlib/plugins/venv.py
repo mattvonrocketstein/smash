@@ -30,11 +30,9 @@ from smashlib.completion  import opt_completer
 # is interesting but maybe not as useful as i thought
 REAL_PREFIX = getattr(sys, 'real_prefix', sys.prefix)
 
-# channel names for use with the smash bus
-C_POST_ACTIVATE = 'post_activate_venv'
-C_PRE_ACTIVATE = 'pre_activate_venv'
-C_POST_DEACTIVATE = 'post_deactivate_venv'
-C_PRE_DEACTIVATE = 'pre_deactivate'
+from smashlib.channels import (
+    C_POST_ACTIVATE, C_PRE_ACTIVATE,
+    C_POST_DEACTIVATE, C_PRE_DEACTIVATE)
 
 @magics_class
 class VirtualEnvMagics(Magics):

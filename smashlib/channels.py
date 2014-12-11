@@ -12,6 +12,13 @@ C_DOT_CMD = 'dot_cmd'
 C_FILE_INPUT = 'file_input'
 C_URL_INPUT = 'url_input'
 
+# venv plugin uses this stuff but
+# much of it has to be renamed.
+C_POST_ACTIVATE = 'post_activate_venv'
+C_PRE_ACTIVATE = 'pre_activate_venv'
+C_POST_DEACTIVATE = 'post_deactivate_venv'
+C_PRE_DEACTIVATE = 'pre_deactivate'
+
 # just examples
 def post_run_cell(bus, finished_input_interpretted):
     print 'prc-',finished_input_interpretted

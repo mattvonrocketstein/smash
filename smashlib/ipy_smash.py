@@ -89,6 +89,7 @@ class Smash(Reporter):
         self.init_bus()
         self.init_plugins()
         self.parse_argv()
+        self.init_macros()
         self.init_config_inheritance()
         smash_bin = os.path.expanduser('~/.smash/bin')
         if smash_bin not in os.environ['PATH']:
@@ -97,16 +98,24 @@ class Smash(Reporter):
         self.init_patches()
         self.publish(C_SMASH_INIT_COMPLETE)
 
-    def init_config_inheritance(self):
-        # have to use a macro here, because setting an alias for an alias does not work
+    def init_macros(self):
+        # suport export foo=bar
+        # macro is used here because setting
+        # an alias for an alias does not work
         from IPython.core.macro import Macro
         m = Macro((
             "tmp=get_ipython()._last_input_line;"
             "get_ipython().magic(tmp.replace('export','set_env'));"
             ))
-        self.shell.user_ns['export']=m
-        #self.shell.magic("export set_env")
+        self.shell.user_ns['export'] = m
 
+        # use bash reset instead of python reset.
+        # a macro is used here because macros are honored
+        # before aliases and this overrides a builtin alias
+        m = Macro("get_ipython().system('reset');")
+        self.shell.user_ns['reset'] = m
+
+    def init_config_inheritance(self):
         if self.load_bash_aliases:
             for alias, cmd in bash.get_aliases():
                 # this check is a hack, but users will frequently override
