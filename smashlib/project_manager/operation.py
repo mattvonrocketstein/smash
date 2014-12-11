@@ -2,6 +2,7 @@
 
     base class for activation, deactivation, check, test, and build
 """
+import os
 from smashlib.v2 import Reporter
 
 
@@ -46,7 +47,6 @@ class NullOperationStep(OperationStep):
         super(NullOperationStep, self).__init__(
             name, _callable, pm=project_manager)
 
-import os
 def require_active_project(fxn):
     def newf(project_manager, *args, **kargs):
         pname = project_manager._current_project

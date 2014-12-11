@@ -22,9 +22,22 @@ class Linter(Reporter):
         Configurable.__init__(self, config=config)
         self.init_logger()
 
-    def __call__(self):
+    def __call__(self, _dir):
         raise Exception("abstract")
 
+class HaskellLinter(Linter):
+    verbose = True
+    def __call__(self, _dir):
+        self.report('starting')
+        require_bin('hlint')
+        base_cmd = 'cd {0} && hlint -c {0}'
+        cmd = base_cmd.format(_dir)
+        output = self.cmd_exec(cmd)
+        lines = [x for x in output.split('\n') if x.strip()]
+        total_problems = lines[-1].split()[0]
+        #self.report("top files: {0}".))
+        print output
+        self.report("total problems: {0}".format(total_problems))
 
 class PyLinter(Linter):
     ignore_unused_imports_in_init_files = True
@@ -80,6 +93,7 @@ class PyLinter(Linter):
         top = sorted_by_severity[:3]
         report = dict(sorted_by_severity)
         print output
-        self.report("total problems: {0}".format(sum(report.values())))
+        total_problems = sum(report.values())
+        self.report("total problems: {0}".format(total_problems))
         self.report("top files: {0}".format(dict(top)))
         return report.keys()

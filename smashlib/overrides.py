@@ -16,7 +16,7 @@ from IPython.terminal.interactiveshell import \
 from IPython.utils.traitlets import Instance
 
 from smashlib import get_smash
-from smashlib.pysh import have_command_alias
+from smashlib.util.ipy import have_command_alias
 
 from smashlib.channels import C_FILE_INPUT, C_URL_INPUT
 from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_COMMAND_FAIL
@@ -52,7 +52,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
 
 
     def __init__(self,*args,**kargs):
-        sooper = super(SmashTerminalInteractiveShell,self)
+        sooper = super(SmashTerminalInteractiveShell, self)
         sooper.__init__(*args, **kargs)
         self._smash_last_input = ""
 
@@ -72,6 +72,8 @@ class SmashTerminalInteractiveShell(BaseTIS):
 
 
     def _showtraceback(self, etype, evalue, stb):
+        """ before we display the traceback, give smash error
+            handlers one more chance to do something smart """
         sooper = super(SmashTerminalInteractiveShell, self)
         if self.smash is not None:
             for handler in self.smash.error_handlers:

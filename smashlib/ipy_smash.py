@@ -12,11 +12,10 @@ from collections import defaultdict
 from IPython.utils.traitlets import List, Bool
 
 from smashlib.v2 import Reporter
-from smashlib.channels import C_POST_RUN_INPUT
 from smashlib.util.reflect import from_dotpath
 from smashlib.util import bash
 from smashlib.magics import SmashMagics
-from smashlib.channels import C_SMASH_INIT_COMPLETE, C_COMMAND_FAIL, C_FILE_INPUT
+from smashlib.channels import C_SMASH_INIT_COMPLETE
 from smashlib.plugins.interface import PluginInterface
 from smashlib.patches.edit import PatchEdit
 from smashlib.patches.pinfo import PatchPinfoMagic
@@ -39,6 +38,7 @@ class Smash(Reporter):
         p.text(repr(self))
 
     def system(self, cmd, quiet=False):
+        print 'yap',cmd
         if not quiet:
             self.report("run: " + cmd)
         return qlocal(cmd, capture=True)
@@ -124,7 +124,6 @@ class Smash(Reporter):
             the simple way.
         """
         super(Smash, self).init_bus()
-        bus = self.bus
 
     def add_completer(self, fxn, **kargs):
         from goulash._inspect import get_caller

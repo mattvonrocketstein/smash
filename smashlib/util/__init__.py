@@ -14,7 +14,7 @@ def home():
 
 def touch_file(_file):
     """ TODO: move to goulash """
-    with open(_file, 'w') as handle:
+    with open(_file, 'w'):
         pass
 
 def require_ipy(require_version):
@@ -34,6 +34,8 @@ def guess_dir_type(_dir, max_depth=3):
         '.py':'python',
         '.pp':'puppet',
         '.md':'docs',
+        '.rst':'docs',
+        '.hs':'haskell',
         'Vagrantfile':'vagrant',
         }
     # create a list based on max-depth like ['*', '*/*', '*/*/*', ..]

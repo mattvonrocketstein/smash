@@ -18,7 +18,7 @@ def fabric_completer(self, event):
         _fabfile = 'Fabfile.py'
     exec 'import {0} as fabfile'.format(os.path.splitext(_fabfile)[0])
     out = []
-    for x in inspect.getmembers(fabfile, inspect.isfunction):
+    for x in inspect.getmembers(fabfile, inspect.isfunction): # NOQA
         name,fxn=x
         if not x[0].startswith('_') and inspect.getfile(fxn)==abspath(_fabfile):
             out.append(name)

@@ -5,7 +5,7 @@
 
 from .deactivate import deactivate_python_venv
 from .activate import activate_vagrant, activate_python_venv
-from .check import python_flakes
+from .check import python_lint, haskell_lint
 from .test import python_test
 
 ACTIVATE = dict(
@@ -14,7 +14,9 @@ ACTIVATE = dict(
     )
 
 CHECK = dict(
-    python=[python_flakes])
+    python=[python_lint],
+    haskell=[haskell_lint]
+    )
 
 TEST = dict(
     python=[python_test])

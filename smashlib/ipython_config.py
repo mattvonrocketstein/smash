@@ -10,9 +10,7 @@
 from smashlib.editor import get_editor
 print '..loading system config', __file__
 
-get_config = eval('get_config') # shut up the linter
-
-_ = get_config()
+_ = get_config() # NOQA
 
 # set editor from $EDITOR if possible
 _.TerminalInteractiveShell.editor = get_editor()
@@ -60,6 +58,7 @@ _.IPCompleter.merge_completions = False
 #_.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
 _.Smash.plugins.append('smashlib.plugins.cli_command_runner')
 _.Smash.plugins.append('smashlib.plugins.post_input')
+_.Smash.plugins.append('smashlib.plugins.prefilter_dot')
 _.Smash.plugins.append('smashlib.plugins.handle_cmd_failure')
 _.Smash.plugins.append('smashlib.plugins.liquidprompt')
 _.Smash.plugins.append('smashlib.plugins.cd_hooks')

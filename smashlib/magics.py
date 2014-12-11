@@ -21,7 +21,7 @@ class SmashMagics(Magics):
 
     @line_magic
     def ed_macros(self, parameter_s=''):
-        self.shell.magic('ed {0}'.format(ALIAS_CONFIG_PATH))
+        self.shell.magic('ed {0}'.format(MACRO_CONFIG_PATH))
 
     @line_magic
     def ed_editor(self, parameter_s=''):

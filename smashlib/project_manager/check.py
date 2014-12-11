@@ -1,7 +1,7 @@
 """ smashlib.project_manager.check
 """
 
-from smashlib.util.linter import PyLinter
+from smashlib.util.linter import PyLinter, HaskellLinter
 from .operation import OperationStep, NullOperationStep
 
 
@@ -12,15 +12,21 @@ class Check(OperationStep):
 class NullCheck(NullOperationStep):
     operation_name = 'check'
 
+def python_lint(project_manager):
+    """ """
+    return _get_linter(PyLinter, project_manager)
 
-def python_flakes(project_manager):
-    """ if any venv's are found, check the first """
-    pm = project_manager
+def haskell_lint(project_manager):
+    """ """
+    return _get_linter(HaskellLinter, project_manager)
+
+def _get_linter(LinterClass, project_manager):
+    """ """
     project_name = project_manager._current_project
     if project_name is None:
-        pm.report("No project has been selected.")
+        project_manager.report("No project has been selected.")
         return
     pdir = project_manager.project_map[project_name]
-    linter = PyLinter(project_manager.smash.shell.config,
-                      cmd_exec=project_manager.smash.system,)
+    linter = LinterClass(project_manager.smash.shell.config,
+                         cmd_exec=project_manager.smash.system,)
     return linter(pdir)

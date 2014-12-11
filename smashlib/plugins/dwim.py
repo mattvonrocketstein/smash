@@ -2,6 +2,8 @@
 
     documentation: http://mattvonrocketstein.github.io/smash/plugins.html#dwim
 """
+import webbrowser
+
 from IPython.utils.traitlets import Bool
 from IPython.utils.traitlets import EventfulDict
 
@@ -12,7 +14,6 @@ from smashlib.util._fabric import qlocal
 from smashlib.util._fabric import has_bin
 
 from goulash.python import splitext, ope, abspath, expanduser, isdir
-import webbrowser
 
 
 def is_editable(_fpath):
@@ -29,7 +30,9 @@ def is_editable(_fpath):
     #   self.report(msg)
     if has_bin('file'):
         file_result = qlocal('file {0}'.format(_fpath), capture=True).strip()
-        if 'ASCII text' in file_result or file_result.endswith('empty'):
+        if 'ASCII text' in file_result or \
+           'Unicode text' in file_result or \
+           file_result.endswith('empty'):
             return True
         else:
             return False
@@ -37,7 +40,7 @@ def is_editable(_fpath):
 class DoWhatIMean(Reporter):
     """ """
 
-    verbose=True
+    verbose = True
 
     automatic_cd = Bool(
         True, config=True,
@@ -108,7 +111,6 @@ class DoWhatIMean(Reporter):
     def handle_NameError(self, last_line, etype, evalue):
         if etype != NameError:
             return
-        line = last_line
         return self.on_file_input('fake_bus', last_line)
 
 

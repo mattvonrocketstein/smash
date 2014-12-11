@@ -4,7 +4,10 @@ import os
 import inspect
 from IPython.utils.traitlets import EventfulDict, EventfulList, Set
 
-from smashlib.channels import C_SMASH_INIT_COMPLETE, C_CHANGE_DIR, C_REHASH_EVENT, C_DOT_CMD
+from report import console
+from smashlib.channels import (
+    C_SMASH_INIT_COMPLETE, C_CHANGE_DIR,
+    C_REHASH_EVENT, C_DOT_CMD)
 
 from smashlib.project_manager.util import (
     clean_project_name, UnknownProjectError)
@@ -49,8 +52,11 @@ class CommandLineMixin(object):
         cmd, args = tmp.pop(0), tmp
         cmd = getattr(self.interface, '_'+cmd, None)
         if cmd:
-            self.report("found command: {0}".format(cmd))
-            cmd(*args)
+            if not callable(cmd):
+                print cmd
+            else:
+                self.report("found command: {0}".format(cmd))
+                cmd(*args)
 
     @receives_event(C_SMASH_INIT_COMPLETE)
     def use_requested_project(self):
@@ -251,10 +257,14 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
         _dir = self.project_map[name]
         step_guesser = getattr(self, '_guess_{0}_steps'.format(op_name))
         default = step_guesser(name, _dir)
-        op_steps = getattr(self,'{0}_map'.format(op_name)).get(name, default)
-        results = [fxn() for fxn in op_steps]
+        op_steps = getattr(self, '{0}_map'.format(op_name)).get(name, default)
+        results=[]
+        for fxn in op_steps:
+            results.append([fxn, fxn()])
+            if not op_steps.index(fxn)==len(op_steps)-1:
+                console.draw_line()
         self.publish('post_operation', op_name, name)
-        return results
+        return dict(results)
 
     @receives_event('post_operation')
     def handle_post_op(self, op_name, project_name):
