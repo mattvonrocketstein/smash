@@ -18,6 +18,7 @@ from smashlib.magics import SmashMagics
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 from smashlib.plugins.interface import PluginInterface
 from smashlib.patches.edit import PatchEdit
+from smashlib.patches.rehash import PatchRehash
 from smashlib.patches.pinfo import PatchPinfoMagic
 from smashlib.util._fabric import qlocal
 
@@ -132,6 +133,7 @@ class Smash(Reporter):
     def init_patches(self):
         PatchEdit(self).install()
         PatchPinfoMagic(self).install()
+        PatchRehash(self).install()
 
     def init_bus(self):
         """ note: it is a special case that due to bootstrap ordering,
