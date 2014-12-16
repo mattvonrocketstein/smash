@@ -38,7 +38,6 @@ class Smash(Reporter):
         p.text(repr(self))
 
     def system(self, cmd, quiet=False):
-        print 'yap',cmd
         if not quiet:
             self.report("run: " + cmd)
         return qlocal(cmd, capture=True)

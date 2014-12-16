@@ -51,7 +51,8 @@ def guess_dir_type(_dir, max_depth=3):
 
 def is_path(input):
     if len(input.split())==1 and \
-       (input.startswith('./') or \
+       (os.path.exists(input) or \
+        input.startswith('./') or \
         input.startswith('~/') or \
         input.startswith('/')):
         return True

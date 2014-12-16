@@ -84,7 +84,7 @@ def complete(to_complete):
     """
     if not to_complete:
         return []
-    cmd = '''bash -c "printf 'echo MARKER\n{complete}\t\t\x01#\necho MARKER'|bash -i"'''.format(complete=to_complete)
+    cmd = '''bash -c "printf 'PS1=\"\";echo MARKER\n{complete}\t\t\x01#\necho MARKER'|bash -i"'''.format(complete=to_complete)
     p1 = Popen(cmd, shell=True, stdout=PIPE, stdin=PIPE, stderr=PIPE)
     out, err = p1.communicate()
     lines = err.split('\n')
