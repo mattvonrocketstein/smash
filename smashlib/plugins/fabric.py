@@ -12,15 +12,20 @@ from smashlib import get_smash
 @opt_completer('fab')
 def fabric_completer(self, event):
     """ """
+    out = []
     if ope('fabfile.py'):
         _fabfile = 'fabfile.py'
     elif ope('Fabfile.py'):
         _fabfile = 'Fabfile.py'
-    exec 'import {0} as fabfile'.format(os.path.splitext(_fabfile)[0])
-    out = []
-    for x in inspect.getmembers(fabfile, inspect.isfunction): # NOQA
-        name,fxn=x
-        if not x[0].startswith('_') and inspect.getfile(fxn)==abspath(_fabfile):
+    else:
+        return out
+
+    try:
+        exec 'import {0} as fabfile'.format(os.path.splitext(_fabfile)[0])
+    except Exception,e:
+        print 'error importing fabfile'
+    for (name,fxn) in inspect.getmembers(fabfile, inspect.isfunction): # NOQA
+        if not name.startswith('_') and getattr(fxn, '__module__',None)=='fabfile':
             out.append(name)
     return out
 
