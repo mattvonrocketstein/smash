@@ -4,10 +4,11 @@ import sys
 import argparse
 from IPython.utils.traitlets import Bool
 from IPython.config.configurable import Configurable
+from IPython.core.macro import Macro
 
 from smashlib.logging import Logger
 from smashlib.bases.eventful import EventfulMix
-
+from collections import defaultdict
 class SmashComponent(object):
     def build_argparser(self):
         parser = argparse.ArgumentParser()
@@ -21,8 +22,23 @@ class SmashComponent(object):
 
     def contribute_magic(self, fxn):
         # TODO: verify signature?
-        # TODO: record this, so it can be undone if extension is unloaded
+        self.installation_record['magics']+=[fxn]
         return self.smash.shell.magics_manager.register_function(fxn)
+
+    def contribute_macro(self, name, macro):
+        if isinstance(macro, list):
+            macro = '\n'.join(macro)
+        if isinstance(macro, basestring):
+            macro = Macro(macro)
+        if not isinstance(macro, Macro):
+            err = "expected input would be string, list of strings, or Macro"
+            raise TypeError(err)
+        if not isinstance(name, basestring):
+            err = "macro's name must be a string!"
+            raise TypeError(err)
+        macro.name = name
+        self.shell.user_ns[name] = macro
+        self.installation_record['macros']+=[macro]
 
     def parse_argv(self):
         parser = self.build_argparser()
@@ -47,6 +63,12 @@ class Base(SmashComponent, EventfulMix, Configurable, ):
 
     def __init__(self, shell, **kargs):
         super(Base, self).__init__(config=shell.config, shell=shell)
+
+        # plugins should use self.contribute_* commands, which update the installation
+        # record automatically.  later the installation record will help with uninstalling
+        # plugins cleanly and completely
+        self.installation_record = defaultdict(list)
+
         self.shell.configurables.append(self)
         self.init_logger()
         self.report("initializing {0}".format(self))
