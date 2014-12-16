@@ -17,7 +17,7 @@ from IPython.utils.traitlets import Instance
 from smashlib import get_smash
 from smashlib.util.ipy import have_command_alias
 
-from smashlib.channels import C_FILE_INPUT, C_URL_INPUT
+from smashlib.channels import C_FILE_INPUT
 from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_COMMAND_FAIL
 
 from smashlib.util import split_on_unquoted_semicolons, is_path

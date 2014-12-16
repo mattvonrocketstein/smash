@@ -60,7 +60,7 @@ class DoWhatIMean(Reporter):
     @receives_event(C_URL_INPUT)
     def on_url_input(self, url, parsed_url):
         if parsed_url.scheme in 'http https ftp'.split():
-            webbrowser.open(fpath)
+            webbrowser.open(url)
             self.report("opening input in browser")
         elif parsed_url.scheme in 'mosh sftp ssh'.split():
             cmd_t = '{0} {1}'.format(

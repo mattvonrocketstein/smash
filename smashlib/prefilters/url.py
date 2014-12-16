@@ -6,7 +6,6 @@ from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
 
 from smashlib import get_smash
 from smashlib.channels import C_URL_INPUT
-from goulash.python import ope
 
 HANDLER_NAME   = 'URLHandler'
 PROTOS = 'http https ssh ftp'.split()
