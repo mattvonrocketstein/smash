@@ -2,6 +2,7 @@
 
     documentation: http://mattvonrocketstein.github.io/smash/plugins.html#dwim
 """
+import os
 import webbrowser
 
 from IPython.utils.traitlets import Bool
@@ -64,7 +65,7 @@ class DoWhatIMean(Reporter):
         elif parsed_url.scheme in 'mosh sftp ssh'.split():
             cmd_t = '{0} {1}'.format(
                 parsed_url.scheme, parsed_url.netloc)
-            self.smash.system(cmd_t)
+            self.smash.shell.system(cmd_t)
 
     @receives_event(C_FILE_INPUT)
     def on_file_input(self, fpath):
@@ -84,6 +85,12 @@ class DoWhatIMean(Reporter):
                 self.report(msg)
 
         fpath = abspath(expanduser(fpath))
+
+        # handle input like .foo/bin/python,
+        # this shouldn't really even get here but
+        # ipython throws a syntax error
+        if os.access(fpath, os.X_OK):
+            return self.smash.shell.system(fpath)
 
         #isolate file:col:row syntax
         if not ope(fpath) and ':' in fpath:
