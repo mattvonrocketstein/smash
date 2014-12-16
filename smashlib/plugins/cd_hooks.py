@@ -1,4 +1,4 @@
-""" smashlib.ipy_cd_hooks
+""" smashlib.plugins.cd_hooks
 
 """
 from IPython.utils.traitlets import EventfulList
