@@ -5,7 +5,7 @@ import os
 import inspect
 
 from smashlib.v2 import Reporter
-from goulash.python import abspath, ope
+from goulash.python import ope
 from smashlib.completion  import opt_completer
 from smashlib import get_smash
 
@@ -23,7 +23,7 @@ def fabric_completer(self, event):
     try:
         exec 'import {0} as fabfile'.format(os.path.splitext(_fabfile)[0])
     except Exception,e:
-        print 'error importing fabfile'
+        print 'error importing fabfile'+str(e)
     for (name,fxn) in inspect.getmembers(fabfile, inspect.isfunction): # NOQA
         if not name.startswith('_') and getattr(fxn, '__module__',None)=='fabfile':
             out.append(name)

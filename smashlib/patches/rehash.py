@@ -1,7 +1,5 @@
 """ smashlib.patches.rehash
 """
-import os
-
 from smashlib import get_smash
 from smashlib.patches.base import PatchMagic
 from smashlib.channels import C_REHASH_EVENT

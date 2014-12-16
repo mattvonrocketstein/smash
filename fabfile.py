@@ -13,7 +13,6 @@
 #
 import os
 
-from fabric.api import env, run
 from fabric.colors import red
 from fabric.api import lcd, local, settings
 from fabric.contrib.console import confirm
