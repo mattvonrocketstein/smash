@@ -11,13 +11,12 @@
 #   * fab pypi_repackage: update this package on pypi
 #   * fab version_bump: increase package version by $VERSION_DELTA
 #
-import os, re, sys
+import os
 
 from fabric.api import env, run
 from fabric.colors import red
-from fabric.api import lcd, local, quiet, settings
+from fabric.api import lcd, local, settings
 from fabric.contrib.console import confirm
-from fabric.colors import red
 
 VERSION_DELTA = .01
 

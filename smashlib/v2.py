@@ -9,6 +9,7 @@ from IPython.core.macro import Macro
 from smashlib.logging import Logger
 from smashlib.bases.eventful import EventfulMix
 from collections import defaultdict
+
 class SmashComponent(object):
     def build_argparser(self):
         parser = argparse.ArgumentParser()
