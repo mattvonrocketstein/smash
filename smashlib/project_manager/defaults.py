@@ -5,7 +5,7 @@
 
 from .deactivate import deactivate_python_venv
 from .activate import activate_vagrant, activate_python_venv
-from .check import python_lint, haskell_lint
+from .check import python_lint, haskell_lint, puppet_lint
 from .test import python_test
 
 ACTIVATE = dict(
@@ -15,7 +15,8 @@ ACTIVATE = dict(
 
 CHECK = dict(
     python=[python_lint],
-    haskell=[haskell_lint]
+    haskell=[haskell_lint],
+    puppet=[puppet_lint],
     )
 
 TEST = dict(

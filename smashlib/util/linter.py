@@ -25,6 +25,36 @@ class Linter(Reporter):
     def __call__(self, _dir):
         raise Exception("abstract")
 
+class PuppetLinter(Linter):
+    """ puppet-lint has an annoying output format where each line looks like
+        "/path/to/file - WARNING: some error on line X", so that's reformatted to be
+        more standard: "/path/to/file:X: - WARNING: some error"
+    """
+
+    verbose = True
+
+    def __call__(self, _dir):
+        self.report('starting')
+        require_bin('puppet-lint')
+        base_cmd = 'cd {0} && puppet-lint --with-filename {0}|grep -v "line has more than 80 characters"'
+        cmd = base_cmd.format(_dir)
+        output = self.cmd_exec(cmd)
+        lines = [x for x in output.split('\n') if x.strip()]
+        problems = defaultdict(list)
+        for line in lines:
+            line_no = line.split(' on line ')[-1]
+            msg = ' on line '.join(line.split(' on line ')[:-1])
+            msg = ' '.join(msg.split()[1:])
+            splt = line.split()
+            filename = splt[0]
+            problems[filename]+=[[line_no, msg]]
+            print "{0}:{1}: {2}".format(filename,line_no,msg)
+        total_problems = len(lines)
+        tmp = sorted(problems.items(), cmp=lambda x,y: cmp(len(x[1]),len(y[1])))
+        tmp = list(reversed([ [x[0],len(x[1])] for x in tmp]))
+        self.report("top files: {0}".format(tmp[:5]))
+        self.report("total problems: {0}".format(total_problems))
+
 class HaskellLinter(Linter):
     verbose = True
     def __call__(self, _dir):

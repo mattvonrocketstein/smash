@@ -1,7 +1,7 @@
 """ smashlib.project_manager.check
 """
 
-from smashlib.util.linter import PyLinter, HaskellLinter
+from smashlib.util.linter import PyLinter, HaskellLinter, PuppetLinter
 from .operation import OperationStep, NullOperationStep
 
 
@@ -13,12 +13,13 @@ class NullCheck(NullOperationStep):
     operation_name = 'check'
 
 def python_lint(project_manager):
-    """ """
     return _get_linter(PyLinter, project_manager)
 
 def haskell_lint(project_manager):
-    """ """
     return _get_linter(HaskellLinter, project_manager)
+
+def puppet_lint(project_manager):
+    return _get_linter(PuppetLinter, project_manager)
 
 def _get_linter(LinterClass, project_manager):
     """ """
