@@ -1,7 +1,11 @@
 """ smashlib.util.fabric
+
+    TODO: move to goulash
 """
 
 from fabric.api import quiet, local
+class MissingSystemCommand(RuntimeError):
+    pass
 
 def qlocal(*args, **kargs):
     with quiet():
@@ -14,4 +18,4 @@ def has_bin(name):
 def require_bin(name, msg=None):
     if not has_bin(name):
         msg = msg or "{0} is required".format(name)
-        raise Exception(msg)
+        raise MissingSystemCommand(msg)
