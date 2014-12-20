@@ -13,7 +13,10 @@ from smashlib.v2 import Reporter
 from smashlib.util.events import receives_event
 from smashlib.channels import C_UPDATE_PROMPT_REQUEST
 
+DEFAULT_IN_TEMPLATE = u'In [\\#]: '
+
 lp_f = os.path.join(os.path.dirname(__file__), 'liquidprompt')
+
 
 def prompt_tag(parameter_s=''):
     """ set prompt tag prefix """
@@ -29,20 +32,22 @@ class LiquidPrompt(Reporter):
 
     @receives_event(C_UPDATE_PROMPT_REQUEST)
     def update_prompt_on_request(self, request_from):
-        "NOTE: really need to update prompt every time anything has run.."
+        "TODO: deprecate"
         #self.update_prompt()
         pass
+
+    def uninstall(self):
+        super(LiquidPrompt,self).uninstall()
+        self.shell.prompt_manager.in_template = DEFAULT_IN_TEMPLATE
 
     def init_magics(self):
         self.contribute_magic(prompt_tag)
 
     def init(self):
         self.update_prompt()
-        self.shell.set_hook(
-            'pre_prompt_hook',
-            lambda himself: self.update_prompt())
+        self.contribute_hook('pre_prompt_hook', self.update_prompt)
 
-    def update_prompt(self):
+    def update_prompt(self, himself=None):
         tmp = self.get_prompt().strip() + self.prompt_append
         if self.float==True:
             tmp = '\n' + tmp
@@ -75,4 +80,4 @@ def load_ipython_extension(ip):
 
 def unload_ipython_extension(ip):
     """ called by %unload_ext magic"""
-    print 'not implemented yet'
+    get_smash()._installed_plugins['liquidprompt'].uninstall()
