@@ -171,9 +171,10 @@ class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
             contents = os.listdir(unicode(base_dir))
             bind_list = []
             for name in contents:
-                if name.startswith('.'):
-                    self.warning("skipping "+name)
                 path = os.path.join(base_dir, name)
+                if name.startswith('.'):
+                    self.warning("skipping "+path)
+
                 #raise Exception,path
                 self.project_map[name] = path
             self.report("discovered {0} projects under '{1}'".format(

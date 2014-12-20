@@ -1,12 +1,10 @@
 """ smashlib.plugins.interface
 """
 
-class myprop(property):
-    pass
-
-class PluginInterface(object):
+class AbstractInterface(object):
+    """ """
     def __repr__(self):
-        return "plugin interface"
+        return self.__class__.__name__
 
     __str__ = __repr__
 
@@ -14,12 +12,16 @@ class PluginInterface(object):
         self.smash = smash
 
     @property
+    def __doc__(self):
+        self.update()
+
+class PluginInterface(AbstractInterface):
+
+
+    @property
     def edit(self):
         self.smash.shell.run_cell('ed_config')
 
-    @property
-    def __doc__(self):
-        self.update()
 
     def __qmark__(self):
         """ user-friendly information when the input is "plugins?" """
@@ -38,11 +40,9 @@ class PluginInterface(object):
             return self.smash._installed_plugins[name]
         for name in tmp:
             tmp2 = lambda himself: fxn(name)
-            #from smashlib.util.reflect import from_dotpath
-            #tmp3=from_dotpath(self.smash._installed_plugins[name].__class__.__module__).__doc__
             tmp3 = self.smash._installed_plugins[name].__qmark__()
             tmp2.__doc__ = tmp3
-            prop = myprop(tmp2)
+            prop = property(tmp2)
             setattr(self.__class__, name, prop)
         whitelist = ['edit','smash', 'update']
         for x in dir(self):

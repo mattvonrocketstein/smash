@@ -3,7 +3,7 @@
 
 from goulash.venv import contains_venv
 from goulash.util import summarize_fpath
-
+from smashlib.util._fabric import require_bin, MissingSystemCommand
 from .operation import OperationStep, NullOperationStep
 
 
@@ -48,4 +48,9 @@ def activate_python_venv(project_manager):
         project_manager.shell.magic('venv_activate {0}'.format(found_venv))
 
 def activate_vagrant(pm):
-    pm.smash.system('vagrant up')
+    try:
+        require_bin('vagrant')
+    except MissingSystemCommand,e:
+        pm.warning("{0}: cannot execute activate_vagrant".format(e))
+    else:
+        pm.smash.system('vagrant up')

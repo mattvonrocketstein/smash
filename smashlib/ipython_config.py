@@ -5,7 +5,7 @@
 # The file in ~/.smash is reset from smashlib source on every run,
 # and thus cannot be edited. To override these values, edit instead
 # the user configuration file: ~/.smash/config.py (or inside smash
-# type ed_ed).
+# type "ed_ed").
 #
 from smashlib.editor import get_editor
 print '..loading system config', __file__
