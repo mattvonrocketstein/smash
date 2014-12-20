@@ -22,6 +22,8 @@ from smashlib.patches.rehash import PatchRehash
 from smashlib.patches.pinfo import PatchPinfoMagic
 from smashlib.util._fabric import qlocal
 
+from .aliases import AliasInterface
+
 class Smash(Reporter):
     plugins             = List(default_value=[], config=True)
     verbose_events      = Bool(False, config=True)
@@ -58,6 +60,11 @@ class Smash(Reporter):
                 msg = msg.format(dotpath)
                 self.warning(msg)
         self._installed_plugins = _installed_plugins
+
+        alias_iface = AliasInterface(self)
+        alias_iface.update()
+        get_ipython().user_ns.update(aliases=alias_iface)
+
         plugin_iface = PluginInterface(self)
         plugin_iface.update()
         get_ipython().user_ns.update(plugins=plugin_iface)
