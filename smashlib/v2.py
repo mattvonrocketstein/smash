@@ -41,6 +41,42 @@ class SmashComponent(object):
         self.shell.user_ns[name] = macro
         self.installation_record['macros']+=[macro]
 
+    def contribute_hook(self, name, fxn):
+        """ contributes a hook to ipython and
+            records it so it can be inverted later
+        """
+        self.shell.set_hook(name, fxn)
+        self.installation_record['hooks'] += [[name, fxn]]
+
+    def uninstall(self):
+        """ uninstall this smash component """
+        self.report("uninstalling myself")
+        self._uninstall_magics()
+        self._uninstall_hooks()
+
+    def _uninstall_hooks(self):
+        """ uninstall all hooks which were installed by "self.contribute_hook"
+        """
+        for name, fxn in self.installation_record['hooks']:
+            self.report("uninstalling hook: {0}".format(name))
+            callchain = self.shell.hooks[name].chain
+            # HACK: cannot figure out another way to unregister items from the callchain
+            #       registry rebinds instance methods and screws with the normal values
+            #       for self.im_class, etc
+            new_callback = []
+            for priority, cfxn in callchain:
+                if cfxn.__name__ == fxn.__name__:
+                    continue
+                new_callback.append([priority,cfxn])
+        self.shell.hooks[name].chain = new_callback
+
+    def _uninstall_magics(self):
+        """ uninstall all magics which were installed by "self.contribute_magic"
+        """
+        for m in self.installation_record['magics']:
+            self.report("uninstalling magic: {0}".format(m))
+            del self.shell.magics_manager.magics['line'][m.__name__]
+
     def parse_argv(self):
         parser = self.build_argparser()
         args, unknown = parser.parse_known_args(sys.argv[1:])
