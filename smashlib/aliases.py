@@ -32,3 +32,48 @@ class AliasMixin(object):
                 self.smash.shell.alias_manager.undefine_alias(name)
             except ValueError:
                 continue
+
+from smashlib.plugins.interface import AbstractInterface
+class AliasInterface(AbstractInterface):
+
+    def __qmark__(self):
+        """ user-friendly information when the input is "plugins?" """
+        alias_map = self.smash.project_manager.alias_map
+        out = ['Smash Aliases: ({0} total, {1} groups)'.format(
+            len(self._aliases),
+            len(alias_map))]
+        for group_name in alias_map.keys():
+            g_aliases = alias_map[group_name]
+            max_summary=3
+            summary = [x[0] for x in g_aliases[:max_summary]]
+            if len(g_aliases)>max_summary:
+                summary += ['..']
+            summary=', '.join(summary)
+            out += ['   : "{0}" with {1} aliases: {2})'.format(
+                group_name, len(g_aliases), summary)]
+
+        return '\n'.join(out)
+
+    @property
+    def edit(self):
+        self.smash.shell.run_cell('ed_aliases')
+
+    @property
+    def _aliases(self):
+        return [x[0].replace('-','.') for x in self.smash.shell.alias_manager.aliases]
+
+    def zonk(self,  name):
+        def blue(himself):
+            return self.smash.shell.alias_manager.linemagics.get(name)
+        return blue
+
+    def update(self):
+        tmp = self._aliases
+        for name in tmp:
+            tmp2 = self.zonk(name)
+            tmp3 = "zoo"#self.smash._installed_aliases[name].__qmark__()
+            tmp2.__doc__ = tmp3
+            prop = property(tmp2)
+            setattr(self.__class__, name, prop)
+def fxn(self, name):
+    return self.smash.shell.alias_manager.linemagics.get(name)
