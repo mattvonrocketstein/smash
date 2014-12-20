@@ -35,7 +35,7 @@ class PuppetLinter(Linter):
 
     def __call__(self, _dir):
         self.report('starting')
-        require_bin('puppet-lint')
+        require_bin('puppet-lint', 'puppet-lint is required (try: "apt-get install puppet-lint")')
         base_cmd = 'cd {0} && puppet-lint --with-filename {0}|grep -v "line has more than 80 characters"'
         cmd = base_cmd.format(_dir)
         output = self.cmd_exec(cmd)
@@ -59,7 +59,7 @@ class HaskellLinter(Linter):
     verbose = True
     def __call__(self, _dir):
         self.report('starting')
-        require_bin('hlint')
+        require_bin('hlint', 'hlint is required (try: "apt-get install hlint")')
         base_cmd = 'cd {0} && hlint -c {0}'
         cmd = base_cmd.format(_dir)
         output = self.cmd_exec(cmd)
@@ -75,7 +75,7 @@ class PyLinter(Linter):
     ignore_undefined_names = List([], config=True)
 
     def __call__(self, _dir):
-        require_bin('flake8')
+        require_bin('flake8', 'flake8 is required (try: "apt-get install flake8")')
         ignore = [
             'E501', # line-too-long
             ]
