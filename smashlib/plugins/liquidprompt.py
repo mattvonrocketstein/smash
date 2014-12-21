@@ -9,6 +9,7 @@ from subprocess import PIPE
 
 from IPython.utils.traitlets import Bool, Unicode
 
+from smashlib import get_smash
 from smashlib.v2 import Reporter
 from smashlib.util.events import receives_event
 from smashlib.channels import C_UPDATE_PROMPT_REQUEST
