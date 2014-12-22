@@ -296,7 +296,14 @@ class ProjectManager(CommandLineMixin, AliasMixin, Plugin):
         return self.perform_operation(pname, 'check')
 
     def guess_project_type(self, project_name):
-        pdir = self.project_map[project_name]
         # if cwd is under project_dir, look there too
         # and combine the lists by priority with dedupe
-        guess_dir_type(pdir)
+        pdir = self.project_map[project_name]
+        subdir = os.getcwd()
+        if abspath(subdir).startswith(abspath(pdir)):
+            fine = guess_dir_type(subdir)
+        else:
+            fine=[]
+        coarse = guess_dir_type(pdir)
+        tmp = fine + [x for x in coarse if x not in fine]
+        return tmp
