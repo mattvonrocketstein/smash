@@ -32,7 +32,6 @@ else
     BRANCH="$1";
 fi;
 echo "using branch: $BRANCH"
-exit
 if [ ! -z "$ORIGIN" -a "$ORIGIN" != " " ]; then
     BNAME="`basename $ORIGIN`";
     if [ $BNAME = "smash.git" ]; then
