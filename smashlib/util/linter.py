@@ -9,11 +9,11 @@ from IPython.config.configurable import Configurable
 from IPython.utils.traitlets import Bool, List
 
 from smashlib.util._fabric import require_bin
-from smashlib.v2 import Reporter
+from smashlib.plugins import Plugin
 
 r_pep8_error = re.compile('.* E\d\d\d .*')
 
-class Linter(Reporter):
+class Linter(Plugin):
     """ """
     def __init__(self, config, cmd_exec=None):
         if cmd_exec==None:

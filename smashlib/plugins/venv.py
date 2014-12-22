@@ -20,7 +20,7 @@ from goulash.util import summarize_fpath
 from goulash.venv import get_venv, to_vbin, to_vlib, get_path
 
 from smashlib import get_smash
-from smashlib.v2 import Reporter
+from smashlib.plugins import Plugin
 from smashlib.data import SMASH_DIR
 from goulash.python import opj, ope, abspath, expanduser
 from smashlib.completion  import opt_completer
@@ -53,7 +53,7 @@ class VirtualEnvMagics(Magics):
 def virtualenv_completer(self, event):
     return []
 
-class VirtualEnvSupport(Reporter):
+class VirtualEnvSupport(Plugin):
     sys_path_changes = []
 
     def deactivate(self):

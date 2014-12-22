@@ -11,7 +11,9 @@ from collections import defaultdict
 
 from IPython.utils.traitlets import List, Bool
 
-from smashlib.v2 import Reporter
+from goulash._inspect import get_caller
+
+from smashlib.plugins import Plugin
 from smashlib.util.reflect import from_dotpath
 from smashlib.util import bash
 from smashlib.magics import SmashMagics
@@ -24,7 +26,7 @@ from smashlib.util._fabric import qlocal
 
 from .aliases import AliasInterface
 
-class Smash(Reporter):
+class Smash(Plugin):
     plugins             = List(default_value=[], config=True)
     verbose_events      = Bool(False, config=True)
     ignore_warnings     = Bool(False, config=True)
@@ -50,10 +52,14 @@ class Smash(Reporter):
 
     def init_plugins(self):
         _installed_plugins = {}
+        from smashlib.plugins import Plugin
         for dotpath in self.plugins:
             mod = from_dotpath(dotpath)
             ext_name = dotpath.split('.')[-1]
             ext_obj = mod.load_ipython_extension(self.shell)
+            assert isinstance(ext_obj, Plugin), \
+                   ("error with extension '{0}': smash requires load_ipython_extension()"
+                    " to return plugin object ").format(ext_name)
             _installed_plugins[ext_name] = ext_obj
             if ext_obj is None:
                 msg = '{0}.load_ipython_extension should return an object'
@@ -136,7 +142,6 @@ class Smash(Reporter):
                 self.shell.magics_manager.register_function(cmd, magic_name=fxn_name)
             self.report("registered magic for bash functions: ",fxns)
 
-
     def init_patches(self):
         PatchEdit(self).install()
         PatchPinfoMagic(self).install()
@@ -151,7 +156,6 @@ class Smash(Reporter):
         super(Smash, self).init_bus()
 
     def add_completer(self, fxn, **kargs):
-        from goulash._inspect import get_caller
         self.completers[get_caller(2)['class']].append(fxn)
         get_ipython().set_hook('complete_command', fxn, **kargs)
 

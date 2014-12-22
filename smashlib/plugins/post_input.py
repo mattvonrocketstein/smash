@@ -7,7 +7,7 @@
 
 """
 
-from smashlib.v2 import Reporter
+from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_POST_RUN_INPUT
 
@@ -19,7 +19,7 @@ REHASH_IF = [
     'setup.py install',
     'apt-get install']
 
-class PostInput(Reporter):
+class PostInput(Plugin):
     verbose = True
     command = None
 

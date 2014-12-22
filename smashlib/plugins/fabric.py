@@ -4,7 +4,7 @@
 import os
 import inspect
 
-from smashlib.v2 import Reporter
+from smashlib.plugins import Plugin
 from goulash.python import ope
 from smashlib.completion  import opt_completer
 from smashlib import get_smash
@@ -29,16 +29,14 @@ def fabric_completer(self, event):
             out.append(name)
     return out
 
-class FabricPlugin(Reporter):
+class FabricPlugin(Plugin):
     def install(self):
         self.smash.add_completer(fabric_completer, re_key='fab .*')
+        return self
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
-    ip = get_ipython()
-    tmp = FabricPlugin(ip)
-    tmp.install()
-    return tmp
+    return FabricPlugin(get_ipython()).install()
 
 def unload_ipython_extension(ip):
     get_smash()

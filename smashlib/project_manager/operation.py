@@ -3,10 +3,10 @@
     base class for activation, deactivation, check, test, and build
 """
 import os
-from smashlib.v2 import Reporter
+from smashlib.plugins import Plugin
 
 
-class OperationStep(Reporter):
+class OperationStep(Plugin):
     """ thin wrapper, basically a named lambda. """
     #verbose = True
     def __init__(self, name, fxn=None, pm=None, args=tuple(), ):

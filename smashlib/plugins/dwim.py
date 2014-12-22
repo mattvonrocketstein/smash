@@ -8,7 +8,7 @@ import webbrowser
 from IPython.utils.traitlets import Bool
 from IPython.utils.traitlets import EventfulDict
 
-from smashlib.v2 import Reporter
+from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_FILE_INPUT, C_URL_INPUT
 from smashlib.util._fabric import qlocal
@@ -38,7 +38,7 @@ def is_editable(_fpath):
         else:
             return False
 
-class DoWhatIMean(Reporter):
+class DoWhatIMean(Plugin):
     """ """
 
     verbose = True

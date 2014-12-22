@@ -3,13 +3,13 @@
 """
 from IPython.utils.traitlets import EventfulList
 
-from smashlib.v2 import Reporter
+from smashlib.plugins import Plugin
 from smashlib.util.reflect import from_dotpath, ObjectNotFound
 from smashlib.channels import C_CHANGE_DIR
 from smashlib.patches import PatchCDMagic, PatchPushdMagic
 
 
-class ChangeDirHooks(Reporter):
+class ChangeDirHooks(Plugin):
 
     last_dir = None
     change_dir_hooks = EventfulList(default_value=[], config=True)

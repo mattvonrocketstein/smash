@@ -12,7 +12,7 @@ import os
 from IPython.core.magic import Magics, magics_class, line_magic
 
 from smashlib import get_smash
-from smashlib.v2 import Reporter
+from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_CHANGE_DIR
 from smashlib.contrib import autojump as _autojump
@@ -50,7 +50,7 @@ class AutojumpMagics(Magics):
             except SystemExit:
                 pass
 
-class AutojumpPlugin(Reporter):
+class AutojumpPlugin(Plugin):
 
     def init_magics(self):
         self.shell.register_magics(AutojumpMagics)

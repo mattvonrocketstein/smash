@@ -2,21 +2,22 @@
 """
 from smashlib.util.ipy import register_prefilter
 from smashlib.prefilters.url import URLChecker, URLHandler
-from smashlib.v2 import SmashComponent
+from smashlib.plugins import Plugin
 from smashlib.util.ipy import uninstall_prefilter
 
-class URLPlugin(SmashComponent):
+class URLPlugin(Plugin):
     """ installs the IPython prefilter which handles urls """
     def install(self):
-        return register_prefilter(URLChecker, URLHandler)
+        register_prefilter(URLChecker, URLHandler)
+        return self
+
     def uninstall(self):
         return uninstall_prefilter(URLChecker, URLHandler)
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic """
-    plugin = URLPlugin()
-    plugin.install()
-    return plugin
+    return URLPlugin(get_ipython()).install()
+
 
 
 def unload_ipython_extension(ip):

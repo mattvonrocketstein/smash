@@ -15,7 +15,7 @@ from goulash.python import abspath, expanduser, getcwd, ope
 from smashlib.util import guess_dir_type
 from smashlib.util.events import receives_event
 from smashlib.util.ipy import green
-from smashlib.v2 import Reporter
+from smashlib.plugins import Plugin
 
 from smashlib.project_manager.magics import ProjectMagics
 
@@ -32,12 +32,12 @@ from smashlib.aliases import AliasMixin
 class CommandLineMixin(object):
     def build_argparser(self):
         """ """
-        parser = Reporter.build_argparser(self)
+        parser = Plugin.build_argparser(self)
         parser.add_argument('-p', '--project', default='')
         return parser
 
     def parse_argv(self):
-        args, unknown = Reporter.parse_argv(self)
+        args, unknown = Plugin.parse_argv(self)
         if args.project:
             # cannot effect the change here due to some race condition.
             # smash will send a signal when it's initialization is complete
@@ -70,7 +70,7 @@ class CommandLineMixin(object):
         except AttributeError:
             pass
 
-class ProjectManager(CommandLineMixin, AliasMixin, Reporter):
+class ProjectManager(CommandLineMixin, AliasMixin, Plugin):
     """ """
     search_dirs      = EventfulList(default_value=[], config=True)
     project_map      = EventfulDict(default_value={}, config=True)

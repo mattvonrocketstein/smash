@@ -1,4 +1,4 @@
-""" ipy_liquidprompt
+""" smashlib.plugins.liquidprompt
 
     Uses the liqiuidprompt project to render the ipyton prompt.
     NOTE: liquidprompt itself requires bash or zsh
@@ -10,7 +10,7 @@ from subprocess import PIPE
 from IPython.utils.traitlets import Bool, Unicode
 
 from smashlib import get_smash
-from smashlib.v2 import Reporter
+from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_UPDATE_PROMPT_REQUEST
 
@@ -25,7 +25,7 @@ def prompt_tag(parameter_s=''):
         parameter_s=' '+parameter_s
     os.environ['LP_PS1_PREFIX'] = parameter_s
 
-class LiquidPrompt(Reporter):
+class LiquidPrompt(Plugin):
     """ this extension requires ipy_cd_hook """
 
     float    = Bool(True, config=True, help="add more space between prompts")

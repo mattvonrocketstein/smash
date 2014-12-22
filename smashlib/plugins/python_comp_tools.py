@@ -4,7 +4,7 @@
 """
 import os
 from smashlib import get_smash
-from smashlib.v2 import Reporter
+from smashlib.plugins import Plugin
 from smashlib.util._tox import get_tox_envs
 from smashlib.completion  import opt_completer
 
@@ -21,17 +21,16 @@ def tox_env_completer(self, event):
     if line and line.split()[-1].strip().endswith('-e'):
         return get_tox_envs()
 
-class ToxPlugin(Reporter):
+class ToxPlugin(Plugin):
     def install(self):
         self.smash.add_completer(tox_env_completer, re_key='tox .*-e')
         self.smash.add_completer(tox_completer, re_key='tox .*')
+        return self
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     ip = get_ipython()
-    tmp = ToxPlugin(ip)
-    tmp.install()
-    return tmp
+    return ToxPlugin(ip).install()
 
 def unload_ipython_extension(ip):
     plugin_name = os.path.splitext(os.path.split(__file__)[-1])[0]
