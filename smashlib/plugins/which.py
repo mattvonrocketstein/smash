@@ -5,7 +5,7 @@ from smashlib.plugins import Plugin
 from smashlib.channels import C_REHASH_EVENT
 from smashlib.util.events import receives_event
 from goulash.util import summarize_fpath
-from report import report as R
+from report import Reporter as R
 report = R("which")
 
 class EnhancedWhich(Plugin):

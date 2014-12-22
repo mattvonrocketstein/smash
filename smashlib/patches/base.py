@@ -18,5 +18,5 @@ class PatchMagic(object):
         self.patched = True
 
     def install(self):
-        if not self.patched:
-            self.component.shell.magics_manager.magics['line'][self.name] = self
+        #if not self.patched:
+        self.component.shell.magics_manager.magics['line'][self.name] = self
