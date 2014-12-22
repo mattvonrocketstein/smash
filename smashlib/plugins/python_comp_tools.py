@@ -1,4 +1,5 @@
 """ smashlib.plugins.python_comp_tools
+
     This code adds tab completion over tox CLI options,
     and dynamic determination of environments for "tox -e"
 """
@@ -29,8 +30,7 @@ class ToxPlugin(Plugin):
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
-    ip = get_ipython()
-    return ToxPlugin(ip).install()
+    return ToxPlugin(get_ipython()).install()
 
 def unload_ipython_extension(ip):
     plugin_name = os.path.splitext(os.path.split(__file__)[-1])[0]

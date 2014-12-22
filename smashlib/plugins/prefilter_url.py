@@ -18,8 +18,6 @@ def load_ipython_extension(ip):
     """ called by %load_ext magic """
     return URLPlugin(get_ipython()).install()
 
-
-
 def unload_ipython_extension(ip):
     """ called by %unload_ext magic """
     plugin = URLPlugin()

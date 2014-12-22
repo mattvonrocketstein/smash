@@ -11,8 +11,9 @@
 # can set the SMASH_BRANCH environment variable, for instance if you're invoking
 # this bootstrap with curl:
 #
-#  $ bootstrap=https://raw.githubusercontent.com/mattvonrocketstein/smash/master/bootstrap.sh
-#  $ SMASH_BRANCH=master curl bootstrap|bash
+#  $ SMASH_BRANCH=master
+#  $ bootstrap=https://raw.githubusercontent.com/mattvonrocketstein/smash/$SMASH_BRANCH/bootstrap.sh
+#  $ curl bootstrap|bash
 #
 set -x
 SMASH_HOME="$HOME/.smash"
@@ -31,6 +32,7 @@ else
     BRANCH="$1";
 fi;
 echo "using branch: $BRANCH"
+exit
 if [ ! -z "$ORIGIN" -a "$ORIGIN" != " " ]; then
     BNAME="`basename $ORIGIN`";
     if [ $BNAME = "smash.git" ]; then

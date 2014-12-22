@@ -1,4 +1,7 @@
 """ smash.plugins.plugin
+
+    NB: plugin related obviously, but this is not a plugin.
+        it's the abstract classes for creating subclasses
 """
 import sys
 import argparse

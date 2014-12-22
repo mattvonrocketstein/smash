@@ -1,4 +1,5 @@
 """ smashlib.plugins.interface
+    NB: plugin-related obviously, but this is not a plugin
 """
 
 class AbstractInterface(object):

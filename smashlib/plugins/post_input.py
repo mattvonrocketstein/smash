@@ -32,9 +32,8 @@ class PostInput(Plugin):
 
 def load_ipython_extension(ip):
     ip = get_ipython()
-    tmp = PostInput(ip)
-    tmp.install()
-    return tmp
+    return PostInput(ip).install()
+
 
 from smashlib import get_smash
 from goulash.python import splitext,ops

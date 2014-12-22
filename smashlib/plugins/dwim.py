@@ -128,9 +128,7 @@ class DoWhatIMean(Plugin):
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
-    ip = get_ipython()
-    dwim = DoWhatIMean(ip)
-    return dwim
+    return DoWhatIMean(get_ipython()).install()
 
 def unload_ipython_extension(ip):
     """ called by %unload_ext magic"""

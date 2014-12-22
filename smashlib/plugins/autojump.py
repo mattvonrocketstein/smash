@@ -74,13 +74,12 @@ class AutojumpPlugin(Plugin):
     def install(self):
         self.is_updating = True
         self.smash.add_completer(j_completer, str_key='j')
+        return self
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     ip = get_ipython()
-    tmp = AutojumpPlugin(ip)
-    tmp.install()
-    return tmp
+    return AutojumpPlugin(ip).install()
 
 def unload_ipython_extension(ip):
     get_smash()

@@ -16,6 +16,7 @@ class ChangeDirHooks(Plugin):
 
     def init(self):
         # FIXME: reregister it properly instead of patching it?
+        # FIXME: this check is probably no needed since patching cannot happen twice
         if not getattr(self, '_already_patched', False):
             mycd = PatchCDMagic(self)
             mypushd = PatchPushdMagic(self, mycd)
@@ -38,8 +39,7 @@ class ChangeDirHooks(Plugin):
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
-    ip = get_ipython()
-    return ChangeDirHooks(ip)
+    return ChangeDirHooks(get_ipython()).install()
 
 def unload_ipython_extension(ip):
     original = ChangeDirHooks.original_cd_magic

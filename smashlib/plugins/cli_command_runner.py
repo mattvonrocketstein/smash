@@ -1,8 +1,8 @@
 """ smashlib.plugins.cli_command_runner
 """
 
-from smashlib.util.events import receives_event
 from smashlib.plugins import Plugin
+from smashlib.util.events import receives_event
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 
 class RunCommand(Plugin):
@@ -34,11 +34,11 @@ class RunCommand(Plugin):
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     ip = get_ipython()
-    tmp = RunCommand(ip)
-    tmp.install()
+    tmp = RunCommand(ip).install()
     return tmp
+
 from smashlib import get_smash
-from goulash.python import splitext,ops
+from goulash.python import splitext, ops
 def unload_ipython_extension(ip):
     plugin_name = splitext(ops(__file__)[-1])[0]
     raise Exception(plugin_name)

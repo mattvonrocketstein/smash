@@ -297,4 +297,6 @@ class ProjectManager(CommandLineMixin, AliasMixin, Plugin):
 
     def guess_project_type(self, project_name):
         pdir = self.project_map[project_name]
-        return guess_dir_type(pdir)
+        # if cwd is under project_dir, look there too
+        # and combine the lists by priority with dedupe
+        guess_dir_type(pdir)
