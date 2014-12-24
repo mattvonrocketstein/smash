@@ -86,6 +86,11 @@ class DoWhatIMean(Plugin):
 
         fpath = abspath(expanduser(fpath))
 
+        if isdir(fpath) and self.automatic_cd:
+            self.report('cd '+fpath)
+            self.smash.shell.magic('pushd '+fpath)
+            return True
+
         # handle input like .foo/bin/python,
         # this shouldn't really even get here but
         # ipython throws a syntax error
@@ -103,11 +108,6 @@ class DoWhatIMean(Plugin):
         #isolate file suffix, guess an opener
         suffix = splitext(fpath)[-1][1:].lower()
         opener = self.suffix_aliases.get(suffix, None)
-        if isdir(fpath) and self.automatic_cd:
-            self.report('cd '+fpath)
-            self.smash.shell.magic('pushd '+fpath)
-            return True
-
         cmd = doit(fpath, suffix, opener, rest)
         if cmd:
             self.smash.shell.run_cell(cmd)
