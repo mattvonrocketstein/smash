@@ -239,7 +239,7 @@ class ProjectManager(CommandLineMixin, AliasMixin, Plugin):
                     issubclass(step_kls,OperationStep),
                     issubclass(default_step,NullOperationStep)])
         steps = []
-        ptype = self.guess_project_type(name)
+        ptype = reversed(self.guess_project_type(name))
 
         for subtype in ptype:
             these_steps = operation_dict.get(subtype, [])

@@ -43,6 +43,8 @@ class SmashTerminalInteractiveShell(BaseTIS):
         clean_line = lastline.strip()
         if is_path(clean_line):
             self.smash.publish(C_FILE_INPUT, clean_line)
+        elif is_path(clean_line.split()[0]):
+            self.system(clean_line)
         else:
             sooper = super(SmashTerminalInteractiveShell, self)
             return sooper.showsyntaxerror(filename=filename)
@@ -115,8 +117,8 @@ class SmashTerminalInteractiveShell(BaseTIS):
         #print 'wrapping system call',cmd
         result = super(SmashTerminalInteractiveShell,self).system(cmd,**kargs)
         error = self.user_ns['_exit_code'] # put exit code into bash for lp?s
-        if error:
-            get_smash().publish(C_COMMAND_FAIL, cmd, error)
+        #if error:
+        #    get_smash().publish(C_COMMAND_FAIL, cmd, error)
         if not quiet and result:
             print result
 TerminalInteractiveShell=SmashTerminalInteractiveShell

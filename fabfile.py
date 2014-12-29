@@ -25,6 +25,7 @@ _expanduser = os.path.expanduser
 _dirname = os.path.dirname
 
 ldir = _dirname(__file__)
+VERSION_DELTA = .01
 
 def version_bump():
     """ bump the version number """
@@ -58,7 +59,6 @@ def pypi_repackage():
     ans = confirm('proceed with pypi update in "{0}"?'.format(ldir))
     if not ans: return
     with lcd(ldir):
-        local("git checkout -b pypi") # in case this has never been done before
         with settings(warn_only=True):
             local("git checkout -b pypi") # in case this has never been done before
         local("git reset --hard master")
