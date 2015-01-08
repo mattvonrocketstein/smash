@@ -37,8 +37,9 @@ class Updater(Plugin):
             r1 = qlocal(cmd1, capture=True).strip()
             r2 = qlocal(cmd2_t.format(smash_repo), capture=True)
             r2 = r2.strip().split()[0]
-            print 'local smash:    ', r1
-            print 'upstream smash: ', r2
+            self.smash.shell.run_cell('which smashlib')
+            self.report('local smash hash:    '+r1)
+            self.report('upstream smash hash: '+r2)
             if r1!=r2:
                 self.report('updating..')
                 self.smash.system('git fetch')
