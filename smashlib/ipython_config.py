@@ -30,6 +30,7 @@ _.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
 _.Smash.verbose = False
 _.DoWhatIMean.verbose = False
 _.LiquidPrompt.verbose = False
+_.Summarize.verbose = False
 _.ProjectManager.verbose = False
 _.ChangeDirHooks.verbose = False
 _.VirtualEnvSupport.verbose = False
@@ -57,6 +58,7 @@ _.IPCompleter.merge_completions = False
 # load optional smash extensions
 #_.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
 _.Smash.plugins.append('smashlib.plugins.cli_command_runner')
+_.Smash.plugins.append('smashlib.plugins.updater')
 _.Smash.plugins.append('smashlib.plugins.post_input')
 _.Smash.plugins.append('smashlib.plugins.uninstall_plugin')
 _.Smash.plugins.append('smashlib.plugins.prefilter_dot')
@@ -64,6 +66,7 @@ _.Smash.plugins.append('smashlib.plugins.which')
 _.Smash.plugins.append('smashlib.plugins.prefilter_url')
 _.Smash.plugins.append('smashlib.plugins.handle_cmd_failure')
 _.Smash.plugins.append('smashlib.plugins.liquidprompt')
+_.Smash.plugins.append('smashlib.plugins.summarize')
 _.Smash.plugins.append('smashlib.plugins.cd_hooks')
 _.Smash.plugins.append('smashlib.plugins.venv')
 _.Smash.plugins.append('smashlib.plugins.project_manager')

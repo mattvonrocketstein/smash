@@ -130,7 +130,7 @@ class VirtualEnvSupport(Plugin):
         #sys.path_changes = set(sys.path) - set(old_sys_path)
         #print 'that added',sys.path_changes
 
-    def _activate(self,path):
+    def _activate(self, path):
         absfpath = abspath(expanduser(path))
         self.publish(C_PRE_ACTIVATE, name=absfpath)
         if True:

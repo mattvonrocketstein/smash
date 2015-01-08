@@ -3,7 +3,8 @@
     TODO: move to goulash
 """
 
-from fabric.api import quiet, local
+from fabric.api import quiet, local, lcd
+
 class MissingSystemCommand(RuntimeError):
     pass
 

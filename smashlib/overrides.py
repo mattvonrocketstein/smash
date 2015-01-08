@@ -12,8 +12,8 @@ import keyword
 from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 from IPython.terminal.interactiveshell import \
      TerminalInteractiveShell as BaseTIS
-from IPython.utils.traitlets import Instance
-
+from IPython.utils.traitlets import Instance, Type
+from IPython.core.displayhook import DisplayHook
 from smashlib import get_smash
 from smashlib.util.ipy import have_command_alias
 
@@ -22,6 +22,20 @@ from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_COMMAND_FAIL
 
 from smashlib.util import split_on_unquoted_semicolons, is_path
 from smashlib.bin.pybcompgen import complete
+from report import report
+
+class SmashDisplayHook(DisplayHook):
+    def finish_displayhook(self):
+        """Finish up all displayhook activities."""
+        try:
+            super(SmashDisplayHook,self).finish_displayhook()
+        except AttributeError, e:
+            # occasionally throws 
+            # IOStream instance has no attribute 'flush'
+            #
+            # I think this is a race condition on embedded shells
+            report(str(e))
+
 
 def smash_bash_complete(*args, **kargs):
     result = complete(*args, **kargs)
@@ -33,7 +47,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
     # is ready to be executed.
     input_splitter = Instance('smashlib.inputsplitter.SmashInputSplitter',
                               (), {'line_input_checker': True})
-
+    displayhook_class = Type(SmashDisplayHook)
     def showsyntaxerror(self, filename=None):
         """ when a syntax error is encountered,
             consider just broadcasting a signal instead
@@ -41,6 +55,8 @@ class SmashTerminalInteractiveShell(BaseTIS):
         """
         lastline = self._smash_last_input
         clean_line = lastline.strip()
+        if not clean_line:
+            return
         if is_path(clean_line):
             self.smash.publish(C_FILE_INPUT, clean_line)
         elif is_path(clean_line.split()[0]):

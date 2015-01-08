@@ -24,30 +24,39 @@ def require_ipy(require_version):
         err = "smash requires ipython {0}, but your version is {1}"
         raise SystemExit(err.format(require_version, ipy_version))
 
-def guess_dir_type(_dir, max_depth=3):
+P_CODE_FILE = {
+    '.py':'python',
+    '.pp':'puppet',
+    '.md':'docs',
+    '.rst':'docs',
+    '.hs':'haskell',
+    'Vagrantfile':'vagrant',
+    'tox.ini':'tox',
+    }
+
+def _guess_dir_type(_dir, max_depth=3):
+    type_map = P_CODE_FILE.copy()
+    type_map.update({
+        'test*':'tests',
+        })
+    # create a list based on max-depth like ['*', '*/*', '*/*/*', ..]
+    globs = [ os.path.sep.join(['*']*x) for x in range(1, max_depth+1) ]
+    matches = {}
+    for ftype, ftype_name in type_map.items():
+        for expr in globs:
+            expr = expr + ftype
+            if glob.glob(os.path.join(_dir,expr)):
+                matches[ftype_name] = _dir
+                break
+    return matches
+
+def guess_dir_type(_dir, **kargs):
     """ given a directory and a depth, find which types of
         files are in the directory.  this implementation
         should be reasonably efficient since it won't count
         the number of items or anything.
     """
-    type_map = {
-        '.py':'python',
-        '.pp':'puppet',
-        '.md':'docs',
-        '.rst':'docs',
-        '.hs':'haskell',
-        'Vagrantfile':'vagrant',
-        }
-    # create a list based on max-depth like ['*', '*/*', '*/*/*', ..]
-    globs = [os.path.sep.join(['*']*x) for x in range(1, max_depth+1)]
-    matches = []
-    for ftype, ftype_name in type_map.items():
-        for expr in globs:
-            expr = expr + ftype
-            if glob.glob(os.path.join(_dir,expr)):
-                matches.append(ftype_name)
-                break
-    return matches
+    return _guess_dir_type(_dir, **kargs).keys()
 
 def is_path(input):
     if len(input.split())==1 and \

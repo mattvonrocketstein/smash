@@ -14,8 +14,9 @@ def embed(argv=tuple(), **kargs):
     from goulash._inspect import get_caller
     context = kargs.pop('user_ns', {})
     caller_context = get_caller(2)
-    context.update(caller_context['globals'])
-    context.update(caller_context['locals'])
+    if context is not None:
+        context.update(caller_context['globals'])
+        context.update(caller_context['locals'])
     start_ipython(argv=argv, user_ns=context, **kargs)
 
 def get_smash():

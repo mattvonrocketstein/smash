@@ -38,6 +38,26 @@ def is_editable(_fpath):
         else:
             return False
 
+from IPython.core.magic import Magics, magics_class, line_magic
+
+@magics_class
+class SmashOpenMagic(Magics):
+    @line_magic
+    def open(self, parameter_s=''):
+        print 'parameter_s', parameter_s
+
+class SmartOpener(object):
+    """ override open() (from __builtins__) with
+        something that also functions as a macro """
+    def __init__(self, *args, **kargs):
+        pass
+
+    def __call__(self, *args, **kargs):
+        print __builtins__.open
+
+    def magically(self, param_s):
+        print 'magically', param_s
+
 class DoWhatIMean(Plugin):
     """ """
 
