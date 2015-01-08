@@ -10,6 +10,6 @@ cyrusbus
 asciitable
 fabric
 flake8
-goulash==0.5
+goulash==0.51
 reporting==0.32
 voluptuous==0.8.6

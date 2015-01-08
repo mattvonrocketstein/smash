@@ -42,6 +42,13 @@ class Updater(Plugin):
             if r1!=r2:
                 self.report('updating..')
                 self.smash.system('git fetch')
+                from goulash.python import opj
+                from smashlib.data import SMASH_DIR
+                pip=opj(SMASH_DIR,'bin','pip')
+                self.smash.system(
+                    '{0} install -r install_requirements'.format(pip))
+                self.smash.system(
+                    '{0} install -r requirements'.format(pip))
             else:
                 self.report("versions match.. nothing to do")
 
