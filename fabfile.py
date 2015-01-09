@@ -9,15 +9,14 @@
 # summary of commands/arguments:
 #
 #   * fab pypi_repackage: update this package on pypi
-#   * fab version_bump: increase package version by $VERSION_DELTA
 #
-import os
+import os, re, sys
 
+from fabric.api import env, run
 from fabric.colors import red
-from fabric.api import lcd, local, settings
+from fabric.api import lcd, local, quiet, settings
 from fabric.contrib.console import confirm
-
-VERSION_DELTA = .01
+from fabric.colors import red
 
 _ope = os.path.exists
 _mkdir = os.mkdir
@@ -25,7 +24,21 @@ _expanduser = os.path.expanduser
 _dirname = os.path.dirname
 
 ldir = _dirname(__file__)
+
 VERSION_DELTA = .01
+
+def pypi_repackage():
+    ldir = _dirname(__file__)
+    print red("warning:") + (" by now you should have commited local"
+                             " master and bumped version string")
+    ans = confirm('proceed with pypi update in "{0}"?'.format(ldir))
+    if not ans: return
+    with lcd(ldir):
+        with settings(warn_only=True):
+            local("git checkout -b pypi") # in case this has never been done before
+        local("git reset --hard master")
+        local("python setup.py register -r pypi")
+        local("python setup.py sdist upload -r pypi")
 
 def version_bump():
     """ bump the version number """
@@ -51,19 +64,6 @@ def version_bump():
     with open(version_file,'w') as fhandle:
         fhandle.write(new_file)
         print 'version has been rewritten.'
-
-def pypi_repackage():
-    """ refreshes the pypi bundle for this project """
-    print red("warning:") + (" by now you should have commited local"
-                             " master and bumped version string")
-    ans = confirm('proceed with pypi update in "{0}"?'.format(ldir))
-    if not ans: return
-    with lcd(ldir):
-        with settings(warn_only=True):
-            local("git checkout -b pypi") # in case this has never been done before
-        local("git reset --hard master")
-        local("python setup.py register -r pypi")
-        local("python setup.py sdist upload -r pypi")
 
 if __name__ == '__main__':
     # a neat hack that makes this file a "self-hosting" fabfile,

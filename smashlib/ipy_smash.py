@@ -44,7 +44,7 @@ class Smash(Plugin):
 
     def system(self, cmd, quiet=False):
         if not quiet:
-            self.report("run: " + cmd)
+            self.report("run: " + cmd, force=True)
         return qlocal(cmd, capture=True)
 
     def init_magics(self):

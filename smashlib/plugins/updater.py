@@ -27,14 +27,16 @@ class Updater(Plugin):
         if args.update:
             self.cli_update = True
         return args, unknown
-
+    def run(self,cmd):
+        self.report("running: ",cmd)
+        return self.smash.system(cmd)
     def update(self):
         self.report("checking for a newer version")
         smash_repo = 'git://github.com/mattvonrocketstein/smash.git'
         with lcd("~/.smash"):
             cmd1 = 'git rev-parse HEAD'
             cmd2_t = 'git ls-remote {0} HEAD'
-            r1 = qlocal(cmd1, capture=True).strip()
+            r1 = self(cmd1, capture=True).strip()
             r2 = qlocal(cmd2_t.format(smash_repo), capture=True)
             r2 = r2.strip().split()[0]
             self.smash.shell.run_cell('which smashlib')
@@ -45,10 +47,10 @@ class Updater(Plugin):
                 self.smash.system('git fetch')
                 from goulash.python import opj
                 from smashlib.data import SMASH_DIR
-                pip=opj(SMASH_DIR,'bin','pip')
-                self.smash.system(
+                pip = opj(SMASH_DIR,'bin','pip')
+                self.run(
                     '{0} install -r install_requirements'.format(pip))
-                self.smash.system(
+                self.run(
                     '{0} install -r requirements'.format(pip))
             else:
                 self.report("versions match.. nothing to do")
