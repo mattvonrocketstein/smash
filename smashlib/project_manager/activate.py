@@ -41,7 +41,7 @@ def activate_python_venv(project_manager):
     else:
         found_venv = contains_venv(
             _dir, report=project_manager.report,
-            ignore_dirs=['.tox']
+            ignore_dirs=['.tox'],
             )
 
     if found_venv:

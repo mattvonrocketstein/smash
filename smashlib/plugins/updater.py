@@ -1,10 +1,13 @@
 """ smashlib.plugins.updater
 """
 
+from goulash.python import opj
+
 from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 from smashlib.util._fabric import qlocal, lcd
+from smashlib.data import SMASH_DIR
 
 class Updater(Plugin):
     """ This plugin is responsible for doing the
@@ -45,8 +48,6 @@ class Updater(Plugin):
             if r1!=r2:
                 self.report('updating..')
                 self.smash.system('git fetch')
-                from goulash.python import opj
-                from smashlib.data import SMASH_DIR
                 pip = opj(SMASH_DIR,'bin','pip')
                 self.run(
                     '{0} install -r install_requirements'.format(pip))
