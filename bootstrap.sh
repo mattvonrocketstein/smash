@@ -50,6 +50,7 @@ if [ ! -d "$SMASH_HOME" ]; then
         git clone --branch=$BRANCH https://github.com/mattvonrocketstein/smash.git ~/.smash
     else
         echo "Already have smash code, will not clone"
+        cd $SMASH_HOME && git fetch && git reset --hard origin/$SMASH_BRANCH
         echo "Creating dir $SMASH_HOME";
         mkdir $SMASH_HOME
     fi
