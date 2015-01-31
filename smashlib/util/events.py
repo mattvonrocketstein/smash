@@ -1,7 +1,9 @@
 """ smashlib.util.events
 """
+
 from smashlib import get_smash
 from smashlib.util.ipy import TermColors
+from smashlib._logging import events_log
 
 class receives_event(object):
     """ note: should only be used with imethods """
@@ -13,7 +15,7 @@ class receives_event(object):
     def report(self, args):
         fxn = self.fxn
         zargs = args[0] if len(args)==1 else args
-        msg = '{0}!{1}{2} @{3} ={4}'.format(
+        msg = '{0}!{1}{2} @ "{3}" = {4}'.format(
             TermColors.LightPurple,
             self.channel,
             TermColors.Normal,
@@ -22,7 +24,7 @@ class receives_event(object):
         if msg[:77]!=msg:
             msg += '...'
             msg=msg[:77]
-        print msg
+        events_log.info(msg)
 
     def __call__(self, fxn):
         self.fxn = fxn

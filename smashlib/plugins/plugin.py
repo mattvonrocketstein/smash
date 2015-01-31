@@ -11,7 +11,7 @@ from collections import defaultdict
 
 from IPython.config.configurable import Configurable
 
-from smashlib.logging import Logger
+from smashlib._logging import Logger
 from smashlib.bases.eventful import EventfulMix
 
 class APlugin(object):

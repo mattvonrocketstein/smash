@@ -30,6 +30,7 @@ _.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
 _.Smash.verbose = False
 _.DoWhatIMean.verbose = False
 _.LiquidPrompt.verbose = False
+_.DjangoPlugin.verbose = True
 _.Summarize.verbose = False
 _.ProjectManager.verbose = False
 _.ChangeDirHooks.verbose = False
@@ -58,6 +59,7 @@ _.IPCompleter.merge_completions = False
 # load optional smash extensions
 #_.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
 _.Smash.plugins.append('smashlib.plugins.cli_command_runner')
+_.Smash.plugins.append('smashlib.plugins._django')
 _.Smash.plugins.append('smashlib.plugins.updater')
 _.Smash.plugins.append('smashlib.plugins.post_input')
 _.Smash.plugins.append('smashlib.plugins.uninstall_plugin')

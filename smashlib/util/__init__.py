@@ -6,16 +6,14 @@
 """
 import os, re, glob
 
+from goulash._os import touch_file, home
 from goulash.python import get_env, opd, ops, opj, ope, expanduser
+from smashlib.data import P_CODE_FILE
 
+from report import Reporter as BaseReporter
 
-def home():
-    return get_env('HOME')
-
-def touch_file(_file):
-    """ TODO: move to goulash """
-    with open(_file, 'w'):
-        pass
+class Reporter(BaseReporter):
+    pass
 
 def require_ipy(require_version):
     import IPython
@@ -23,16 +21,6 @@ def require_ipy(require_version):
     if not ipy_version.startswith(require_version):
         err = "smash requires ipython {0}, but your version is {1}"
         raise SystemExit(err.format(require_version, ipy_version))
-
-P_CODE_FILE = {
-    '.py':'python',
-    '.pp':'puppet',
-    '.md':'docs',
-    '.rst':'docs',
-    '.hs':'haskell',
-    'Vagrantfile':'vagrant',
-    'tox.ini':'tox',
-    }
 
 def _guess_dir_type(_dir, max_depth=3):
     type_map = P_CODE_FILE.copy()

@@ -1,11 +1,14 @@
 """ smashlib.plugins.which
 """
 import sys
+
 from smashlib.plugins import Plugin
 from smashlib.channels import C_REHASH_EVENT
 from smashlib.util.events import receives_event
+
 from goulash.util import summarize_fpath
 from report import Reporter as R
+
 report = R("which")
 
 class EnhancedWhich(Plugin):
@@ -16,7 +19,10 @@ class EnhancedWhich(Plugin):
 
     def which(self, query):
         system_result = self.smash.system('which {0}'.format(query)).strip()
-        python_result = sys.modules.get(query, None)
+        try:
+            python_result = __import__(query) #sys.modules.get(query, None)
+        except ImportError:
+            python_result = None
         if system_result:
             report.system("{0}".format(system_result))
         if python_result:
@@ -24,7 +30,8 @@ class EnhancedWhich(Plugin):
             fpath = summarize_fpath(fpath)
             report.python('module: "{0}"'.format(python_result.__name__))
             report.python('\tfile: {0}'.format(fpath))
-            version = getattr(python_result, '__version__', None)
+            version = getattr(python_result, '__version__',
+                              getattr(python_result, 'VERSION', None))
             version = version or getattr(python_result, 'version', None)
             report.python('\tversion: {0}'.format(version or '??'))
 

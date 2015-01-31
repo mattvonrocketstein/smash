@@ -89,7 +89,9 @@ class VirtualEnvSupport(Plugin):
             # clean sys.path according to python..
             # stupid, but this seems to work
             self.report('resetting sys.path')#,sys.path_changes)
-            sys.path = self.reset_path
+            reset_path = getattr(self, 'reset_path', None)
+            if reset_path is not None:
+                sys.path = reset_path
 
             self._clean_user_namespace(venv)
             self.publish(C_POST_DEACTIVATE, venv)

@@ -4,13 +4,12 @@ import os, shutil
 import demjson, voluptuous
 from IPython.core.profiledir import ProfileDir
 
-from report import Reporter
 from goulash.python import create_dir_if_not_exists, ope, opj
-
+from smashlib.util import Reporter
 from smashlib.config import schemas
 from smashlib.data import USER_CONFIG_PATH
 from smashlib.data import SMASH_ETC, SMASH_DIR, SMASHLIB_DIR, main_profile_name
-
+from smashlib._logging import boot_log
 
 report = Reporter("SmashConfig")
 
@@ -18,6 +17,9 @@ def _find_schema(fname):
     fname = os.path.split(fname)[-1]
     fname = os.path.splitext(fname)[0]
     return getattr(schemas, fname)
+
+class ConfigError(RuntimeError):
+    pass
 
 class SmashConfig(object):
     """
@@ -28,7 +30,7 @@ class SmashConfig(object):
 
     def load_from_etc(self, fname, schema=None):
         """ if schema is given, validate it.  otherwise just load blindly """
-        report('loading and validating {0}'.format(fname))
+        boot_log.info('loading and validating {0}'.format(fname))
         schema = schema or _find_schema(fname)
         absf = opj(SMASH_ETC, fname)
         try:
@@ -36,8 +38,8 @@ class SmashConfig(object):
                 data = demjson.decode(fhandle.read())
         except demjson.JSONDecodeError:
             err = "file is not json: {0}".format(absf)
-            report.ERROR(err)
-            raise SystemExit(err)
+            boot_log.ERROR(err)
+            raise ConfigError(err)
         except IOError:
             report("{0} does not exist..".format(absf))
             if getattr(schema, 'default', None) is not None:
@@ -52,7 +54,7 @@ class SmashConfig(object):
                 return self.load_from_etc(fname, schema)
             else:
                 err = "{0} does not exist, and no default is defined".format(absf)
-                report.ERROR(err)
+                boot_log.critical(err)
                 raise SystemExit(err)
         try:
             schema(data)

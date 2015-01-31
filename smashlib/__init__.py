@@ -17,6 +17,8 @@ def embed(argv=tuple(), **kargs):
     if context is not None:
         context.update(caller_context['globals'])
         context.update(caller_context['locals'])
+    if '--no-confirm-exit' not in argv:
+        argv = ['--no-confirm-exit'] + list(argv)
     start_ipython(argv=argv, user_ns=context, **kargs)
 
 def get_smash():
