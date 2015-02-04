@@ -11,7 +11,7 @@ from smashlib.plugins import Plugin
 from smashlib.util._fabric import require_bin
 from smashlib.util import guess_dir_type
 
-from goulash.venv import contains_venv, find_venvs
+from goulash.venv import find_venvs
 
 def sloccount(_dir):
     require_bin('sloccount')

@@ -2,8 +2,8 @@
 
 """
 
-import os
-from IPython.core.magic import Magics, magics_class, line_magic
+#import os
+from IPython.core.magic import Magics, magics_class
 
 from smashlib import get_smash
 from smashlib.plugins import Plugin

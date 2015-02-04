@@ -28,7 +28,7 @@ from .aliases import AliasInterface
 
 class Smash(Plugin):
     plugins             = List(default_value=[], config=True)
-    verbose_events      = Bool(False, config=True)
+    verbose_events      = Bool(True, config=True)
     ignore_warnings     = Bool(False, config=True)
     load_bash_aliases   = Bool(False, config=True)
     load_bash_functions = Bool(False, config=True)
@@ -43,8 +43,7 @@ class Smash(Plugin):
         p.text(repr(self))
 
     def system(self, cmd, quiet=False):
-        if not quiet:
-            self.report("run: " + cmd, force=True)
+        self.report("run: " + cmd, force=True)
         return qlocal(cmd, capture=True)
 
     def init_magics(self):

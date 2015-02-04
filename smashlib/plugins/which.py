@@ -12,6 +12,7 @@ from report import Reporter as R
 report = R("which")
 
 class EnhancedWhich(Plugin):
+
     verbose = True
 
     def init(self):
@@ -21,7 +22,8 @@ class EnhancedWhich(Plugin):
         system_result = self.smash.system('which {0}'.format(query)).strip()
         try:
             python_result = __import__(query) #sys.modules.get(query, None)
-        except ImportError:
+        except ImportError, e:
+            self.report("error importing: "+str(e))
             python_result = None
         if system_result:
             report.system("{0}".format(system_result))

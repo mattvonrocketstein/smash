@@ -15,6 +15,7 @@ from smashlib._logging import Logger
 from smashlib.bases.eventful import EventfulMix
 
 class APlugin(object):
+    """ """
     def build_argparser(self):
         parser = argparse.ArgumentParser()
         return parser
@@ -85,9 +86,19 @@ class APlugin(object):
             self.report("uninstalling magic: {0}".format(m))
             del self.shell.magics_manager.magics['line'][m.__name__]
 
+    def die(self, msg=''):
+        import os
+        if msg:
+            print msg
+        self.smash.shell.run_cell('exit')
+        os.system('kill -KILL {0}'.format(os.getpid()))
+
     def parse_argv(self):
         parser = self.build_argparser()
-        args, unknown = parser.parse_known_args(sys.argv[1:])
+        try:
+            args, unknown = parser.parse_known_args(sys.argv[1:])
+        except SystemExit:
+            self.die('exiting at request of argparser')
         if len(vars(args)):
             self.report("parsed argv: "+str(args))
         return args, unknown
