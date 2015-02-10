@@ -19,7 +19,10 @@ def embed(argv=tuple(), **kargs):
         context.update(caller_context['locals'])
     if '--no-confirm-exit' not in argv:
         argv = ['--no-confirm-exit'] + list(argv)
-    start_ipython(argv=argv, user_ns=context, **kargs)
+    try:
+        start_ipython(argv=argv, user_ns=context, **kargs)
+    except KeyboardInterrupt:
+        print 'caught kbi'
 
 def get_smash():
     try:

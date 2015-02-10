@@ -53,4 +53,4 @@ def activate_vagrant(pm):
     except MissingSystemCommand,e:
         pm.warning("{0}: cannot execute activate_vagrant".format(e))
     else:
-        pm.smash.system('vagrant up')
+        pm.smash.system('vagrant list')
