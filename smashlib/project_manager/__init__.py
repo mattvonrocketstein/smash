@@ -28,6 +28,7 @@ from .deactivate import Deactivation, NullDeactivation
 from .defaults import ACTIVATE, CHECK, TEST, DEACTIVATE
 
 from smashlib.aliases import AliasMixin
+from smashlib.env import EnvMixin
 
 class CommandLineMixin(object):
     def build_argparser(self):
@@ -70,11 +71,12 @@ class CommandLineMixin(object):
         except AttributeError:
             pass
 
-class ProjectManager(CommandLineMixin, AliasMixin, Plugin):
+class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
     """ """
     search_dirs      = EventfulList(default_value=[], config=True)
     project_map      = EventfulDict(default_value={}, config=True)
     alias_map        = EventfulDict(default_value={}, config=True)
+    env_map          = EventfulDict(default_value={}, config=True)
     activation_map   = EventfulDict(default_value={}, config=True)
     check_map        = EventfulDict(default_value={}, config=True)
     test_map         = EventfulDict(default_value={}, config=True)
@@ -96,6 +98,7 @@ class ProjectManager(CommandLineMixin, AliasMixin, Plugin):
         for x in self.project_map.copy():
             self.project_map[x]=self.project_map[x]
         self._load_alias_group('__smash__')
+        self._load_env_group('__smash__')
 
     def init_interface(self, pmi):
         ProjectManagerInterface._project_manager = self
@@ -271,8 +274,9 @@ class ProjectManager(CommandLineMixin, AliasMixin, Plugin):
     def handle_post_op(self, op_name, project_name):
         if op_name=='activation':
             self._load_alias_group(project_name)
+            self._load_env_group(project_name)
         if op_name=='deactivation':
-            self._unload_alias_group(project_name)
+            self._unload_env_group(project_name)
 
     def deactivate(self):
         name = self._current_project

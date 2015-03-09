@@ -17,7 +17,8 @@ REHASH_IF = [
     'setup.py develop',
     'pip install',
     'setup.py install',
-    'apt-get install']
+    'apt-get install', 
+    'puppet apply']
 
 class PostInput(Plugin):
     verbose = True

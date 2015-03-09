@@ -13,6 +13,19 @@ aliases = """
  }
 """
 
+env = """
+{
+ //default env, these are active for all projects
+ '__smash__':[
+   //['some_var_name',    'env_var_value'],
+   //['another_var_name', 'env_var_value'],
+ ]
+ //'some_project':[
+   //['some_var','another_env_var_value'],
+ //]
+ }
+"""
+
 macros = """
 {
  //default macros, these are active for all projects

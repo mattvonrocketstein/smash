@@ -113,6 +113,7 @@ config = SmashConfig(_)
 config.append_from_etc(projects.search_dirs, 'search_dirs.json')
 config.update_from_etc(projects.project_map, 'projects.json')
 config.update_from_etc(projects.alias_map, 'aliases.json')
+config.update_from_etc(projects.env_map, 'env.json')
 config.update_from_etc(projects.macro_map, 'macros.json')
 config.update_from_etc(projects.venv_map, 'venvs.json')
 

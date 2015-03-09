@@ -32,8 +32,22 @@ def AliasListDict(x):
                        "element is command)").format(k,v.index(i),i)
                 raise Invalid(err)
 
+def EnvListDict(x):
+    """TODO: dryer with AliasListDict """
+    for k, v in x.items():
+        if not isinstance(k, basestring):
+            raise Invalid("{0} is not a string".format(k))
+        if not isinstance(v, list):
+            raise Invalid("{0} is not a list".format(k))
+        for i in v:
+            if not isinstance(i, list) or not len(i)==2:
+                err = ("env[{0}][{1}]='{2}' should be an array "
+                       "of length 2 (first element is alias, second "
+                       "element is command)").format(k,v.index(i),i)
+                raise Invalid(err)
 
 aliases = Schema(AliasListDict, templates.aliases)
+env = Schema(EnvListDict, templates.env)
 macros = Schema(AliasListDict, templates.macros)
 
 search_dirs = Schema(list, [])
