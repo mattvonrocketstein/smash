@@ -49,7 +49,11 @@ class LiquidPrompt(Plugin):
         self.contribute_hook('pre_prompt_hook', self.update_prompt)
 
     def update_prompt(self, himself=None):
-        tmp = self.get_prompt().strip() + self.prompt_append
+        try:
+            tmp = self.get_prompt()
+        except OSError: #cwd was removed?
+            tmp = ''
+        tmp = tmp.strip() + self.prompt_append
         if self.float==True:
             tmp = '\n' + tmp
         self.shell.prompt_manager.in_template = tmp
