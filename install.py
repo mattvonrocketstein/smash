@@ -53,22 +53,22 @@ class InstallCommand(install):
         return result
 
     def add_ipython(self):
-        self.report("smash requires dev version of ipython.  looking for it..")
-        result = self.venv_ipython()
-        have_ipy = result.succeeded
-        good_IPY_VERSION = result.succeeded and (result.strip()==IPY_VERSION)
-        if have_ipy:
-            self.report("{0} has ipython..".format(DOT_SMASH))
-            if good_IPY_VERSION:
-                self.report(".. and the version is correct")
-            else:
-                msg = "..but the version is wrong. getting the correct version"
-                self.report(msg)
-                self.clone_ipython(IPY_VERSION)
-        else:
-            msg = "ipython not found.  getting the correct version"
-            self.report(msg)
-            self.clone_ipython(IPY_VERSION)
+        pass #self.report("smash requires dev version of ipython.  looking for it..")
+        #result = self.venv_ipython()
+        #have_ipy = result.succeeded
+        #good_IPY_VERSION = result.succeeded and (result.strip()==IPY_VERSION)
+        #if have_ipy:
+        #    self.report("{0} has ipython..".format(DOT_SMASH))
+        #    if good_IPY_VERSION:
+        #        self.report(".. and the version is correct")
+        #    else:
+        #        msg = "..but the version is wrong. getting the correct version"
+        #        self.report(msg)
+        #        self.clone_ipython(IPY_VERSION)
+        #else:
+        #    msg = "ipython not found.  getting the correct version"
+        #    self.report(msg)
+        #    self.clone_ipython(IPY_VERSION)
 
         if not good_IPY_VERSION:
             self.report("installing ipython into smash venv")
@@ -80,28 +80,29 @@ class InstallCommand(install):
                 os.path.join(DOT_SMASH,'ipython'),
                 os.path.join(DOT_SMASH, 'bin','python')))
 
-    def clone_ipython(self, version):
-        url = 'http://github.com/ipython/ipython.git'
-        #or..  https://github.com/ipython/ipython/archive/master.zip
-        self.report("cloning the official repo.  this might take a while")
-        self.report("clone url: "+url)
-        ipy_clone_path = os.path.join(DOT_SMASH, 'ipython')
-        if not os.path.exists(ipy_clone_path):
-            with fab_api.settings(warn_only=True):
-                cmd = ('cd {0} && '
-                       'git clone --verbose --branch master '
-                       '--single-branch --depth 1 {1}')
-                result = fab_api.local(
-                    cmd.format(DOT_SMASH, url),
-                    capture=True)
-            if not result.succeeded:
-                print result
-                err = 'failed to clone.  check your network connection?'
-                self.report(err)
-                raise SystemExit()
-        else:
-            self.report('official repo is already already cloned..')
-            self.report('.. will not update it')
+#    def clone_ipython(self, version):
+#        return
+#        url = 'http://github.com/ipython/ipython.git'
+#        #or..  https://github.com/ipython/ipython/archive/master.zip
+#        self.report("cloning the official repo.  this might take a while")
+#        self.report("clone url: "+url)
+#        ipy_clone_path = os.path.join(DOT_SMASH, 'ipython')
+#        if not os.path.exists(ipy_clone_path):
+#            with fab_api.settings(warn_only=True):
+#                cmd = ('cd {0} && '
+#                       'git clone --verbose --branch master '
+#                       '--single-branch --depth 1 {1}')
+#                result = fab_api.local(
+#                    cmd.format(DOT_SMASH, url),
+#                    capture=True)
+#            if not result.succeeded:
+#                print result
+#                err = 'failed to clone.  check your network connection?'
+#                self.report(err)
+#                raise SystemExit()
+#        else:
+#            self.report('official repo is already already cloned..')
+#            self.report('.. will not update it')
 
     def report(self, msg):
         red(msg)
@@ -169,7 +170,7 @@ class InstallCommand(install):
         self._require_bin('virtualenv', 'python-virtualenv')
         self._require_bin('git', 'git-core')
         self.build_smash_venv()
-        self.add_ipython()
+        #self.add_ipython()
         self.add_smashlib()
 
 class DevelopCommand(InstallCommand):
