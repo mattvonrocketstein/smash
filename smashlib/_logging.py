@@ -14,7 +14,7 @@ from smashlib.util.ipy import TermColors
 
 default_file = opj(SMASH_LOGS, 'smash.log')
 event_file = opj(SMASH_LOGS, 'events.log')
-boot_file = opj(SMASH_LOGS, 'bootstrap.log')
+#boot_file = opj(SMASH_LOGS, 'bootstrap.log')
 
 if not ope(SMASH_LOGS):
     os.makedirs(SMASH_LOGS)
@@ -65,21 +65,30 @@ LOG_SETTINGS = {
         }
     }
 
+last_change = None
 def reset_logs():
+    def ignoreHandlers(*args, **kargs):
+        from goulash._inspect import get_caller
+        caller_context = get_caller(4)
+        global last_change
+        last_change=caller_context
+        print 'LOGGING SETUP CHANGED BY:',caller_context['__file__']
     # instantiate root logger & remove all old handlers
     log = logging.getLogger()
     for hdlr in log.handlers:
         log.removeHandler(hdlr)
+    # this is insane, but some module somewhere is badly behaved
+    # and keeps adding a handler after my initialization.  this
+    # results in lots of noise going to stdout.  let everything
+    # use it's own logger, and let nothing use the root logger
+    log.addHandler = ignoreHandlers
     return log
 
-log = reset_logs()
+
 dictConfig(LOG_SETTINGS)
-
-logger = logging.getLogger('smash')
+log = reset_logs()
+smash_log = logger = logging.getLogger('smash')
 logger.info("Initializing smash default logger")
-
-boot_log = logging.getLogger('bootstrap')
-boot_log.info("Initializing smash bootstrap log")
 
 events_log = logging.getLogger('smash_events')
 events_log.info("Initializing smash_events log")
@@ -87,6 +96,9 @@ events_log.info("Initializing smash_events log")
 class Logger(object):
     def __init__(self, component):
         self.component = component
+        self.info = smash_log.info
+        self.debug = smash_log.debug
+        self.warning = smash_log.warning
 
     @property
     def verbose(self):
@@ -96,10 +108,6 @@ class Logger(object):
     def ignore_warnings(self):
         """ shortcut to the value returned by the main smash settings """
         return get_smash().ignore_warnings
-
-    @property
-    def ignore_info(self):
-        return False
 
     def report(self, msg, *args, **kargs):
         force = kargs.pop('force', False)
@@ -112,19 +120,3 @@ class Logger(object):
                 header, content, TermColors.Normal)
             if args:
                 print '  ',args
-
-    def warning(self,*args, **kargs):
-        """ simple Logger subclasses get a warning() method,
-            which will honor the main smash setting for
-            "ignore_warnings".
-        """
-        if not self.ignore_warnings:
-            kargs['force'] = True
-            kargs['header'] = 'warning'
-            self.report(*args, **kargs)
-
-    def info(self, *args, **kargs):
-        if not self.ignore_info:
-            kargs['force'] = True
-            #kargs['header'] = ''
-            self.report(*args, **kargs)

@@ -30,7 +30,7 @@ class SmashDisplayHook(DisplayHook):
         try:
             super(SmashDisplayHook,self).finish_displayhook()
         except AttributeError, e:
-            # occasionally throws 
+            # occasionally throws
             # IOStream instance has no attribute 'flush'
             #
             # I think this is a race condition on embedded shells
@@ -155,18 +155,20 @@ class SmashTerminalIPythonApp(BaseTIA):
             ipython_dir=self.ipython_dir,
             user_ns=self.user_ns)
         self.shell.configurables.append(self)
-        def my_matcher(text):
+        def smash_matcher(text):
+            #print 'smash_matcher',text #dbg
             line = self.shell.Completer.readline.get_line_buffer()
             first_word = line.split()[0]
             magic_command_alias = first_word.startswith('%') and \
                                   have_command_alias(first_word[1:])
             naked_command_alias = have_command_alias(first_word)
+            #print 'smash_matcher',text,naked_command_alias,magic_command_alias #dbg
             if naked_command_alias:
                 return smash_bash_complete(line)
             if magic_command_alias:
                 return smash_bash_complete(line[1:])
             return []
-        self.shell.Completer.matchers = [my_matcher] + \
+        self.shell.Completer.matchers = [smash_matcher] + \
                                         self.shell.Completer.matchers
 TerminalIPythonApp = SmashTerminalIPythonApp
 launch_new_instance = TerminalIPythonApp.launch_instance

@@ -9,3 +9,8 @@ node/*
 .coverage
 .ipynb_checkpoints
 logs/*
+bin/*
+etc/*
+lib/*
+include/*
+autojump.txt.*

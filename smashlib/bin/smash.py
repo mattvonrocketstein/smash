@@ -5,15 +5,12 @@ import os, sys
 import logging
 import importlib
 
-from smashlib.util import require_ipy
-
 class RewriteIPythonImport(object):
-    """ """
     def find_module(self, fullname, path=None):
         if fullname.startswith('IPython'):
             new_fullname = ['smashlib','ipy3x']+fullname.split('.')[1:]
             new_fullname='.'.join(new_fullname)
-            logging.warning("import : {0}->{1}".format(fullname, new_fullname))
+            #logging.warning("import : {0}->{1}".format(fullname, new_fullname))
             self.path = path
             self.original_name = fullname
             self.rewritten_name = new_fullname
@@ -28,8 +25,6 @@ class RewriteIPythonImport(object):
 sys.meta_path = [RewriteIPythonImport()]
 
 def main():
-    #REQUIRE_VERSION = '3.2.0-dev'
-    #require_ipy(REQUIRE_VERSION)
     os.environ['SMASH'] = '1'
     from smashlib import embed
     from smashlib.config import SmashConfig, SmashUserConfig

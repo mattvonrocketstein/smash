@@ -9,7 +9,7 @@ from smashlib.util import Reporter
 from smashlib.config import schemas
 from smashlib.data import USER_CONFIG_PATH
 from smashlib.data import SMASH_ETC, SMASH_DIR, SMASHLIB_DIR, main_profile_name
-from smashlib._logging import boot_log
+from smashlib._logging import smash_log
 from smashlib.exceptions import ConfigError
 
 report = Reporter("SmashConfig")
@@ -30,7 +30,7 @@ class SmashConfig(object):
     def load_from_etc(self, fname, schema=None):
         """ if schema is given, validate it.  otherwise
             just load blindly """
-        boot_log.info('loading and validating {0}'.format(fname))
+        smash_log.info('loading and validating {0}'.format(fname))
         schema = schema or _find_schema(fname)
         absf = opj(SMASH_ETC, fname)
         try:

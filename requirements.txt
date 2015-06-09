@@ -14,6 +14,7 @@ pywhich
 goulash==0.58
 reporting==0.32
 voluptuous==0.8.6
+Importing==1.10
 
 #smashlib.ipy3x requirements
 git+git://github.com/ipython/traitlets.git

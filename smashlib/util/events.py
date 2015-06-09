@@ -21,9 +21,9 @@ class receives_event(object):
             TermColors.Normal,
             fxn.__name__,
             zargs)
-        if msg[:77]!=msg:
+        if msg[:77] != msg:
             msg += '...'
-            msg=msg[:77]
+            msg = msg[:77]
         events_log.info(msg)
 
     def __call__(self, fxn):

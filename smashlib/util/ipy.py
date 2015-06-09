@@ -3,8 +3,12 @@
     import shortcuts for ipython.  this also might help to keep
     smashlib in sync with changing ipython target versions?
 """
+import re
 import keyword
 from IPython.utils.coloransi import TermColors
+from peak.util.imports import lazyModule
+logging = lazyModule('smashlib._logging')
+
 
 def green(txt):
     return TermColors.Green + txt + TermColors.Normal
@@ -30,6 +34,7 @@ def uninstall_prefilter(HandlerOrCheckerClass):
         if isinstance(tmp, HandlerOrCheckerClass):
             del checker_list[checker_list.index(tmp)]
 
+r_cmd = re.compile('^[\w-]+$')
 def have_command_alias(x):
     """ this helper function is fairly expensive to be running on
         (almost) every input line.  perhaps it should be cached, but
@@ -37,6 +42,9 @@ def have_command_alias(x):
           a) answers would have to be kept in sync with rehashx calls
           b) the alias list must be getting checked all the time anyway?
     """
+    if not r_cmd.match(x):
+        return False
+    logging.smash_log.info('answering have_command_alias {0}'.format(x))
     blacklist = [
         'ed',    # posix line oriented, not as useful as ipython edit
         'ip',    # often used as in ip=get_ipython()
@@ -45,7 +53,9 @@ def have_command_alias(x):
         return False
     else:
         alias_list = get_ipython().alias_manager.aliases
-        cmd_list = [ cmd for alias, cmd in alias_list ]
+        cmd_list = set()
+        for alias, cmd in alias_list:
+            cmd_list = cmd_list.union(set([alias, cmd]))
         return x in cmd_list
 have_alias = have_command_alias
 

@@ -115,7 +115,7 @@ class APlugin(object):
         return self.smash.bus.publish
 
 from IPython.utils.traitlets import Bool
-
+from smashlib._logging import smash_log
 class SmashPlugin(APlugin, EventfulMix, Configurable, ):
 
     verbose = Bool(False, config=True)
@@ -130,7 +130,7 @@ class SmashPlugin(APlugin, EventfulMix, Configurable, ):
 
         self.shell.configurables.append(self)
         self.init_logger()
-        self.report("initializing {0}".format(self))
+        smash_log.info("initializing {0}".format(self))
         self.init_eventful()
         self.init_bus()
         self.init_magics()

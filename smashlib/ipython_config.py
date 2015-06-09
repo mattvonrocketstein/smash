@@ -8,7 +8,9 @@
 # type "ed_ed").
 #
 from smashlib.editor import get_editor
-print '..loading system config', __file__
+from smashlib._logging import smash_log
+msg = '..loading system config: '+__file__
+print msg; smash_log.debug(msg)
 
 _ = get_config() # NOQA
 

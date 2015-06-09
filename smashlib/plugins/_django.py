@@ -40,10 +40,7 @@ class DjangoPlugin(Plugin):
             a good idea to call this after the "jump" command or
             after "pushd" as well, but that's not implemented.
         """
-        print 'checking if this is a django project'
-
-    #def install(self):
-    #    return self
+        self.logger.debug('checking if new WD is a django project')
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
