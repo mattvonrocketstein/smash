@@ -9,20 +9,21 @@
 """
 import keyword
 
+from report import report
+
 from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 from IPython.terminal.interactiveshell import \
      TerminalInteractiveShell as BaseTIS
 from IPython.utils.traitlets import Instance, Type
 from IPython.core.displayhook import DisplayHook
-from smashlib import get_smash
-from smashlib.util.ipy import have_command_alias
 
+from smashlib import get_smash
+from smashlib._logging import smash_log
+from smashlib.util.ipy import have_command_alias
 from smashlib.channels import C_FILE_INPUT
 from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_COMMAND_FAIL
-
 from smashlib.util import split_on_unquoted_semicolons, is_path
 from smashlib.bin.pybcompgen import complete
-from report import report
 
 class SmashDisplayHook(DisplayHook):
     def finish_displayhook(self):
@@ -65,7 +66,6 @@ class SmashTerminalInteractiveShell(BaseTIS):
             sooper = super(SmashTerminalInteractiveShell, self)
             return sooper.showsyntaxerror(filename=filename)
 
-
     def __init__(self,*args,**kargs):
         sooper = super(SmashTerminalInteractiveShell, self)
         sooper.__init__(*args, **kargs)
@@ -80,11 +80,10 @@ class SmashTerminalInteractiveShell(BaseTIS):
     # not be finished.  for example if input is a multi-line
     # function definition, pasted stuff, or uses a trailing "\"
     def raw_input(self, *args, **kargs):
-        sooper = super(SmashTerminalInteractiveShell,self)
+        sooper = super(SmashTerminalInteractiveShell, self)
         out = sooper.raw_input(*args, **kargs)
         self._smash_last_input += out
         return out
-
 
     def _showtraceback(self, etype, evalue, stb):
         """ before we display the traceback, give smash error
@@ -101,12 +100,12 @@ class SmashTerminalInteractiveShell(BaseTIS):
     # NOTE: when run-cell runs, input is finished
     def run_cell(self, raw_cell, store_history=False,
                  silent=False, shell_futures=True):
-
+        smash_log.info("running raw_cell: {0}".format(raw_cell))
         # as long as the expressions are semicolon separated,
         # this section allows hybrid bash/python expressions
         bits = split_on_unquoted_semicolons(raw_cell)
         if len(bits) > 1:
-            out=[]
+            out = []
             for x in bits:
                 out.append(
                     self.run_cell(
@@ -127,7 +126,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
                 self.smash.publish(C_POST_RUN_CELL, this)
                 self.smash.publish(C_POST_RUN_INPUT, last_input)
             self._smash_last_input = ""
-        return out
+        return [out]
 
     def system(self, cmd, quiet=False, **kargs):
         #print 'wrapping system call',cmd

@@ -9,7 +9,6 @@ from IPython.utils.coloransi import TermColors
 from peak.util.imports import lazyModule
 logging = lazyModule('smashlib._logging')
 
-
 def green(txt):
     return TermColors.Green + txt + TermColors.Normal
 
@@ -55,7 +54,8 @@ def have_command_alias(x):
         alias_list = get_ipython().alias_manager.aliases
         cmd_list = set()
         for alias, cmd in alias_list:
-            cmd_list = cmd_list.union(set([alias, cmd]))
+            if alias==cmd:
+                cmd_list = cmd_list.union(set([alias]))
         return x in cmd_list
 have_alias = have_command_alias
 

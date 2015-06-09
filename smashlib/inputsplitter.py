@@ -2,8 +2,9 @@
 """
 
 import re
-from IPython.core.inputsplitter import IPythonInputSplitter
 from goulash.python import ope
+
+from IPython.core.inputsplitter import IPythonInputSplitter
 
 r_ed = 'ed [^:]*'
 
@@ -17,9 +18,9 @@ class SmashInputSplitter(IPythonInputSplitter):
         instance ack-grep)
     """
     def push(self, lines):
-        result = super(SmashInputSplitter,self).push(lines)
+        result = super(SmashInputSplitter, self).push(lines)
         lines = lines.strip()
-        match=re.compile(r_ed).match(lines)
+        match = re.compile(r_ed).match(lines)
         if match:
             fname = match.group().split()[1]
             if ope(fname):

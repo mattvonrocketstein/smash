@@ -2,6 +2,8 @@
 """
 
 from IPython.core.macro import Macro
+from peak.util.imports import lazyModule
+logging = lazyModule('smashlib._logging')
 
 class AliasMixin(object):
     """ """
@@ -10,10 +12,12 @@ class AliasMixin(object):
                  self.macro_map.get(group_name, []) ]
 
     def _load_alias_group(self, group_name):
+        logging.smash_log.info('loading alias group: {0}'.format(group_name))
         aliases, macros = self._get_alias_group(group_name)
         for alias in aliases:
             name, cmd = alias
             self.smash.shell.alias_manager.define_alias(name, cmd)
+            logging.smash_log.info(' alias: {0}'.format(name))
         self.report("Loaded {0} aliases".format(len(aliases)))
 
         for m in macros:
@@ -25,6 +29,7 @@ class AliasMixin(object):
             self.smash.shell.user_ns[name]=macro
 
     def _unload_alias_group(self, group_name):
+        logging.smash_log.info('unloading alias group: {0}'.format(group_name))
         aliases, macros = self._get_alias_group(group_name)
         for alias in aliases:
             name, cmd=alias

@@ -3,7 +3,7 @@
 
 from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
 from smashlib.util.ipy import have_alias
-
+#from smashlib._logger import smash_log
 SHELL_HANDLER_NAME = 'ShellHandler'
 
 class ShellHandler(PrefilterHandler):
@@ -12,6 +12,7 @@ class ShellHandler(PrefilterHandler):
 
     def handle(self, line_info):
         cmd = line_info.line.strip()
+        #smash_log.info("shellhandler: {0}".format(cmd))
         return 'get_ipython().system(%r)' % (cmd, )
 
 class ShellChecker(PrefilterChecker):

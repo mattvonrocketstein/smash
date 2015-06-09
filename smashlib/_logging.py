@@ -6,11 +6,9 @@ from logging.config import dictConfig
 
 from goulash.python import ope, opj, dirname
 
-from smashlib import get_smash
 from smashlib.data import SMASH_LOGS
-
-from smashlib.util import touch_file
-from smashlib.util.ipy import TermColors
+from goulash._os import touch_file
+from IPython.utils.coloransi import TermColors
 
 default_file = opj(SMASH_LOGS, 'smash.log')
 event_file = opj(SMASH_LOGS, 'events.log')
@@ -20,6 +18,9 @@ if not ope(SMASH_LOGS):
     os.makedirs(SMASH_LOGS)
 touch_file(default_file)
 touch_file(event_file)
+LOG_FMT = ('[%(name)s:%(levelname)s:%(process)d] '
+           '%(pathname)s:%(lineno)-4d \n'
+           '  - %(funcName)s: %(message)s')
 
 LOG_SETTINGS = {
     'version': 1,
@@ -48,9 +49,7 @@ LOG_SETTINGS = {
         },
     'formatters': {
         'detailed': {
-            'format': ('%(name)s %(process)d %(pathname)s '
-                       'in %(funcName)s line:%(lineno)-4d \n'
-                       '  %(levelname)s %(message)s')
+            'format': LOG_FMT,
             },
         },
     'loggers': {
@@ -103,11 +102,6 @@ class Logger(object):
     @property
     def verbose(self):
         return self.component.verbose
-
-    @property
-    def ignore_warnings(self):
-        """ shortcut to the value returned by the main smash settings """
-        return get_smash().ignore_warnings
 
     def report(self, msg, *args, **kargs):
         force = kargs.pop('force', False)
