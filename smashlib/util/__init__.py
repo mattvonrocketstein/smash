@@ -15,13 +15,6 @@ from report import Reporter as BaseReporter
 class Reporter(BaseReporter):
     pass
 
-def require_ipy(require_version):
-    import IPython
-    ipy_version = IPython.__version__
-    if not ipy_version.startswith(require_version):
-        err = "smash requires ipython {0}, but your version is {1}"
-        raise SystemExit(err.format(require_version, ipy_version))
-
 def _guess_dir_type(_dir, max_depth=3):
     type_map = P_CODE_FILE.copy()
     type_map.update({

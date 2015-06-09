@@ -24,11 +24,11 @@ touch_file(event_file)
 LOG_SETTINGS = {
     'version': 1,
     'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'level': 'DEBUG',
-            'formatter': 'detailed',
-            'stream': 'ext://sys.stdout',},
+       # 'console': {
+       #     'class': 'logging.StreamHandler',
+       #     'level': 'DEBUG',
+       #     'formatter': 'detailed',
+       #     'stream': 'ext://sys.stdout',},
         'event_file': {
             'class': 'logging.handlers.RotatingFileHandler',
             'level': 'INFO',

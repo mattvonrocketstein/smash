@@ -8,3 +8,4 @@ node/*
 .tox/
 .coverage
 .ipynb_checkpoints
+logs/*
