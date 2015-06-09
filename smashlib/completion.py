@@ -18,7 +18,7 @@ def complete_long_opts(cmd):
 class opt_completer(object):
     """ """
     def __init__(self, cmd_name):
-        self.cmd=cmd_name
+        self.cmd = cmd_name
 
     def __call__(self, fxn):
         def newf(himself, event):

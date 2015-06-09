@@ -10,6 +10,7 @@ cyrusbus
 asciitable
 fabric
 flake8
+pywhich
 goulash==0.52
 reporting==0.32
 voluptuous==0.8.6
