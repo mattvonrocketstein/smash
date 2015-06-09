@@ -8,11 +8,10 @@ import os
 import shutil
 import errno
 
-from traitlets.config.configurable import LoggingConfigurable
-from IPython.paths import get_ipython_package_dir
-from IPython.utils.path import expand_path, ensure_dir_exists
+from IPython.config.configurable import LoggingConfigurable
+from IPython.utils.path import get_ipython_package_dir, expand_path, ensure_dir_exists
 from IPython.utils import py3compat
-from traitlets import Unicode, Bool
+from IPython.utils.traitlets import Unicode, Bool
 
 #-----------------------------------------------------------------------------
 # Module errors
@@ -115,7 +114,7 @@ class ProfileDir(LoggingConfigurable):
         self._mkdir(self.startup_dir)
 
         readme = os.path.join(self.startup_dir, 'README')
-        src = os.path.join(get_ipython_package_dir(), u'core', u'profile', u'README_STARTUP')
+        src = os.path.join(get_ipython_package_dir(), u'config', u'profile', u'README_STARTUP')
 
         if not os.path.exists(src):
             self.log.warn("Could not copy README_STARTUP to startup dir. Source file %s does not exist.", src)
@@ -138,16 +137,31 @@ class ProfileDir(LoggingConfigurable):
     def _static_dir_changed(self, name, old, new):
         self.check_startup_dir()
 
+    def check_static_dir(self):
+        self._mkdir(self.static_dir)
+        custom = os.path.join(self.static_dir, 'custom')
+        self._mkdir(custom)
+        from IPython.html import DEFAULT_STATIC_FILES_PATH
+        for fname in ('custom.js', 'custom.css'):
+            src = os.path.join(DEFAULT_STATIC_FILES_PATH, 'custom', fname)
+            dest = os.path.join(custom, fname)
+            if not os.path.exists(src):
+                self.log.warn("Could not copy default file to static dir. Source file %s does not exist.", src)
+                continue
+            if not os.path.exists(dest):
+                shutil.copy(src, dest)
+
     def check_dirs(self):
         self.check_security_dir()
         self.check_log_dir()
         self.check_pid_dir()
         self.check_startup_dir()
+        self.check_static_dir()
 
     def copy_config_file(self, config_file, path=None, overwrite=False):
         """Copy a default config file into the active profile directory.
 
-        Default configuration files are kept in :mod:`IPython.core.profile`.
+        Default configuration files are kept in :mod:`IPython.config.default`.
         This function moves these from that location to the working profile
         directory.
         """
@@ -155,7 +169,7 @@ class ProfileDir(LoggingConfigurable):
         if os.path.isfile(dst) and not overwrite:
             return False
         if path is None:
-            path = os.path.join(get_ipython_package_dir(), u'core', u'profile', u'default')
+            path = os.path.join(get_ipython_package_dir(), u'config', u'profile', u'default')
         src = os.path.join(path, config_file)
         shutil.copy(src, dst)
         return True

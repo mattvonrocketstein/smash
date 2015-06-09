@@ -12,7 +12,7 @@ from contextlib import contextmanager
 
 import nose.tools as nt
 
-from traitlets.config.loader import Config
+from IPython.config.loader import Config
 from IPython.core import completer
 from IPython.external.decorators import knownfailureif
 from IPython.utils.tempdir import TemporaryDirectory, TemporaryWorkingDirectory
@@ -146,46 +146,6 @@ def test_latex_completions():
     text, matches = ip.complete(u'\\al')
     nt.assert_in('\\alpha', matches)
     nt.assert_in('\\aleph', matches)
-
-
-
-
-@dec.onlyif(sys.version_info[0] >= 3, 'This test only apply on python3')
-def test_back_latex_completion():
-    ip = get_ipython()
-
-    # do not return more than 1 matches fro \beta, only the latex one.
-    name, matches = ip.complete('\\β')
-    nt.assert_equal(len(matches), 1)
-    nt.assert_equal(matches[0], '\\beta')
-
-@dec.onlyif(sys.version_info[0] >= 3, 'This test only apply on python3')
-def test_back_unicode_completion():
-    ip = get_ipython()
-    
-    name, matches = ip.complete('\\Ⅴ')
-    nt.assert_equal(len(matches), 1)
-    nt.assert_equal(matches[0], '\\ROMAN NUMERAL FIVE')
-
-
-@dec.onlyif(sys.version_info[0] >= 3, 'This test only apply on python3')
-def test_forward_unicode_completion():
-    ip = get_ipython()
-    
-    name, matches = ip.complete('\\ROMAN NUMERAL FIVE')
-    nt.assert_equal(len(matches), 1)
-    nt.assert_equal(matches[0], 'Ⅴ')
-
-@dec.onlyif(sys.version_info[0] >= 3, 'This test only apply on python3')
-def test_no_ascii_back_completion():
-    ip = get_ipython()
-    with TemporaryWorkingDirectory():  # Avoid any filename completions
-        # single ascii letter that don't have yet completions
-        for letter in 'fjqyJMQVWY' :
-            name, matches = ip.complete('\\'+letter)
-            nt.assert_equal(matches, [])
-
-
 
 
 class CompletionSplitterTestCase(unittest.TestCase):
@@ -530,11 +490,6 @@ def test_dict_key_completion_string():
     _, matches = complete(line_buffer="d[\"a'")
     nt.assert_in("b", matches)
 
-    # need to not split at delims that readline won't split at
-    if '-' not in ip.Completer.splitter.delims:
-        ip.user_ns['d'] = {'before-after': None}
-        _, matches = complete(line_buffer="d['before-af")
-        nt.assert_in('before-after', matches)
 
 def test_dict_key_completion_contexts():
     """Test expression contexts in which dict key completion occurs"""
@@ -713,20 +668,6 @@ def test_struct_array_key_completion():
     _, matches = complete(line_buffer="d['")
     nt.assert_in("hello", matches)
     nt.assert_in("world", matches)
-    # complete on the numpy struct itself
-    dt = numpy.dtype([('my_head', [('my_dt', '>u4'), ('my_df', '>u4')]),
-                      ('my_data', '>f4', 5)])
-    x = numpy.zeros(2, dtype=dt)
-    ip.user_ns['d'] = x[1]
-    _, matches = complete(line_buffer="d['")
-    nt.assert_in("my_head", matches)
-    nt.assert_in("my_data", matches)
-    # complete on a nested level
-    with greedy_completion():
-        ip.user_ns['d'] = numpy.zeros(2, dtype=dt)
-        _, matches = complete(line_buffer="d[1]['my_head']['")
-        nt.assert_true(any(["my_dt" in m for m in matches]))
-        nt.assert_true(any(["my_df" in m for m in matches]))
 
 
 @dec.skip_without('pandas')

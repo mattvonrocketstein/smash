@@ -28,10 +28,10 @@ import time
 
 from string import Formatter
 
-from traitlets.config.configurable import Configurable
+from IPython.config.configurable import Configurable
 from IPython.core import release
 from IPython.utils import coloransi, py3compat
-from traitlets import (Unicode, Instance, Dict, Bool, Int)
+from IPython.utils.traitlets import (Unicode, Instance, Dict, Bool, Int)
 
 #-----------------------------------------------------------------------------
 # Color schemes for prompts
@@ -278,9 +278,9 @@ class UserNSFormatter(Formatter):
 
 class PromptManager(Configurable):
     """This is the primary interface for producing IPython's prompts."""
-    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC', allow_none=True)
+    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC')
     
-    color_scheme_table = Instance(coloransi.ColorSchemeTable, allow_none=True)
+    color_scheme_table = Instance(coloransi.ColorSchemeTable)
     color_scheme = Unicode('Linux', config=True)
     def _color_scheme_changed(self, name, new_value):
         self.color_scheme_table.set_active_scheme(new_value)

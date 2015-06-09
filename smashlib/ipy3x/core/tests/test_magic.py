@@ -8,7 +8,6 @@ from __future__ import absolute_import
 import io
 import os
 import sys
-import warnings
 from unittest import TestCase, skipIf
 
 try:
@@ -19,7 +18,6 @@ except ImportError:
 
 import nose.tools as nt
 
-from IPython import get_ipython
 from IPython.core import magic
 from IPython.core.error import UsageError
 from IPython.core.magic import (Magics, magics_class, line_magic,
@@ -619,16 +617,14 @@ def test_extension():
         tmpdir.cleanup()
 
 
-@dec.skip_without('nbformat')
-def test_notebook_export_json():
-    _ip = get_ipython()
-    _ip.history_manager.reset()   # Clear any existing history.
-    cmds = [u"a=1", u"def b():\n  return a**2", u"print('noël, été', b())"]
-    for i, cmd in enumerate(cmds, start=1):
-        _ip.history_manager.store_inputs(i, cmd)
-    with TemporaryDirectory() as td:
-        outfile = os.path.join(td, "nb.ipynb")
-        _ip.magic("notebook -e %s" % outfile)
+# The nose skip decorator doesn't work on classes, so this uses unittest's skipIf
+@skipIf(dec.module_not_available('IPython.nbformat'), 'nbformat not importable')
+class NotebookExportMagicTests(TestCase):
+    def test_notebook_export_json(self):
+        with TemporaryDirectory() as td:
+            outfile = os.path.join(td, "nb.ipynb")
+            _ip.ex(py3compat.u_format(u"u = {u}'héllo'"))
+            _ip.magic("notebook -e %s" % outfile)
 
 
 class TestEnv(TestCase):
@@ -984,13 +980,3 @@ def test_bookmark():
     with tt.AssertPrints('bmname'):
         ip.run_line_magic('bookmark', '-l')
     ip.run_line_magic('bookmark', '-d bmname')
-
-def test_ls_magic():
-    ip = get_ipython()
-    json_formatter = ip.display_formatter.formatters['application/json']
-    json_formatter.enabled = True
-    lsmagic = ip.magic('lsmagic')
-    with warnings.catch_warnings(record=True) as w:
-        j = json_formatter(lsmagic)
-    nt.assert_equal(sorted(j), ['cell', 'line'])
-    nt.assert_equal(w, []) # no warnings

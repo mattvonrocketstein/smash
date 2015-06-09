@@ -64,7 +64,7 @@ class MagicsDisplay(object):
         return magic_dict
         
     def _repr_json_(self):
-        return self._jsonable()
+        return json.dumps(self._jsonable())
 
 
 @magics_class
@@ -596,14 +596,12 @@ Defaulting color scheme to 'NoColor'"""
         """
         args = magic_arguments.parse_argstring(self.notebook, s)
 
-        from nbformat import write, v4
+        from IPython.nbformat import write, v4
         args.filename = unquote_filename(args.filename)
         if args.export:
             cells = []
             hist = list(self.shell.history_manager.get_range())
-            if(len(hist)<=1):
-                raise ValueError('History is empty, cannot export')
-            for session, execution_count, source in hist[:-1]:
+            for session, execution_count, input in hist[:-1]:
                 cells.append(v4.new_code_cell(
                     execution_count=execution_count,
                     source=source

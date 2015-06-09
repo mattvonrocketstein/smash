@@ -24,11 +24,11 @@ import os
 import re
 import sys
 
-from traitlets.config.configurable import Configurable
+from IPython.config.configurable import Configurable
 from IPython.core.error import UsageError
 
 from IPython.utils.py3compat import string_types
-from traitlets import List, Instance
+from IPython.utils.traitlets import List, Instance
 from IPython.utils.warn import error
 
 #-----------------------------------------------------------------------------
@@ -151,8 +151,8 @@ class Alias(object):
             raise InvalidAliasError("An alias command must be a string, "
                                     "got: %r" % self.cmd)
 
-        nargs = self.cmd.count('%s') - self.cmd.count('%%s')
-  
+        nargs = self.cmd.count('%s')
+
         if (nargs > 0) and (self.cmd.find('%l') >= 0):
             raise InvalidAliasError('The %s and %l specifiers are mutually '
                                     'exclusive in alias definitions.')
@@ -169,10 +169,7 @@ class Alias(object):
         if cmd.find('%l') >= 0:
             cmd = cmd.replace('%l', rest)
             rest = ''
-        
         if nargs==0:
-            if cmd.find('%%s') >= 1:
-                cmd = cmd.replace('%%s', '%s')
             # Simple, argument-less aliases
             cmd = '%s %s' % (cmd, rest)
         else:
@@ -193,7 +190,7 @@ class AliasManager(Configurable):
 
     default_aliases = List(default_aliases(), config=True)
     user_aliases = List(default_value=[], config=True)
-    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC', allow_none=True)
+    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC')
 
     def __init__(self, shell=None, **kwargs):
         super(AliasManager, self).__init__(shell=shell, **kwargs)

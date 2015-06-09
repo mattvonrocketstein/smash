@@ -11,6 +11,13 @@ asciitable
 fabric
 flake8
 pywhich
-goulash==0.52
+goulash==0.58
 reporting==0.32
 voluptuous==0.8.6
+
+#smashlib.ipy3x requirements
+git+git://github.com/ipython/traitlets.git
+pexpect
+decorator
+pickleshare
+simplegeneric>0.8

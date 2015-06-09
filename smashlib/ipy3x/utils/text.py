@@ -8,20 +8,41 @@ Inheritance diagram:
    :parts: 3
 """
 
+#-----------------------------------------------------------------------------
+#  Copyright (C) 2008-2011  The IPython Development Team
+#
+#  Distributed under the terms of the BSD License.  The full license is in
+#  the file COPYING, distributed as part of this software.
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
+
 import os
 import re
 import sys
 import textwrap
 from string import Formatter
 
+from IPython.external.path import path
 from IPython.testing.skipdoctest import skip_doctest_py3, skip_doctest
 from IPython.utils import py3compat
+
+#-----------------------------------------------------------------------------
+# Declarations
+#-----------------------------------------------------------------------------
 
 # datetime.strftime date format for ipython
 if sys.platform == 'win32':
     date_format = "%B %d, %Y"
 else:
     date_format = "%B %-d, %Y"
+
+
+#-----------------------------------------------------------------------------
+# Code
+#-----------------------------------------------------------------------------
 
 class LSString(str):
     """String derivative with a special access attributes.
@@ -31,7 +52,7 @@ class LSString(str):
         .l (or .list) : value as list (split on newlines).
         .n (or .nlstr): original value (the string itself).
         .s (or .spstr): value as whitespace-separated string.
-        .p (or .paths): list of path objects (requires path.py package)
+        .p (or .paths): list of path objects
 
     Any values which require transformations are computed only once and
     cached.
@@ -63,7 +84,6 @@ class LSString(str):
     n = nlstr = property(get_nlstr)
 
     def get_paths(self):
-        from path import path
         try:
             return self.__paths
         except AttributeError:
@@ -93,7 +113,7 @@ class SList(list):
     * .l (or .list) : value as list (the list itself).
     * .n (or .nlstr): value as a string, joined on newlines.
     * .s (or .spstr): value as a string, joined on spaces.
-    * .p (or .paths): list of path objects (requires path.py package)
+    * .p (or .paths): list of path objects
 
     Any values which require transformations are computed only once and
     cached."""
@@ -122,7 +142,6 @@ class SList(list):
     n = nlstr = property(get_nlstr)
 
     def get_paths(self):
-        from path import path
         try:
             return self.__paths
         except AttributeError:
@@ -646,6 +665,7 @@ def _get_or_default(mylist, i, default=None):
         return mylist[i]
 
 
+@skip_doctest
 def compute_item_matrix(items, empty=None, *args, **kwargs) :
     """Returns a nested list, and info to columnize items
 

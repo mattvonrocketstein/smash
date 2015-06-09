@@ -1,4 +1,3 @@
-# coding: utf-8
 """Tests for IPython.lib.pretty."""
 
 # Copyright (c) IPython Development Team.
@@ -6,13 +5,13 @@
 
 from __future__ import print_function
 
-from collections import Counter, defaultdict, deque, OrderedDict
-
+# Third-party imports
 import nose.tools as nt
 
+# Our own imports
 from IPython.lib import pretty
 from IPython.testing.decorators import skip_without
-from IPython.utils.py3compat import PY3, unicode_to_str
+from IPython.utils.py3compat import PY3
 
 if PY3:
     from io import StringIO
@@ -239,21 +238,6 @@ def test_metaclass_repr():
     nt.assert_equal(output, "[CUSTOM REPR FOR CLASS ClassWithMeta]")
 
 
-def test_unicode_repr():
-    u = u"üniçodé"
-    ustr = unicode_to_str(u)
-    
-    class C(object):
-        def __repr__(self):
-            return ustr
-    
-    c = C()
-    p = pretty.pretty(c)
-    nt.assert_equal(p, u)
-    p = pretty.pretty([c])
-    nt.assert_equal(p, u'[%s]' % u)
-
-
 def test_basic_class():
     def type_pprint_wrapper(obj, p, cycle):
         if obj is MyObj:
@@ -270,89 +254,3 @@ def test_basic_class():
 
     nt.assert_equal(output, '%s.MyObj' % __name__)
     nt.assert_true(type_pprint_wrapper.called)
-
-
-def test_collections_defaultdict():
-    # Create defaultdicts with cycles
-    a = defaultdict()
-    a.default_factory = a
-    b = defaultdict(list)
-    b['key'] = b
-
-    # Dictionary order cannot be relied on, test against single keys.
-    cases = [
-        (defaultdict(list), 'defaultdict(list, {})'),
-        (defaultdict(list, {'key': '-' * 50}),
-         "defaultdict(list,\n"
-         "            {'key': '--------------------------------------------------'})"),
-        (a, 'defaultdict(defaultdict(...), {})'),
-        (b, "defaultdict(list, {'key': defaultdict(...)})"),
-    ]
-    for obj, expected in cases:
-        nt.assert_equal(pretty.pretty(obj), expected)
-
-
-def test_collections_ordereddict():
-    # Create OrderedDict with cycle
-    a = OrderedDict()
-    a['key'] = a
-
-    cases = [
-        (OrderedDict(), 'OrderedDict()'),
-        (OrderedDict((i, i) for i in range(1000, 1010)),
-         'OrderedDict([(1000, 1000),\n'
-         '             (1001, 1001),\n'
-         '             (1002, 1002),\n'
-         '             (1003, 1003),\n'
-         '             (1004, 1004),\n'
-         '             (1005, 1005),\n'
-         '             (1006, 1006),\n'
-         '             (1007, 1007),\n'
-         '             (1008, 1008),\n'
-         '             (1009, 1009)])'),
-        (a, "OrderedDict([('key', OrderedDict(...))])"),
-    ]
-    for obj, expected in cases:
-        nt.assert_equal(pretty.pretty(obj), expected)
-
-
-def test_collections_deque():
-    # Create deque with cycle
-    a = deque()
-    a.append(a)
-
-    cases = [
-        (deque(), 'deque([])'),
-        (deque(i for i in range(1000, 1020)),
-         'deque([1000,\n'
-         '       1001,\n'
-         '       1002,\n'
-         '       1003,\n'
-         '       1004,\n'
-         '       1005,\n'
-         '       1006,\n'
-         '       1007,\n'
-         '       1008,\n'
-         '       1009,\n'
-         '       1010,\n'
-         '       1011,\n'
-         '       1012,\n'
-         '       1013,\n'
-         '       1014,\n'
-         '       1015,\n'
-         '       1016,\n'
-         '       1017,\n'
-         '       1018,\n'
-         '       1019])'),
-        (a, 'deque([deque(...)])'),
-    ]
-    for obj, expected in cases:
-        nt.assert_equal(pretty.pretty(obj), expected)
-
-def test_collections_counter():
-    cases = [
-        (Counter(), 'Counter()'),
-        (Counter(a=1), "Counter({'a': 1})"),
-    ]
-    for obj, expected in cases:
-        nt.assert_equal(pretty.pretty(obj), expected)

@@ -50,9 +50,6 @@ ip = get_ipython()
 # Tests
 #-----------------------------------------------------------------------------
 
-class DerivedInterrupt(KeyboardInterrupt):
-    pass
-
 class InteractiveShellTestCase(unittest.TestCase):
     def test_naked_string_cells(self):
         """Test that cells with only naked strings are fully executed"""
@@ -67,9 +64,8 @@ class InteractiveShellTestCase(unittest.TestCase):
         """Just make sure we don't get a horrible error with a blank
         cell of input. Yes, I did overlook that."""
         old_xc = ip.execution_count
-        res = ip.run_cell('')
+        ip.run_cell('')
         self.assertEqual(ip.execution_count, old_xc)
-        self.assertEqual(res.execution_count, None)
 
     def test_run_cell_multiline(self):
         """Multi-block, multi-line cells must execute correctly.
@@ -79,29 +75,24 @@ class InteractiveShellTestCase(unittest.TestCase):
                          "if 1:",
                          "    x += 1",
                          "    y += 1",])
-        res = ip.run_cell(src)
+        ip.run_cell(src)
         self.assertEqual(ip.user_ns['x'], 2)
         self.assertEqual(ip.user_ns['y'], 3)
-        self.assertEqual(res.success, True)
-        self.assertEqual(res.result, None)
 
     def test_multiline_string_cells(self):
         "Code sprinkled with multiline strings should execute (GH-306)"
         ip.run_cell('tmp=0')
         self.assertEqual(ip.user_ns['tmp'], 0)
-        res = ip.run_cell('tmp=1;"""a\nb"""\n')
+        ip.run_cell('tmp=1;"""a\nb"""\n')
         self.assertEqual(ip.user_ns['tmp'], 1)
-        self.assertEqual(res.success, True)
-        self.assertEqual(res.result, "a\nb")
 
     def test_dont_cache_with_semicolon(self):
         "Ending a line with semicolon should not cache the returned object (GH-307)"
         oldlen = len(ip.user_ns['Out'])
         for cell in ['1;', '1;1;']:
-            res = ip.run_cell(cell, store_history=True)
+            ip.run_cell(cell, store_history=True)
             newlen = len(ip.user_ns['Out'])
             self.assertEqual(oldlen, newlen)
-            self.assertIsNone(res.result)
         i = 0
         #also test the default caching behavior
         for cell in ['1', '1;1']:
@@ -109,10 +100,6 @@ class InteractiveShellTestCase(unittest.TestCase):
             newlen = len(ip.user_ns['Out'])
             i += 1
             self.assertEqual(oldlen+i, newlen)
-
-    def test_syntax_error(self):
-        res = ip.run_cell("raise = 3")
-        self.assertIsInstance(res.error_before_exec, SyntaxError)
 
     def test_In_variable(self):
         "Verify that In variable grows with user input (GH-284)"
@@ -343,9 +330,8 @@ class InteractiveShellTestCase(unittest.TestCase):
         
         try:
             trap.hook = failing_hook
-            res = ip.run_cell("1", silent=True)
+            ip.run_cell("1", silent=True)
             self.assertFalse(d['called'])
-            self.assertIsNone(res.result)
             # double-check that non-silent exec did what we expected
             # silent to avoid
             ip.run_cell("1")
@@ -457,11 +443,9 @@ class InteractiveShellTestCase(unittest.TestCase):
         
         ip.set_custom_exc((ValueError,), my_handler)
         try:
-            res = ip.run_cell("raise ValueError('test')")
+            ip.run_cell("raise ValueError('test')")
             # Check that this was called, and only once.
             self.assertEqual(called, [ValueError])
-            # Check that the error is on the result object
-            self.assertIsInstance(res.error_in_exec, ValueError)
         finally:
             # Reset the custom exception hook
             ip.set_custom_exc((), None)
@@ -505,6 +489,8 @@ class InteractiveShellTestCase(unittest.TestCase):
             msg = ip.get_exception_only()
         self.assertEqual(msg, 'KeyboardInterrupt\n')
 
+        class DerivedInterrupt(KeyboardInterrupt):
+            pass
         try:
             raise DerivedInterrupt("foo")
         except KeyboardInterrupt:
@@ -608,8 +594,8 @@ class TestModules(unittest.TestCase, tt.TempFileMixin):
         """
         self.mktmp("import sys\n"
                    "print('numpy' in sys.modules)\n"
-                   "print('ipyparallel' in sys.modules)\n"
-                   "print('ipykernel' in sys.modules)\n"
+                   "print('IPython.parallel' in sys.modules)\n"
+                   "print('IPython.kernel.zmq' in sys.modules)\n"
                    )
         out = "False\nFalse\nFalse\n"
         tt.ipexec_validate(self.fname, out)
@@ -774,9 +760,7 @@ class TestAstTransformInputRejection(unittest.TestCase):
             ip.run_cell("'unsafe'")
 
         with expect_exception_tb, expect_no_cell_output:
-            res = ip.run_cell("'unsafe'")
-
-        self.assertIsInstance(res.error_before_exec, InputRejected)
+            ip.run_cell("'unsafe'")
 
 def test__IPYTHON__():
     # This shouldn't raise a NameError, that's all
@@ -901,44 +885,3 @@ def test_warning_suppression():
             ip.run_cell("warnings.warn('asdf')")
     finally:
         ip.run_cell("del warnings")
-
-
-def test_deprecation_warning():
-    ip.run_cell("""
-import warnings
-def wrn():
-    warnings.warn(
-        "I AM  A WARNING",
-        DeprecationWarning
-    )
-        """)
-    try:
-        with tt.AssertPrints("I AM  A WARNING", channel="stderr"):
-            ip.run_cell("wrn()")
-    finally:
-        ip.run_cell("del warnings")
-        ip.run_cell("del wrn")
-
-
-class TestImportNoDeprecate(tt.TempFileMixin):
-
-    def setup(self):
-        """Make a valid python temp file."""
-        self.mktmp("""
-import warnings
-def wrn():
-    warnings.warn(
-        "I AM  A WARNING",
-        DeprecationWarning
-    )
-""")
-
-    def test_no_dep(self):
-        """
-        No deprecation warning should be raised from imported functions
-        """
-        ip.run_cell("from {} import wrn".format(self.fname))
-
-        with tt.AssertNotPrints("I AM  A WARNING"):
-            ip.run_cell("wrn()")
-        ip.run_cell("del wrn")

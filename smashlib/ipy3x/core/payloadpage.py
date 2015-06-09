@@ -4,9 +4,11 @@
 # Copyright (c) IPython Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-import warnings
 from IPython.core.getipython import get_ipython
 
+#-----------------------------------------------------------------------------
+# Classes and functions
+#-----------------------------------------------------------------------------
 
 def page(strng, start=0, screen_lines=0, pager_cmd=None):
     """Print a string, piping through a pager.
@@ -41,12 +43,6 @@ def page(strng, start=0, screen_lines=0, pager_cmd=None):
 
 
 def install_payload_page():
-    """DEPRECATED, use show_in_pager hook
-    
-    Install this version of page as IPython.core.page.page.
-    """
-    warnings.warn("""install_payload_page is deprecated.
-    Use `ip.set_hook('show_in_pager, page.as_hook(payloadpage.page))`
-    """)
+    """Install this version of page as IPython.core.page.page."""
     from IPython.core import page as corepage
     corepage.page = page

@@ -173,7 +173,7 @@ def late_startup_hook(self):
     #print "default startup hook ok" # dbg
 
 
-def show_in_pager(self, data, start, screen_lines):
+def show_in_pager(self,s):
     """ Run a string through pager """
     # raising TryNext here will use the default paging functionality
     raise TryNext

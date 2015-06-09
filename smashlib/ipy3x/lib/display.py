@@ -368,8 +368,7 @@ class FileLinks(FileLink):
                  result_html_prefix='',
                  result_html_suffix='<br>',
                  notebook_display_formatter=None,
-                 terminal_display_formatter=None,
-                 recursive=True):
+                 terminal_display_formatter=None):
         """
         See :class:`FileLink` for the ``path``, ``url_prefix``,
         ``result_html_prefix`` and ``result_html_suffix`` parameters.
@@ -397,8 +396,6 @@ class FileLinks(FileLink):
         included_suffixes : list
           The file suffixes that should be included in the output (passing None
           meansto include all suffixes in the output in the built-in formatters)
-        recursive : boolean
-          Whether to recurse into subdirectories. Default is True.
 
         The function should return a list of lines that will be printed in the
         notebook (if passing notebook_display_formatter) or the terminal (if
@@ -423,8 +420,6 @@ class FileLinks(FileLink):
              notebook_display_formatter or self._get_notebook_display_formatter()
         self.terminal_display_formatter = \
              terminal_display_formatter or self._get_terminal_display_formatter()
-
-        self.recursive = recursive
 
     def _get_display_formatter(self,
                                dirname_output_format,
@@ -521,10 +516,7 @@ class FileLinks(FileLink):
 
     def _format_path(self):
         result_lines = []
-        if self.recursive:
-            walked_dir = list(walk(self.path))
-        else:
-            walked_dir = [next(walk(self.path))]
+        walked_dir = list(walk(self.path))
         walked_dir.sort()
         for dirname, subdirs, fnames in walked_dir:
             result_lines += self.notebook_display_formatter(dirname, fnames, self.included_suffixes)
@@ -534,10 +526,7 @@ class FileLinks(FileLink):
         """return newline-separated absolute paths
         """
         result_lines = []
-        if self.recursive:
-            walked_dir = list(walk(self.path))
-        else:
-            walked_dir = [next(walk(self.path))]
+        walked_dir = list(walk(self.path))
         walked_dir.sort()
         for dirname, subdirs, fnames in walked_dir:
             result_lines += self.terminal_display_formatter(dirname, fnames, self.included_suffixes)

@@ -36,7 +36,7 @@ try:
 except ImportError:
     has_nose = False
 
-from traitlets.config.loader import Config
+from IPython.config.loader import Config
 from IPython.utils.process import get_output_error_code
 from IPython.utils.text import list_strings
 from IPython.utils.io import temp_pyfile, Tee
@@ -217,10 +217,7 @@ def ipexec(fname, options=None, commands=()):
     full_fname = os.path.join(test_dir, fname)
     full_cmd = ipython_cmd + cmdargs + [full_fname]
     env = os.environ.copy()
-    # FIXME: ignore all warnings in ipexec while we have shims
-    # should we keep suppressing warnings here, even after removing shims?
-    env['PYTHONWARNINGS'] = 'ignore'
-    # env.pop('PYTHONWARNINGS', None)  # Avoid extraneous warnings appearing on stderr
+    env.pop('PYTHONWARNINGS', None)  # Avoid extraneous warnings appearing on stderr
     for k, v in env.items():
         # Debug a bizarre failure we've seen on Windows:
         # TypeError: environment can only contain strings
@@ -444,6 +441,17 @@ def make_tempfile(name):
         os.unlink(name)
 
 
+@contextmanager
+def monkeypatch(obj, name, attr):
+    """
+    Context manager to replace attribute named `name` in `obj` with `attr`.
+    """
+    orig = getattr(obj, name)
+    setattr(obj, name, attr)
+    yield
+    setattr(obj, name, orig)
+
+
 def help_output_test(subcommand=''):
     """test that `ipython [subcommand] -h` works"""
     cmd = get_ipython_cmd() + [subcommand, '-h']
@@ -465,3 +473,23 @@ def help_all_output_test(subcommand=''):
     nt.assert_in("Class parameters", out)
     return out, err
 
+def assert_big_text_equal(a, b, chunk_size=80):
+    """assert that large strings are equal
+
+    Zooms in on first chunk that differs,
+    to give better info than vanilla assertEqual for large text blobs.
+    """
+    for i in range(0, len(a), chunk_size):
+        chunk_a = a[i:i + chunk_size]
+        chunk_b = b[i:i + chunk_size]
+        nt.assert_equal(chunk_a, chunk_b, "[offset: %i]\n%r != \n%r" % (
+            i, chunk_a, chunk_b))
+
+    if len(a) > len(b):
+        nt.fail("Length doesn't match (%i > %i). Extra text:\n%r" % (
+            len(a), len(b), a[len(b):]
+        ))
+    elif len(a) < len(b):
+        nt.fail("Length doesn't match (%i < %i). Extra text:\n%r" % (
+            len(a), len(b), b[len(a):]
+        ))

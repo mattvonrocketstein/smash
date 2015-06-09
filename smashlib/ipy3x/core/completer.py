@@ -61,20 +61,18 @@ import keyword
 import os
 import re
 import sys
-import unicodedata
-import string
 
-from traitlets.config.configurable import Configurable 
+from IPython.config.configurable import Configurable
 from IPython.core.error import TryNext
 from IPython.core.inputsplitter import ESC_MAGIC
-from IPython.core.latex_symbols import latex_symbols, reverse_latex_symbol
+from IPython.core.latex_symbols import latex_symbols
 from IPython.utils import generics
 from IPython.utils import io
 from IPython.utils.decorators import undoc
 from IPython.utils.dir2 import dir2
 from IPython.utils.process import arg_split
 from IPython.utils.py3compat import builtin_mod, string_types, PY3
-from traitlets import CBool, Enum
+from IPython.utils.traitlets import CBool, Enum
 
 #-----------------------------------------------------------------------------
 # Globals
@@ -418,7 +416,7 @@ def get__all__entries(obj):
     return [w for w in words if isinstance(w, string_types)]
 
 
-def match_dict_keys(keys, prefix, delims):
+def match_dict_keys(keys, prefix):
     """Used by dict_key_matches, matching the prefix to a list of keys"""
     if not prefix:
         return None, 0, [repr(k) for k in keys
@@ -429,9 +427,8 @@ def match_dict_keys(keys, prefix, delims):
         prefix_str = eval(prefix + quote, {})
     except Exception:
         return None, 0, []
-
-    pattern = '[^' + ''.join('\\' + c for c in delims) + ']*$'
-    token_match = re.search(pattern, prefix, re.UNICODE)
+    
+    token_match = re.search(r'\w*$', prefix, re.UNICODE)
     token_start = token_match.start()
     token_prefix = token_match.group()
 
@@ -475,64 +472,6 @@ def _safe_isinstance(obj, module, class_name):
     return (module in sys.modules and
             isinstance(obj, getattr(__import__(module), class_name)))
 
-
-
-def back_unicode_name_matches(text):
-    u"""Match unicode characters back to unicode name
-    
-    This does  ☃ -> \\snowman
-
-    Note that snowman is not a valid python3 combining character but will be expanded.
-    Though it will not recombine back to the snowman character by the completion machinery.
-
-    This will not either back-complete standard sequences like \n, \b ...
-    
-    Used on Python 3 only.
-    """
-    if len(text)<2:
-        return u'', ()
-    maybe_slash = text[-2]
-    if maybe_slash != '\\':
-        return u'', ()
-
-    char = text[-1]
-    # no expand on quote for completion in strings.
-    # nor backcomplete standard ascii keys
-    if char in string.ascii_letters or char in ['"',"'"]:
-        return u'', ()
-    try :
-        unic = unicodedata.name(char)
-        return '\\'+char,['\\'+unic]
-    except KeyError as e:
-        pass
-    return u'', ()
-
-def back_latex_name_matches(text):
-    u"""Match latex characters back to unicode name
-    
-    This does  ->\\sqrt
-
-    Used on Python 3 only.
-    """
-    if len(text)<2:
-        return u'', ()
-    maybe_slash = text[-2]
-    if maybe_slash != '\\':
-        return u'', ()
-
-
-    char = text[-1]
-    # no expand on quote for completion in strings.
-    # nor backcomplete standard ascii keys
-    if char in string.ascii_letters or char in ['"',"'"]:
-        return u'', ()
-    try :
-        latex = reverse_latex_symbol[char]
-        # '\\' replace the \ as well
-        return '\\'+char,[latex]
-    except KeyError as e:
-        pass
-    return u'', ()
 
 
 class IPCompleter(Completer):
@@ -924,8 +863,7 @@ class IPCompleter(Completer):
                     return list(obj.keys())
                 except Exception:
                     return []
-            elif _safe_isinstance(obj, 'numpy', 'ndarray') or\
-                 _safe_isinstance(obj, 'numpy', 'void'):
+            elif _safe_isinstance(obj, 'numpy', 'ndarray'):
                 return obj.dtype.names or []
             return []
 
@@ -974,7 +912,7 @@ class IPCompleter(Completer):
         keys = get_keys(obj)
         if not keys:
             return keys
-        closing_quote, token_offset, matches = match_dict_keys(keys, prefix, self.splitter.delims)
+        closing_quote, token_offset, matches = match_dict_keys(keys, prefix)
         if not matches:
             return matches
         
@@ -1015,32 +953,6 @@ class IPCompleter(Completer):
                 suf += ']'
         
         return [leading + k + suf for k in matches]
-
-    def unicode_name_matches(self, text):
-        u"""Match Latex-like syntax for unicode characters base 
-        on the name of the character.
-        
-        This does  \\GREEK SMALL LETTER ETA -> η
-
-        Works only on valid python 3 identifier, or on combining characters that 
-        will combine to form a valid identifier.
-        
-        Used on Python 3 only.
-        """
-        slashpos = text.rfind('\\')
-        if slashpos > -1:
-            s = text[slashpos+1:]
-            try :
-                unic = unicodedata.lookup(s)
-                # allow combining chars
-                if ('a'+unic).isidentifier():
-                    return '\\'+s,[unic]
-            except KeyError as e:
-                pass
-        return u'', []
-
-
-
 
     def latex_matches(self, text):
         u"""Match Latex syntax for unicode characters.
@@ -1144,18 +1056,11 @@ class IPCompleter(Completer):
             cursor_pos = len(line_buffer) if text is None else len(text)
 
         if PY3:
-
-            base_text = text if not line_buffer else line_buffer[:cursor_pos]
-            latex_text, latex_matches = self.latex_matches(base_text)
+            latex_text = text if not line_buffer else line_buffer[:cursor_pos]
+            latex_text, latex_matches = self.latex_matches(latex_text)
             if latex_matches:
-                 return latex_text, latex_matches
-            name_text = ''
-            name_matches = []
-            for meth in (self.unicode_name_matches, back_latex_name_matches, back_unicode_name_matches):
-                name_text, name_matches = meth(base_text)
-                if name_text:
-                    return name_text, name_matches
-        
+                return latex_text, latex_matches
+
         # if text is either None or an empty string, rely on the line buffer
         if not text:
             text = self.splitter.split_line(line_buffer, cursor_pos)
@@ -1264,4 +1169,3 @@ class IPCompleter(Completer):
             return self.matches[state]
         except IndexError:
             return None
-

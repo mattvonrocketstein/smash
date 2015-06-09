@@ -1,15 +1,17 @@
-# Copyright (c) IPython Development Team.
-# Distributed under the terms of the Modified BSD License.
-
-import json
+#-----------------------------------------------------------------------------
+#  Copyright (C) 2010-2011 The IPython Development Team.
+#
+#  Distributed under the terms of the BSD License.
+#
+#  The full license is in the file COPYING.txt, distributed with this software.
+#-----------------------------------------------------------------------------
 import os
-import warnings
 
 import nose.tools as nt
 
 from IPython.core import display
 from IPython.core.getipython import get_ipython
-from IPython import paths as ipath
+from IPython.utils import path as ipath
 
 import IPython.testing.decorators as dec
 
@@ -22,8 +24,6 @@ def test_image_size():
     nt.assert_equal(u'<img src="%s" width="200"/>' % (thisurl), img._repr_html_())
     img = display.Image(url=thisurl)
     nt.assert_equal(u'<img src="%s"/>' % (thisurl), img._repr_html_())
-    img = display.Image(url=thisurl, unconfined=True)
-    nt.assert_equal(u'<img src="%s" class="unconfined"/>' % (thisurl), img._repr_html_())
 
 def test_retina_png():
     here = os.path.dirname(__file__)
@@ -50,8 +50,11 @@ def test_image_filename_defaults():
                      embed=True)
     nt.assert_raises(ValueError, display.Image)
     nt.assert_raises(ValueError, display.Image, data='this is not an image', format='badformat', embed=True)
+    from IPython.html import DEFAULT_STATIC_FILES_PATH
     # check boths paths to allow packages to test at build and install time
-    imgfile = os.path.join(tpath, 'core/tests/2x2.png')
+    imgfile = os.path.join(tpath, 'html/static/base/images/logo.png')
+    if not os.path.exists(imgfile):
+        imgfile = os.path.join(DEFAULT_STATIC_FILES_PATH, 'base/images/logo.png')
     img = display.Image(filename=imgfile)
     nt.assert_equal('png', img.format)
     nt.assert_is_not_none(img._repr_png_())
@@ -60,7 +63,7 @@ def test_image_filename_defaults():
     nt.assert_is_none(img._repr_jpeg_())
 
 def _get_inline_config():
-    from ipykernel.pylab.config import InlineBackend
+    from IPython.kernel.zmq.pylab.config import InlineBackend
     return InlineBackend.instance()
     
 @dec.skip_without('matplotlib')
@@ -127,26 +130,3 @@ def test_displayobject_repr():
     nt.assert_equal(repr(j), object.__repr__(j))
     j._show_mem_addr = False
     nt.assert_equal(repr(j), '<IPython.core.display.Javascript object>')
-
-def test_json():
-    d = {'a': 5}
-    lis = [d]
-    j = display.JSON(d)
-    nt.assert_equal(j._repr_json_(), d)
-    
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        j = display.JSON(json.dumps(d))
-        nt.assert_equal(len(w), 1)
-        nt.assert_equal(j._repr_json_(), d)
-    
-    j = display.JSON(lis)
-    nt.assert_equal(j._repr_json_(), lis)
-    
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        j = display.JSON(json.dumps(lis))
-        nt.assert_equal(len(w), 1)
-        nt.assert_equal(j._repr_json_(), lis)
-    
-    

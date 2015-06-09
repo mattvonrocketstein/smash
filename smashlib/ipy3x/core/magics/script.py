@@ -22,7 +22,7 @@ from subprocess import Popen, PIPE
 import atexit
 
 # Our own packages
-from traitlets.config.configurable import Configurable
+from IPython.config.configurable import Configurable
 from IPython.core import magic_arguments
 from IPython.core.magic import  (
     Magics, magics_class, line_magic, cell_magic
@@ -30,7 +30,7 @@ from IPython.core.magic import  (
 from IPython.lib.backgroundjobs import BackgroundJobManager
 from IPython.utils import py3compat
 from IPython.utils.process import arg_split
-from traitlets import List, Dict
+from IPython.utils.traitlets import List, Dict
 
 #-----------------------------------------------------------------------------
 # Magic implementation classes
@@ -104,6 +104,7 @@ class ScriptMagics(Magics):
         if os.name == 'nt':
             defaults.extend([
                 'cmd',
+                'powershell',
             ])
         
         return defaults

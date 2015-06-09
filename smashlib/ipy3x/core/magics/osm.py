@@ -380,16 +380,7 @@ class OSMagics(Magics):
 
     @line_magic
     def env(self, parameter_s=''):
-        """Get, set, or list environment variables.
-
-        Usage:\\
-
-          %env: lists all environment variables/values
-          %env var: get value for var
-          %env var val: set value for var
-          %env var=val: set value for var
-          %env var=$val: set value for var, using python expansion if possible
-        """
+        """List environment variables."""
         if parameter_s.strip():
             split = '=' if '=' in parameter_s else ' '
             bits = parameter_s.split(split)
@@ -411,9 +402,7 @@ class OSMagics(Magics):
         string.
 
         Usage:\\
-          %set_env var val: set value for var
-          %set_env var=val: set value for var
-          %set_env var=$val: set value for var, using python expansion if possible
+        %set_env var val
         """
         split = '=' if '=' in parameter_s else ' '
         bits = parameter_s.split(split, 1)

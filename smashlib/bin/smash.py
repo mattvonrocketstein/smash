@@ -5,36 +5,29 @@ import os,sys
 import imp
 import logging
 from smashlib.util import require_ipy
-
+#from smashlib.util.reflect import namedAny
+import importlib
 class RewriteIPythonImport(object):
     def __init__(self):
-        self.module_names = ['IPython']
+        pass
 
     def find_module(self, fullname, path=None):
-        print fullname,path
-        if fullname in self.module_names:
-            logging.warning("rewriting IPython import: %s", fullname, path)
+        print fullname, path
+        if fullname.startswith('IPython'):
+            new_fullname = ['smashlib','ipy3x']+fullname.split('.')[1:]
+            new_fullname='.'.join(new_fullname)
+            logging.warning("rewriting IPython import: {0}->{1}".format(fullname, new_fullname))
             self.path = path
+            self.original_name = fullname
+            self.rewritten_name = new_fullname
             return self
         return None
 
     def load_module(self, name):
-        if name in sys.modules:
-            return sys.modules[name]
-        from smashlib import ipy3x
-        sys.modules[name] = ipy3x
-        return ipy3x
+        result = importlib.import_module(self.rewritten_name)
+        sys.modules[name] = result
+        return result
 
-def my_import(name):
-    try:
-        m = __import__(name)
-        for n in name.split(".")[1:]:
-            m = getattr(m, n)
-    except ImportError:
-        raise ImportError("No such module: "+name)
-    #except AttributeError:
-    #    raise ImportError('No such module "{0}" in {1}'.format(n,m))
-    return m
 sys.meta_path = [RewriteIPythonImport()]
 from IPython.terminal.interactiveshell import get_default_editor
 

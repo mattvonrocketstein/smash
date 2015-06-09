@@ -30,11 +30,26 @@ def safe_hasattr(obj, attr):
         return False
 
 
+def get_class_members(cls):
+    ret = dir(cls)
+    if safe_hasattr(cls, '__bases__'):
+        try:
+            bases = cls.__bases__
+        except AttributeError:
+            # `obj` lied to hasattr (e.g. Pyro), ignore
+            pass
+        else:
+            for base in bases:
+                ret.extend(get_class_members(base))
+    return ret
+
+
 def dir2(obj):
     """dir2(obj) -> list of strings
 
     Extended version of the Python builtin dir(), which does a few extra
-    checks, and handles Traits objects, which can confuse dir().
+    checks, and supports common objects with unusual internals that confuse
+    dir(), such as Traits and PyCrust.
 
     This version is guaranteed to return only a list of true strings, whereas
     dir() returns anything that objects inject into themselves, even if they
@@ -50,6 +65,22 @@ def dir2(obj):
     except Exception:
         # TypeError: dir(obj) does not return a list
         words = set()
+
+    if safe_hasattr(obj, '__class__'):
+        #words.add('__class__')
+        words |= set(get_class_members(obj.__class__))
+
+
+    # for objects with Enthought's traits, add trait_names() list
+    # for PyCrust-style, add _getAttributeNames() magic method list
+    for attr in ('trait_names', '_getAttributeNames'):
+        try:
+            func = getattr(obj, attr)
+            if callable(func):
+                words |= set(func())
+        except:
+            # TypeError: obj is class not instance
+            pass
 
     # filter out non-string attributes which may be stuffed by dir() calls
     # and poor coding in third-party modules

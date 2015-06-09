@@ -28,7 +28,6 @@ from __future__ import print_function
 
 import bdb
 import functools
-import inspect
 import linecache
 import sys
 
@@ -303,9 +302,6 @@ class Pdb(OldPdb):
         if hasattr(self, 'old_all_completions'):
             self.shell.Completer.all_completions=self.old_all_completions
 
-        # Pdb sets readline delimiters, so set them back to our own
-        if self.shell.readline is not None:
-            self.shell.readline.set_completer_delims(self.shell.readline_delims)
 
         return OldPdb.do_quit(self, arg)
 
@@ -514,28 +510,6 @@ class Pdb(OldPdb):
 
     do_l = do_list
 
-    def getsourcelines(self, obj):
-        lines, lineno = inspect.findsource(obj)
-        if inspect.isframe(obj) and obj.f_globals is obj.f_locals:
-            # must be a module frame: do not try to cut a block out of it
-            return lines, 1
-        elif inspect.ismodule(obj):
-            return lines, 1
-        return inspect.getblock(lines[lineno:]), lineno+1
-
-    def do_longlist(self, arg):
-        self.lastcmd = 'longlist'
-        filename = self.curframe.f_code.co_filename
-        breaklist = self.get_file_breaks(filename)
-        try:
-            lines, lineno = self.getsourcelines(self.curframe)
-        except OSError as err:
-            self.error(err)
-            return
-        last = lineno + len(lines)
-        self.print_list_lines(self.curframe.f_code.co_filename, lineno, last)
-    do_ll = do_longlist
-
     def do_pdef(self, arg):
         """Print the call signature for any callable object.
 
@@ -582,3 +556,36 @@ class Pdb(OldPdb):
         namespaces = [('Locals', self.curframe.f_locals),
                       ('Globals', self.curframe.f_globals)]
         self.shell.find_line_magic('psource')(arg, namespaces=namespaces)
+
+    def checkline(self, filename, lineno):
+        """Check whether specified line seems to be executable.
+
+        Return `lineno` if it is, 0 if not (e.g. a docstring, comment, blank
+        line or EOF). Warning: testing is not comprehensive.
+        """
+        #######################################################################
+        # XXX Hack!  Use python-2.5 compatible code for this call, because with
+        # all of our changes, we've drifted from the pdb api in 2.6.  For now,
+        # changing:
+        #
+        #line = linecache.getline(filename, lineno, self.curframe.f_globals)
+        # to:
+        #
+        line = linecache.getline(filename, lineno)
+        #
+        # does the trick.  But in reality, we need to fix this by reconciling
+        # our updates with the new Pdb APIs in Python 2.6.
+        #
+        # End hack.  The rest of this method is copied verbatim from 2.6 pdb.py
+        #######################################################################
+
+        if not line:
+            print('End of file', file=self.stdout)
+            return 0
+        line = line.strip()
+        # Don't allow setting breakpoint at a blank line
+        if (not line or (line[0] == '#') or
+             (line[:3] == '"""') or line[:3] == "'''"):
+            print('*** Blank or comment', file=self.stdout)
+            return 0
+        return lineno

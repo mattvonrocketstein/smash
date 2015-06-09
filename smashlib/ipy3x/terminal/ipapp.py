@@ -3,10 +3,25 @@
 """
 The :class:`~IPython.core.application.Application` object for the command
 line :command:`ipython` program.
+
+Authors
+-------
+
+* Brian Granger
+* Fernando Perez
+* Min Ragan-Kelley
 """
 
-# Copyright (c) IPython Development Team.
-# Distributed under the terms of the Modified BSD License.
+#-----------------------------------------------------------------------------
+#  Copyright (C) 2008-2011  The IPython Development Team
+#
+#  Distributed under the terms of the BSD License.  The full license is in
+#  the file COPYING, distributed as part of this software.
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -15,8 +30,8 @@ import logging
 import os
 import sys
 
-from traitlets.config.loader import Config
-from traitlets.config.application import boolean_flag, catch_config_error, Application
+from IPython.config.loader import Config
+from IPython.config.application import boolean_flag, catch_config_error, Application
 from IPython.core import release
 from IPython.core import usage
 from IPython.core.completer import IPCompleter
@@ -34,8 +49,8 @@ from IPython.core.shellapp import (
 from IPython.extensions.storemagic import StoreMagics
 from IPython.terminal.interactiveshell import TerminalInteractiveShell
 from IPython.utils import warn
-from IPython.paths import get_ipython_dir
-from traitlets import (
+from IPython.utils.path import get_ipython_dir, check_for_old_config
+from IPython.utils.traitlets import (
     Bool, List, Dict,
 )
 
@@ -207,20 +222,20 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
         ]
 
     subcommands = dict(
-        qtconsole=('qtconsole.qtconsoleapp.JupyterQtConsoleApp',
-            """DEPRECATD: Launch the Jupyter Qt Console."""
+        qtconsole=('IPython.qt.console.qtconsoleapp.IPythonQtConsoleApp',
+            """Launch the IPython Qt Console."""
         ),
-        notebook=('notebook.notebookapp.NotebookApp',
-            """DEPRECATED: Launch the Jupyter HTML Notebook Server."""
+        notebook=('IPython.html.notebookapp.NotebookApp',
+            """Launch the IPython HTML Notebook Server."""
         ),
         profile = ("IPython.core.profileapp.ProfileApp",
             "Create and manage IPython profiles."
         ),
-        kernel = ("ipykernel.kernelapp.IPKernelApp",
+        kernel = ("IPython.kernel.zmq.kernelapp.IPKernelApp",
             "Start a kernel without an attached frontend."
         ),
-        console=('jupyter_console.app.ZMQTerminalIPythonApp',
-            """DEPRECATED: Launch the Jupyter terminal-based Console."""
+        console=('IPython.terminal.console.app.ZMQTerminalIPythonApp',
+            """Launch the IPython terminal-based Console."""
         ),
         locate=('IPython.terminal.ipapp.LocateIPythonApp',
             LocateIPythonApp.description
@@ -228,30 +243,34 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
         history=('IPython.core.historyapp.HistoryApp',
             "Manage the IPython history database."
         ),
-        nbconvert=('nbconvert.nbconvertapp.NbConvertApp',
-            "DEPRECATED: Convert notebooks to/from other formats."
+        nbconvert=('IPython.nbconvert.nbconvertapp.NbConvertApp',
+            "Convert notebooks to/from other formats."
         ),
-        trust=('nbformat.sign.TrustNotebookApp',
-            "DEPRECATED: Sign notebooks to trust their potentially unsafe contents at load."
+        trust=('IPython.nbformat.sign.TrustNotebookApp',
+            "Sign notebooks to trust their potentially unsafe contents at load."
         ),
-        kernelspec=('jupyter_client.kernelspecapp.KernelSpecApp',
-            "DEPRECATED: Manage Jupyter kernel specifications."
+        kernelspec=('IPython.kernel.kernelspecapp.KernelSpecApp',
+            "Manage IPython kernel specifications."
         ),
     )
     subcommands['install-nbextension'] = (
-        "notebook.nbextensions.NBExtensionApp",
-        "DEPRECATED: Install Jupyter notebook extension files"
+        "IPython.html.nbextensions.NBExtensionApp",
+        "Install IPython notebook extension files"
     )
 
     # *do* autocreate requested profile, but don't create the config file.
     auto_create=Bool(True)
     # configurables
+    ignore_old_config=Bool(False, config=True,
+        help="Suppress warning messages about legacy config files"
+    )
     quick = Bool(False, config=True,
         help="""Start IPython quickly by skipping the loading of config files."""
     )
     def _quick_changed(self, name, old, new):
         if new:
             self.load_config_file = lambda *a, **kw: None
+            self.ignore_old_config=True
 
     display_banner = Bool(True, config=True,
         help="Whether to display a banner upon starting IPython."
@@ -303,6 +322,8 @@ class TerminalIPythonApp(BaseIPythonApplication, InteractiveShellApp):
         if self.subapp is not None:
             # don't bother initializing further, starting subapp
             return
+        if not self.ignore_old_config:
+            check_for_old_config(self.ipython_dir)
         # print self.extra_args
         if self.extra_args and not self.something_to_run:
             self.file_to_run = self.extra_args[0]

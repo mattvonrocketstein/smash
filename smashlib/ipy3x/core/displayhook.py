@@ -10,14 +10,12 @@ This defines a callable class that IPython uses for `sys.displayhook`.
 from __future__ import print_function
 
 import sys
-import io as _io
-import tokenize
 
 from IPython.core.formatters import _safe_get_formatter_method
-from traitlets.config.configurable import Configurable
+from IPython.config.configurable import Configurable
 from IPython.utils import io
-from IPython.utils.py3compat import builtin_mod, cast_unicode_py2
-from traitlets import Instance, Float
+from IPython.utils.py3compat import builtin_mod
+from IPython.utils.traitlets import Instance, Float
 from IPython.utils.warn import warn
 
 # TODO: Move the various attributes (cache_size, [others now moved]). Some
@@ -31,10 +29,7 @@ class DisplayHook(Configurable):
     that gets called anytime user code returns a value.
     """
 
-    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC',
-                     allow_none=True)
-    exec_result = Instance('IPython.core.interactiveshell.ExecutionResult',
-                           allow_none=True)
+    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC')
     cull_fraction = Float(0.2)
 
     def __init__(self, shell=None, cache_size=1000, **kwargs):
@@ -85,23 +80,12 @@ class DisplayHook(Configurable):
     def quiet(self):
         """Should we silence the display hook because of ';'?"""
         # do not print output if input ends in ';'
-        
         try:
-            cell = cast_unicode_py2(self.shell.history_manager.input_hist_parsed[-1])
+            cell = self.shell.history_manager.input_hist_parsed[self.prompt_count]
+            return cell.rstrip().endswith(';')
         except IndexError:
             # some uses of ipshellembed may fail here
             return False
-        
-        sio = _io.StringIO(cell)
-        tokens = list(tokenize.generate_tokens(sio.readline))
-
-        for token in reversed(tokens):
-            if token[0] in (tokenize.ENDMARKER, tokenize.COMMENT):
-                continue
-            if (token[0] == tokenize.OP) and (token[1] == ';'):
-                return True
-            else:
-                return False
 
     def start_displayhook(self):
         """Start the displayhook, initializing resources."""
@@ -214,10 +198,6 @@ class DisplayHook(Configurable):
                 self.shell.push(to_main, interactive=False)
                 self.shell.user_ns['_oh'][self.prompt_count] = result
 
-    def fill_exec_result(self, result):
-        if self.exec_result is not None:
-            self.exec_result.result = result
-
     def log_output(self, format_dict):
         """Log the output."""
         if 'text/plain' not in format_dict:
@@ -241,14 +221,20 @@ class DisplayHook(Configurable):
         """
         self.check_for_underscore()
         if result is not None and not self.quiet():
+            # If _ipython_display_ is defined, use that to display this object.
+            display_method = _safe_get_formatter_method(result, '_ipython_display_')
+            if display_method is not None:
+                try:
+                    return display_method()
+                except NotImplementedError:
+                    pass
+            
             self.start_displayhook()
             self.write_output_prompt()
             format_dict, md_dict = self.compute_format_data(result)
+            self.write_format_data(format_dict, md_dict)
             self.update_user_ns(result)
-            self.fill_exec_result(result)
-            if format_dict:
-                self.write_format_data(format_dict, md_dict)
-                self.log_output(format_dict)
+            self.log_output(format_dict)
             self.finish_displayhook()
 
     def cull_cache(self):

@@ -22,8 +22,7 @@ backends = {'tk': 'TkAgg',
             'qt5': 'Qt5Agg',
             'osx': 'MacOSX',
             'nbagg': 'nbAgg',
-            'notebook': 'nbAgg',
-            'inline' : 'module://ipykernel.pylab.backend_inline'}
+            'inline' : 'module://IPython.kernel.zmq.pylab.backend_inline'}
 
 # We also need a reverse backends2guis mapping that will properly choose which
 # GUI support to activate based on the desired matplotlib backend.  For the
@@ -182,7 +181,7 @@ def select_figure_formats(shell, formats, **kwargs):
         Extra keyword arguments to be passed to fig.canvas.print_figure.
     """
     from matplotlib.figure import Figure
-    from ipykernel.pylab import backend_inline
+    from IPython.kernel.zmq.pylab import backend_inline
 
     svg_formatter = shell.display_formatter.formatters['image/svg+xml']
     png_formatter = shell.display_formatter.formatters['image/png']
@@ -233,7 +232,7 @@ def find_gui_and_backend(gui=None, gui_select=None):
     Returns
     -------
     A tuple of (gui, backend) where backend is one of ('TkAgg','GTKAgg',
-    'WXAgg','Qt4Agg','module://ipykernel.pylab.backend_inline').
+    'WXAgg','Qt4Agg','module://IPython.kernel.zmq.pylab.backend_inline').
     """
 
     import matplotlib
@@ -334,7 +333,7 @@ def configure_inline_support(shell, backend):
     # continuing (such as in terminal-only shells in environments without
     # zeromq available).
     try:
-        from ipykernel.pylab.backend_inline import InlineBackend
+        from IPython.kernel.zmq.pylab.backend_inline import InlineBackend
     except ImportError:
         return
     from matplotlib import pyplot
@@ -345,7 +344,7 @@ def configure_inline_support(shell, backend):
         shell.configurables.append(cfg)
 
     if backend == backends['inline']:
-        from ipykernel.pylab.backend_inline import flush_figures
+        from IPython.kernel.zmq.pylab.backend_inline import flush_figures
         shell.events.register('post_execute', flush_figures)
 
         # Save rcParams that will be overwrittern
@@ -355,7 +354,7 @@ def configure_inline_support(shell, backend):
         # load inline_rc
         pyplot.rcParams.update(cfg.rc)
     else:
-        from ipykernel.pylab.backend_inline import flush_figures
+        from IPython.kernel.zmq.pylab.backend_inline import flush_figures
         try:
             shell.events.unregister('post_execute', flush_figures)
         except ValueError:

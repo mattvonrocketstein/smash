@@ -23,11 +23,6 @@ import tempfile
 import textwrap
 import unittest
 
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
-
 import nose.tools as nt
 from nose import SkipTest
 
@@ -375,10 +370,10 @@ tclass.py: deleting object: C-third
         with tt.AssertNotPrints('SystemExit'):
             _ip.magic('run -e %s' % self.fname)
 
-    @dec.skip_without('nbformat')  # Requires jsonschema
+    @dec.skip_without('IPython.nbformat')  # Requires jsonschema
     def test_run_nb(self):
         """Test %run notebook.ipynb"""
-        from nbformat import v4, writes
+        from IPython.nbformat import v4, writes
         nb = v4.new_notebook(
            cells=[
                 v4.new_markdown_cell("The Ultimate Question of Everything"),
@@ -453,7 +448,7 @@ class TestMagicRunWithPackage(unittest.TestCase):
     def with_fake_debugger(func):
         @functools.wraps(func)
         def wrapper(*args, **kwds):
-            with patch.object(debugger.Pdb, 'run', staticmethod(eval)):
+            with tt.monkeypatch(debugger.Pdb, 'run', staticmethod(eval)):
                 return func(*args, **kwds)
         return wrapper
 

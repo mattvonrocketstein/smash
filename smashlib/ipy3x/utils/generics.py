@@ -1,11 +1,26 @@
 # encoding: utf-8
 """Generic functions for extending IPython.
 
-See http://pypi.python.org/pypi/simplegeneric.
+See http://cheeseshop.python.org/pypi/simplegeneric.
 """
 
+#-----------------------------------------------------------------------------
+#  Copyright (C) 2008-2011  The IPython Development Team
+#
+#  Distributed under the terms of the BSD License.  The full license is in
+#  the file COPYING, distributed as part of this software.
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
+
 from IPython.core.error import TryNext
-from simplegeneric import generic
+from IPython.external.simplegeneric import generic
+
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
 
 
 @generic

@@ -24,15 +24,15 @@ from __future__ import print_function
 
 import os
 
-from traitlets.config.application import Application
+from IPython.config.application import Application
 from IPython.core.application import (
     BaseIPythonApplication, base_flags
 )
 from IPython.core.profiledir import ProfileDir
 from IPython.utils.importstring import import_item
-from IPython.paths import get_ipython_dir, get_ipython_package_dir
+from IPython.utils.path import get_ipython_dir, get_ipython_package_dir
 from IPython.utils import py3compat
-from traitlets import Unicode, Bool, Dict
+from IPython.utils.traitlets import Unicode, Bool, Dict
 
 #-----------------------------------------------------------------------------
 # Constants
@@ -112,7 +112,7 @@ def list_profiles_in(path):
 
 def list_bundled_profiles():
     """list profiles that are bundled with IPython."""
-    path = os.path.join(get_ipython_package_dir(), u'core', u'profile')
+    path = os.path.join(get_ipython_package_dir(), u'config', u'profile')
     files = os.listdir(path)
     profiles = []
     for profile in files:
@@ -261,19 +261,25 @@ class ProfileCreate(BaseIPythonApplication):
         from IPython.terminal.ipapp import TerminalIPythonApp
         apps = [TerminalIPythonApp]
         for app_path in (
-            'ipykernel.kernelapp.IPKernelApp',
+            'IPython.kernel.zmq.kernelapp.IPKernelApp',
+            'IPython.terminal.console.app.ZMQTerminalIPythonApp',
+            'IPython.qt.console.qtconsoleapp.IPythonQtConsoleApp',
+            'IPython.html.notebookapp.NotebookApp',
+            'IPython.nbconvert.nbconvertapp.NbConvertApp',
         ):
             app = self._import_app(app_path)
             if app is not None:
                 apps.append(app)
         if self.parallel:
-            from ipyparallel.apps.ipcontrollerapp import IPControllerApp
-            from ipyparallel.apps.ipengineapp import IPEngineApp
-            from ipyparallel.apps.ipclusterapp import IPClusterStart
+            from IPython.parallel.apps.ipcontrollerapp import IPControllerApp
+            from IPython.parallel.apps.ipengineapp import IPEngineApp
+            from IPython.parallel.apps.ipclusterapp import IPClusterStart
+            from IPython.parallel.apps.iploggerapp import IPLoggerApp
             apps.extend([
                 IPControllerApp,
                 IPEngineApp,
                 IPClusterStart,
+                IPLoggerApp,
             ])
         for App in apps:
             app = App()

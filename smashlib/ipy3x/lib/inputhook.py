@@ -3,8 +3,16 @@
 Inputhook management for GUI event loop integration.
 """
 
-# Copyright (c) IPython Development Team.
-# Distributed under the terms of the Modified BSD License.
+#-----------------------------------------------------------------------------
+#  Copyright (C) 2008-2011  The IPython Development Team
+#
+#  Distributed under the terms of the BSD License.  The full license is in
+#  the file COPYING, distributed as part of this software.
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
 
 try:
     import ctypes
@@ -13,7 +21,6 @@ except ImportError:
 except SystemError: # IronPython issue, 2/8/2014
     ctypes = None
 import os
-import platform
 import sys
 from distutils.version import LooseVersion as V
 
@@ -50,14 +57,8 @@ def _stdin_ready_nt():
 
 def _stdin_ready_other():
     """Return True, assuming there's something to read on stdin."""
-    return True
+    return True #
 
-def _use_appnope():
-    """Should we use appnope for dealing with OS X app nap?
-
-    Checks if we are on OS X 10.9 or greater.
-    """
-    return sys.platform == 'darwin' and V(platform.mac_ver()[0]) >= V('10.9')
 
 def _ignore_CTRL_C_posix():
     """Ignore CTRL+C (SIGINT)."""
@@ -107,8 +108,8 @@ class InputHookManager(object):
     def __init__(self):
         if ctypes is None:
             warn("IPython GUI event loop requires ctypes, %gui will not be available")
-        else:
-            self.PYFUNC = ctypes.PYFUNCTYPE(ctypes.c_int)
+            return
+        self.PYFUNC = ctypes.PYFUNCTYPE(ctypes.c_int)
         self.guihooks = {}
         self.aliases = {}
         self.apps = {}
@@ -197,11 +198,10 @@ class InputHookManager(object):
                     ...
         """
         def decorator(cls):
-            if ctypes is not None:
-                inst = cls(self)
-                self.guihooks[toolkitname] = inst
-                for a in aliases:
-                    self.aliases[a] = toolkitname
+            inst = cls(self)
+            self.guihooks[toolkitname] = inst
+            for a in aliases:
+                self.aliases[a] = toolkitname
             return cls
         return decorator
 
@@ -317,10 +317,9 @@ class WxInputHook(InputHookBase):
             raise ValueError("requires wxPython >= 2.8, but you have %s" % wx.__version__)
         
         from IPython.lib.inputhookwx import inputhook_wx
+        from IPython.external.appnope import nope
         self.manager.set_inputhook(inputhook_wx)
-        if _use_appnope():
-            from appnope import nope
-            nope()
+        nope()
 
         import wx
         if app is None:
@@ -335,9 +334,8 @@ class WxInputHook(InputHookBase):
 
         This restores appnapp on OS X
         """
-        if _use_appnope():
-            from appnope import nap
-            nap()
+        from IPython.external.appnope import nap
+        nap()
 
 @inputhook_manager.register('qt', 'qt4')
 class Qt4InputHook(InputHookBase):
@@ -364,11 +362,10 @@ class Qt4InputHook(InputHookBase):
             app = QtGui.QApplication(sys.argv)
         """
         from IPython.lib.inputhookqt4 import create_inputhook_qt4
+        from IPython.external.appnope import nope
         app, inputhook_qt4 = create_inputhook_qt4(self.manager, app)
         self.manager.set_inputhook(inputhook_qt4)
-        if _use_appnope():
-            from appnope import nope
-            nope()
+        nope()
 
         return app
 
@@ -377,9 +374,8 @@ class Qt4InputHook(InputHookBase):
 
         This restores appnapp on OS X
         """
-        if _use_appnope():
-            from appnope import nap
-            nap()
+        from IPython.external.appnope import nap
+        nap()
 
 
 @inputhook_manager.register('qt5')

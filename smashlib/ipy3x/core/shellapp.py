@@ -2,10 +2,23 @@
 """
 A mixin for :class:`~IPython.core.application.Application` classes that
 launch InteractiveShell instances, load extensions, etc.
+
+Authors
+-------
+
+* Min Ragan-Kelley
 """
 
-# Copyright (c) IPython Development Team.
-# Distributed under the terms of the Modified BSD License.
+#-----------------------------------------------------------------------------
+#  Copyright (C) 2008-2011  The IPython Development Team
+#
+#  Distributed under the terms of the BSD License.  The full license is in
+#  the file COPYING, distributed as part of this software.
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------------
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -14,14 +27,14 @@ import glob
 import os
 import sys
 
-from traitlets.config.application import boolean_flag
-from traitlets.config.configurable import Configurable
-from traitlets.config.loader import Config
+from IPython.config.application import boolean_flag
+from IPython.config.configurable import Configurable
+from IPython.config.loader import Config
 from IPython.core import pylabtools
 from IPython.utils import py3compat
 from IPython.utils.contexts import preserve_keys
 from IPython.utils.path import filefind
-from traitlets import (
+from IPython.utils.traitlets import (
     Unicode, Instance, List, Bool, CaselessStrEnum
 )
 from IPython.lib.inputhook import guis
@@ -63,15 +76,19 @@ addflag('pprint', 'PlainTextFormatter.pprint',
     "Disable auto pretty printing of results."
 )
 addflag('color-info', 'InteractiveShell.color_info',
-    """IPython can display information about objects via a set of functions,
-    and optionally can use colors for this, syntax highlighting
-    source code and various other elements. This is on by default, but can cause
-    problems with some pagers. If you see such problems, you can disable the
-    colours.""",
+    """IPython can display information about objects via a set of func-
+    tions, and optionally can use colors for this, syntax highlighting
+    source code and various other elements.  However, because this
+    information is passed through a pager (like 'less') and many pagers get
+    confused with color codes, this option is off by default.  You can test
+    it and turn it on permanently in your ipython_config.py file if it
+    works for you.  Test it and turn it on permanently if it works with
+    your system.  The magic function %%color_info allows you to toggle this
+    interactively for testing.""",
     "Disable using colors for info related things."
 )
 addflag('deep-reload', 'InteractiveShell.deep_reload',
-    """ **Deprecated** Enable deep (recursive) reloading by default. IPython can use the
+    """Enable deep (recursive) reloading by default. IPython can use the
     deep_reload module which reloads changes in modules recursively (it
     replaces the reload() function, so you don't need to change anything to
     use it). deep_reload() forces a full reload of modules whose code may
@@ -139,13 +156,11 @@ class InteractiveShellApp(Configurable):
     extra_extension = Unicode('', config=True,
         help="dotted module name of an IPython extension to load."
     )
-
-    reraise_ipython_extension_failures = Bool(
-        False,
-        config=True,
-        help="Reraise exceptions encountered loading IPython extensions?",
-    )
-
+    def _extra_extension_changed(self, name, old, new):
+        if new:
+            # add to self.extensions
+            self.extensions.append(new)
+    
     # Extensions that are always loaded (not configurable)
     default_extensions = List(Unicode, [u'storemagic'], config=False)
     
@@ -173,15 +188,15 @@ class InteractiveShellApp(Configurable):
     module_to_run = Unicode('', config=True,
         help="Run the module as a script."
     )
-    gui = CaselessStrEnum(gui_keys, config=True, allow_none=True,
+    gui = CaselessStrEnum(gui_keys, config=True,
         help="Enable GUI event loop integration with any of {0}.".format(gui_keys)
     )
-    matplotlib = CaselessStrEnum(backend_keys, allow_none=True,
+    matplotlib = CaselessStrEnum(backend_keys,
         config=True,
         help="""Configure matplotlib for interactive use with
         the default matplotlib backend."""
     )
-    pylab = CaselessStrEnum(backend_keys, allow_none=True,
+    pylab = CaselessStrEnum(backend_keys,
         config=True,
         help="""Pre-load matplotlib and numpy for interactive use,
         selecting a particular matplotlib backend and loop integration.
@@ -194,8 +209,7 @@ class InteractiveShellApp(Configurable):
         When False, pylab mode should not import any names into the user namespace.
         """
     )
-    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC',
-                     allow_none=True)
+    shell = Instance('IPython.core.interactiveshell.InteractiveShellABC')
     
     user_ns = Instance(dict, args=None, allow_none=True)
     def _user_ns_changed(self, name, old, new):
@@ -259,25 +273,18 @@ class InteractiveShellApp(Configurable):
         try:
             self.log.debug("Loading IPython extensions...")
             extensions = self.default_extensions + self.extensions
-            if self.extra_extension:
-                extensions.append(self.extra_extension)
             for ext in extensions:
                 try:
                     self.log.info("Loading IPython extension: %s" % ext)
                     self.shell.extension_manager.load_extension(ext)
                 except:
-                    if self.reraise_ipython_extension_failures:
-                        raise
-                    msg = ("Error in loading extension: {ext}\n"
-                           "Check your config files in {location}".format(
-                               ext=ext,
-                               location=self.profile_dir.location
-                           ))
-                    self.log.warn(msg, exc_info=True)
+                    self.log.warn("Error in loading extension: %s" % ext +
+                        "\nCheck your config files in %s" % self.profile_dir.location
+                    )
+                    self.shell.showtraceback()
         except:
-            if self.reraise_ipython_extension_failures:
-                raise
-            self.log.warn("Unknown error in loading extensions:", exc_info=True)
+            self.log.warn("Unknown error in loading extensions:")
+            self.shell.showtraceback()
 
     def init_code(self):
         """run the pre-flight code, specified via exec_lines"""

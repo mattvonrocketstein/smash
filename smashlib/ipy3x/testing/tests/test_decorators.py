@@ -12,6 +12,7 @@ import nose.tools as nt
 
 # Our own
 from IPython.testing import decorators as dec
+from IPython.testing.skipdoctest import skip_doctest
 
 #-----------------------------------------------------------------------------
 # Utilities
@@ -60,6 +61,7 @@ def test_deliberately_broken2():
 
 # Verify that we can correctly skip the doctest for a function at will, but
 # that the docstring itself is NOT destroyed by the decorator.
+@skip_doctest
 def doctest_bad(x,y=1,**k):
     """A function whose doctest we need to skip.
 
@@ -107,6 +109,7 @@ class FooClass(object):
     2
     """
 
+    @skip_doctest
     def __init__(self,x):
         """Make a FooClass.
 
@@ -118,6 +121,7 @@ class FooClass(object):
         print('Making a FooClass.')
         self.x = x
         
+    @skip_doctest
     def bar(self,y):
         """Example:
 

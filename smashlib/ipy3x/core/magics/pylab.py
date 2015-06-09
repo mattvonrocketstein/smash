@@ -14,7 +14,7 @@ from __future__ import print_function
 #-----------------------------------------------------------------------------
 
 # Our own packages
-from traitlets.config.application import Application
+from IPython.config.application import Application
 from IPython.core import magic_arguments
 from IPython.core.magic import Magics, magics_class, line_magic
 from IPython.testing.skipdoctest import skip_doctest
@@ -42,8 +42,6 @@ class PylabMagics(Magics):
     @skip_doctest
     @line_magic
     @magic_arguments.magic_arguments()
-    @magic_arguments.argument('-l', '--list', action='store_true',
-                              help='Show available matplotlib backends')
     @magic_gui_arg
     def matplotlib(self, line=''):
         """Set up matplotlib to work interactively.
@@ -59,17 +57,9 @@ class PylabMagics(Magics):
             
             In [2]: set_matplotlib_formats('pdf', 'svg')
 
-        The default for inline figures sets `bbox_inches` to 'tight'. This can
-        cause discrepancies between the displayed image and the identical
-        image created using `savefig`. This behavior can be disabled using the
-        `%config` magic::
-            
-            In [3]: %config InlineBackend.print_figure_kwargs = {'bbox_inches':None}
-
-        In addition, see the docstring of
-        `IPython.display.set_matplotlib_formats` and
+        See the docstring of `IPython.display.set_matplotlib_formats` and
         `IPython.display.set_matplotlib_close` for more information on
-        changing additional behaviors of the inline backend.
+        changing the behavior of the inline backend.
 
         Examples
         --------
@@ -85,20 +75,10 @@ class PylabMagics(Magics):
         But you can explicitly request a different GUI backend::
 
             In [3]: %matplotlib qt
-
-        You can list the available backends using the -l/--list option
-
-           In [4]: %matplotlib --list
-           Available matplotlib backends: ['osx', 'qt4', 'qt5', 'gtk3', 'notebook', 'wx', 'qt', 'nbagg',
-            'gtk', 'tk', 'inline']
         """
         args = magic_arguments.parse_argstring(self.matplotlib, line)
-        if args.list:
-            backends_list = list(backends.keys())
-            print("Available matplotlib backends: %s" % backends_list)
-        else:
-            gui, backend = self.shell.enable_matplotlib(args.gui)
-            self._show_matplotlib_backend(args.gui, backend)
+        gui, backend = self.shell.enable_matplotlib(args.gui)
+        self._show_matplotlib_backend(args.gui, backend)
 
     @skip_doctest
     @line_magic

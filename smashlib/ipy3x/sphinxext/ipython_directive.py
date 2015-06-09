@@ -126,14 +126,12 @@ from __future__ import print_function
 #-----------------------------------------------------------------------------
 
 # Stdlib
-import atexit
 import os
 import re
 import sys
 import tempfile
 import ast
 import warnings
-import shutil
 
 # To keep compatibility with various python versions
 try:
@@ -148,8 +146,7 @@ from docutils import nodes
 from sphinx.util.compat import Directive
 
 # Our own
-from traitlets.config import Config
-from IPython import InteractiveShell
+from IPython import Config, InteractiveShell
 from IPython.core.profiledir import ProfileDir
 from IPython.utils import io
 from IPython.utils.py3compat import PY3
@@ -297,7 +294,6 @@ class EmbeddedSphinxShell(object):
 
         # Create and initialize global ipython, but don't start its mainloop.
         # This will persist across different EmbededSphinxShell instances.
-        atexit.register(self.cleanup)
         IP = InteractiveShell.instance(config=config, profile_dir=profile)
 
         # io.stdout redirect must be done after instantiating InteractiveShell
@@ -316,7 +312,6 @@ class EmbeddedSphinxShell(object):
 
         self.input = ''
         self.output = ''
-        self.tmp_profile_dir = tmp_profile_dir
 
         self.is_verbatim = False
         self.is_doctest = False
@@ -336,9 +331,6 @@ class EmbeddedSphinxShell(object):
         # Prepopulate the namespace.
         for line in exec_lines:
             self.process_input_line(line, store_history=False)
-
-    def cleanup(self):
-        shutil.rmtree(self.tmp_profile_dir, ignore_errors=True)
 
     def clear_cout(self):
         self.cout.seek(0)

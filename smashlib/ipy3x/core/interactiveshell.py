@@ -25,19 +25,16 @@ import tempfile
 import traceback
 import types
 import subprocess
-import warnings
 from io import open as io_open
 
-from pickleshare import PickleShareDB
-
-from traitlets.config.configurable import SingletonConfigurable
+from IPython.config.configurable import SingletonConfigurable
 from IPython.core import debugger, oinspect
 from IPython.core import magic
 from IPython.core import page
 from IPython.core import prefilter
 from IPython.core import shadowns
 from IPython.core import ultratb
-from IPython.core.alias import Alias, AliasManager
+from IPython.core.alias import AliasManager, AliasError
 from IPython.core.autocall import ExitAutocall
 from IPython.core.builtin_trap import BuiltinTrap
 from IPython.core.events import EventManager, available_events
@@ -57,6 +54,7 @@ from IPython.core.prefilter import PrefilterManager
 from IPython.core.profiledir import ProfileDir
 from IPython.core.prompts import PromptManager
 from IPython.core.usage import default_banner
+from IPython.lib.latextools import LaTeXTool
 from IPython.testing.skipdoctest import skip_doctest
 from IPython.utils import PyColorize
 from IPython.utils import io
@@ -65,8 +63,8 @@ from IPython.utils import openpy
 from IPython.utils.decorators import undoc
 from IPython.utils.io import ask_yes_no
 from IPython.utils.ipstruct import Struct
-from IPython.paths import get_ipython_dir
-from IPython.utils.path import get_home_dir, get_py_filename, unquote_filename, ensure_dir_exists
+from IPython.utils.path import get_home_dir, get_ipython_dir, get_py_filename, unquote_filename, ensure_dir_exists
+from IPython.utils.pickleshare import PickleShareDB
 from IPython.utils.process import system, getoutput
 from IPython.utils.py3compat import (builtin_mod, unicode_type, string_types,
                                      with_metaclass, iteritems)
@@ -74,8 +72,8 @@ from IPython.utils.strdispatch import StrDispatch
 from IPython.utils.syspathcontext import prepended_to_syspath
 from IPython.utils.text import (format_screen, LSString, SList,
                                 DollarFormatter)
-from traitlets import (Integer, Bool, CBool, CaselessStrEnum, Enum,
-                                     List, Dict, Unicode, Instance, Type)
+from IPython.utils.traitlets import (Integer, CBool, CaselessStrEnum, Enum,
+                                     List, Unicode, Instance, Type)
 from IPython.utils.warn import warn, error
 import IPython.core.hooks
 
@@ -194,28 +192,9 @@ class DummyMod(object):
     a namespace must be assigned to the module's __dict__."""
     pass
 
-
-class ExecutionResult(object):
-    """The result of a call to :meth:`InteractiveShell.run_cell`
-
-    Stores information about what took place.
-    """
-    execution_count = None
-    error_before_exec = None
-    error_in_exec = None
-    result = None
-
-    @property
-    def success(self):
-        return (self.error_before_exec is None) and (self.error_in_exec is None)
-
-    def raise_error(self):
-        """Reraises error if `success` is `False`, otherwise does nothing"""
-        if self.error_before_exec is not None:
-            raise self.error_before_exec
-        if self.error_in_exec is not None:
-            raise self.error_in_exec
-
+#-----------------------------------------------------------------------------
+# Main IPython class
+#-----------------------------------------------------------------------------
 
 class InteractiveShell(SingletonConfigurable):
     """An enhanced, interactive shell for Python."""
@@ -251,6 +230,8 @@ class InteractiveShell(SingletonConfigurable):
         Enable magic commands to be called without the leading %.
         """
     )
+    
+    banner = Unicode('')
     
     banner1 = Unicode(default_banner, config=True,
         help="""The part of the banner to be printed before the profile"""
@@ -292,12 +273,10 @@ class InteractiveShell(SingletonConfigurable):
     debug = CBool(False, config=True)
     deep_reload = CBool(False, config=True, help=
         """
-        **Deprecated**
-
         Enable deep (recursive) reloading by default. IPython can use the
         deep_reload module which reloads changes in modules recursively (it
         replaces the reload() function, so you don't need to change anything to
-        use it). `deep_reload` forces a full reload of modules whose code may
+        use it). deep_reload() forces a full reload of modules whose code may
         have changed, which the default reload() function does not.  When
         deep_reload is off, IPython will use the normal reload(), but
         deep_reload will still be available as dreload().
@@ -306,7 +285,7 @@ class InteractiveShell(SingletonConfigurable):
     disable_failing_post_execute = CBool(False, config=True,
         help="Don't call post-execute functions that have failed in the past."
     )
-    display_formatter = Instance(DisplayFormatter, allow_none=True)
+    display_formatter = Instance(DisplayFormatter)
     displayhook_class = Type(DisplayHook)
     display_pub_class = Type(DisplayPublisher)
     data_pub_class = None
@@ -332,8 +311,7 @@ class InteractiveShell(SingletonConfigurable):
     
     logstart = CBool(False, config=True, help=
         """
-        Start logging to the default log file in overwrite mode.
-        Use `logappend` to specify a log file to **append** logs to.
+        Start logging to the default log file.
         """
     )
     logfile = Unicode('', config=True, help=
@@ -344,7 +322,6 @@ class InteractiveShell(SingletonConfigurable):
     logappend = Unicode('', config=True, help=
         """
         Start logging to the given file in append mode.
-        Use `logfile` to specify a log file to **overwrite** logs to.
         """
     )
     object_info_string_level = Enum((0,1,2), default_value=0,
@@ -356,10 +333,6 @@ class InteractiveShell(SingletonConfigurable):
     )
     multiline_history = CBool(sys.platform != 'win32', config=True,
         help="Save multi-line entries as one entry in readline history"
-    )
-    display_page = Bool(False, config=True,
-        help="""If True, anything that would be passed to the pager
-        will be displayed as regular output instead."""
     )
 
     # deprecated prompt traits:
@@ -400,13 +373,6 @@ class InteractiveShell(SingletonConfigurable):
     quiet = CBool(False, config=True)
 
     history_length = Integer(10000, config=True)
-
-    history_load_length = Integer(1000, config=True, help=
-        """
-        The number of saved history entries to be loaded
-        into the readline buffer at startup.
-        """
-    )
 
     # The readline stuff will eventually be moved to the terminal subclass
     # but for now, we can't do that as readline is welded in everywhere.
@@ -453,16 +419,16 @@ class InteractiveShell(SingletonConfigurable):
                             default_value='Context', config=True)
 
     # Subcomponents of InteractiveShell
-    alias_manager = Instance('IPython.core.alias.AliasManager', allow_none=True)
-    prefilter_manager = Instance('IPython.core.prefilter.PrefilterManager', allow_none=True)
-    builtin_trap = Instance('IPython.core.builtin_trap.BuiltinTrap', allow_none=True)
-    display_trap = Instance('IPython.core.display_trap.DisplayTrap', allow_none=True)
-    extension_manager = Instance('IPython.core.extensions.ExtensionManager', allow_none=True)
-    payload_manager = Instance('IPython.core.payload.PayloadManager', allow_none=True)
-    history_manager = Instance('IPython.core.history.HistoryAccessorBase', allow_none=True)
-    magics_manager = Instance('IPython.core.magic.MagicsManager', allow_none=True)
+    alias_manager = Instance('IPython.core.alias.AliasManager')
+    prefilter_manager = Instance('IPython.core.prefilter.PrefilterManager')
+    builtin_trap = Instance('IPython.core.builtin_trap.BuiltinTrap')
+    display_trap = Instance('IPython.core.display_trap.DisplayTrap')
+    extension_manager = Instance('IPython.core.extensions.ExtensionManager')
+    payload_manager = Instance('IPython.core.payload.PayloadManager')
+    history_manager = Instance('IPython.core.history.HistoryAccessorBase')
+    magics_manager = Instance('IPython.core.magic.MagicsManager')
 
-    profile_dir = Instance('IPython.core.application.ProfileDir', allow_none=True)
+    profile_dir = Instance('IPython.core.application.ProfileDir')
     @property
     def profile(self):
         if self.profile_dir is not None:
@@ -471,7 +437,7 @@ class InteractiveShell(SingletonConfigurable):
 
 
     # Private interface
-    _post_execute = Dict()
+    _post_execute = Instance(dict)
 
     # Tracks any GUI loop loaded for pylab
     pylab_gui_select = None
@@ -551,13 +517,13 @@ class InteractiveShell(SingletonConfigurable):
         self.init_display_pub()
         self.init_data_pub()
         self.init_displayhook()
+        self.init_latextool()
         self.init_magics()
         self.init_alias()
         self.init_logstart()
         self.init_pdb()
         self.init_extension_manager()
         self.init_payload()
-        self.init_deprecation_warnings()
         self.hooks.late_startup_hook()
         self.events.trigger('shell_initialized', self)
         atexit.register(self.atexit_operations)
@@ -674,15 +640,6 @@ class InteractiveShell(SingletonConfigurable):
         elif self.logstart:
             self.magic('logstart')
 
-    def init_deprecation_warnings(self):
-        """
-        register default filter for deprecation warning.
-
-        This will allow deprecation warning of function used interactively to show
-        warning to users, and still hide deprecation warning from libraries import.
-        """
-        warnings.filterwarnings("default", category=DeprecationWarning, module=self.user_ns.get("__name__"))
-
     def init_builtins(self):
         # A single, static flag that we set to True.  Its presence indicates
         # that an IPython shell has been created, and we make no attempts at
@@ -753,6 +710,12 @@ class InteractiveShell(SingletonConfigurable):
         # This is a context manager that installs/revmoes the displayhook at
         # the appropriate time.
         self.display_trap = DisplayTrap(hook=self.displayhook)
+
+    def init_latextool(self):
+        """Configure LaTeXTool."""
+        cfg = LaTeXTool.instance(parent=self)
+        if cfg not in self.configurables:
+            self.configurables.append(cfg)
 
     def init_virtualenv(self):
         """Add a virtualenv to sys.path so the user can import modules from it.
@@ -857,10 +820,7 @@ class InteractiveShell(SingletonConfigurable):
             # default hooks have priority 100, i.e. low; user hooks should have
             # 0-100 priority
             self.set_hook(hook_name,getattr(hooks,hook_name), 100, _warn_deprecated=False)
-        
-        if self.display_page:
-            self.set_hook('show_in_pager', page.as_hook(page.display_page), 90)
-    
+
     def set_hook(self,name,hook, priority=50, str_key=None, re_key=None,
                  _warn_deprecated=True):
         """set_hook(name,hook) -> sets an internal IPython hook.
@@ -1533,7 +1493,6 @@ class InteractiveShell(SingletonConfigurable):
                 found = True
                 ospace = 'IPython internal'
                 ismagic = True
-                isalias = isinstance(obj, Alias)
 
         # Last try: special-case some literals like '', [], {}, etc:
         if not found and oname_head in ["''",'""','[]','{}','()']:
@@ -2023,7 +1982,7 @@ class InteractiveShell(SingletonConfigurable):
         self.readline.clear_history()
         stdin_encoding = sys.stdin.encoding or "utf-8"
         last_cell = u""
-        for _, _, cell in self.history_manager.get_tail(self.history_load_length,
+        for _, _, cell in self.history_manager.get_tail(1000,
                                                         include_latest=True):
             # Ignore blank lines and consecutive duplicates
             cell = cell.rstrip()
@@ -2684,7 +2643,7 @@ class InteractiveShell(SingletonConfigurable):
                 # tb offset is 2 because we wrap execfile
                 self.showtraceback(tb_offset=2)
 
-    def safe_execfile_ipy(self, fname, shell_futures=False, raise_exceptions=False):
+    def safe_execfile_ipy(self, fname, shell_futures=False):
         """Like safe_execfile, but for .ipy or .ipynb files with IPython syntax.
 
         Parameters
@@ -2697,8 +2656,6 @@ class InteractiveShell(SingletonConfigurable):
             shell. It will both be affected by previous __future__ imports, and
             any __future__ imports in the code will affect the shell. If False,
             __future__ imports are not shared in either direction.
-        raise_exceptions : bool (False)
-            If True raise exceptions everywhere.  Meant for testing.
         """
         fname = os.path.abspath(os.path.expanduser(fname))
 
@@ -2718,7 +2675,7 @@ class InteractiveShell(SingletonConfigurable):
         def get_cells():
             """generator for sequence of code blocks to run"""
             if fname.endswith('.ipynb'):
-                from nbformat import read
+                from IPython.nbformat import read
                 with io_open(fname) as f:
                     nb = read(f, as_version=4)
                     if not nb.cells:
@@ -2733,14 +2690,12 @@ class InteractiveShell(SingletonConfigurable):
         with prepended_to_syspath(dname):
             try:
                 for cell in get_cells():
-                    result = self.run_cell(cell, silent=True, shell_futures=shell_futures)
-                    if raise_exceptions:
-                        result.raise_error()
-                    elif not result.success:
-                        break
+                    # self.run_cell currently captures all exceptions
+                    # raised in user code.  It would be nice if there were
+                    # versions of run_cell that did raise, so
+                    # we could catch the errors.
+                    self.run_cell(cell, silent=True, shell_futures=shell_futures)
             except:
-                if raise_exceptions:
-                    raise
                 self.showtraceback()
                 warn('Unknown failure executing file: <%s>' % fname)
 
@@ -2798,25 +2753,12 @@ class InteractiveShell(SingletonConfigurable):
           shell. It will both be affected by previous __future__ imports, and
           any __future__ imports in the code will affect the shell. If False,
           __future__ imports are not shared in either direction.
-
-        Returns
-        -------
-        result : :class:`ExecutionResult`
         """
-        result = ExecutionResult()
-
         if (not raw_cell) or raw_cell.isspace():
-            return result
+            return
         
         if silent:
             store_history = False
-
-        if store_history:
-            result.execution_count = self.execution_count
-
-        def error_before_exec(value):
-            result.error_before_exec = value
-            return result
 
         self.events.trigger('pre_execute')
         if not silent:
@@ -2857,7 +2799,7 @@ class InteractiveShell(SingletonConfigurable):
             self.showtraceback(preprocessing_exc_tuple)
             if store_history:
                 self.execution_count += 1
-            return error_before_exec(preprocessing_exc_tuple[2])
+            return
 
         # Our own compiler remembers the __future__ environment. If we want to
         # run code with a separate __future__ environment, use the default
@@ -2871,40 +2813,32 @@ class InteractiveShell(SingletonConfigurable):
                 # Compile to bytecode
                 try:
                     code_ast = compiler.ast_parse(cell, filename=cell_name)
-                except IndentationError as e:
+                except IndentationError:
                     self.showindentationerror()
                     if store_history:
                         self.execution_count += 1
-                    return error_before_exec(e)
+                    return None
                 except (OverflowError, SyntaxError, ValueError, TypeError,
-                        MemoryError) as e:
+                        MemoryError):
                     self.showsyntaxerror()
                     if store_history:
                         self.execution_count += 1
-                    return error_before_exec(e)
+                    return None
 
                 # Apply AST transformations
                 try:
                     code_ast = self.transform_ast(code_ast)
-                except InputRejected as e:
+                except InputRejected:
                     self.showtraceback()
                     if store_history:
                         self.execution_count += 1
-                    return error_before_exec(e)
-
-                # Give the displayhook a reference to our ExecutionResult so it
-                # can fill in the output value.
-                self.displayhook.exec_result = result
+                    return None
 
                 # Execute the user code
                 interactivity = "none" if silent else self.ast_node_interactivity
                 self.run_ast_nodes(code_ast.body, cell_name,
-                   interactivity=interactivity, compiler=compiler, result=result)
-
-                # Reset this so later displayed values do not modify the
-                # ExecutionResult
-                self.displayhook.exec_result = None
-
+                                   interactivity=interactivity, compiler=compiler)
+                
                 self.events.trigger('post_execute')
                 if not silent:
                     self.events.trigger('post_run_cell')
@@ -2915,8 +2849,6 @@ class InteractiveShell(SingletonConfigurable):
             self.history_manager.store_output(self.execution_count)
             # Each cell is a *single* input, regardless of how many lines it has
             self.execution_count += 1
-
-        return result
     
     def transform_ast(self, node):
         """Apply the AST transformations from self.ast_transformers
@@ -2951,7 +2883,7 @@ class InteractiveShell(SingletonConfigurable):
                 
 
     def run_ast_nodes(self, nodelist, cell_name, interactivity='last_expr',
-                        compiler=compile, result=None):
+                        compiler=compile):
         """Run a sequence of AST nodes. The execution mode depends on the
         interactivity parameter.
 
@@ -2971,13 +2903,6 @@ class InteractiveShell(SingletonConfigurable):
         compiler : callable
           A function with the same interface as the built-in compile(), to turn
           the AST nodes into code objects. Default is the built-in compile().
-        result : ExecutionResult, optional
-          An object to store exceptions that occur during execution.
-
-        Returns
-        -------
-        True if an exception occurred while running code, False if it finished
-        running.
         """
         if not nodelist:
             return
@@ -3003,13 +2928,13 @@ class InteractiveShell(SingletonConfigurable):
             for i, node in enumerate(to_run_exec):
                 mod = ast.Module([node])
                 code = compiler(mod, cell_name, "exec")
-                if self.run_code(code, result):
+                if self.run_code(code):
                     return True
 
             for i, node in enumerate(to_run_interactive):
                 mod = ast.Interactive([node])
                 code = compiler(mod, cell_name, "single")
-                if self.run_code(code, result):
+                if self.run_code(code):
                     return True
 
             # Flush softspace
@@ -3026,14 +2951,11 @@ class InteractiveShell(SingletonConfigurable):
             # We do only one try/except outside the loop to minimize the impact
             # on runtime, and also because if any node in the node list is
             # broken, we should stop execution completely.
-            if result:
-                result.error_before_exec = sys.exc_info()[1]
             self.showtraceback()
-            return True
 
         return False
 
-    def run_code(self, code_obj, result=None):
+    def run_code(self, code_obj):
         """Execute a code object.
 
         When an exception occurs, self.showtraceback() is called to display a
@@ -3043,8 +2965,6 @@ class InteractiveShell(SingletonConfigurable):
         ----------
         code_obj : code object
           A compiled code object, to be executed
-        result : ExecutionResult, optional
-          An object to store exceptions that occur during execution.
 
         Returns
         -------
@@ -3067,19 +2987,13 @@ class InteractiveShell(SingletonConfigurable):
             finally:
                 # Reset our crash handler in place
                 sys.excepthook = old_excepthook
-        except SystemExit as e:
-            if result is not None:
-                result.error_in_exec = e
+        except SystemExit:
             self.showtraceback(exception_only=True)
             warn("To exit: use 'exit', 'quit', or Ctrl-D.", level=1)
         except self.custom_exceptions:
             etype, value, tb = sys.exc_info()
-            if result is not None:
-                result.error_in_exec = value
             self.CustomTB(etype, value, tb)
         except:
-            if result is not None:
-                result.error_in_exec = sys.exc_info()[1]
             self.showtraceback()
         else:
             outflag = 0
