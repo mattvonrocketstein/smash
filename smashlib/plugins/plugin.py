@@ -110,9 +110,9 @@ class APlugin(object):
         except AttributeError:
             raise Exception("load smash first")
 
-    @property
-    def publish(self):
-        return self.smash.bus.publish
+    def publish(self, *args, **kargs):
+        smash_log.info("{0} {1} {2}".format(self, args, kargs))
+        return self.smash.bus.publish(*args, **kargs)
 
 from IPython.utils.traitlets import Bool
 from smashlib._logging import smash_log

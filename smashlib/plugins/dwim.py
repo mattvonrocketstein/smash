@@ -5,16 +5,15 @@
 import os
 import webbrowser
 
+from goulash._fabric import qlocal, has_bin
+from goulash.python import splitext, ope, abspath, expanduser, isdir
+
 from IPython.utils.traitlets import Bool
 from IPython.utils.traitlets import EventfulDict
 
 from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_FILE_INPUT, C_URL_INPUT
-from smashlib.util._fabric import qlocal
-from smashlib.util._fabric import has_bin
-
-from goulash.python import splitext, ope, abspath, expanduser, isdir
 
 
 def is_editable(_fpath):

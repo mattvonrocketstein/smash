@@ -1,13 +1,14 @@
 """ smashlib.plugins.cli_command_runner
 """
 
-from goulash.python import opj
+from fabric.api import lcd
 
+from goulash.python import opj
+from goulash._fabric import qlocal
 from smashlib.plugins import Plugin
 from smashlib.data import SMASH_DIR
 from smashlib.util.events import receives_event
 from smashlib.channels import C_SMASH_INIT_COMPLETE
-from smashlib.util._fabric import qlocal, lcd
 
 bootstrap_file = 'bootstrap.sh'
 

@@ -1,12 +1,14 @@
 """ smashlib.plugins.updater
 """
 
+from fabric.api import lcd
+
+from goulash._fabric import qlocal
 from goulash.python import opj
 
 from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_SMASH_INIT_COMPLETE
-from smashlib.util._fabric import qlocal, lcd
 from smashlib.data import SMASH_DIR
 
 class Updater(Plugin):
