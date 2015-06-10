@@ -2,10 +2,9 @@
 """
 import os
 
-from goulash.venv import find_venvs
-
 from goulash.python import ope
-from smashlib.util._fabric import require_bin
+from goulash.venv import find_venvs
+from goulash._fabric import require_bin
 
 def require_active_project(fxn):
     def newf(self, *args, **kargs):

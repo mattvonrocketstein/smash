@@ -3,7 +3,8 @@
 
 from goulash.venv import contains_venv
 from goulash.util import summarize_fpath
-from smashlib.util._fabric import require_bin, MissingSystemCommand
+from goulash._fabric import require_bin, MissingSystemCommand
+
 from .operation import OperationStep, NullOperationStep
 
 
