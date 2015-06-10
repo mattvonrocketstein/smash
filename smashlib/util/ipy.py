@@ -34,6 +34,10 @@ def uninstall_prefilter(HandlerOrCheckerClass):
             del checker_list[checker_list.index(tmp)]
 
 r_cmd = re.compile('^[\w-]+$')
+
+from goulash.cache import MWT
+
+@MWT(timeout=500)
 def have_command_alias(x):
     """ this helper function is fairly expensive to be running on
         (almost) every input line.  perhaps it should be cached, but
@@ -45,8 +49,12 @@ def have_command_alias(x):
         return False
     logging.smash_log.info('answering have_command_alias {0}'.format(x))
     blacklist = [
-        'ed',    # posix line oriented, not as useful as ipython edit
-        'ip',    # often used as in ip=get_ipython()
+        # posix line oriented, not very useful so
+        # this should not override ipython edit
+        'ed',
+
+        # often used as in ip=get_ipython()
+        'ip',
         ] + keyword.kwlist
     if x in blacklist:
         return False

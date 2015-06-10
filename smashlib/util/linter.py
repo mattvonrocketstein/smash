@@ -5,10 +5,11 @@ import re
 from collections import defaultdict
 
 from goulash.venv import find_venvs
+from goulash._fabric import require_bin
+
 from IPython.config.configurable import Configurable
 from IPython.utils.traitlets import Bool, List
 
-from smashlib.util._fabric import require_bin
 from smashlib.plugins import Plugin
 
 r_pep8_error = re.compile('.* E\d\d\d .*')
