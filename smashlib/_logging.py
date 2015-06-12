@@ -98,6 +98,7 @@ class Logger(object):
         self.info = smash_log.info
         self.debug = smash_log.debug
         self.warning = smash_log.warning
+        self.critical = smash_log.critical
 
     @property
     def verbose(self):

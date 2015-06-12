@@ -9,10 +9,12 @@ import os
 import cyrusbus
 from collections import defaultdict
 
-from IPython.utils.traitlets import List, Bool
-
+from goulash._fabric import qlocal
 from goulash._inspect import get_caller
 
+from IPython.utils.traitlets import List, Bool
+
+from smashlib import data
 from smashlib.plugins import Plugin
 from smashlib.util.reflect import from_dotpath
 from smashlib.util import bash
@@ -22,7 +24,7 @@ from smashlib.plugins.interface import PluginInterface
 from smashlib.patches.edit import PatchEdit
 from smashlib.patches.rehash import PatchRehash
 from smashlib.patches.pinfo import PatchPinfoMagic
-from smashlib.util._fabric import qlocal
+
 
 from .aliases import AliasInterface
 
@@ -53,7 +55,14 @@ class Smash(Plugin):
         _installed_plugins = {}
         from smashlib.plugins import Plugin
         for dotpath in self.plugins:
-            mod = from_dotpath(dotpath)
+            try:
+                mod = from_dotpath(dotpath)
+            except AttributeError as e:
+                err = "Error working with plugin {0}: {1}"
+                err = err.format(dotpath, e)
+                self.report(err)
+                self.logger.warning(err)
+                continue
             ext_name = dotpath.split('.')[-1]
             ext_obj = mod.load_ipython_extension(self.shell)
             assert isinstance(ext_obj, Plugin), \
@@ -78,7 +87,7 @@ class Smash(Plugin):
     def build_argparser(self):
         parser = super(Smash, self).build_argparser()
         # thinking of adding extra parsing here?  think twice.
-        # whatever you're doing probably belongs in a plugin..
+        # whatever you're doing probably belongs in a plugin
         return parser
 
     def parse_argv(self):
@@ -103,9 +112,8 @@ class Smash(Plugin):
         self.parse_argv()
         self.init_macros()
         self.init_config_inheritance()
-        smash_bin = os.path.expanduser('~/.smash/bin')
-        if smash_bin not in os.environ['PATH']:
-            os.environ['PATH'] = smash_bin + ':' + os.environ['PATH']
+        if data.SMASH_BIN not in os.environ['PATH']:
+            os.environ['PATH'] = data.SMASH_BIN + ':' + os.environ['PATH']
 
         self.init_patches()
         self.publish(C_SMASH_INIT_COMPLETE)

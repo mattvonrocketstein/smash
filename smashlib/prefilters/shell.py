@@ -1,8 +1,10 @@
 """ smashlib.prefilters.shell
 """
 
-from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
 from smashlib.util.ipy import have_alias
+
+from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
+
 #from smashlib._logger import smash_log
 SHELL_HANDLER_NAME = 'ShellHandler'
 

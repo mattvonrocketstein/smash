@@ -5,27 +5,11 @@ import os, sys
 import logging
 import importlib
 
-class RewriteIPythonImport(object):
-    def find_module(self, fullname, path=None):
-        if fullname.startswith('IPython'):
-            new_fullname = ['smashlib','ipy3x']+fullname.split('.')[1:]
-            new_fullname='.'.join(new_fullname)
-            #logging.warning("import : {0}->{1}".format(fullname, new_fullname))
-            self.path = path
-            self.original_name = fullname
-            self.rewritten_name = new_fullname
-            return self
-        return None
-
-    def load_module(self, name):
-        result = importlib.import_module(self.rewritten_name)
-        sys.modules[name] = result
-        return result
-
-sys.meta_path = [RewriteIPythonImport()]
+from smashlib.import_hooks import hijack_ipython_module
 
 def main():
     os.environ['SMASH'] = '1'
+    hijack_ipython_module()
     from smashlib import embed
     from smashlib.config import SmashConfig, SmashUserConfig
     smash_prof = SmashConfig.ensure()['profile']

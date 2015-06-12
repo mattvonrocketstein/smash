@@ -2,6 +2,7 @@
 """
 import os, shutil
 import demjson, voluptuous
+
 from IPython.core.profiledir import ProfileDir
 
 from goulash.python import create_dir_if_not_exists, ope, opj

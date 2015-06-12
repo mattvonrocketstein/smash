@@ -8,7 +8,7 @@ def complete_long_opts(cmd):
     """ completes long-opts args for any command,
         assuming it supports --help
     """
-    tmp = subprocess.check_output(cmd+' --help',shell=True)
+    tmp = subprocess.check_output(cmd+' --help', shell=True)
     out = re.compile('\s+--[a-zA-Z]+').findall(tmp)
     out += re.compile('\s+-[a-zA-Z]+').findall(tmp)
     out = [ x.strip() for x in out ]

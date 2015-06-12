@@ -1,17 +1,19 @@
 """smashlib.data
 """
+import os
 from goulash.python import expanduser, opj, dirname
 
 main_profile_name = 'SmaSh'
 user_config_name = 'config.py'
 SMASH_DIR = expanduser('~/.smash')
-SMASH_LOGS = opj(SMASH_DIR, 'logs')
-SMASH_ETC = opj(SMASH_DIR, 'etc')
+SMASH_BIN = os.path.join(SMASH_DIR, 'bin')
+SMASH_LOGS = os.path.join(SMASH_DIR, 'logs')
+SMASH_ETC = os.path.join(SMASH_DIR, 'etc')
 SMASHLIB_DIR = dirname(__file__)
-USER_CONFIG_PATH = opj(SMASH_DIR, user_config_name)
-ALIAS_CONFIG_PATH = opj(SMASH_ETC, 'aliases.json')
-MACRO_CONFIG_PATH = opj(SMASH_ETC, 'macros.json')
-EDITOR_CONFIG_PATH = opj(SMASH_ETC, 'editor.json')
+USER_CONFIG_PATH = os.path.join(SMASH_DIR, user_config_name)
+ALIAS_CONFIG_PATH = os.path.join(SMASH_ETC, 'aliases.json')
+MACRO_CONFIG_PATH = os.path.join(SMASH_ETC, 'macros.json')
+EDITOR_CONFIG_PATH = os.path.join(SMASH_ETC, 'editor.json')
 
 P_CODE_FILE = {
     '.py':'python',
@@ -22,7 +24,7 @@ P_CODE_FILE = {
     'Vagrantfile':'vagrant',
     'tox.ini':'tox',
     }
-
+"""
 lcfg =  {
     'version': 1,
     'disable_existing_loggers': False,
@@ -50,3 +52,4 @@ lcfg =  {
         },
     }
 }
+"""

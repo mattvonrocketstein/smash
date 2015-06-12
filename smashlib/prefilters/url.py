@@ -1,4 +1,4 @@
-""" smashlib.prefilters.dot
+""" smashlib.prefilters.url
 """
 
 import urlparse
@@ -10,10 +10,6 @@ from smashlib.channels import C_URL_INPUT
 HANDLER_NAME   = 'URLHandler'
 PROTOS = 'http https ssh ftp'.split()
 
-def get_scheme(clean_line):
-    scheme = urlparse.urlparse(clean_line).scheme
-    if scheme in PROTOS:
-        return scheme
 
 class URLHandler(PrefilterHandler):
 
@@ -35,10 +31,10 @@ class URLChecker(PrefilterChecker):
     priority = 1
 
     def check(self, line_info):
-        #if line_info.continue_prompt or \
-        #      line_info.line.split() or \
-        #       not line_info.line.strip():
-        #    return None
+        def get_scheme(clean_line):
+            scheme = urlparse.urlparse(clean_line).scheme
+            if scheme in PROTOS:
+                return scheme
         scheme = get_scheme(line_info.line.strip())
         if scheme is not None:
             dhandler = self.prefilter_manager.get_handler_by_name(HANDLER_NAME)

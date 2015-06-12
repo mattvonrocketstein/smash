@@ -1,13 +1,16 @@
 """ smashlib
 """
 __version__ = 0.1
+import os
+
+from smashlib.import_hooks import hijack_ipython_module
 
 def start_ipython(argv=None, **kwargs):
     from smashlib.overrides import launch_new_instance
     return launch_new_instance(argv=argv, **kwargs)
 
 def embed(argv=tuple(), **kargs):
-    import os
+    hijack_ipython_module()
     #if os.environ.get('SMASH', None):
     #    print "..detected nesting.. this may cause problems"
 
