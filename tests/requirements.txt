@@ -1,4 +1,5 @@
 #
 # smash/tests/requirements.txt
 #
+tox
 nose

@@ -6,11 +6,11 @@ from smashlib.util.ipy import have_alias
 from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
 
 #from smashlib._logger import smash_log
-SHELL_HANDLER_NAME = 'ShellHandler'
+HANDLER_NAME = 'ShellHandler'
 
 class ShellHandler(PrefilterHandler):
     """ ShellHandler changes certain lines to system calls """
-    handler_name = Unicode(SHELL_HANDLER_NAME)
+    handler_name = Unicode(HANDLER_NAME)
 
     def handle(self, line_info):
         cmd = line_info.line.strip()
@@ -29,7 +29,7 @@ class ShellChecker(PrefilterChecker):
         """
         if line_info.continue_prompt or not line_info.line.strip():
             return None
-        shandler = self.prefilter_manager.get_handler_by_name(SHELL_HANDLER_NAME)
+        shandler = self.prefilter_manager.get_handler_by_name(HANDLER_NAME)
         line = line_info.line
         split_line = line.split()
         if have_alias(split_line[0]):
