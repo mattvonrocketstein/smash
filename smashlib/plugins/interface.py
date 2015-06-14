@@ -18,11 +18,9 @@ class AbstractInterface(object):
 
 class PluginInterface(AbstractInterface):
 
-
     @property
     def edit(self):
         self.smash.shell.run_cell('ed_config')
-
 
     def __qmark__(self):
         """ user-friendly information when the input is "plugins?" """
@@ -34,6 +32,9 @@ class PluginInterface(AbstractInterface):
     @property
     def _plugins(self):
         return self.smash._installed_plugins
+
+    def __getitem__(self, plugin_name):
+        return self._plugins[plugin_name]
 
     def update(self):
         tmp = self._plugins

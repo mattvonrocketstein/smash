@@ -5,7 +5,7 @@
     derived from environment bash system settings.  It doesn't need to know
     anything about whether you use /etc/completion or /etc/bash_completion.d,
     all that matters is whether *bash* knows about the completion.  The benefit
-    of doing this are obvious: you get access to all the completion features
+    of doing it this way is obvious: you get access to all the completion features
     that the system has installed without caring how the completion features
     work.  Note that this approach doesn't just work for things in the users
     $PATH, it works for arbitrary complex completion. In the default linux
@@ -15,10 +15,10 @@
     Example I/O:
 
        $ pybcompgen "/et"
-       ["apt-get "]
+       ["/etc "]
 
        $ pybcompgen "git lo"
-       ["log"]
+       ["log", "lol", "lola"]
 
        $ pybcompgen "apt-ge"
        ["apt-get "]
@@ -29,12 +29,11 @@
        $pybcompgen "apt-get install ubuntu-art"
        ["ubuntu-artwork "]
 """
+import re
 import sys
 import json
 import unicodedata
 from subprocess import Popen, PIPE
-
-import re
 
 # possibly this should be all vt100 codes, idk
 # http://ascii-table.com/ansi-escape-sequences-vt-100.php
@@ -54,7 +53,7 @@ def complete(to_complete):
         start by executing "printf '/et\x09\x09' | bash -i".  What this
         command does is put bash into interactive mode, then simulate
         typing "/et<tab><tab>" inside bash.  The tab-completion information
-        can scraped out of the text, but several things complicate the final
+        can be scraped out of the text, but several things complicate the final
         solution:
 
         1) the tab-completion info, apart from being post-processed, must be

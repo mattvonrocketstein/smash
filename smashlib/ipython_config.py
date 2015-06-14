@@ -67,10 +67,16 @@ _.Smash.plugins.append('smashlib.plugins._django')
 _.Smash.plugins.append('smashlib.plugins.post_input')
 _.Smash.plugins.append('smashlib.plugins.uninstall_plugin')
 _.Smash.plugins.append('smashlib.plugins.prefilter_dot')
+_.Smash.plugins.append('smashlib.plugins.prompt')
+
+# enhanced which:
+#   provides information about binaries on $PATH
+#   provides information about python libraries (in the current venv, if any)
 _.Smash.plugins.append('smashlib.plugins.which')
+
 _.Smash.plugins.append('smashlib.plugins.prefilter_url')
 _.Smash.plugins.append('smashlib.plugins.handle_cmd_failure')
-_.Smash.plugins.append('smashlib.plugins.liquidprompt')
+
 _.Smash.plugins.append('smashlib.plugins.summarize')
 _.Smash.plugins.append('smashlib.plugins.cd_hooks')
 _.Smash.plugins.append('smashlib.plugins.venv')
@@ -96,9 +102,11 @@ _.PyLinter.ignore_undefined_names = [
 
 ## configure the liquidprompt extension with some reasonable defaults.
 ################################################################################
-_.LiquidPrompt.float           = True # insert more space around prompt
-_.LiquidPrompt.prompt_append='\n> '
 _.PromptManager.justify        = False
+#_.LiquidPrompt.float           = True # insert more space around prompt
+#_.LiquidPrompt.prompt_append='\n> '
+#_.Smash.plugins.append('smashlib.plugins.liquidprompt')
+_.Smash.plugins.append('smashlib.plugins.prompt')
 
 # configure the project manager extension
 ################################################################################

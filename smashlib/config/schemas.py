@@ -46,10 +46,23 @@ def EnvListDict(x):
                        "element is command)").format(k,v.index(i),i)
                 raise Invalid(err)
 
+def PromptDict(lst):
+    doc_url = 'http://placeholder'
+    _types = 'python env shell literal'.split()
+    err = ('The prompt.json entry at index {0} ("{1}") should be '
+           'a dictionary where at least "type" and "value" are defined.  '
+           'The value for "type" is one of {3}.  See the documentation at {4}')
+    for x in lst:
+        if 'type' not in x or 'value' not in x:
+            raise Invalid(err.format(lst.index(x), x, _types, doc_url ))
+        if x['type'] not in _types:
+            raise Invalid(err.format(lst.index(x), x, _types, doc_url ))
+
 aliases = Schema(AliasListDict, templates.aliases)
 env = Schema(EnvListDict, templates.env)
 macros = Schema(AliasListDict, templates.macros)
 
+prompt = Schema(PromptDict, {})
 search_dirs = Schema(list, [])
 venvs = Schema(SimpleStringDict, {})
 projects = Schema(SimpleStringDict, {})

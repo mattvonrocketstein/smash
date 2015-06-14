@@ -31,3 +31,4 @@ def hijack_ipython_module():
             break
     if not found:
         sys.meta_path.append(RewriteIPythonImport())
+hijack_ipython=hijack_ipython_module
