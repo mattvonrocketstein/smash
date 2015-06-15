@@ -31,7 +31,6 @@ _.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
 ################################################################################
 _.Smash.verbose = True
 _.DoWhatIMean.verbose = False
-_.LiquidPrompt.verbose = False
 _.DjangoPlugin.verbose = True
 _.Summarize.verbose = False
 _.ProjectManager.verbose = False
@@ -100,12 +99,9 @@ _.PyLinter.ignore_undefined_names = [
     ['load_subconfig','.*ipython_config.py'],
 ]
 
-## configure the liquidprompt extension with some reasonable defaults.
+## configure the prompt extension with some reasonable defaults.
 ################################################################################
-_.PromptManager.justify        = False
-#_.LiquidPrompt.float           = True # insert more space around prompt
-#_.LiquidPrompt.prompt_append='\n> '
-#_.Smash.plugins.append('smashlib.plugins.liquidprompt')
+_.PromptManager.justify = False
 _.Smash.plugins.append('smashlib.plugins.prompt')
 
 # configure the project manager extension

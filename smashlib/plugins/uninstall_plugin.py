@@ -6,7 +6,8 @@ from smashlib.plugins import Plugin
 class UninstallPlugins(Plugin):
     def install(self):
         def fxn(*args):
-            return get_smash()._installed_plugins.keys()
+            tmp = get_smash()._installed_plugins.keys()
+            print tmp
         self.contribute_completer('uninstall_plugin .*', fxn)
         self.contribute_completer('%uninstall_plugin .*', fxn)
         return self
@@ -18,4 +19,4 @@ def load_ipython_extension(ip):
 
 def unload_ipython_extension(ip):
     """ called by %unload_ext magic"""
-    get_smash()._installed_plugins['liquidprompt'].uninstall()
+    get_smash()._installed_plugins['uninstallplugin'].uninstall()

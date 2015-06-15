@@ -1,7 +1,4 @@
 """ smashlib.plugins.prompt
-
-
-    NOTE: liquidprompt itself requires bash or zsh
 """
 import os
 
