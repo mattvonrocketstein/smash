@@ -53,8 +53,6 @@ class SmashPrompt(Plugin):
 
     def update_prompt(self, himself=None):
         tmp = self.get_prompt()
-        #self.shell.prompt_manager.in_template = tmp
-        print tmp
         self.shell.prompt_manager.update_prompt('in', tmp)
 
     def get_prompt(self):

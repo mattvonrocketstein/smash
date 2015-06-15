@@ -2,8 +2,8 @@
 node/*
 *.egg-info/*
 \#*
-*#
-.#*
+*\#
+.\#*
 .ropeproject/*
 .tox/
 .coverage
@@ -14,3 +14,9 @@ etc/*
 lib/*
 include/*
 autojump.txt.*
+config.py
+autojump.txt
+man/*
+local/*
+*.sqlite
+profile_*/*
