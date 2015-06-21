@@ -1,0 +1,6 @@
+#
+# doc-build requirements
+#
+-r ../requirements.txt
+pdoc
+mkdocs==0.14.0

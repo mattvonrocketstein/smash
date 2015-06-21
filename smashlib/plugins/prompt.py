@@ -56,6 +56,7 @@ class SmashPrompt(Plugin):
         prompt = '\n'
         for component in self.prompt_components:
             prompt += component()
+        prompt = prompt.replace('  ', ' ')
         return prompt
 
 def load_ipython_extension(ip):

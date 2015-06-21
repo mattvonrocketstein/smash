@@ -1,0 +1,13 @@
+site_name: smash
+theme_dir: glsh
+repo_url: https://github.com/mattvonrocketstein/smashlib.git
+site_author: mvr
+pages:
+- 'Home': 'index.md'
+- 'Feature Overview': 'features.md'
+- 'Configuration': 'configuration.md'
+- 'Plugins': 'plugins.md'
+#- 'Python Features': 'python_use_cases.md'
+#- 'Shell Features': 'shell_use_cases.md'
+- 'Project Manager': 'project_manager.md'
+- 'API Reference': 'api/index.html'

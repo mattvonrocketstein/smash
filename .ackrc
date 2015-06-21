@@ -1,0 +1,5 @@
+--ignore-dir=smashlib/ipy3x
+--ignore-dir=.tox
+--ignore-dir=logs/
+--ignore-dir=lib/
+

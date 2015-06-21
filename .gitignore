@@ -20,3 +20,8 @@ man/*
 local/*
 *.sqlite
 profile_*/*
+docs/site
+docs/docs/api
+docs/api
+share
+docs/glsh

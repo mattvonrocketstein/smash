@@ -39,7 +39,7 @@ class SmashConfig(object):
                 data = demjson.decode(fhandle.read())
         except demjson.JSONDecodeError:
             err = "file is not json: {0}".format(absf)
-            boot_log.critical(err)
+            #boot_log.critical(err)
             raise ConfigError(err)
         except IOError:
             report("{0} does not exist..".format(absf))
@@ -56,7 +56,7 @@ class SmashConfig(object):
             else:
                 err = ("{0} does not exist, and no default"
                        " is defined").format(absf)
-                boot_log.critical(err)
+                #boot_log.critical(err)
                 raise SystemExit(err)
         try:
             schema(data)

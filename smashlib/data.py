@@ -14,6 +14,8 @@ USER_CONFIG_PATH = os.path.join(SMASH_DIR, user_config_name)
 ALIAS_CONFIG_PATH = os.path.join(SMASH_ETC, 'aliases.json')
 MACRO_CONFIG_PATH = os.path.join(SMASH_ETC, 'macros.json')
 EDITOR_CONFIG_PATH = os.path.join(SMASH_ETC, 'editor.json')
+ENV_CONFIG_PATH = os.path.join(SMASH_ETC, 'env.json')
+PROMPT_CONFIG_PATH = os.path.join(SMASH_ETC, 'prompt.json')
 
 P_CODE_FILE = {
     '.py':'python',

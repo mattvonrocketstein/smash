@@ -5,8 +5,8 @@
 # original code is here: https://github.com/kennethreitz/autoenv
 
 """
-  Copyright © 2008-2012 Joel Schaerer
-  Copyright © 2012-2014 William Ting
+  Copyright c 2008-2012 Joel Schaerer
+  Copyright c 2012-2014 William Ting
 
   * This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

@@ -7,6 +7,7 @@ from smashlib import get_smash
 
 from smashlib.data import USER_CONFIG_PATH, EDITOR_CONFIG_PATH
 from smashlib.data import ALIAS_CONFIG_PATH, MACRO_CONFIG_PATH
+from smashlib.data import ENV_CONFIG_PATH, PROMPT_CONFIG_PATH
 
 
 @magics_class
@@ -20,6 +21,14 @@ class SmashMagics(Magics):
     @line_magic
     def ed_aliases(self, parameter_s=''):
         self.shell.magic('ed {0}'.format(ALIAS_CONFIG_PATH))
+
+    @line_magic
+    def ed_env(self, parameter_s=''):
+        self.shell.magic('ed {0}'.format(ENV_CONFIG_PATH))
+
+    @line_magic
+    def ed_prompt(self, parameter_s=''):
+        self.shell.magic('ed {0}'.format(PROMPT_CONFIG_PATH))
 
     @line_magic
     def ed_macros(self, parameter_s=''):
