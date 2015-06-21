@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="mvr">
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+
+        <title>Feature Overview - smash</title>
+
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <link href="../css/base.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="..">smash</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
+            
+            
+                <li >
+                    <a href="..">Home</a>
+                </li>
+            
+            
+            
+                <li class="active">
+                    <a href="./">Feature Overview</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../configuration/">Configuration</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../plugins/">Plugins</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../project_manager/">Project Manager</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../api/">API Reference</a>
+                </li>
+            
+            
+            </ul>
+
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                <li >
+                    <a rel="next" href="..">
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li >
+                    <a rel="prev" href="../configuration/">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://github.com/mattvonrocketstein/smashlib.git">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#system-shell-python-support">System Shell + Python Support</a></li>
+        
+    
+        <li class="main "><a href="#prompt">Prompt </a></li>
+        
+    
+        <li class="main "><a href="#tab-completion-system">Tab Completion System </a></li>
+        
+    
+        <li class="main "><a href="#configuration">Configuration </a></li>
+        
+    
+        <li class="main "><a href="#plugins-extensions">Plugins / Extensions </a></li>
+        
+    
+    </ul>
+</div></div>
+            <div class="col-md-9" role="main">
+
+<h3 id="system-shell-python-support">System Shell + Python Support</h3>
+<p>Smash functions as a normal system shell, but it also has full fledged python interpretter.  The goal is to be unsurprising and seamless, doing shell stuff in the shell places and python stuff in the python places.  If you're a bash user or an ipython user, many aspects of your existing configuration efforts can also be <a href="../configuration.html#inheritance">inherited automatically</a>.</p>
+<p><img alt="screenshot1" src="../scr/demo-python-bash.png" title="screenshot1" /></p>
+<p>If you don't care anything about python, you can ignore the python features of Smash completely.  If you <em>are</em> a python programmer, then you probably spend as much time in a python interpretter as you do in shell.  Why not trade those two windows for just one and reduce your screen clutter? You can start reading <a href="#smash-for-python-devs">here</a> to find out some of the other python friendly features of smash.</p>
+<hr />
+<h3 id="prompt">Prompt <a id="prompts"></a></h3>
+<p>By default smash ships with the wonderfully dynamic <a href="#https://github.com/nojhan/liquidprompt">liquidprompt tool</a>.  Liquidprompt has rich options for configuration and it's recommended that you <a href="https://github.com/nojhan/liquidprompt#features-configuration">configure it in the normal way</a>, but, some of these options can be overridden from <code>~/.smash/config.py</code>.  (See the <a href="../plugins.html#liquidprompt">liquidprompt plugin information</a> for more details.)  The default liquidprompt configuration features a prompt that shows activated python virtual environments, as well as VCS branch and commit/stash status, etc.  Other options include everything from cpu/battery status to write-permissions for the current directory.  Take a look at how it updates below based on the context:</p>
+<p><img alt="screenshot1" src="../scr/demo-liquidprompt.png?raw=true" title="screenshot1" /></p>
+<p>The prompt can be turned off by disabling the liquid prompt plugin, and either setting <code>PS1</code>' as usual or <code>prompt_manager.in_template</code> Support for <a href="#http://powerline.readthedocs.org/en/latest/usage/other.html?highlight=ipython#ipython-prompt">powerline</a> prompts isn't installed by default, but adding it should be easy.  If you can't live without that, <a href="https://github.com/mattvonrocketstein/smash/issues">make an issue of it</a>!</p>
+<hr />
+<h3 id="tab-completion-system">Tab Completion System <a id="tab-completion"></a></h3>
+<p>Depending on the context, tab completion information is derived either from ipython (for python namespaces, ipython aliases, etc) or directly from bash (for system commands / paths, hostnames, VCS subcommands, debian packages, whatever your system supports).  Thus if you now use bash exclusively<sup>**</sup> then this means that no effort at all goes into porting old completers into smash shell.  For building new completion mechanisms, you have the option of writing them inside or outside of smash, based on your preference.</p>
+<p><img alt="screenshot1" src="../scr/demo-completion.png?raw=true" title="screenshot3" /></p>
+<p><sub>**: if you are a zsh wizard, please help fix <a href="https://github.com/mattvonrocketstein/smash/issues/11">issue 11</a>!</sub></p>
+<hr />
+<h3 id="configuration">Configuration <a id="configuration"></a></h3>
+<p>The main documentation for configuration is <a href="../configuration.html">here</a>, and this section is just a summary.  Smash configuration aims at being simple and self-contained.  Everything is configured in JSON files which are stored in <code>~/.smash/etc</code>.  You can have per-project aliases and environment variables and enable or disable a variety of plugins.</p>
+<hr />
+<h3 id="plugins-extensions">Plugins / Extensions <a id="plugins"></a></h3>
+<p>Smash has lots of plugins that extend or modify the core behaviour.  Some plugins are turned on by default, some are complete but opt-in, and still others are works in progress, demonstrations, or proof-of-concepts.  The smash core just includes essential stuff, so it's safe to assume that most of the functionality described in this documentation is technically describing smash plugins.  If you're interested in reading about or configuring individual plugins, see the <a href="../plugins.html#list">list of plugins</a>.  If you want to write a new plugin, check out the documentation <a href="../plugins.html#writing-plugins">here</a></p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+        </footer>
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script src="../js/base.js"></script>
+    </body>
+</html>

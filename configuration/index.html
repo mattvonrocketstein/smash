@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="mvr">
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+
+        <title>Configuration - smash</title>
+
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <link href="../css/base.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="..">smash</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
+            
+            
+                <li >
+                    <a href="..">Home</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../features/">Feature Overview</a>
+                </li>
+            
+            
+            
+                <li class="active">
+                    <a href="./">Configuration</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../plugins/">Plugins</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../project_manager/">Project Manager</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../api/">API Reference</a>
+                </li>
+            
+            
+            </ul>
+
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                <li >
+                    <a rel="next" href="../features/">
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li >
+                    <a rel="prev" href="../plugins/">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://github.com/mattvonrocketstein/smashlib.git">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#inheriting-existing-shell-configuration">Inheriting existing shell configuration</a></li>
+        
+    
+        <li class="main "><a href="#inheriting-existing-ipython-configuration">Inheriting existing IPython configuration</a></li>
+        
+    
+        <li class="main "><a href="#editor-configuration">Editor configuration</a></li>
+        
+    
+        <li class="main "><a href="#alias-configuration">Alias configuration</a></li>
+        
+    
+    </ul>
+</div></div>
+            <div class="col-md-9" role="main">
+
+<p>Smash configuration, like smash libraries and executables, are stored in <code>~/.smash</code>.  The main configuration file is <code>~/.smash/etc/config.py</code>.  If your <a href="#editor">editor is configured</a>, you can open the main configuration file at any time from typing <code>ed_config</code> inside of smash.</p>
+<p><a id="inheritance-shell"></a><a id="inheritance"></a></p>
+<h4 id="inheriting-existing-shell-configuration">Inheriting existing shell configuration</h4>
+<p>By default smash will try to honor existing bash aliases and functions.  If you do not want your bash aliases migrated into Smash, ensure the <code>load_bash_aliases</code> settings is False.</p>
+<pre><code class="python">    Smash.load_bash_aliases = False
+</code></pre>
+
+<p>If you do not want to be able to run legacy bash functions from your shell, ensure the <code>load_bash_functions</code> setting is False.  Note that only bash functions mentioned in your profile, .bashrc, etc will be loaded.  (Loading bash functions from arbitrary files that you source is <a href="https://github.com/mattvonrocketstein/smash/issues">issue #15</a>)</p>
+<pre><code class="python">    Smash.load_bash_functions = False
+</code></pre>
+
+<p><a id="inheritance-ipython"></a></p>
+<h4 id="inheriting-existing-ipython-configuration">Inheriting existing IPython configuration</h4>
+<p>If you are already using IPython and want to load aspects of existing profile configuration, add something like this to <code>~/.smash/config.py</code>:</p>
+<pre><code class="python">    load_subconfig('ipython_config.py', profile='default')
+</code></pre>
+
+<p><a id="editor"></a></p>
+<h4 id="editor-configuration">Editor configuration</h4>
+<p>There are several reasons that it can be useful to let smash know about your editor.  Here are a few:</p>
+<ul>
+<li>Smash, like IPython, helps you open and edit the code for any given object.  (try: <code>import webbrowser; ed webbrowser</code>).</li>
+<li>Zsh-style <a href="../plugins.html#dwim-suffix">suffix aliases</a> are supported by the <a href="../plugins.html#dwim">DWIM plugin</a></li>
+<li>various shortcuts help you open smash configuration: <code>ed_editor</code>, <code>ed_aliases</code>, etc</li>
+</ul>
+<p>The editor configuration file (<code>~/.smash/etc/editor.json</code>) should have the following format, otherwise the json validator will complain:</p>
+<pre><code class="json"> {
+   &quot;console&quot;:&quot;some_editor_invocation&quot;,
+   &quot;window_env&quot;:&quot;some_editor_invocation&quot;
+ }
+</code></pre>
+
+<p>If this file does not exist, it will be created for you with default values.  Note that invocation lines may include flags, for instance <em>emacsclient -n</em> or  <em>nano --softwrap --quiet</em> is fine.</p>
+<p><a id="aliases"></a></p>
+<h4 id="alias-configuration">Alias configuration</h4>
+<p>In smash aliases are essentially the same as ipython or bash aliases, except that these aliases are potentially project specific.  The alias configuration file (<code>~/.smash/etc/aliases.json</code>) will be created if it does not exist, and should have a format similar to the following example, or else the json validator will complain.</p>
+<pre><code class="json">{ &quot;__smash__&quot;:
+    [ [&quot;bunzip&quot;,&quot; bunzip2&quot;],
+      [&quot;l&quot;, &quot;ls -la --color&quot;],
+      .....
+    ],
+  &quot;my_first_project&quot;:
+    [ [&quot;go&quot;, &quot;start-daemon&amp;&quot;],
+      [&quot;stop&quot;, &quot;kill -KILL `cat daemon.pid`&quot;]
+    ],
+  &quot;other_project&quot;:
+    [ [&quot;go&quot;, &quot;sudo /etc/init.d/mongo start&quot;],
+      [&quot;stop&quot;, &quot;sudo /etc/init.d/mongo stop&quot;],
+      ...
+    ],
+  ...
+}
+</code></pre>
+
+<p><strong>The aliases mentioned in the <code>__smash__</code> section are global and always-on, so this is most likely where you want to put your default aliases.</strong>  The aliases mentioned in "my_first_project" and "other_project" would only be activated when that project was activated.  See the <a href="../project_manager.html">project manager documentation</a> for a more in-depth explanation of projects.</p></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+        </footer>
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script src="../js/base.js"></script>
+    </body>
+</html>

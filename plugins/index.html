@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="mvr">
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+
+        <title>Plugins - smash</title>
+
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <link href="../css/base.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="..">smash</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
+            
+            
+                <li >
+                    <a href="..">Home</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../features/">Feature Overview</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../configuration/">Configuration</a>
+                </li>
+            
+            
+            
+                <li class="active">
+                    <a href="./">Plugins</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../project_manager/">Project Manager</a>
+                </li>
+            
+            
+            
+                <li >
+                    <a href="../api/">API Reference</a>
+                </li>
+            
+            
+            </ul>
+
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                <li >
+                    <a rel="next" href="../configuration/">
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li >
+                    <a rel="prev" href="../project_manager/">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://github.com/mattvonrocketstein/smashlib.git">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#handle-command-failure">Handle Command Failure</a></li>
+        
+            <li><a href="#signals">Signals</a></li>
+        
+    
+        <li class="main "><a href="#python-tools-completion">Python Tools Completion</a></li>
+        
+            <li><a href="#configuration-options">Configuration Options:</a></li>
+        
+    
+        <li class="main "><a href="#autojump">Autojump</a></li>
+        
+            <li><a href="#commands">Commands:</a></li>
+        
+            <li><a href="#configuration-options_1">Configuration Options:</a></li>
+        
+            <li><a href="#signals_1">Signals</a></li>
+        
+    
+        <li class="main "><a href="#liquidprompt">Liquidprompt</a></li>
+        
+            <li><a href="#commands_1">Commands:</a></li>
+        
+            <li><a href="#configuration-options_2">Configuration Options:</a></li>
+        
+            <li><a href="#signals_2">Signals</a></li>
+        
+    
+        <li class="main "><a href="#change-directory-hooks">Change directory hooks</a></li>
+        
+            <li><a href="#configuration-options_3">Configuration Options:</a></li>
+        
+            <li><a href="#signals_3">Signals</a></li>
+        
+    
+        <li class="main "><a href="#do-what-i-mean">Do What I mean</a></li>
+        
+            <li><a href="#configuration-options_4">Configuration Options:</a></li>
+        
+            <li><a href="#signals_4">Signals</a></li>
+        
+    
+        <li class="main "><a href="#virtual-environment">Virtual Environment</a></li>
+        
+            <li><a href="#commands_2">Commands:</a></li>
+        
+            <li><a href="#configuration-options_5">Configuration Options:</a></li>
+        
+            <li><a href="#signals_5">Signals</a></li>
+        
+    
+        <li class="main "><a href="#writing-new-plugins">Writing new plugins</a></li>
+        
+    
+    </ul>
+</div></div>
+            <div class="col-md-9" role="main">
+
+<hr />
+<p><a id="list"></a></p>
+<p><a href="#liquidprompt">Liquidprompt</a> |
+<a href="#autojump">Autojump</a> |
+<a href="#hcf">Handle Command Failure</a> |
+<a href="#dwim">Do What I Mean</a> |
+<a href="#cd-hooks">Change-dir Hooks</a> |
+<a href="#ptc">Python Tools Completion</a> |
+<a href="#virtualenv">Python Virtual Environments</a></p>
+<p>The smash core aims to be small and only include the essentials, so much of the behaviour of shell comes down to plugins.  In Smash, "plugins" are just IPython extensions which require smashlib, and possibly require the smash shell itself.  As a result many of the plugins may work in vanilla IPython.  If you don't care about the built in plugin options and only want to write new plugins, <a href="#writing-new">see this section</a>.  There are a few main things that plugins may potentially do.  Specifically, <strong>each plugin may</strong>:</p>
+<ol>
+<li>have configuration options</li>
+<li>publish commands or command aliases</li>
+<li>add completers or new input preprocessing</li>
+<li>receive signals from the IPython event subsystem</li>
+<li>receive signals from the smash-specific event subsystem</li>
+<li>send signals on the smash-specific event subsystem</li>
+</ol>
+<p>The rest of this page attempts to completely describe the plugins which ship with smash, although note that these plugins may not be enabled by default.</p>
+<h4 id="handle-command-failure"><a id="hcf">Handle Command Failure</a></h4>
+<p>This plugin receives a signal whenever a system command fails, where the signal contains information about both the full command and the exit code.  Note that this is happens all the time since "ls /does/not/exist" terminates with a non-zero exit status, but this may interest plugins.</p>
+<h5 id="signals">Signals</h5>
+<p><em>Receives:</em> COMMAND_FAIL</p>
+<p><a id="ptc"></a></p>
+<h4 id="python-tools-completion">Python Tools Completion</h4>
+<p>This plugin provides completion options for common python tools like <a href="#">Fabric</a>, <a href="#">IPython</a>, <a href="#">setup.py</a>, <a href="#">flake8</a>/<a href="#">pyflakes</a> <a href="#">tox</a>, and other stuff you probably use on a daily basis.  Completion for each command is at least over command line options/flags, but in some cases there are other context clues that can be provided:</p>
+<ul>
+<li>fabric completion also works over task names.</li>
+<li>tox completion includes available environments according to tox.ini when using "tox -e"</li>
+<li>ipython completion includes available profiles when using --profile option</li>
+</ul>
+<h5 id="configuration-options">Configuration Options:</h5>
+<ul>
+<li><code>PythonTools.verbose</code>: set True to see debug messages</li>
+</ul>
+<hr />
+<h4 id="autojump"><a id="autojump">Autojump</a></h4>
+<p>Smash ships with an integrated version of the wonderful <a href="https://github.com/joelthelion/autojump">autojump</a> command line tool, which uses information from change-dir to maintain a ranked list of flexible short cuts.  In other words after you've cd'd into /foo/bar/baz/qux at least once, you can use <code>j qux</code> or <code>jump qux</code> to take you there afterwards.  Tab completion over jump-destinations is automatically enabled so that <code>j qu&lt;TAB&gt;</code> does what you'd expect.</p>
+<h5 id="commands">Commands:</h5>
+<ul>
+<li><code>j some_bookmark</code>: jump to a directory based on the weighted ratings in the current database</li>
+</ul>
+<h5 id="configuration-options_1">Configuration Options:</h5>
+<ul>
+<li><code>_.AutoJump.verbose</code>: set True to see debug messages</li>
+</ul>
+<h5 id="signals_1">Signals</h5>
+<p><em>Receives:</em> CHANGE_DIR</p>
+<hr />
+<h4 id="liquidprompt"><a id="liquidprompt">Liquidprompt</a></h4>
+<p>This plugin provides prompt rendering via the wonderfully dynamic <a href="#https://github.com/nojhan/liquidprompt">liquidprompt tool</a>.  Liquidprompt has rich options for configuration and it's recommended that you <a href="https://github.com/nojhan/liquidprompt#features-configuration">configure it in the normal way</a>, but, some of these options can be overridden from <code>~/.smash/config.py</code> (see below).</p>
+<h5 id="commands_1">Commands:</h5>
+<ul>
+<li><code>prompt_tag "my tag"</code>: add a text prefix for the current prompt</li>
+</ul>
+<h5 id="configuration-options_2">Configuration Options:</h5>
+<ul>
+<li><code>_.LiquidPrompt.verbose</code>: set True to see debug messages</li>
+<li><code>_.LiquidPrompt.float</code>: set True to insert more space around prompt</li>
+<li><code>_.LiquidPrompt.prompt_append</code>: set a suffix on the prompt ('\n&gt;' is a good one for legibility)</li>
+</ul>
+<h5 id="signals_2">Signals</h5>
+<p><em>Receives:</em> UPDATE_PROMPT_REQUEST</p>
+<hr />
+<h4 id="change-directory-hooks"><a id="cd-hooks">Change directory hooks</a></h4>
+<p>The CD hooks feature is mostly a service for other plugins to use. It adds a "directory changed" event to smash, which is useful for building stuff like automatic-activation rules (see for example the <a href="../project_manager.html">project manager</a>.  New plugins can build hooks and subscribe to CD events, or you can just register a callback without writing a new plugin.  Here's a minimal example of what a callback would look like:</p>
+<pre><code class="python">    def test_change_message(bus, new, old):
+        &quot;&quot;&quot; a demo for the CD hook &quot;&quot;&quot;
+        print 'moved from old directory {0} to new one at {1}'.format(old, new)
+</code></pre>
+
+<h5 id="configuration-options_3">Configuration Options:</h5>
+<ul>
+<li><code>ChangeDirHooks.verbose</code>: set True to see debug messages</li>
+<li><code>ChangeDirHooks.change_dir_hooks.append('foo)</code>: add python dot-paths or shell commands as cd-hooks</li>
+</ul>
+<h5 id="signals_3">Signals</h5>
+<p><em>Publishes:</em> CHANGE_DIR</p>
+<hr />
+<h4 id="do-what-i-mean"><a id="dwim">Do What I mean</a></h4>
+<p><a id="dwim-suffix"></a>
+The DoWhatIMean plugin supports zsh-style alias suffixes, automatic directory changing, opening of urls, etc.  For a feature summary, see the input -&gt; action list below.</p>
+<table>
+<thead>
+<tr>
+<th>On Input</th>
+<th>Run test</th>
+<th>If test is true Action is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>http://foo/bar</td>
+<td><em>(none)</em></td>
+<td>open with browser</td>
+</tr>
+<tr>
+<td>ftp://foo/bar</td>
+<td><em>(none)</em></td>
+<td>open with browser</td>
+</tr>
+<tr>
+<td>ssh://user@host</td>
+<td><em>(none)</em></td>
+<td>run ssh</td>
+</tr>
+<tr>
+<td>mosh://user@host</td>
+<td><em>(none)</em></td>
+<td>run mosh</td>
+</tr>
+<tr>
+<td>foo.bar</td>
+<td>is foo.bar executable?</td>
+<td>run as usual</td>
+</tr>
+<tr>
+<td>foo.bar</td>
+<td>is bar a defined suffix_alias?</td>
+<td>open with specified opener</td>
+</tr>
+<tr>
+<td>foo/bar</td>
+<td>is bar a directory?</td>
+<td>change-dir to bar</td>
+</tr>
+<tr>
+<td>foo/bar</td>
+<td>is bar editable?</td>
+<td>open with editor</td>
+</tr>
+<tr>
+<td>foo/bar:ROW:COL:</td>
+<td>is bar editable?</td>
+<td>open with editor</td>
+</tr>
+</tbody>
+</table>
+<h5 id="configuration-options_4">Configuration Options:</h5>
+<ul>
+<li><code>DoWhatIMean.verbose</code>: set True to see debug messages</li>
+<li><code>DoWhatIMean.suffix_aliases</code>: map of <code>{file_extension -&gt; open_command}</code></li>
+</ul>
+<h5 id="signals_4">Signals</h5>
+<p><em>Receives:</em> URL_INPUT, FILE_INPUT</p>
+<hr />
+<h4 id="virtual-environment"><a id="virtualenv">Virtual Environment</a></h4>
+<p>Smash has sophisticated virtualenv support which is useful particularly if you're working on multiple projects or working with multiple versions of the same requirements.  Activating/deactivating venvs is done with <code>venv_activate some_dir</code> and <code>venv_deactivate</code>, respectively.  This not only updates your $PATH, but updates the python runtime.  Modules from the new environment can now be imported directly, and side-effects from the old virtualenv are purged.  To activate and deactivate virtualenv's automatically, take a look at the <a href="../project_manager.html">project manager documentation</a>.</p>
+<h5 id="commands_2">Commands:</h5>
+<ul>
+<li><code>venv_activate some_dir</code>: activate a specific virtual environment</li>
+<li><code>venv_deactivate some_dir</code>: deactivates the current virtual environment</li>
+</ul>
+<h5 id="configuration-options_5">Configuration Options:</h5>
+<ul>
+<li><code>VirtualEnv.verbose</code>: set True to see debug messages</li>
+</ul>
+<h5 id="signals_5">Signals</h5>
+<hr />
+<h2 id="writing-new-plugins"><a id="writing-new">Writing new plugins</a></h2>
+<p>Writing new plugins is fairly easy, but may not be necessary for your application (see the <a href="../features.html#configuration">configuration summary</a> or the <a href="../configuration.html">main configuration documentation</a>). If you do need to write a plugin, read on, but first a bit of background.  Smash is built on top of <a href="http://ipython.org/">IPython</a> and is in fact itself an IPython extension.  <em>Smash plugins are essentially ipython extensions which require smash</em>, but it can be useful to differentiate the terminology.  Before going much further it's probably a good idea to check out the existing IPython docs on <a href="http://ipython.org/ipython-doc/dev/config/extensions/">writing extensions</a>.</p>
+<p>If you want to do simple stuff like just writing new commands then a tutorials for <a href="http://catherinedevlin.blogspot.com/2013/07/ipython-helloworld-magic.html">writing IPython magic</a> will probably be all you need.</p>
+<p>If you want to get your hooks into smash-specific events like "directory change" or "virtual environment deactived" then read <a href="../shell_use_cases.html#signals">this documentation</a> about the smash event system. For an example of writing new tab-completion stuff, check out <a href="https://raw.githubusercontent.com/mattvonrocketstein/smash/master/smashlib/plugins/fabric.py">the code for the fabric completer</a>.  For an example of input preprocessing see the <a href="#TODO">code for</a> the <a href="#TODO">currency converter</a>.  For an example of all-else-fails input processing (meaning input was neither bash nor python) see <a href="https://raw.githubusercontent.com/mattvonrocketstein/smash/master/smashlib/plugins/dwim.py">the code for</a> the <a href="#TODO">do-what-i-mean plugin</a></p>
+<hr /></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            
+        </footer>
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script src="../js/base.js"></script>
+    </body>
+</html>
