@@ -9,6 +9,7 @@ from IPython.utils.py3compat import with_metaclass
 
 
 class ChannelABC(with_metaclass(abc.ABCMeta, object)):
+
     """A base class for all channel ABCs."""
 
     @abc.abstractmethod
@@ -25,6 +26,7 @@ class ChannelABC(with_metaclass(abc.ABCMeta, object)):
 
 
 class ShellChannelABC(ChannelABC):
+
     """ShellChannel ABC.
 
     The docstrings for this class can be found in the base implementation:
@@ -63,6 +65,7 @@ class ShellChannelABC(ChannelABC):
 
 
 class IOPubChannelABC(ChannelABC):
+
     """IOPubChannel ABC.
 
     The docstrings for this class can be found in the base implementation:
@@ -76,6 +79,7 @@ class IOPubChannelABC(ChannelABC):
 
 
 class StdInChannelABC(ChannelABC):
+
     """StdInChannel ABC.
 
     The docstrings for this class can be found in the base implementation:
@@ -89,6 +93,7 @@ class StdInChannelABC(ChannelABC):
 
 
 class HBChannelABC(ChannelABC):
+
     """HBChannel ABC.
 
     The docstrings for this class can be found in the base implementation:

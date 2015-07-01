@@ -24,7 +24,6 @@ class TestConvert(TestsBase):
         (major, minor) = get_version(nb)
         self.assertEqual(major, 2)
 
-
     def test_upgrade_2_3(self):
         """Do notebook upgrades work?"""
 
@@ -36,7 +35,6 @@ class TestConvert(TestsBase):
         # Check if upgrade was successful.
         (major, minor) = get_version(nb)
         self.assertEqual(major, 3)
-
 
     def test_open_current(self):
         """Can an old notebook be opened and converted to the current version 

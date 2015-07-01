@@ -8,7 +8,9 @@ from IPython.core.inputsplitter import IPythonInputSplitter
 
 r_ed = 'ed [^:]*'
 
+
 class SmashInputSplitter(IPythonInputSplitter):
+
     """ It may be useful for something else in the future, but at the moment
         Smash overrides the core IPythonInputSplitter for just one reason:
 
@@ -17,6 +19,7 @@ class SmashInputSplitter(IPythonInputSplitter):
         this format is often used as output for command line tools (for
         instance ack-grep)
     """
+
     def push(self, lines):
         result = super(SmashInputSplitter, self).push(lines)
         lines = lines.strip()

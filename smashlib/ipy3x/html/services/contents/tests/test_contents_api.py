@@ -24,22 +24,26 @@ from IPython.utils.data import uniq_stable
 
 
 def notebooks_only(dir_model):
-    return [nb for nb in dir_model['content'] if nb['type']=='notebook']
+    return [nb for nb in dir_model['content'] if nb['type'] == 'notebook']
+
 
 def dirs_only(dir_model):
-    return [x for x in dir_model['content'] if x['type']=='directory']
+    return [x for x in dir_model['content'] if x['type'] == 'directory']
 
 
 class API(object):
+
     """Wrapper for contents API calls."""
+
     def __init__(self, base_url):
         self.base_url = base_url
 
     def _req(self, verb, path, body=None, params=None):
         response = requests.request(verb,
-                url_path_join(self.base_url, 'api/contents', path),
-                data=body, params=params,
-        )
+                                    url_path_join(
+                                        self.base_url, 'api/contents', path),
+                                    data=body, params=params,
+                                    )
         response.raise_for_status()
         return response
 
@@ -64,7 +68,7 @@ class API(object):
         return self._req('POST', path, json.dumps({'type': 'directory'}))
 
     def copy(self, copy_from, path='/'):
-        body = json.dumps({'copy_from':copy_from})
+        body = json.dumps({'copy_from': copy_from})
         return self._req('POST', path, body)
 
     def create(self, path='/'):
@@ -80,7 +84,7 @@ class API(object):
         return self._req('PUT', path, json.dumps({'type': 'directory'}))
 
     def copy_put(self, copy_from, path='/'):
-        body = json.dumps({'copy_from':copy_from})
+        body = json.dumps({'copy_from': copy_from})
         return self._req('PUT', path, body)
 
     def save(self, path, body):
@@ -105,7 +109,9 @@ class API(object):
     def delete_checkpoint(self, path, checkpoint_id):
         return self._req('DELETE', url_path_join(path, 'checkpoints', checkpoint_id))
 
+
 class APITest(NotebookTestBase):
+
     """Test the kernels web service API"""
     dirs_nbs = [('', 'inroot'),
                 ('Directory with spaces in', 'inspace'),
@@ -119,10 +125,10 @@ class APITest(NotebookTestBase):
                 ('ordering', 'b'),
                 ('ordering', 'C'),
                 (u'å b', u'ç d'),
-               ]
+                ]
     hidden_dirs = ['.hidden', '__pycache__']
 
-    dirs = uniq_stable([py3compat.cast_unicode(d) for (d,n) in dirs_nbs])
+    dirs = uniq_stable([py3compat.cast_unicode(d) for (d, n) in dirs_nbs])
     del dirs[0]  # remove ''
     top_level_dirs = {normalize('NFC', d.split('/')[0]) for d in dirs}
 
@@ -177,7 +183,8 @@ class APITest(NotebookTestBase):
         self.assertEqual(len(nbs), 1)
         self.assertEqual(nbs[0]['name'], 'inroot.ipynb')
 
-        nbs = notebooks_only(self.api.list('/Directory with spaces in/').json())
+        nbs = notebooks_only(
+            self.api.list('/Directory with spaces in/').json())
         self.assertEqual(len(nbs), 1)
         self.assertEqual(nbs[0]['name'], 'inspace.ipynb')
 
@@ -193,9 +200,10 @@ class APITest(NotebookTestBase):
 
         nbs = notebooks_only(self.api.list('foo').json())
         self.assertEqual(len(nbs), 4)
-        nbnames = { normalize('NFC', n['name']) for n in nbs }
-        expected = [ u'a.ipynb', u'b.ipynb', u'name with spaces.ipynb', u'unicodé.ipynb']
-        expected = { normalize('NFC', name) for name in expected }
+        nbnames = {normalize('NFC', n['name']) for n in nbs}
+        expected = [u'a.ipynb', u'b.ipynb',
+                    u'name with spaces.ipynb', u'unicodé.ipynb']
+        expected = {normalize('NFC', name) for name in expected}
         self.assertEqual(nbnames, expected)
 
         nbs = notebooks_only(self.api.list('ordering').json())
@@ -209,7 +217,8 @@ class APITest(NotebookTestBase):
         dir_names = {normalize('NFC', d['name']) for d in dirs}
         print(dir_names)
         print(self.top_level_dirs)
-        self.assertEqual(dir_names, self.top_level_dirs)  # Excluding hidden dirs
+        # Excluding hidden dirs
+        self.assertEqual(dir_names, self.top_level_dirs)
 
     def test_list_nonexistant_dir(self):
         with assert_http_error(404):
@@ -261,7 +270,8 @@ class APITest(NotebookTestBase):
             self.assertIn('content', model)
             self.assertEqual(model['format'], 'base64')
             self.assertEqual(model['type'], 'file')
-            b64_data = base64.encodestring(self._blob_for_name(name)).decode('ascii')
+            b64_data = base64.encodestring(
+                self._blob_for_name(name)).decode('ascii')
             self.assertEqual(model['content'], b64_data)
 
         # Name that doesn't exist - should be a 404
@@ -278,7 +288,8 @@ class APITest(NotebookTestBase):
     def _check_created(self, resp, path, type='notebook'):
         self.assertEqual(resp.status_code, 201)
         location_header = py3compat.str_to_unicode(resp.headers['Location'])
-        self.assertEqual(location_header, url_escape(url_path_join(u'/api/contents', path)))
+        self.assertEqual(
+            location_header, url_escape(url_path_join(u'/api/contents', path)))
         rjson = resp.json()
         self.assertEqual(rjson['name'], path.rsplit('/', 1)[-1])
         self.assertEqual(rjson['path'], path)
@@ -342,9 +353,9 @@ class APITest(NotebookTestBase):
     def test_upload_txt(self):
         body = u'ünicode téxt'
         model = {
-            'content' : body,
-            'format'  : 'text',
-            'type'    : 'file',
+            'content': body,
+            'format': 'text',
+            'type': 'file',
         }
         path = u'å b/Upload tést.txt'
         resp = self.api.upload(path, body=json.dumps(model))
@@ -360,9 +371,9 @@ class APITest(NotebookTestBase):
         body = b'\xFFblob'
         b64body = base64.encodestring(body).decode('ascii')
         model = {
-            'content' : b64body,
-            'format'  : 'base64',
-            'type'    : 'file',
+            'content': b64body,
+            'format': 'base64',
+            'type': 'file',
         }
         path = u'å b/Upload tést.blob'
         resp = self.api.upload(path, body=json.dumps(model))
@@ -392,21 +403,21 @@ class APITest(NotebookTestBase):
     def test_copy(self):
         resp = self.api.copy(u'å b/ç d.ipynb', u'å b')
         self._check_created(resp, u'å b/ç d-Copy1.ipynb')
-        
+
         resp = self.api.copy(u'å b/ç d.ipynb', u'å b')
         self._check_created(resp, u'å b/ç d-Copy2.ipynb')
-    
+
     def test_copy_copy(self):
         resp = self.api.copy(u'å b/ç d.ipynb', u'å b')
         self._check_created(resp, u'å b/ç d-Copy1.ipynb')
-        
+
         resp = self.api.copy(u'å b/ç d-Copy1.ipynb', u'å b')
         self._check_created(resp, u'å b/ç d-Copy2.ipynb')
-    
+
     def test_copy_path(self):
         resp = self.api.copy(u'foo/a.ipynb', u'å b')
         self._check_created(resp, u'å b/a.ipynb')
-        
+
         resp = self.api.copy(u'foo/a.ipynb', u'å b')
         self._check_created(resp, u'å b/a-Copy1.ipynb')
 
@@ -433,7 +444,8 @@ class APITest(NotebookTestBase):
             self.assertEqual(nbs, [])
 
     def test_delete_dirs(self):
-        # depth-first delete everything, so we don't try to delete empty directories
+        # depth-first delete everything, so we don't try to delete empty
+        # directories
         for name in sorted(self.dirs + ['/'], key=len, reverse=True):
             listing = self.api.list(name).json()['content']
             for model in listing:
@@ -468,7 +480,7 @@ class APITest(NotebookTestBase):
         nb = from_dict(nbcontent)
         nb.cells.append(new_markdown_cell(u'Created by test ³'))
 
-        nbmodel= {'content': nb, 'type': 'notebook'}
+        nbmodel = {'content': nb, 'type': 'notebook'}
         resp = self.api.save('foo/a.ipynb', body=json.dumps(nbmodel))
 
         nbfile = pjoin(self.notebook_dir.name, 'foo', 'a.ipynb')
@@ -480,7 +492,6 @@ class APITest(NotebookTestBase):
         newnb = from_dict(nbcontent)
         self.assertEqual(newnb.cells[0].source,
                          u'Created by test ³')
-
 
     def test_checkpoints(self):
         resp = self.api.read('foo/a.ipynb')
@@ -496,7 +507,7 @@ class APITest(NotebookTestBase):
         hcell = new_markdown_cell('Created by test')
         nb.cells.append(hcell)
         # Save
-        nbmodel= {'content': nb, 'type': 'notebook'}
+        nbmodel = {'content': nb, 'type': 'notebook'}
         resp = self.api.save('foo/a.ipynb', body=json.dumps(nbmodel))
 
         # List checkpoints

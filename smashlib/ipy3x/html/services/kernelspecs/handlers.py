@@ -23,7 +23,8 @@ class MainKernelSpecHandler(IPythonHandler):
             try:
                 d = ksm.get_kernel_spec(kernel_name).to_dict()
             except Exception:
-                self.log.error("Failed to load kernel spec: '%s'", kernel_name, exc_info=True)
+                self.log.error(
+                    "Failed to load kernel spec: '%s'", kernel_name, exc_info=True)
                 continue
             d['name'] = kernel_name
             specs[kernel_name] = d

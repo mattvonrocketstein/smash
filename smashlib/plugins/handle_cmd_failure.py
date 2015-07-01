@@ -9,6 +9,7 @@ from smashlib.util.events import receives_event
 from smashlib.channels import C_COMMAND_FAIL, C_FILE_INPUT
 from smashlib.util import is_path
 
+
 class HandleCommandFail(Plugin):
     verbose = True
 
@@ -22,7 +23,9 @@ def load_ipython_extension(ip):
     return HandleCommandFail(get_ipython()).install()
 
 from smashlib import get_smash
-from goulash.python import splitext,ops
+from goulash.python import splitext, ops
+
+
 def unload_ipython_extension(ip):
     plugin_name = splitext(ops(__file__)[-1])[0]
     raise Exception(plugin_name)

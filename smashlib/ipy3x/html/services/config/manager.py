@@ -36,6 +36,7 @@ def recursive_update(target, new):
 
 class ConfigManager(LoggingConfigurable):
     profile_dir = Unicode()
+
     def _profile_dir_default(self):
         return locate_profile()
 
@@ -51,7 +52,7 @@ class ConfigManager(LoggingConfigurable):
                 raise
 
     def file_name(self, section_name):
-        return os.path.join(self.config_dir, section_name+'.json')
+        return os.path.join(self.config_dir, section_name + '.json')
 
     def get(self, section_name):
         """Retrieve the config data for the specified section.

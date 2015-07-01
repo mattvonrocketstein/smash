@@ -7,6 +7,7 @@ from IPython.utils import py3compat
 
 from smashlib.patches.base import PatchMagic
 
+
 class PatchPushdMagic(PatchMagic):
 
     name = 'pushd'
@@ -23,8 +24,9 @@ class PatchPushdMagic(PatchMagic):
         """
         dir_s = self.component.smash.shell.dir_stack
         tgt = os.path.expanduser(unquote_filename(parameter_s))
-        cwd = py3compat.getcwd().replace(self.component.smash.shell.home_dir,'~')
+        cwd = py3compat.getcwd().replace(
+            self.component.smash.shell.home_dir, '~')
         if tgt:
             self.mycd(parameter_s)
-        dir_s.insert(0,cwd)
+        dir_s.insert(0, cwd)
         return self.component.smash.shell.magic('dirs')

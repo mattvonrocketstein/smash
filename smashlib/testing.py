@@ -11,5 +11,6 @@ hijack_ipython_module()
 
 main = unittest.main
 
+
 class TestCase(unittest.TestCase):
     pass

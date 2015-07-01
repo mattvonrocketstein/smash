@@ -1,3 +1,4 @@
+<a id="about"></a>
 ##What is it?
 
 Smash is a smarter shell.  [Python developers](Python_use_cases.html) will be particularly interested because it also happens to host a full-fledged Python runtime (via IPython) and offers sophisticated support for Python virtual environments.  Smash leverages existing system tab completion setup as well as allowing variable & keyword completion in Python namespaces and also has a flexible [plugin architecture](plugins.html) that is easy to use.

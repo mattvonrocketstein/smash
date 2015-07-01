@@ -1,7 +1,9 @@
 """ Defines a convenient mix-in class for implementing Qt frontends.
 """
 
+
 class BaseFrontendMixin(object):
+
     """ A mix-in class for implementing Qt frontends.
 
     To handle messages of a particular type, frontends need only define an
@@ -9,9 +11,9 @@ class BaseFrontendMixin(object):
     a '_handle_stream(msg)' method.
     """
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # 'BaseFrontendMixin' concrete interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     _kernel_client = None
     _kernel_manager = None
 
@@ -32,9 +34,12 @@ class BaseFrontendMixin(object):
             old_client.stopped_channels.disconnect(self._stopped_channels)
 
             # Disconnect the old kernel client's channels.
-            old_client.iopub_channel.message_received.disconnect(self._dispatch)
-            old_client.shell_channel.message_received.disconnect(self._dispatch)
-            old_client.stdin_channel.message_received.disconnect(self._dispatch)
+            old_client.iopub_channel.message_received.disconnect(
+                self._dispatch)
+            old_client.shell_channel.message_received.disconnect(
+                self._dispatch)
+            old_client.stdin_channel.message_received.disconnect(
+                self._dispatch)
             old_client.hb_channel.kernel_died.disconnect(
                 self._handle_kernel_died)
 
@@ -80,9 +85,9 @@ class BaseFrontendMixin(object):
 
         kernel_manager.kernel_restarted.connect(self._handle_kernel_restarted)
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # 'BaseFrontendMixin' abstract interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     def _handle_kernel_died(self, since_last_heartbeat):
         """ This is called when the ``kernel_died`` signal is emitted.
@@ -109,6 +114,7 @@ class BaseFrontendMixin(object):
         since_last_heartbeat : float
             The time since the heartbeat was last received.
         """
+
     def _started_kernel(self):
         """Called when the KernelManager starts (or restarts) the kernel subprocess.
         Channels may or may not be running at this point.
@@ -124,9 +130,9 @@ class BaseFrontendMixin(object):
             when a listening KernelManager is removed from the frontend.
         """
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # 'BaseFrontendMixin' protected interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     def _dispatch(self, msg):
         """ Calls the frontend handler associated with the message type of the
@@ -136,12 +142,12 @@ class BaseFrontendMixin(object):
         handler = getattr(self, '_handle_' + msg_type, None)
         if handler:
             handler(msg)
-    
+
     def from_here(self, msg):
         """Return whether a message is from this session"""
         session_id = self._kernel_client.session.session
         return msg['parent_header'].get("session", session_id) == session_id
-    
+
     def include_output(self, msg):
         """Return whether we should include a given output message"""
         if self._hidden:
@@ -150,9 +156,8 @@ class BaseFrontendMixin(object):
         if msg['msg_type'] == 'execute_input':
             # only echo inputs not from here
             return self.include_other_output and not from_here
-        
+
         if self.include_other_output:
             return True
         else:
             return from_here
-    

@@ -1,4 +1,4 @@
-###System Shell + Python Support
+###System Shell + Python
 Smash functions as a normal system shell, but it also has full fledged python interpretter.  The goal is to be unsurprising and seamless, doing shell stuff in the shell places and python stuff in the python places.  If you're a bash user or an ipython user, many aspects of your existing configuration efforts can also be [inherited automatically](configuration.html#inheritance).
 
 ![screenshot1](scr/demo-python-bash.png "screenshot1")
@@ -7,7 +7,7 @@ If you don't care anything about python, you can ignore the python features of S
 
 -------------------------------------------------------------------------------
 
-### Prompt <a id="prompts"></a>
+### Prompt Features <a id="prompts"></a>
 By default smash ships with the wonderfully dynamic [liquidprompt tool](#https://github.com/nojhan/liquidprompt).  Liquidprompt has rich options for configuration and it's recommended that you [configure it in the normal way](https://github.com/nojhan/liquidprompt#features-configuration), but, some of these options can be overridden from `~/.smash/config.py`.  (See the [liquidprompt plugin information](plugins.html#liquidprompt) for more details.)  The default liquidprompt configuration features a prompt that shows activated python virtual environments, as well as VCS branch and commit/stash status, etc.  Other options include everything from cpu/battery status to write-permissions for the current directory.  Take a look at how it updates below based on the context:
 
 ![screenshot1](scr/demo-liquidprompt.png?raw=true "screenshot1")

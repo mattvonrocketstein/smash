@@ -9,10 +9,11 @@
 #
 from smashlib.editor import get_editor
 from smashlib._logging import smash_log
-msg = '..loading system config: '+__file__
-print msg; smash_log.debug(msg)
+msg = '..loading system config: ' + __file__
+print msg
+smash_log.debug(msg)
 
-_ = get_config() # NOQA
+_ = get_config()  # NOQA
 
 # set editor from $EDITOR if possible
 _.TerminalInteractiveShell.editor = get_editor()
@@ -21,14 +22,14 @@ _.Smash.load_bash_aliases = True
 _.Smash.load_bash_functions = True
 
 # load toplevel extensions
-################################################################################
+##########################################################################
 _.InteractiveShellApp.extensions.append("smashlib.pysh")
 #_.InteractiveShellApp.extensions.append("smashlib.dot_prefilter")
 _.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
 
 # every smash component gets it's own verbosity setting.
 # this mostly controls the printing of debugging info
-################################################################################
+##########################################################################
 _.Smash.verbose = True
 _.DoWhatIMean.verbose = False
 _.DjangoPlugin.verbose = True
@@ -38,27 +39,31 @@ _.ChangeDirHooks.verbose = False
 _.VirtualEnvSupport.verbose = False
 
 # cross-cutting verbosity configs
-################################################################################
+##########################################################################
 _.Smash.ignore_warnings = True
 _.Smash.verbose_events = False
 
 # include various things that used to be
 # done in profile_pysh/ipython_config.py
-################################################################################
+##########################################################################
 _.InteractiveShell.separate_in = ''
 _.InteractiveShell.separate_out = ''
 _.InteractiveShell.separate_out2 = ''
+#_.InteractiveShellApp.extensions = ['autoreload']
+#_.InteractiveShellApp.exec_lines = ['%autoreload 2']
+#.InteractiveShellApp.exec_lines.append('print("Warning: disable autoreload in ipython_config.py to improve performance.")')
+
 _.TerminalIPythonApp.display_banner = False
 _.TerminalInteractiveShell.confirm_exit = False
 
 # If False, only the completion results from
 # the first non-empty completer will be returned.
-################################################################################
+##########################################################################
 _.IPCompleter.merge_completions = False
 
 
 # load optional smash extensions
-#_.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
+# _.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
 _.Smash.plugins.append('smashlib.plugins.cli_command_runner')
 _.Smash.plugins.append('smashlib.plugins.cli_update_runner')
 _.Smash.plugins.append('smashlib.plugins._django')
@@ -86,26 +91,26 @@ _.Smash.plugins.append("smashlib.plugins.python_comp_tools")
 _.Smash.plugins.append("smashlib.plugins.autojump")
 
 # setup default configuration for the linter (used by "project manager" plugin)
-################################################################################
+##########################################################################
 
 
 # setup default configuration for the linter (used by "project manager" plugin)
-################################################################################
+##########################################################################
 _.PyLinter.verbose = True
 _.PyLinter.ignore_pep8 = True
 _.PyLinter.ignore_undefined_names = [
     'get_ipython',
-    ['get_config','.*_config.py'],
-    ['load_subconfig','.*ipython_config.py'],
+    ['get_config', '.*_config.py'],
+    ['load_subconfig', '.*ipython_config.py'],
 ]
 
-## configure the prompt extension with some reasonable defaults.
-################################################################################
+# configure the prompt extension with some reasonable defaults.
+##########################################################################
 _.PromptManager.justify = False
 _.Smash.plugins.append('smashlib.plugins.prompt')
 
 # configure the project manager extension
-################################################################################
+##########################################################################
 projects = _.ProjectManager
 
 # this is safe even when the directories do not exist
@@ -124,15 +129,19 @@ config.update_from_etc(projects.macro_map, 'macros.json')
 config.update_from_etc(projects.venv_map, 'venvs.json')
 
 # configure the ipython app
-################################################################################
+##########################################################################
 app = _.InteractiveShellApp
+app.extensions.append("autoreload")
 app.exec_lines.append("""%rehashx""")
 app.exec_lines.append("""ip = get_ipython()""")
 app.exec_lines.append("""cfg = ip.config""")
 app.exec_lines.append("""_smash = ip._smash""")
+app.exec_lines.append('%autoreload 2')
+app.exec_lines.append(
+    'print("Warning: disable autoreload in ipython_config.py to improve performance.")')
 
 
 # load smash user config.  NB: this must happen last!
-################################################################################
+##########################################################################
 from smashlib.config import SmashUserConfig
 SmashUserConfig.load(globals())

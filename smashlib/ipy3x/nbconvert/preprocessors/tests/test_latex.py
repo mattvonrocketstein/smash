@@ -8,8 +8,8 @@ from ..latex import LatexPreprocessor
 
 
 class TestLatex(PreprocessorTestsBase):
-    """Contains test functions for latex.py"""
 
+    """Contains test functions for latex.py"""
 
     def build_preprocessor(self):
         """Make an instance of a preprocessor"""
@@ -20,7 +20,6 @@ class TestLatex(PreprocessorTestsBase):
     def test_constructor(self):
         """Can a LatexPreprocessor be constructed?"""
         self.build_preprocessor()
-        
 
     def test_output(self):
         """Test the output of the LatexPreprocessor"""

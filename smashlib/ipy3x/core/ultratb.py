@@ -133,6 +133,8 @@ DEFAULT_SCHEME = 'NoColor'
 # Code begins
 
 # Utility functions
+
+
 def inspect_error():
     """Print a message about internal inspect errors.
 
@@ -215,7 +217,8 @@ def findsource(object):
         # the length of lines, which causes an error.  Safeguard against that.
         lnum = min(object.co_firstlineno, len(lines)) - 1
         while lnum > 0:
-            if pmatch(lines[lnum]): break
+            if pmatch(lines[lnum]):
+                break
             lnum -= 1
 
         return lines, lnum
@@ -255,7 +258,8 @@ def fix_frame_records_filenames(records):
                 # __file__. It might also be None if the error occurred during
                 # import.
                 filename = better_fn
-        fixed_records.append((frame, filename, line_no, func_name, lines, index))
+        fixed_records.append(
+            (frame, filename, line_no, func_name, lines, index))
     return fixed_records
 
 
@@ -316,7 +320,8 @@ def _format_traceback_lines(lnum, index, lines, Colors, lvals=None, scheme=None)
         line = py3compat.cast_unicode(line)
 
         new_line, err = _line_format(line, 'str', scheme)
-        if not err: line = new_line
+        if not err:
+            line = new_line
 
         if i == lnum:
             # This is the line with the error
@@ -347,6 +352,7 @@ def _format_traceback_lines(lnum, index, lines, Colors, lvals=None, scheme=None)
 #---------------------------------------------------------------------------
 # Module classes
 class TBTools(object):
+
     """Basic tools used by all traceback printer classes."""
 
     # Number of frames to skip when reporting tracebacks
@@ -442,11 +448,12 @@ class TBTools(object):
 
 #---------------------------------------------------------------------------
 class ListTB(TBTools):
+
     """Print traceback information from a traceback list, with optional color.
 
     Calling requires 3 arguments: (etype, evalue, elist)
     as would be obtained by::
-    
+
       etype, evalue, tb = sys.exc_info()
       if tb:
         elist = traceback.extract_tb(tb)
@@ -512,9 +519,9 @@ class ListTB(TBTools):
 
         # Note: this code originally read:
 
-        ## for line in lines[:-1]:
+        # for line in lines[:-1]:
         ##     out_list.append(" "+line)
-        ## out_list.append(lines[-1])
+        # out_list.append(lines[-1])
 
         # This means it was indenting everything but the last line by a little
         # bit.  I've disabled this for now, but if we see ugliness somewhere we
@@ -582,17 +589,19 @@ class ListTB(TBTools):
         else:
             if issubclass(etype, SyntaxError):
                 have_filedata = True
-                if not value.filename: value.filename = "<string>"
+                if not value.filename:
+                    value.filename = "<string>"
                 if value.lineno:
                     lineno = value.lineno
                     textline = ulinecache.getline(value.filename, value.lineno)
                 else:
                     lineno = 'unknown'
                     textline = ''
-                list.append('%s  File %s"%s"%s, line %s%s%s\n' % \
+                list.append('%s  File %s"%s"%s, line %s%s%s\n' %
                             (Colors.normalEm,
-                             Colors.filenameEm, py3compat.cast_unicode(value.filename), Colors.normalEm,
-                             Colors.linenoEm, lineno, Colors.Normal  ))
+                             Colors.filenameEm, py3compat.cast_unicode(
+                                 value.filename), Colors.normalEm,
+                             Colors.linenoEm, lineno, Colors.Normal))
                 if textline == '':
                     textline = py3compat.cast_unicode(value.text, "utf-8")
 
@@ -627,7 +636,8 @@ class ListTB(TBTools):
         if have_filedata:
             ipinst = get_ipython()
             if ipinst is not None:
-                ipinst.hooks.synchronize_with_editor(value.filename, value.lineno, 0)
+                ipinst.hooks.synchronize_with_editor(
+                    value.filename, value.lineno, 0)
 
         return list
 
@@ -666,6 +676,7 @@ class ListTB(TBTools):
 
 #----------------------------------------------------------------------------
 class VerboseTB(TBTools):
+
     """A port of Ka-Ping Yee's cgitb.py module that outputs color text instead
     of HTML.  Requires inspect and pydoc.  Crazy, man.
 
@@ -721,7 +732,7 @@ class VerboseTB(TBTools):
 
         abspath = os.path.abspath
         for frame, file, lnum, func, lines, index in records:
-            #print '*** record:',file,lnum,func,lines,index  # dbg
+            # print '*** record:',file,lnum,func,lines,index  # dbg
             if not file:
                 file = '?'
             elif file.startswith(str("<")) and file.endswith(str(">")):
@@ -891,14 +902,15 @@ class VerboseTB(TBTools):
             date = time.ctime(time.time())
 
             head = '%s%s%s\n%s%s%s\n%s' % (colors.topline, '-' * 75, colorsnormal,
-                                           exc, ' ' * (75 - len(str(etype)) - len(pyver)),
-                                           pyver, date.rjust(75) )
+                                           exc, ' ' *
+                                           (75 - len(str(etype)) - len(pyver)),
+                                           pyver, date.rjust(75))
             head += "\nA problem occurred executing Python code.  Here is the sequence of function" \
                     "\ncalls leading up to the error, with the most recent (innermost) call last."
         else:
             # Simplified header
-            head = '%s%s' % (exc, 'Traceback (most recent call last)'. \
-                             rjust(75 - len(str(etype))) )
+            head = '%s%s' % (exc, 'Traceback (most recent call last)'.
+                             rjust(75 - len(str(etype))))
 
         return head
 
@@ -919,7 +931,8 @@ class VerboseTB(TBTools):
 
         if (not py3compat.PY3) and type(evalue) is types.InstanceType:
             try:
-                names = [w for w in dir(evalue) if isinstance(w, py3compat.string_types)]
+                names = [
+                    w for w in dir(evalue) if isinstance(w, py3compat.string_types)]
             except:
                 # Every now and then, an object with funny internals blows up
                 # when dir() is called on it.  We do the best we can to report
@@ -976,7 +989,8 @@ class VerboseTB(TBTools):
             # reproduce the problem.
             inspect_error()
             traceback.print_exc(file=self.ostream)
-            info('\nUnfortunately, your original traceback can not be constructed.\n')
+            info(
+                '\nUnfortunately, your original traceback can not be constructed.\n')
             return None
 
     def get_parts_of_chained_exception(self, evalue):
@@ -1008,7 +1022,8 @@ class VerboseTB(TBTools):
             formatted_exceptions = formatted_exception
             exception = self.get_parts_of_chained_exception(evalue)
             if exception:
-                formatted_exceptions += self.prepare_chained_exception_message(evalue.__cause__)
+                formatted_exceptions += self.prepare_chained_exception_message(
+                    evalue.__cause__)
                 etype, evalue, etb = exception
             else:
                 evalue = None
@@ -1018,7 +1033,8 @@ class VerboseTB(TBTools):
                 exception = self.get_parts_of_chained_exception(evalue)
 
                 if exception:
-                    formatted_exceptions += self.prepare_chained_exception_message(evalue.__cause__)
+                    formatted_exceptions += self.prepare_chained_exception_message(
+                        evalue.__cause__)
                     etype, evalue, etb = exception
                 else:
                     evalue = None
@@ -1101,6 +1117,7 @@ class VerboseTB(TBTools):
 
 #----------------------------------------------------------------------------
 class FormattedTB(VerboseTB, ListTB):
+
     """Subclass ListTB but allow calling with a traceback.
 
     It can thus be used as a sys.excepthook for Python > 2.1.
@@ -1160,7 +1177,6 @@ class FormattedTB(VerboseTB, ListTB):
         """Convert a structured traceback (a list) to a string."""
         return self.tb_join_char.join(stb)
 
-
     def set_mode(self, mode=None):
         """Switch to the desired mode.
 
@@ -1168,7 +1184,7 @@ class FormattedTB(VerboseTB, ListTB):
 
         if not mode:
             new_idx = (self.valid_modes.index(self.mode) + 1 ) % \
-                      len(self.valid_modes)
+                len(self.valid_modes)
             self.mode = self.valid_modes[new_idx]
         elif mode not in self.valid_modes:
             raise ValueError('Unrecognized mode in FormattedTB: <' + mode + '>\n'
@@ -1193,6 +1209,7 @@ class FormattedTB(VerboseTB, ListTB):
 
 #----------------------------------------------------------------------------
 class AutoFormattedTB(FormattedTB):
+
     """A traceback printer which can be called on the fly.
 
     It will find out about exceptions by itself.
@@ -1243,6 +1260,7 @@ class AutoFormattedTB(FormattedTB):
 
 # A simple class to preserve Nathan's original functionality.
 class ColorTB(FormattedTB):
+
     """Shorthand to initialize a FormattedTB in Linux colors mode."""
 
     def __init__(self, color_scheme='Linux', call_pdb=0):
@@ -1251,6 +1269,7 @@ class ColorTB(FormattedTB):
 
 
 class SyntaxTB(ListTB):
+
     """Extension which holds some state: the last exception value"""
 
     def __init__(self, color_scheme='NoColor'):
@@ -1367,4 +1386,3 @@ if __name__ == "__main__":
     except:
         handler(*sys.exc_info())
     print('')
-

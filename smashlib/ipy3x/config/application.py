@@ -38,14 +38,14 @@ option_description = """
 Arguments that take values are actually convenience aliases to full
 Configurables, whose aliases are listed on the help line. For more information
 on full configurables, see '--help-all'.
-""".strip() # trim newlines of front and back
+""".strip()  # trim newlines of front and back
 
 keyvalue_description = """
 Parameters are set from command-line arguments of the form:
 `--Class.trait=value`.
 This line is evaluated in Python, so simple expressions are allowed, e.g.::
 `--C.a='range(3)'` For setting C.a=[0,1,2].
-""".strip() # trim newlines of front and back
+""".strip()  # trim newlines of front and back
 
 # sys.argv can be missing, for example when python is embedded. See the docs
 # for details: http://docs.python.org/2/c-api/intro.html#embedding-python
@@ -62,13 +62,14 @@ subcommand 'cmd', do: `{app} cmd -h`.
 # Application class
 #-----------------------------------------------------------------------------
 
+
 @decorator
 def catch_config_error(method, app, *args, **kwargs):
     """Method decorator for catching invalid config (Trait/ArgumentErrors) during init.
 
     On a TraitError (generally caused by bad config), this will print the trait's
     message, and exit the app.
-    
+
     For use on init methods, to prevent invoking excepthook on invalid input.
     """
     try:
@@ -84,27 +85,30 @@ def catch_config_error(method, app, *args, **kwargs):
 class ApplicationError(Exception):
     pass
 
+
 class LevelFormatter(logging.Formatter):
+
     """Formatter with additional `highlevel` record
-    
+
     This field is empty if log level is less than highlevel_limit,
     otherwise it is formatted with self.highlevel_format.
-    
+
     Useful for adding 'WARNING' to warning messages,
     without adding 'INFO' to info, etc.
     """
     highlevel_limit = logging.WARN
     highlevel_format = " %(levelname)s |"
-    
+
     def format(self, record):
         if record.levelno >= self.highlevel_limit:
             record.highlevel = self.highlevel_format % record.__dict__
         else:
             record.highlevel = ""
         return super(LevelFormatter, self).format(record)
-            
+
 
 class Application(SingletonConfigurable):
+
     """A singleton application with full configuration support."""
 
     # The name of the application, will usually match the name of the command
@@ -125,11 +129,12 @@ class Application(SingletonConfigurable):
     # A sequence of Configurable subclasses whose config=True attributes will
     # be exposed at the command line.
     classes = []
+
     @property
     def _help_classes(self):
         """Define `App.help_classes` if CLI classes should differ from config file classes"""
         return getattr(self, 'help_classes', self.classes)
-    
+
     @property
     def _config_classes(self):
         """Define `App.config_classes` if config file classes should differ from CLI classes."""
@@ -137,41 +142,45 @@ class Application(SingletonConfigurable):
 
     # The version string of this application.
     version = Unicode(u'0.0')
-    
+
     # the argv used to initialize the application
     argv = List()
 
     # The log level for the application
-    log_level = Enum((0,10,20,30,40,50,'DEBUG','INFO','WARN','ERROR','CRITICAL'),
-                    default_value=logging.WARN,
-                    config=True,
-                    help="Set the log level by value or name.")
+    log_level = Enum((0, 10, 20, 30, 40, 50, 'DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'),
+                     default_value=logging.WARN,
+                     config=True,
+                     help="Set the log level by value or name.")
+
     def _log_level_changed(self, name, old, new):
         """Adjust the log level when log_level is set."""
         if isinstance(new, string_types):
             new = getattr(logging, new)
             self.log_level = new
         self.log.setLevel(new)
-    
+
     _log_formatter_cls = LevelFormatter
-    
+
     log_datefmt = Unicode("%Y-%m-%d %H:%M:%S", config=True,
-        help="The date format used by logging formatters for %(asctime)s"
-    )
+                          help="The date format used by logging formatters for %(asctime)s"
+                          )
+
     def _log_datefmt_changed(self, name, old, new):
         self._log_format_changed()
-    
+
     log_format = Unicode("[%(name)s]%(highlevel)s %(message)s", config=True,
-        help="The Logging format template",
-    )
+                         help="The Logging format template",
+                         )
+
     def _log_format_changed(self, name, old, new):
         """Change the log formatter when log_format is set."""
         _log_handler = self.log.handlers[0]
-        _log_formatter = self._log_formatter_cls(fmt=new, datefmt=self.log_datefmt)
+        _log_formatter = self._log_formatter_cls(
+            fmt=new, datefmt=self.log_datefmt)
         _log_handler.setFormatter(_log_formatter)
-    
 
     log = Instance(logging.Logger)
+
     def _log_default(self):
         """Start logging for this application.
 
@@ -182,7 +191,7 @@ class Application(SingletonConfigurable):
         log = logging.getLogger(self.__class__.__name__)
         log.setLevel(self.log_level)
         log.propagate = False
-        _log = log # copied from Logger.hasHandlers() (new in Python 3.2)
+        _log = log  # copied from Logger.hasHandlers() (new in Python 3.2)
         while _log:
             if _log.handlers:
                 return log
@@ -196,26 +205,29 @@ class Application(SingletonConfigurable):
             _log_handler = logging.StreamHandler(open(os.devnull, 'w'))
         else:
             _log_handler = logging.StreamHandler()
-        _log_formatter = self._log_formatter_cls(fmt=self.log_format, datefmt=self.log_datefmt)
+        _log_formatter = self._log_formatter_cls(
+            fmt=self.log_format, datefmt=self.log_datefmt)
         _log_handler.setFormatter(_log_formatter)
         log.addHandler(_log_handler)
         return log
 
     # the alias map for configurables
-    aliases = Dict({'log-level' : 'Application.log_level'})
+    aliases = Dict({'log-level': 'Application.log_level'})
 
     # flags for loading Configurables or store_const style flags
     # flags are loaded from this dict by '--key' flags
     # this must be a dict of two-tuples, the first element being the Config/dict
     # and the second being the help string for the flag
     flags = Dict()
+
     def _flags_changed(self, name, old, new):
         """ensure flags dict is valid"""
-        for key,value in iteritems(new):
-            assert len(value) == 2, "Bad flag: %r:%s"%(key,value)
-            assert isinstance(value[0], (dict, Config)), "Bad flag: %r:%s"%(key,value)
-            assert isinstance(value[1], string_types), "Bad flag: %r:%s"%(key,value)
-
+        for key, value in iteritems(new):
+            assert len(value) == 2, "Bad flag: %r:%s" % (key, value)
+            assert isinstance(
+                value[0], (dict, Config)), "Bad flag: %r:%s" % (key, value)
+            assert isinstance(
+                value[1], string_types), "Bad flag: %r:%s" % (key, value)
 
     # subcommands for launching other applications
     # if this is not empty, this will be a parent Application
@@ -224,11 +236,11 @@ class Application(SingletonConfigurable):
     # and the second being the help string for the subcommand
     subcommands = Dict()
     # parse_command_line will initialize a subapp, if requested
-    subapp = Instance('IPython.config.application.Application', allow_none=True)
+    subapp = Instance(
+        'IPython.config.application.Application', allow_none=True)
 
     # extra command-line arguments that don't set config values
     extra_args = List(Unicode)
-
 
     def __init__(self, **kwargs):
         SingletonConfigurable.__init__(self, **kwargs)
@@ -250,7 +262,6 @@ class Application(SingletonConfigurable):
         """
         self.parse_command_line(argv)
 
-
     def start(self):
         """Start the app mainloop.
 
@@ -267,20 +278,21 @@ class Application(SingletonConfigurable):
         lines = []
         classdict = {}
         for cls in self._help_classes:
-            # include all parents (up to, but excluding Configurable) in available names
+            # include all parents (up to, but excluding Configurable) in
+            # available names
             for c in cls.mro()[:-3]:
                 classdict[c.__name__] = c
 
         for alias, longname in iteritems(self.aliases):
-            classname, traitname = longname.split('.',1)
+            classname, traitname = longname.split('.', 1)
             cls = classdict[classname]
 
             trait = cls.class_traits(config=True)[traitname]
             help = cls.class_get_trait_help(trait).splitlines()
             # reformat first line
-            help[0] = help[0].replace(longname, alias) + ' (%s)'%longname
+            help[0] = help[0].replace(longname, alias) + ' (%s)' % longname
             if len(alias) == 1:
-                help[0] = help[0].replace('--%s='%alias, '-%s '%alias)
+                help[0] = help[0].replace('--%s=' % alias, '-%s ' % alias)
             lines.extend(help)
         # lines.append('')
         print(os.linesep.join(lines))
@@ -291,9 +303,9 @@ class Application(SingletonConfigurable):
             return
 
         lines = []
-        for m, (cfg,help) in iteritems(self.flags):
+        for m, (cfg, help) in iteritems(self.flags):
             prefix = '--' if len(m) > 1 else '-'
-            lines.append(prefix+m)
+            lines.append(prefix + m)
             lines.append(indent(dedent(help.strip())))
         # lines.append('')
         print(os.linesep.join(lines))
@@ -302,7 +314,7 @@ class Application(SingletonConfigurable):
         if not self.flags and not self.aliases:
             return
         lines = ['Options']
-        lines.append('-'*len(lines[0]))
+        lines.append('-' * len(lines[0]))
         lines.append('')
         for p in wrap_paragraphs(self.option_description):
             lines.append(p)
@@ -318,10 +330,10 @@ class Application(SingletonConfigurable):
             return
 
         lines = ["Subcommands"]
-        lines.append('-'*len(lines[0]))
+        lines.append('-' * len(lines[0]))
         lines.append('')
         for p in wrap_paragraphs(self.subcommand_description.format(
-                    app=self.name)):
+                app=self.name)):
             lines.append(p)
             lines.append('')
         for subc, (cls, help) in iteritems(self.subcommands):
@@ -359,7 +371,6 @@ class Application(SingletonConfigurable):
 
         self.print_examples()
 
-
     def print_description(self):
         """Print the application description."""
         for p in wrap_paragraphs(self.description):
@@ -396,7 +407,7 @@ class Application(SingletonConfigurable):
     @catch_config_error
     def initialize_subcommand(self, subc, argv=None):
         """Initialize a subcommand with argv."""
-        subapp,help = self.subcommands.get(subc)
+        subapp, help = self.subcommands.get(subc)
 
         if isinstance(subapp, string_types):
             subapp = import_item(subapp)
@@ -407,17 +418,17 @@ class Application(SingletonConfigurable):
         self.subapp = subapp.instance(config=self.config)
         # and initialize subapp
         self.subapp.initialize(argv)
-    
+
     def flatten_flags(self):
         """flatten flags and aliases, so cl-args override as expected.
-        
+
         This prevents issues such as an alias pointing to InteractiveShell,
         but a config file setting the same trait in TerminalInteraciveShell
         getting inappropriate priority over the command-line arg.
 
         Only aliases with exactly one descendent in the class list
         will be promoted.
-        
+
         """
         # build a tree of classes in our list that inherit from a particular
         # it will be a dict by parent classname of classes in our list
@@ -432,13 +443,13 @@ class Application(SingletonConfigurable):
         # { 'alias' : 'Class.trait' }
         aliases = {}
         for alias, cls_trait in iteritems(self.aliases):
-            cls,trait = cls_trait.split('.',1)
+            cls, trait = cls_trait.split('.', 1)
             children = mro_tree[cls]
             if len(children) == 1:
                 # exactly one descendent, promote alias
                 cls = children[0]
-            aliases[alias] = '.'.join([cls,trait])
-        
+            aliases[alias] = '.'.join([cls, trait])
+
         # flatten flags, which are of the form:
         # { 'key' : ({'Cls' : {'trait' : value}}, 'help')}
         flags = {}
@@ -457,8 +468,8 @@ class Application(SingletonConfigurable):
     def parse_command_line(self, argv=None):
         """Parse the command line arguments."""
         argv = sys.argv[1:] if argv is None else argv
-        self.argv = [ py3compat.cast_unicode(arg) for arg in argv ]
-        
+        self.argv = [py3compat.cast_unicode(arg) for arg in argv]
+
         if argv and argv[0] == 'help':
             # turn `ipython help notebook` into `ipython notebook -h`
             argv = argv[1:] + ['-h']
@@ -486,9 +497,9 @@ class Application(SingletonConfigurable):
         if '--version' in interpreted_argv or '-V' in interpreted_argv:
             self.print_version()
             self.exit(0)
-        
+
         # flatten flags&aliases, so cl-args get appropriate priority:
-        flags,aliases = self.flatten_flags()
+        flags, aliases = self.flatten_flags()
         loader = KVArgParseConfigLoader(argv=argv, aliases=aliases,
                                         flags=flags, log=self.log)
         config = loader.load_config()
@@ -502,13 +513,16 @@ class Application(SingletonConfigurable):
 
         yield each config object in turn.
         """
-        
+
         if not isinstance(path, list):
             path = [path]
         for path in path[::-1]:
-            # path list is in descending priority order, so load files backwards:
-            pyloader = PyFileConfigLoader(basefilename+'.py', path=path, log=log)
-            jsonloader = JSONFileConfigLoader(basefilename+'.json', path=path, log=log)
+            # path list is in descending priority order, so load files
+            # backwards:
+            pyloader = PyFileConfigLoader(
+                basefilename + '.py', path=path, log=log)
+            jsonloader = JSONFileConfigLoader(
+                basefilename + '.json', path=path, log=log)
             config = None
             for loader in [pyloader, jsonloader]:
                 try:
@@ -517,20 +531,21 @@ class Application(SingletonConfigurable):
                     pass
                 except Exception:
                     # try to get the full filename, but it will be empty in the
-                    # unlikely event that the error raised before filefind finished
+                    # unlikely event that the error raised before filefind
+                    # finished
                     filename = loader.full_filename or basefilename
                     # problem while running the file
                     if log:
                         log.error("Exception while loading config file %s",
-                                filename, exc_info=True)
+                                  filename, exc_info=True)
                 else:
                     if log:
-                        log.debug("Loaded config file: %s", loader.full_filename)
+                        log.debug(
+                            "Loaded config file: %s", loader.full_filename)
                 if config:
-                     yield config
+                    yield config
 
         raise StopIteration
-
 
     @catch_config_error
     def load_config_file(self, filename, path=None):
@@ -545,13 +560,12 @@ class Application(SingletonConfigurable):
             if collisions:
                 self.log.warn("Collisions detected in {0}.py and {0}.json config files."
                               " {0}.json has higher priority: {1}".format(
-                              filename, json.dumps(collisions, indent=2),
-                ))
-
+                                  filename, json.dumps(collisions, indent=2),
+                              ))
 
     def generate_config_file(self):
         """generate default config file from Configurables"""
-        lines = ["# Configuration file for %s."%self.name]
+        lines = ["# Configuration file for %s." % self.name]
         lines.append('')
         lines.append('c = get_config()')
         lines.append('')
@@ -566,7 +580,7 @@ class Application(SingletonConfigurable):
     @classmethod
     def launch_instance(cls, argv=None, **kwargs):
         """Launch a global instance of this Application
-        
+
         If a global instance already exists, this reinitializes and starts it
         """
         app = cls.instance(**kwargs)
@@ -576,6 +590,7 @@ class Application(SingletonConfigurable):
 #-----------------------------------------------------------------------------
 # utility functions, for convenience
 #-----------------------------------------------------------------------------
+
 
 def boolean_flag(name, configurable, set_help='', unset_help=''):
     """Helper for building basic --trait, --no-trait flags.
@@ -600,12 +615,11 @@ def boolean_flag(name, configurable, set_help='', unset_help=''):
         the trait, respectively.
     """
     # default helpstrings
-    set_help = set_help or "set %s=True"%configurable
-    unset_help = unset_help or "set %s=False"%configurable
+    set_help = set_help or "set %s=True" % configurable
+    unset_help = unset_help or "set %s=False" % configurable
 
-    cls,trait = configurable.split('.')
+    cls, trait = configurable.split('.')
 
-    setter = {cls : {trait : True}}
-    unsetter = {cls : {trait : False}}
-    return {name : (setter, set_help), 'no-'+name : (unsetter, unset_help)}
-
+    setter = {cls: {trait: True}}
+    unsetter = {cls: {trait: False}}
+    return {name: (setter, set_help), 'no-' + name: (unsetter, unset_help)}

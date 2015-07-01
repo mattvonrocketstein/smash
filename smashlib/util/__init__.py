@@ -4,7 +4,9 @@
     Safe, simple packages only (no ipython imports in here)
     Stick to stdlib, or known-safe sections of smashlib
 """
-import os, re, glob
+import os
+import re
+import glob
 
 from goulash._os import touch_file, home
 from goulash.python import get_env, opd, ops, opj, ope, expanduser
@@ -12,24 +14,27 @@ from smashlib.data import P_CODE_FILE
 
 from report import Reporter as BaseReporter
 
+
 class Reporter(BaseReporter):
     pass
+
 
 def _guess_dir_type(_dir, max_depth=3):
     type_map = P_CODE_FILE.copy()
     type_map.update({
-        'test*':'tests',
-        })
+        'test*': 'tests',
+    })
     # create a list based on max-depth like ['*', '*/*', '*/*/*', ..]
-    globs = [ os.path.sep.join(['*']*x) for x in range(1, max_depth+1) ]
+    globs = [os.path.sep.join(['*'] * x) for x in range(1, max_depth + 1)]
     matches = {}
     for ftype, ftype_name in type_map.items():
         for expr in globs:
             expr = expr + ftype
-            if glob.glob(os.path.join(_dir,expr)):
+            if glob.glob(os.path.join(_dir, expr)):
                 matches[ftype_name] = _dir
                 break
     return matches
+
 
 def guess_dir_type(_dir, **kargs):
     """ given a directory and a depth, find which types of
@@ -39,13 +44,15 @@ def guess_dir_type(_dir, **kargs):
     """
     return _guess_dir_type(_dir, **kargs).keys()
 
+
 def is_path(input):
-    if len(input.split())==1 and \
-       (os.path.exists(input) or \
-        input.startswith('./') or \
-        input.startswith('~/') or \
-        input.startswith('/')):
+    if len(input.split()) == 1 and \
+       (os.path.exists(input) or
+            input.startswith('./') or
+            input.startswith('~/') or
+            input.startswith('/')):
         return True
+
 
 def split_on_unquoted_semicolons(txt):
     # use this in "ed fpath:1:2"?

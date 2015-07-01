@@ -6,14 +6,18 @@
 
 from contextlib import contextmanager
 
+
 def beginActivityWithOptions(options, reason=""):
     return
+
 
 def endActivity(activity):
     return
 
+
 def nope():
     return
+
 
 def nap():
     return
@@ -21,10 +25,11 @@ def nap():
 
 @contextmanager
 def nope_scope(
-        options=0,
-        reason="Because Reasons"
-    ):
+    options=0,
+    reason="Because Reasons"
+):
     yield
+
 
 def napping_allowed():
     return True

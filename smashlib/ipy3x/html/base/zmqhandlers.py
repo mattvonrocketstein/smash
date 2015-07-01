@@ -10,9 +10,9 @@ import struct
 import warnings
 
 try:
-    from urllib.parse import urlparse # Py 3
+    from urllib.parse import urlparse  # Py 3
 except ImportError:
-    from urlparse import urlparse # Py 2
+    from urlparse import urlparse  # Py 2
 
 import tornado
 from tornado import gen, ioloop, web
@@ -23,6 +23,7 @@ from IPython.utils.jsonutil import date_default, extract_dates
 from IPython.utils.py3compat import cast_unicode
 
 from .handlers import IPythonHandler
+
 
 def serialize_binary_message(msg):
     """serialize a message as a binary blob
@@ -70,7 +71,7 @@ def deserialize_binary_message(bmsg):
     message dictionary
     """
     nbufs = struct.unpack('!i', bmsg[:4])[0]
-    offsets = list(struct.unpack('!' + 'I' * nbufs, bmsg[4:4*(nbufs+1)]))
+    offsets = list(struct.unpack('!' + 'I' * nbufs, bmsg[4:4 * (nbufs + 1)]))
     offsets.append(None)
     bufs = []
     for start, stop in zip(offsets[:-1], offsets[1:]):
@@ -92,11 +93,12 @@ if os.environ.get('IPYTHON_ALLOW_DRAFT_WEBSOCKETS_FOR_PHANTOMJS', False):
     # draft 76 doesn't support ping
     WS_PING_INTERVAL = 0
 
+
 class ZMQStreamHandler(WebSocketHandler):
-    
+
     def check_origin(self, origin):
         """Check Origin == Host or Access-Control-Allow-Origin.
-        
+
         Tornado >= 4 calls this method automatically, raising 403 if it returns False.
         We call it explicitly in `open` on Tornado < 4.
         """
@@ -107,19 +109,21 @@ class ZMQStreamHandler(WebSocketHandler):
 
         # If no header is provided, assume we can't verify origin
         if origin is None:
-            self.log.warn("Missing Origin header, rejecting WebSocket connection.")
+            self.log.warn(
+                "Missing Origin header, rejecting WebSocket connection.")
             return False
         if host is None:
-            self.log.warn("Missing Host header, rejecting WebSocket connection.")
+            self.log.warn(
+                "Missing Host header, rejecting WebSocket connection.")
             return False
-        
+
         origin = origin.lower()
         origin_host = urlparse(origin).netloc
-        
+
         # OK if origin matches host
         if origin_host == host:
             return True
-        
+
         # Check CORS headers
         if self.allow_origin:
             allow = self.allow_origin == origin
@@ -130,8 +134,8 @@ class ZMQStreamHandler(WebSocketHandler):
             allow = False
         if not allow:
             self.log.warn("Blocking Cross Origin WebSocket Attempt.  Origin: %s, Host: %s",
-                origin, host,
-            )
+                          origin, host,
+                          )
         return allow
 
     def clear_cookie(self, *args, **kwargs):
@@ -158,27 +162,30 @@ class ZMQStreamHandler(WebSocketHandler):
     def _on_zmq_reply(self, msg_list):
         # Sometimes this gets triggered when the on_close method is scheduled in the
         # eventloop but hasn't been called.
-        if self.stream.closed(): return
+        if self.stream.closed():
+            return
         try:
             msg = self._reserialize_reply(msg_list)
         except Exception:
-            self.log.critical("Malformed message: %r" % msg_list, exc_info=True)
+            self.log.critical("Malformed message: %r" %
+                              msg_list, exc_info=True)
         else:
             self.write_message(msg, binary=isinstance(msg, bytes))
+
 
 class AuthenticatedZMQStreamHandler(ZMQStreamHandler, IPythonHandler):
     ping_callback = None
     last_ping = 0
     last_pong = 0
-    
+
     @property
     def ping_interval(self):
         """The interval for websocket keep-alive pings.
-        
+
         Set ws_ping_interval = 0 to disable pings.
         """
         return self.settings.get('ws_ping_interval', WS_PING_INTERVAL)
-    
+
     @property
     def ping_timeout(self):
         """If no ping is received in this many milliseconds,
@@ -186,19 +193,19 @@ class AuthenticatedZMQStreamHandler(ZMQStreamHandler, IPythonHandler):
         Default is max of 3 pings or 30 seconds.
         """
         return self.settings.get('ws_ping_timeout',
-            max(3 * self.ping_interval, WS_PING_INTERVAL)
-        )
+                                 max(3 * self.ping_interval, WS_PING_INTERVAL)
+                                 )
 
     def set_default_headers(self):
         """Undo the set_default_headers in IPythonHandler
-        
+
         which doesn't make sense for websockets
         """
         pass
-    
+
     def pre_get(self):
         """Run before finishing the GET request
-        
+
         Extend this method to add logic that should fire before
         the websocket finishes completing.
         """
@@ -206,12 +213,13 @@ class AuthenticatedZMQStreamHandler(ZMQStreamHandler, IPythonHandler):
         if self.get_current_user() is None:
             self.log.warn("Couldn't authenticate WebSocket connection")
             raise web.HTTPError(403)
-        
+
         if self.get_argument('session_id', False):
-            self.session.session = cast_unicode(self.get_argument('session_id'))
+            self.session.session = cast_unicode(
+                self.get_argument('session_id'))
         else:
             self.log.warn("No session ID specified")
-    
+
     @gen.coroutine
     def get(self, *args, **kwargs):
         # pre_get can be a coroutine in subclasses
@@ -219,19 +227,22 @@ class AuthenticatedZMQStreamHandler(ZMQStreamHandler, IPythonHandler):
         res = self.pre_get()
         yield gen.maybe_future(res)
         super(AuthenticatedZMQStreamHandler, self).get(*args, **kwargs)
-    
+
     def initialize(self):
-        self.log.debug("Initializing websocket connection %s", self.request.path)
+        self.log.debug(
+            "Initializing websocket connection %s", self.request.path)
         self.session = Session(config=self.config)
-    
+
     def open(self, *args, **kwargs):
         self.log.debug("Opening websocket %s", self.request.path)
-        
+
         # start the pinging
         if self.ping_interval > 0:
-            self.last_ping = ioloop.IOLoop.instance().time()  # Remember time of last ping
+            # Remember time of last ping
+            self.last_ping = ioloop.IOLoop.instance().time()
             self.last_pong = self.last_ping
-            self.ping_callback = ioloop.PeriodicCallback(self.send_ping, self.ping_interval)
+            self.ping_callback = ioloop.PeriodicCallback(
+                self.send_ping, self.ping_interval)
             self.ping_callback.start()
 
     def send_ping(self):
@@ -239,14 +250,16 @@ class AuthenticatedZMQStreamHandler(ZMQStreamHandler, IPythonHandler):
         if self.stream.closed() and self.ping_callback is not None:
             self.ping_callback.stop()
             return
-        
+
         # check for timeout on pong.  Make sure that we really have sent a recent ping in
-        # case the machine with both server and client has been suspended since the last ping.
+        # case the machine with both server and client has been suspended since
+        # the last ping.
         now = ioloop.IOLoop.instance().time()
         since_last_pong = 1e3 * (now - self.last_pong)
         since_last_ping = 1e3 * (now - self.last_ping)
-        if since_last_ping < 2*self.ping_interval and since_last_pong > self.ping_timeout:
-            self.log.warn("WebSocket ping timeout after %i ms.", since_last_pong)
+        if since_last_ping < 2 * self.ping_interval and since_last_pong > self.ping_timeout:
+            self.log.warn(
+                "WebSocket ping timeout after %i ms.", since_last_pong)
             self.close()
             return
 

@@ -42,9 +42,12 @@ __all__ = [
     'markdown2rst',
 ]
 
+
 class NodeJSMissing(ConversionException):
+
     """Exception raised when node.js is missing."""
     pass
+
 
 def markdown2latex(source, markup='markdown', extra_args=None):
     """Convert a markdown string to LaTeX via pandoc.
@@ -73,11 +76,13 @@ def markdown2latex(source, markup='markdown', extra_args=None):
 class MathBlockGrammar(mistune.BlockGrammar):
     block_math = re.compile("^\$\$(.*?)\$\$", re.DOTALL)
     latex_environment = re.compile(r"^\\begin\{([a-z]*\*?)\}(.*?)\\end\{\1\}",
-                                                re.DOTALL)
+                                   re.DOTALL)
+
 
 @undoc
 class MathBlockLexer(mistune.BlockLexer):
-    default_rules = ['block_math', 'latex_environment'] + mistune.BlockLexer.default_rules
+    default_rules = ['block_math', 'latex_environment'] + \
+        mistune.BlockLexer.default_rules
 
     def __init__(self, rules=None, **kwargs):
         if rules is None:
@@ -98,10 +103,12 @@ class MathBlockLexer(mistune.BlockLexer):
             'text': m.group(2)
         })
 
+
 @undoc
 class MathInlineGrammar(mistune.InlineGrammar):
     math = re.compile("^\$(.+?)\$")
     text = re.compile(r'^[\s\S]+?(?=[\\<!\[_*`~$]|https?://| {2,}\n|$)')
+
 
 @undoc
 class MathInlineLexer(mistune.InlineLexer):
@@ -115,8 +122,10 @@ class MathInlineLexer(mistune.InlineLexer):
     def output_math(self, m):
         return self.renderer.inline_math(m.group(1))
 
+
 @undoc
 class MarkdownWithMath(mistune.Markdown):
+
     def __init__(self, renderer, **kwargs):
         if 'inline' not in kwargs:
             kwargs['inline'] = MathInlineLexer
@@ -130,8 +139,10 @@ class MarkdownWithMath(mistune.Markdown):
     def output_latex_environment(self):
         return self.renderer.latex_environment(self.token['name'], self.token['text'])
 
+
 @undoc
 class IPythonRenderer(mistune.Renderer):
+
     def block_code(self, code, lang):
         if lang:
             try:
@@ -161,14 +172,17 @@ class IPythonRenderer(mistune.Renderer):
     def inline_math(self, text):
         return '$%s$' % text
 
+
 def markdown2html_mistune(source):
     """Convert a markdown string to HTML using mistune"""
     return MarkdownWithMath(renderer=IPythonRenderer()).render(source)
+
 
 def markdown2html_pandoc(source, extra_args=None):
     """Convert a markdown string to HTML via pandoc"""
     extra_args = extra_args or ['--mathjax']
     return pandoc(source, 'markdown', 'html', extra_args=extra_args)
+
 
 def _find_nodejs():
     global _node
@@ -180,13 +194,14 @@ def _find_nodejs():
             _node = 'node'
     return _node
 
+
 def markdown2html_marked(source, encoding='utf-8'):
     """Convert a markdown string to HTML via marked"""
     command = [_find_nodejs(), marked]
     try:
         p = subprocess.Popen(command,
                              stdin=subprocess.PIPE, stdout=subprocess.PIPE
-        )
+                             )
     except OSError as e:
         raise NodeJSMissing(
             "The command '%s' returned an error: %s.\n" % (" ".join(command), e) +
@@ -198,6 +213,7 @@ def markdown2html_marked(source, encoding='utf-8'):
 
 # The mistune renderer is the default, because it's simple to depend on it
 markdown2html = markdown2html_mistune
+
 
 def markdown2rst(source, extra_args=None):
     """Convert a markdown string to ReST via pandoc.
@@ -216,6 +232,7 @@ def markdown2rst(source, extra_args=None):
       Output as returned by pandoc.
     """
     return pandoc(source, 'markdown', 'rst', extra_args=extra_args)
+
 
 def _verify_node(cmd):
     """Verify that the node command exists and is at least the minimum supported

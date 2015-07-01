@@ -29,7 +29,7 @@ from IPython.core import oinspect
 from IPython.core import page
 from IPython.core.alias import AliasError, Alias
 from IPython.core.error import UsageError
-from IPython.core.magic import  (
+from IPython.core.magic import (
     Magics, compress_dhist, magics_class, line_magic, cell_magic, line_cell_magic
 )
 from IPython.testing.skipdoctest import skip_doctest
@@ -43,8 +43,11 @@ from IPython.utils.terminal import set_term_title
 #-----------------------------------------------------------------------------
 # Magic implementation classes
 #-----------------------------------------------------------------------------
+
+
 @magics_class
 class OSMagics(Magics):
+
     """Magics to interact with the underlying OS (shell-type functionality).
     """
 
@@ -116,11 +119,11 @@ class OSMagics(Magics):
 
         # Now try to define a new one
         try:
-            alias,cmd = par.split(None, 1)
+            alias, cmd = par.split(None, 1)
         except TypeError:
             print(oinspect.getdoc(self.alias))
             return
-        
+
         try:
             self.shell.alias_manager.define_alias(alias, cmd)
         except AliasError as e:
@@ -137,10 +140,10 @@ class OSMagics(Magics):
         except ValueError as e:
             print(e)
             return
-        
-        stored = self.shell.db.get('stored_aliases', {} )
+
+        stored = self.shell.db.get('stored_aliases', {})
         if aname in stored:
-            print("Removing %stored alias",aname)
+            print("Removing %stored alias", aname)
             del stored[aname]
             self.shell.db['stored_aliases'] = stored
 
@@ -164,22 +167,24 @@ class OSMagics(Magics):
         del self.shell.db['rootmodules_cache']
 
         path = [os.path.abspath(os.path.expanduser(p)) for p in
-            os.environ.get('PATH','').split(os.pathsep)]
+                os.environ.get('PATH', '').split(os.pathsep)]
 
         syscmdlist = []
         # Now define isexec in a cross platform manner.
         if os.name == 'posix':
-            isexec = lambda fname:os.path.isfile(fname) and \
-                     os.access(fname,os.X_OK)
+            isexec = lambda fname: os.path.isfile(fname) and \
+                os.access(fname, os.X_OK)
         else:
             try:
-                winext = os.environ['pathext'].replace(';','|').replace('.','')
+                winext = os.environ['pathext'].replace(
+                    ';', '|').replace('.', '')
             except KeyError:
                 winext = 'exe|com|bat|py'
             if 'py' not in winext:
                 winext += '|py'
-            execre = re.compile(r'(.*)\.(%s)$' % winext,re.IGNORECASE)
-            isexec = lambda fname:os.path.isfile(fname) and execre.match(fname)
+            execre = re.compile(r'(.*)\.(%s)$' % winext, re.IGNORECASE)
+            isexec = lambda fname: os.path.isfile(
+                fname) and execre.match(fname)
         savedir = py3compat.getcwd()
 
         # Now walk the paths looking for executables to alias.
@@ -200,7 +205,7 @@ class OSMagics(Magics):
                                 # will assume names with dots to be python.
                                 if not self.shell.alias_manager.is_alias(ff):
                                     self.shell.alias_manager.define_alias(
-                                        ff.replace('.',''), ff)
+                                        ff.replace('.', ''), ff)
                             except InvalidAliasError:
                                 pass
                             else:
@@ -222,7 +227,7 @@ class OSMagics(Magics):
                                     # Removes dots from the name since ipython
                                     # will assume names with dots to be python.
                                     self.shell.alias_manager.define_alias(
-                                        base.lower().replace('.',''), ff)
+                                        base.lower().replace('.', ''), ff)
                                 except InvalidAliasError:
                                     pass
                                 syscmdlist.append(ff)
@@ -287,7 +292,7 @@ class OSMagics(Magics):
         """
 
         oldcwd = py3compat.getcwd()
-        numcd = re.match(r'(-)(\d+)$',parameter_s)
+        numcd = re.match(r'(-)(\d+)$', parameter_s)
         # jump in directory history by number
         if numcd:
             nn = int(numcd.group(2))
@@ -322,12 +327,11 @@ class OSMagics(Magics):
             else:
                 opts = {}
 
-
         else:
-            #turn all non-space-escaping backslashes to slashes,
+            # turn all non-space-escaping backslashes to slashes,
             # for c:\windows\directory\names\
-            parameter_s = re.sub(r'\\(?! )','/', parameter_s)
-            opts,ps = self.parse_options(parameter_s,'qb',mode='string')
+            parameter_s = re.sub(r'\\(?! )', '/', parameter_s)
+            opts, ps = self.parse_options(parameter_s, 'qb', mode='string')
         # jump to previous
         if ps == '-':
             try:
@@ -346,7 +350,7 @@ class OSMagics(Magics):
                 else:
                     if 'b' in opts:
                         raise UsageError("Bookmark '%s' not found.  "
-                              "Use '%%bookmark -l' to see your bookmarks." % ps)
+                                         "Use '%%bookmark -l' to see your bookmarks." % ps)
 
         # strip extra quotes on Windows, because os.chdir doesn't like them
         ps = unquote_filename(ps)
@@ -406,7 +410,7 @@ class OSMagics(Magics):
         """
         split = '=' if '=' in parameter_s else ' '
         bits = parameter_s.split(split, 1)
-        if not parameter_s.strip() or len(bits)<2:
+        if not parameter_s.strip() or len(bits) < 2:
             raise UsageError("usage is 'set_env var=val'")
         var = bits[0].strip()
         val = bits[1].strip()
@@ -420,8 +424,9 @@ class OSMagics(Magics):
             err = "refusing to set env var with whitespace: '{0}'"
             err = err.format(val)
             raise UsageError(err)
-        os.environ[py3compat.cast_bytes_py2(var)] = py3compat.cast_bytes_py2(val)
-        print('env: {0}={1}'.format(var,val))
+        os.environ[
+            py3compat.cast_bytes_py2(var)] = py3compat.cast_bytes_py2(val)
+        print('env: {0}={1}'.format(var, val))
 
     @line_magic
     def pushd(self, parameter_s=''):
@@ -433,10 +438,10 @@ class OSMagics(Magics):
 
         dir_s = self.shell.dir_stack
         tgt = os.path.expanduser(unquote_filename(parameter_s))
-        cwd = py3compat.getcwd().replace(self.shell.home_dir,'~')
+        cwd = py3compat.getcwd().replace(self.shell.home_dir, '~')
         if tgt:
             self.cd(parameter_s)
-        dir_s.insert(0,cwd)
+        dir_s.insert(0, cwd)
         return self.shell.magic('dirs')
 
     @line_magic
@@ -447,7 +452,7 @@ class OSMagics(Magics):
             raise UsageError("%popd on empty stack")
         top = self.shell.dir_stack.pop(0)
         self.cd(top)
-        print("popd ->",top)
+        print("popd ->", top)
 
     @line_magic
     def dirs(self, parameter_s=''):
@@ -475,20 +480,20 @@ class OSMagics(Magics):
         dh = self.shell.user_ns['_dh']
         if parameter_s:
             try:
-                args = map(int,parameter_s.split())
+                args = map(int, parameter_s.split())
             except:
                 self.arg_err(self.dhist)
                 return
             if len(args) == 1:
-                ini,fin = max(len(dh)-(args[0]),0),len(dh)
+                ini, fin = max(len(dh) - (args[0]), 0), len(dh)
             elif len(args) == 2:
-                ini,fin = args
+                ini, fin = args
                 fin = min(fin, len(dh))
             else:
                 self.arg_err(self.dhist)
                 return
         else:
-            ini,fin = 0,len(dh)
+            ini, fin = 0, len(dh)
         print('Directory history (kept in _dh)')
         for i in range(ini, fin):
             print("%d: %s" % (i, dh[i]))
@@ -586,26 +591,26 @@ class OSMagics(Magics):
             .s (or .spstr): value as space-separated string.
         """
 
-        opts,args = self.parse_options(parameter_s, 'lv')
+        opts, args = self.parse_options(parameter_s, 'lv')
         # Try to get a variable name and command to run
         try:
             # the variable name must be obtained from the parse_options
             # output, which uses shlex.split to strip options out.
-            var,_ = args.split('=', 1)
+            var, _ = args.split('=', 1)
             var = var.strip()
             # But the command has to be extracted from the original input
             # parameter_s, not on what parse_options returns, to avoid the
             # quote stripping which shlex.split performs on it.
-            _,cmd = parameter_s.split('=', 1)
+            _, cmd = parameter_s.split('=', 1)
         except ValueError:
-            var,cmd = '',''
+            var, cmd = '', ''
         # If all looks ok, proceed
         split = 'l' in opts
         out = self.shell.getoutput(cmd, split=split)
         if 'v' in opts:
             print('%s ==\n%s' % (var, pformat(out)))
         if var:
-            self.shell.user_ns.update({var:out})
+            self.shell.user_ns.update({var: out})
         else:
             return out
 
@@ -650,12 +655,12 @@ class OSMagics(Magics):
 
         This is very useful when trying to use such lists as arguments to
         system commands."""
-        
+
         if cell is None:
             # line magic
             return self.shell.getoutput(line)
         else:
-            opts,args = self.parse_options(line, '', 'out=')
+            opts, args = self.parse_options(line, '', 'out=')
             output = self.shell.getoutput(cell)
             out_name = opts.get('out', opts.get('o'))
             if out_name:
@@ -686,11 +691,11 @@ class OSMagics(Magics):
         Your bookmarks persist through IPython sessions, but they are
         associated with each profile."""
 
-        opts,args = self.parse_options(parameter_s,'drl',mode='list')
+        opts, args = self.parse_options(parameter_s, 'drl', mode='list')
         if len(args) > 2:
             raise UsageError("%bookmark: too many arguments")
 
-        bkms = self.shell.db.get('bookmarks',{})
+        bkms = self.shell.db.get('bookmarks', {})
 
         if 'd' in opts:
             try:
@@ -713,16 +718,17 @@ class OSMagics(Magics):
                 size = max(map(len, bks))
             else:
                 size = 0
-            fmt = '%-'+str(size)+'s -> %s'
+            fmt = '%-' + str(size) + 's -> %s'
             print('Current bookmarks:')
             for bk in bks:
                 print(fmt % (bk, bkms[bk]))
         else:
             if not args:
-                raise UsageError("%bookmark: You must specify the bookmark name")
-            elif len(args)==1:
+                raise UsageError(
+                    "%bookmark: You must specify the bookmark name")
+            elif len(args) == 1:
                 bkms[args[0]] = py3compat.getcwd()
-            elif len(args)==2:
+            elif len(args) == 2:
                 bkms[args[0]] = args[1]
         self.shell.db['bookmarks'] = bkms
 
@@ -745,8 +751,9 @@ class OSMagics(Magics):
             raise UsageError('Missing filename, URL, input history range, '
                              'or macro.')
 
-        try :
-            cont = self.shell.find_user_code(parameter_s, skip_encoding_cookie=False)
+        try:
+            cont = self.shell.find_user_code(
+                parameter_s, skip_encoding_cookie=False)
         except (ValueError, IOError):
             print("Error: no such file, variable, URL, history range or macro")
             return
@@ -766,12 +773,12 @@ class OSMagics(Magics):
     @cell_magic
     def writefile(self, line, cell):
         """Write the contents of the cell to a file.
-        
+
         The file will be overwritten unless the -a (--append) flag is specified.
         """
         args = magic_arguments.parse_argstring(self.writefile, line)
         filename = os.path.expanduser(unquote_filename(args.filename))
-        
+
         if os.path.exists(filename):
             if args.append:
                 print("Appending to %s" % filename)
@@ -779,7 +786,7 @@ class OSMagics(Magics):
                 print("Overwriting %s" % filename)
         else:
             print("Writing %s" % filename)
-        
+
         mode = 'a' if args.append else 'w'
         with io.open(filename, mode, encoding='utf-8') as f:
             f.write(cell)

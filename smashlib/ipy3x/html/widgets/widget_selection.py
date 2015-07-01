@@ -25,13 +25,16 @@ from IPython.utils.warn import DeprecatedClass
 #-----------------------------------------------------------------------------
 # SelectionWidget
 #-----------------------------------------------------------------------------
+
+
 class _Selection(DOMWidget):
+
     """Base class for Selection widgets
-    
+
     ``values`` can be specified as a list or dict. If given as a list,
     it will be transformed to a dict of the form ``{str(value):value}``.
     """
-    
+
     value = Any(help="Selected value")
     values = Dict(help="""Dictionary of {name: value} the user can select.
     
@@ -48,9 +51,9 @@ class _Selection(DOMWidget):
         
         These strings are used to display the choices in the front-end.""", sync=True)
     disabled = Bool(False, help="Enable or disable user changes", sync=True)
-    description = Unicode(help="Description of the value this widget represents", sync=True)
-    
-    
+    description = Unicode(
+        help="Description of the value this widget represents", sync=True)
+
     def __init__(self, *args, **kwargs):
         self.value_lock = Lock()
         self._in_values_changed = False
@@ -59,14 +62,15 @@ class _Selection(DOMWidget):
             # convert list values to an dict of {str(v):v}
             if isinstance(values, list):
                 # preserve list order with an OrderedDict
-                kwargs['values'] = OrderedDict((unicode_type(v), v) for v in values)
+                kwargs['values'] = OrderedDict(
+                    (unicode_type(v), v) for v in values)
             # python3.3 turned on hash randomization by default - this means that sometimes, randomly
             # we try to set value before setting values, due to dictionary ordering.  To fix this, force
             # the setting of self.values right now, before anything else runs
             self.values = kwargs.pop('values')
         DOMWidget.__init__(self, *args, **kwargs)
         self._value_in_values()
-    
+
     def _values_changed(self, name, old, new):
         """Handles when the values dict has been changed.
 
@@ -84,17 +88,18 @@ class _Selection(DOMWidget):
         if self.values:
             if self.value not in self.values.values():
                 self.value = next(iter(self.values.values()))
-    
+
     def _value_names_changed(self, name, old, new):
         if not self._in_values_changed:
-            raise TraitError("value_names is a read-only proxy to values.keys(). Use the values dict instead.")
+            raise TraitError(
+                "value_names is a read-only proxy to values.keys(). Use the values dict instead.")
 
     def _value_changed(self, name, old, new):
         """Called when value has been changed"""
         if self.value_lock.acquire(False):
             try:
                 # Reverse dictionary lookup for the value name
-                for k,v in self.values.items():
+                for k, v in self.values.items():
                     if new == v:
                         # set the selected value name
                         self.value_name = k
@@ -116,35 +121,40 @@ class _Selection(DOMWidget):
 
 @register('IPython.ToggleButtons')
 class ToggleButtons(_Selection):
+
     """Group of toggle buttons that represent an enumeration.  Only one toggle
-    button can be toggled at any point in time.""" 
+    button can be toggled at any point in time."""
     _view_name = Unicode('ToggleButtonsView', sync=True)
 
     button_style = CaselessStrEnum(
-        values=['primary', 'success', 'info', 'warning', 'danger', ''], 
+        values=['primary', 'success', 'info', 'warning', 'danger', ''],
         default_value='', allow_none=True, sync=True, help="""Use a
         predefined styling for the buttons.""")
 
+
 @register('IPython.Dropdown')
 class Dropdown(_Selection):
+
     """Allows you to select a single item from a dropdown."""
     _view_name = Unicode('DropdownView', sync=True)
 
     button_style = CaselessStrEnum(
-        values=['primary', 'success', 'info', 'warning', 'danger', ''], 
+        values=['primary', 'success', 'info', 'warning', 'danger', ''],
         default_value='', allow_none=True, sync=True, help="""Use a
         predefined styling for the buttons.""")
 
+
 @register('IPython.RadioButtons')
 class RadioButtons(_Selection):
+
     """Group of radio buttons that represent an enumeration.  Only one radio
-    button can be toggled at any point in time.""" 
+    button can be toggled at any point in time."""
     _view_name = Unicode('RadioButtonsView', sync=True)
-    
 
 
 @register('IPython.Select')
 class Select(_Selection):
+
     """Listbox that only allows one item to be selected at any given time."""
     _view_name = Unicode('SelectView', sync=True)
 

@@ -34,11 +34,11 @@ from .validator import validate, ValidationError
 from IPython.utils.log import get_logger
 
 __all__ = ['NotebookNode', 'new_code_cell', 'new_text_cell', 'new_notebook',
-'new_output', 'new_worksheet', 'parse_filename', 'new_metadata', 'new_author',
-'new_heading_cell', 'nbformat', 'nbformat_minor', 'nbformat_schema',
-'to_notebook_json', 'convert', 'validate', 'NBFormatError', 'parse_py',
-'reads_json', 'writes_json', 'reads_py', 'writes_py', 'reads', 'writes', 'read',
-'write']
+           'new_output', 'new_worksheet', 'parse_filename', 'new_metadata', 'new_author',
+           'new_heading_cell', 'nbformat', 'nbformat_minor', 'nbformat_schema',
+           'to_notebook_json', 'convert', 'validate', 'NBFormatError', 'parse_py',
+           'reads_json', 'writes_json', 'reads_py', 'writes_py', 'reads', 'writes', 'read',
+           'write']
 
 current_nbformat = nbformat
 current_nbformat_minor = nbformat_minor
@@ -58,9 +58,9 @@ def parse_py(s, **kwargs):
     """Parse a string into a (nbformat, string) tuple."""
     nbf = current_nbformat
     nbm = current_nbformat_minor
-    
+
     pattern = r'# <nbformat>(?P<nbformat>\d+[\.\d+]*)</nbformat>'
-    m = re.search(pattern,s)
+    m = re.search(pattern, s)
     if m is not None:
         digits = m.group('nbformat').split('.')
         nbf = int(digits[0])
@@ -75,10 +75,12 @@ def reads_json(nbjson, **kwargs):
     warnings.warn("reads_json is deprecated, use reads")
     return reads(nbjson)
 
+
 def writes_json(nb, **kwargs):
     """DEPRECATED, use writes"""
     warnings.warn("writes_json is deprecated, use writes")
     return writes(nb, **kwargs)
+
 
 def reads_py(s, **kwargs):
     """DEPRECATED: use nbconvert"""
@@ -89,6 +91,7 @@ def reads_py(s, **kwargs):
     else:
         raise NBFormatError('Unsupported PY nbformat version: %i' % nbf)
     return nb
+
 
 def writes_py(nb, **kwargs):
     """DEPRECATED: use nbconvert"""
@@ -189,4 +192,3 @@ def write(nb, fp, format='DEPRECATED', **kwargs):
     if isinstance(s, bytes):
         s = s.decode('utf8')
     return fp.write(s)
-

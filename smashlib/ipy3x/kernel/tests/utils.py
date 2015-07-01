@@ -17,9 +17,9 @@ import nose.tools as nt
 
 from IPython.kernel import manager
 
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 # Globals
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 
 STARTUP_TIMEOUT = 60
 TIMEOUT = 15
@@ -27,21 +27,24 @@ TIMEOUT = 15
 KM = None
 KC = None
 
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 # code
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
+
 def start_new_kernel(**kwargs):
     """start a new kernel, and return its Manager and Client
-    
+
     Integrates with our output capturing for tests.
     """
     kwargs.update(dict(stdout=nose.iptest_stdstreams_fileno(), stderr=STDOUT))
     return manager.start_new_kernel(startup_timeout=STARTUP_TIMEOUT, **kwargs)
 
+
 def flush_channels(kc=None):
     """flush any messages waiting on the queue"""
     from .test_message_spec import validate_message
-    
+
     if kc is None:
         kc = KC
     for channel in (kc.shell_channel, kc.iopub_channel):
@@ -65,13 +68,14 @@ def execute(code='', kc=None, **kwargs):
     busy = kc.get_iopub_msg(timeout=TIMEOUT)
     validate_message(busy, 'status', msg_id)
     nt.assert_equal(busy['content']['execution_state'], 'busy')
-    
+
     if not kwargs.get('silent'):
         execute_input = kc.get_iopub_msg(timeout=TIMEOUT)
         validate_message(execute_input, 'execute_input', msg_id)
         nt.assert_equal(execute_input['content']['code'], code)
-    
+
     return msg_id, reply['content']
+
 
 def start_global_kernel():
     """start the global kernel (if it isn't running) and return its client"""
@@ -83,17 +87,19 @@ def start_global_kernel():
         flush_channels(KC)
     return KC
 
+
 @contextmanager
 def kernel():
     """Context manager for the global kernel instance
-    
+
     Should be used for most kernel tests
-    
+
     Returns
     -------
     kernel_client: connected KernelClient instance
     """
     yield start_global_kernel()
+
 
 def uses_kernel(test_f):
     """Decorator for tests that use the global kernel"""
@@ -103,6 +109,7 @@ def uses_kernel(test_f):
     wrapped_test.__doc__ = test_f.__doc__
     wrapped_test.__name__ = test_f.__name__
     return wrapped_test
+
 
 def stop_global_kernel():
     """Stop the global shared kernel instance, if it exists"""
@@ -114,11 +121,12 @@ def stop_global_kernel():
     KM.shutdown_kernel(now=True)
     KM = None
 
+
 def new_kernel(argv=None):
     """Context manager for a new kernel in a subprocess
-    
+
     Should only be used for tests where the kernel must not be re-used.
-    
+
     Returns
     -------
     kernel_client: connected KernelClient instance
@@ -128,6 +136,7 @@ def new_kernel(argv=None):
     if argv is not None:
         kwargs['extra_arguments'] = argv
     return manager.run_kernel(**kwargs)
+
 
 def assemble_output(iopub):
     """assemble stdout/err from an execution"""
@@ -151,6 +160,7 @@ def assemble_output(iopub):
             # other output, ignored
             pass
     return stdout, stderr
+
 
 def wait_for_idle(kc):
     while True:

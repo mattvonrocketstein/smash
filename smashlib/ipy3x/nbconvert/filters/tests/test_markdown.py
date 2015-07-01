@@ -15,6 +15,7 @@ from ..markdown import markdown2latex, markdown2html, markdown2rst
 
 from jinja2 import Environment
 
+
 class TestMarkdown(TestsBase):
 
     tests = [
@@ -44,7 +45,6 @@ class TestMarkdown(TestsBase):
         'test',
         ('test', 'https://google.com/'),
     ]
-
 
     @dec.onlyif_cmds_exist('pandoc')
     def test_markdown2latex(self):
@@ -103,10 +103,11 @@ class TestMarkdown(TestsBase):
         for md, tokens in [
             ('# test',
                 ('<h1', '>test', 'id="test"', u'&#182;</a>', "anchor-link")
-            ),
+             ),
             ('###test head space',
-                ('<h3', '>test head space', 'id="test-head-space"', u'&#182;</a>', "anchor-link")
-            )
+                ('<h3', '>test head space', 'id="test-head-space"',
+                 u'&#182;</a>', "anchor-link")
+             )
         ]:
             self._try_markdown(markdown2html, md, tokens)
 
@@ -118,8 +119,8 @@ class TestMarkdown(TestsBase):
                  ("$$\n"
                   "a = 1 *3* 5\n"
                   "$$"),
-                  "$ a = 1 *3* 5 $",
-                ]
+                 "$ a = 1 *3* 5 $",
+                 ]
         for case in cases:
             self.assertIn(case, markdown2html(case))
 
@@ -134,14 +135,13 @@ With $s_0$ defined as the initial storage content in $t=1$, we have"""
     def test_markdown2rst(self):
         """markdown2rst test"""
 
-        #Modify token array for rst, escape asterik
+        # Modify token array for rst, escape asterik
         tokens = copy(self.tokens)
         tokens[0] = r'\*test'
         tokens[1] = r'\*\*test'
 
         for index, test in enumerate(self.tests):
             self._try_markdown(markdown2rst, test, tokens[index])
-
 
     def _try_markdown(self, method, test, tokens):
         results = method(test)

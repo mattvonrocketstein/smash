@@ -40,11 +40,12 @@ from subprocess import Popen, PIPE
 # http://stackoverflow.com/questions/7857352/python-regex-to-match-vt100-escape-sequences
 ansi_escape = re.compile(r'\x1b\[C')
 
+
 def remove_control_characters(s):
     s = unicode(s)
     s = ansi_escape.sub('', s)
-    s = s.replace('[1@#','')
-    return "".join(ch for ch in s if unicodedata.category(ch)[0]!="C")
+    s = s.replace('[1@#', '')
+    return "".join(ch for ch in s if unicodedata.category(ch)[0] != "C")
 
 
 def complete(to_complete):
@@ -83,7 +84,8 @@ def complete(to_complete):
     """
     if not to_complete:
         return []
-    cmd = '''bash -c "printf 'PS1=\"\";echo MARKER\n{complete}\t\t\x01#\necho MARKER'|bash -i"'''.format(complete=to_complete)
+    cmd = '''bash -c "printf 'PS1=\"\";echo MARKER\n{complete}\t\t\x01#\necho MARKER'|bash -i"'''.format(
+        complete=to_complete)
     p1 = Popen(cmd, shell=True, stdout=PIPE, stdin=PIPE, stderr=PIPE)
     out, err = p1.communicate()
     lines = err.split('\n')
@@ -106,34 +108,36 @@ def complete(to_complete):
         # Pagination indicators like '--More--'must be removed
         lines = [x for x in lines if not line.startswith('--More')]
         last_marker = len(lines) - 3
-        first_marker+=1
+        first_marker += 1
 
-    complete_lines = lines[first_marker+2:last_marker-1]
+    complete_lines = lines[first_marker + 2:last_marker - 1]
 
-    #SPECIAL-CASE: no completion options or only one option
+    # SPECIAL-CASE: no completion options or only one option
     if not complete_lines:
         # NOTE:
         #   if there is only one option, readline simply applies it,
         #   which affects the current line in place.  apparently this
         #   results in tons of control-characters being dumped onto
         #   the line, and we have to clean those up for the output
-        the_line = lines[first_marker+1:last_marker][0]
+        the_line = lines[first_marker + 1:last_marker][0]
         the_line = remove_control_characters(the_line)
-        tmp = the_line[the_line.rfind(to_complete)+len(to_complete):]
-        result = to_complete.split()[-1]+tmp
+        tmp = the_line[the_line.rfind(to_complete) + len(to_complete):]
+        result = to_complete.split()[-1] + tmp
 
         if '#' in result:
             # this seems to only happen for directories.  not sure why
             result = result[:result.find('#')]
         if result == to_complete.split()[-1]:
-            #SPECIAL-CASE: no completion options at all.
+            # SPECIAL-CASE: no completion options at all.
             return []
         return [result]
     else:
         # there are multiple completion options
         completion_choices_by_row = [x.split() for x in complete_lines]
-        completion_choices = reduce(lambda x,y:x+y, completion_choices_by_row)
+        completion_choices = reduce(
+            lambda x, y: x + y, completion_choices_by_row)
         return completion_choices
+
 
 def main():
     # if being called from the command line, output json
@@ -142,5 +146,5 @@ def main():
     result = complete(txt)
     print json.dumps(result)
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

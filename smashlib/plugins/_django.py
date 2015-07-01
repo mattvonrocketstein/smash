@@ -13,6 +13,7 @@ from smashlib.channels import C_CHANGE_DIR
 
 @magics_class
 class DjangoMagics(Magics):
+
     """ django magics for smash """
 
    # @line_magic
@@ -29,6 +30,7 @@ class DjangoMagics(Magics):
    #         except SystemExit:
    #             pass
 
+
 class DjangoPlugin(Plugin):
 
     def init_magics(self):
@@ -42,10 +44,12 @@ class DjangoPlugin(Plugin):
         """
         self.logger.debug('checking if new WD is a django project')
 
+
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     ip = get_ipython()
     return DjangoPlugin(ip).install()
+
 
 def unload_ipython_extension(ip):
     get_smash()

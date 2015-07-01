@@ -11,6 +11,7 @@ from ..svg2pdf import SVG2PDFPreprocessor
 
 
 class Testsvg2pdf(PreprocessorTestsBase):
+
     """Contains test functions for svg2pdf.py"""
 
     simple_svg = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -43,13 +44,13 @@ class Testsvg2pdf(PreprocessorTestsBase):
         Overrides base in PreprocessorTestsBase"""
 
         outputs = [nbformat.new_output(output_type='display_data',
-                                       data={'image/svg+xml':self.simple_svg})
-                  ]
+                                       data={'image/svg+xml': self.simple_svg})
+                   ]
 
-        cells=[nbformat.new_code_cell(source="", execution_count=1, outputs=outputs)]
+        cells = [nbformat.new_code_cell(
+            source="", execution_count=1, outputs=outputs)]
 
         return nbformat.new_notebook(cells=cells)
-
 
     def build_preprocessor(self):
         """Make an instance of a preprocessor"""
@@ -57,11 +58,9 @@ class Testsvg2pdf(PreprocessorTestsBase):
         preprocessor.enabled = True
         return preprocessor
 
-
     def test_constructor(self):
         """Can a SVG2PDFPreprocessor be constructed?"""
         self.build_preprocessor()
-
 
     @dec.onlyif_cmds_exist('inkscape')
     def test_output(self):

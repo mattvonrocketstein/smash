@@ -12,8 +12,10 @@ from IPython.utils.traitlets import Unicode, List
 from IPython.display import clear_output
 from IPython.testing.skipdoctest import skip_doctest
 
+
 @skip_doctest
 class Output(DOMWidget):
+
     """Widget used as a context manager to display output.
 
     This widget can capture and display stdout, stderr, and rich output.  To use
@@ -26,7 +28,7 @@ class Output(DOMWidget):
         from IPython.display import display
         out = widgets.Output()
         display(out)
-        
+
         print('prints to output area')
 
         with out:

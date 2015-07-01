@@ -26,10 +26,13 @@ from IPython.utils.py3compat import string_types
 #-----------------------------------------------------------------------------
 # Classes
 #-----------------------------------------------------------------------------
+
+
 class CallbackDispatcher(LoggingConfigurable):
+
     """A structure for registering and running callbacks"""
     callbacks = List()
-    
+
     def __call__(self, *args, **kwargs):
         """Call all of the registered callbacks."""
         value = None
@@ -39,7 +42,8 @@ class CallbackDispatcher(LoggingConfigurable):
             except Exception as e:
                 ip = get_ipython()
                 if ip is None:
-                    self.log.warn("Exception in callback %s: %s", callback, e, exc_info=True)
+                    self.log.warn(
+                        "Exception in callback %s: %s", callback, e, exc_info=True)
                 else:
                     ip.showtraceback()
             else:
@@ -55,22 +59,25 @@ class CallbackDispatcher(LoggingConfigurable):
             Method to be registered or unregistered.
         remove=False: bool
             Whether to unregister the callback."""
-        
+
         # (Un)Register the callback.
         if remove and callback in self.callbacks:
             self.callbacks.remove(callback)
         elif not remove and callback not in self.callbacks:
             self.callbacks.append(callback)
 
+
 def _show_traceback(method):
     """decorator for showing tracebacks in IPython"""
+
     def m(self, *args, **kwargs):
         try:
             return(method(self, *args, **kwargs))
         except Exception as e:
             ip = get_ipython()
             if ip is None:
-                self.log.warn("Exception in widget method %s: %s", method, e, exc_info=True)
+                self.log.warn(
+                    "Exception in widget method %s: %s", method, e, exc_info=True)
             else:
                 ip.showtraceback()
     return m
@@ -116,7 +123,6 @@ class Widget(LoggingConfigurable):
         widget_class = import_item(msg['content']['data']['widget_class'])
         widget = widget_class(comm=comm)
 
-
     #-------------------------------------------------------------------------
     # Traits
     #-------------------------------------------------------------------------
@@ -129,21 +135,22 @@ class Widget(LoggingConfigurable):
     _view_name = Unicode(None, allow_none=True, help="""Default view registered in the front-end
         to use to represent the widget.""", sync=True)
     comm = Instance('IPython.kernel.comm.Comm')
-    
+
     msg_throttle = Int(3, sync=True, help="""Maximum number of msgs the 
         front-end can send before receiving an idle msg from the back-end.""")
-    
+
     version = Int(0, sync=True, help="""Widget's version""")
     keys = List()
+
     def _keys_default(self):
         return [name for name in self.traits(sync=True)]
-    
+
     _property_lock = Tuple((None, None))
     _send_state_lock = Int(0)
     _states_to_send = Set(allow_none=False)
     _display_callbacks = Instance(CallbackDispatcher, ())
     _msg_callbacks = Instance(CallbackDispatcher, ())
-    
+
     #-------------------------------------------------------------------------
     # (Con/de)structor
     #-------------------------------------------------------------------------
@@ -178,10 +185,10 @@ class Widget(LoggingConfigurable):
         if new is None:
             return
         self._model_id = self.model_id
-        
+
         self.comm.on_msg(self._handle_msg)
         Widget.widgets[self.model_id] = self
-        
+
         # first update
         self.send_state()
 
@@ -206,7 +213,7 @@ class Widget(LoggingConfigurable):
             Widget.widgets.pop(self.model_id, None)
             self.comm.close()
             self.comm = None
-    
+
     def send_state(self, key=None):
         """Sends the widget state, or a piece of it, to the front-end.
 
@@ -216,8 +223,8 @@ class Widget(LoggingConfigurable):
             A single property's name or iterable of property names to sync with the front-end.
         """
         self._send({
-            "method" : "update",
-            "state"  : self.get_state(key=key)
+            "method": "update",
+            "state": self.get_state(key=key)
         })
 
     def get_state(self, key=None):
@@ -235,7 +242,8 @@ class Widget(LoggingConfigurable):
         elif isinstance(key, collections.Iterable):
             keys = key
         else:
-            raise ValueError("key must be a string, an iterable of keys, or None")
+            raise ValueError(
+                "key must be a string, an iterable of keys, or None")
         state = {}
         for k in keys:
             f = self.trait_metadata(k, 'to_json', self._trait_to_json)
@@ -248,10 +256,11 @@ class Widget(LoggingConfigurable):
         for name in self.keys:
             if name in sync_data:
                 json_value = sync_data[name]
-                from_json = self.trait_metadata(name, 'from_json', self._trait_from_json)
+                from_json = self.trait_metadata(
+                    name, 'from_json', self._trait_from_json)
                 with self._lock_property(name, json_value):
                     setattr(self, name, from_json(json_value))
-    
+
     def send(self, content):
         """Sends a custom msg to the widget model in the front-end.
 
@@ -269,9 +278,9 @@ class Widget(LoggingConfigurable):
         ----------
         callback: callable
             callback will be passed two arguments when a message arrives::
-            
+
                 callback(widget, content)
-            
+
         remove: bool
             True if the callback should be unregistered."""
         self._msg_callbacks.register_callback(callback, remove=remove)
@@ -283,9 +292,9 @@ class Widget(LoggingConfigurable):
         ----------
         callback: method handler
             Must have a signature of::
-            
+
                 callback(widget, **kwargs)
-            
+
             kwargs from display are passed through without modification.
         remove: bool
             True if the callback should be unregistered."""
@@ -318,7 +327,7 @@ class Widget(LoggingConfigurable):
         try:
             yield
         finally:
-            self._send_state_lock -=1
+            self._send_state_lock -= 1
             if self._send_state_lock == 0:
                 self.send_state(self._states_to_send)
                 self._states_to_send.clear()
@@ -327,14 +336,14 @@ class Widget(LoggingConfigurable):
         """Check the property lock (property_lock)"""
         to_json = self.trait_metadata(key, 'to_json', self._trait_to_json)
         if (key == self._property_lock[0]
-            and to_json(value) == self._property_lock[1]):
+                and to_json(value) == self._property_lock[1]):
             return False
         elif self._send_state_lock > 0:
             self._states_to_send.add(key)
             return False
         else:
             return True
-    
+
     # Event handlers
     @_show_traceback
     def _handle_msg(self, msg):
@@ -342,12 +351,13 @@ class Widget(LoggingConfigurable):
         data = msg['content']['data']
         method = data['method']
         if not method in ['backbone', 'custom']:
-            self.log.error('Unknown front-end to back-end widget msg with method "%s"' % method)
+            self.log.error(
+                'Unknown front-end to back-end widget msg with method "%s"' % method)
 
         # Handle backbone sync methods CREATE, PATCH, and UPDATE all in one.
         if method == 'backbone' and 'sync_data' in data:
             sync_data = data['sync_data']
-            self.set_state(sync_data) # handles all methods
+            self.set_state(sync_data)  # handles all methods
 
         # Handle a custom msg from the front-end
         elif method == 'custom':
@@ -368,7 +378,7 @@ class Widget(LoggingConfigurable):
         # Send the state after the user registered callbacks for trait changes
         # have all fired (allows for user to validate values).
         if self.comm is not None and name in self.keys:
-        # Make sure this isn't information that the front-end just sent us.
+            # Make sure this isn't information that the front-end just sent us.
             if self._should_send_property(name, new_value):
                 # Send new state to front-end
                 self.send_state(key=name)
@@ -390,7 +400,7 @@ class Widget(LoggingConfigurable):
         elif isinstance(x, Widget):
             return "IPY_MODEL_" + x.model_id
         else:
-            return x # Value must be JSON-able
+            return x  # Value must be JSON-able
 
     def _trait_from_json(self, x):
         """Convert json values to objects
@@ -424,7 +434,7 @@ class DOMWidget(Widget):
     visible = Bool(True, help="Whether the widget is visible.", sync=True)
     _css = Tuple(sync=True, help="CSS property list: (selector, key, value)")
     _dom_classes = Tuple(sync=True, help="DOM classes applied to widget.$el.")
-    
+
     width = CUnicode(sync=True)
     height = CUnicode(sync=True)
     padding = CUnicode(sync=True)
@@ -436,35 +446,35 @@ class DOMWidget(Widget):
 
     border_width = CUnicode(sync=True)
     border_radius = CUnicode(sync=True)
-    border_style = CaselessStrEnum(values=[ # http://www.w3schools.com/cssref/pr_border-style.asp
-        'none', 
-        'hidden', 
-        'dotted', 
-        'dashed', 
-        'solid', 
-        'double', 
-        'groove', 
-        'ridge', 
-        'inset', 
-        'outset', 
-        'initial', 
+    border_style = CaselessStrEnum(values=[  # http://www.w3schools.com/cssref/pr_border-style.asp
+        'none',
+        'hidden',
+        'dotted',
+        'dashed',
+        'solid',
+        'double',
+        'groove',
+        'ridge',
+        'inset',
+        'outset',
+        'initial',
         'inherit', ''],
         default_value='', sync=True)
 
-    font_style = CaselessStrEnum(values=[ # http://www.w3schools.com/cssref/pr_font_font-style.asp
-        'normal', 
-        'italic', 
-        'oblique', 
-        'initial', 
-        'inherit', ''], 
+    font_style = CaselessStrEnum(values=[  # http://www.w3schools.com/cssref/pr_font_font-style.asp
+        'normal',
+        'italic',
+        'oblique',
+        'initial',
+        'inherit', ''],
         default_value='', sync=True)
-    font_weight = CaselessStrEnum(values=[ # http://www.w3schools.com/cssref/pr_font_weight.asp
-        'normal', 
-        'bold', 
-        'bolder', 
+    font_weight = CaselessStrEnum(values=[  # http://www.w3schools.com/cssref/pr_font_weight.asp
+        'normal',
+        'bold',
+        'bolder',
         'lighter',
-        'initial', 
-        'inherit', ''] + [str(100 * (i+1)) for i in range(9)], 
+        'initial',
+        'inherit', ''] + [str(100 * (i + 1)) for i in range(9)],
         default_value='', sync=True)
     font_size = CUnicode(sync=True)
     font_family = Unicode(sync=True)
@@ -478,4 +488,5 @@ class DOMWidget(Widget):
                     self.border_width = 1
                 if name != 'border_style' and self.border_style == '':
                     self.border_style = 'solid'
-        self.on_trait_change(_validate_border, ['border_width', 'border_style', 'border_color'])
+        self.on_trait_change(
+            _validate_border, ['border_width', 'border_style', 'border_color'])

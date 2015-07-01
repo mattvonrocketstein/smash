@@ -17,6 +17,7 @@ from ..pdf import PDFExporter
 #-----------------------------------------------------------------------------
 
 class TestPDF(ExportersTestsBase):
+
     """Test PDF export"""
 
     exporter_class = PDFExporter
@@ -25,12 +26,11 @@ class TestPDF(ExportersTestsBase):
         """Can a PDFExporter be constructed?"""
         self.exporter_class()
 
-
     @dec.onlyif_cmds_exist('pdflatex')
     @dec.onlyif_cmds_exist('pandoc')
     def test_export(self):
         """Smoke test PDFExporter"""
-        (output, resources) = self.exporter_class(latex_count=1).from_filename(self._get_notebook())
+        (output, resources) = self.exporter_class(
+            latex_count=1).from_filename(self._get_notebook())
         self.assertIsInstance(output, bytes)
         assert len(output) > 0
-

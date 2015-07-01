@@ -2,6 +2,7 @@ from tornado import web
 from ..base.handlers import IPythonHandler
 from ..services.kernelspecs.handlers import kernel_name_regex
 
+
 class KernelSpecResourceHandler(web.StaticFileHandler, IPythonHandler):
     SUPPORTED_METHODS = ('GET', 'HEAD')
 
@@ -23,5 +24,6 @@ class KernelSpecResourceHandler(web.StaticFileHandler, IPythonHandler):
         self.get(kernel_name, path, include_body=False)
 
 default_handlers = [
-    (r"/kernelspecs/%s/(?P<path>.*)" % kernel_name_regex, KernelSpecResourceHandler),
+    (r"/kernelspecs/%s/(?P<path>.*)" %
+     kernel_name_regex, KernelSpecResourceHandler),
 ]

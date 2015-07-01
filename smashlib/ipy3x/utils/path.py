@@ -27,9 +27,11 @@ from IPython.utils import py3compat
 
 fs_encoding = sys.getfilesystemencoding()
 
+
 def _get_long_path_name(path):
     """Dummy no-op."""
     return path
+
 
 def _writable_dir(path):
     """Whether `path` is a directory, to which the user has write access."""
@@ -50,10 +52,11 @@ if sys.platform == 'win32':
         try:
             import ctypes
         except ImportError:
-            raise ImportError('you need to have ctypes installed for this to work')
+            raise ImportError(
+                'you need to have ctypes installed for this to work')
         _GetLongPathName = ctypes.windll.kernel32.GetLongPathNameW
         _GetLongPathName.argtypes = [ctypes.c_wchar_p, ctypes.c_wchar_p,
-            ctypes.c_uint ]
+                                     ctypes.c_uint]
 
         buf = ctypes.create_unicode_buffer(260)
         rv = _GetLongPathName(path, buf, 260)
@@ -72,7 +75,7 @@ def get_long_path_name(path):
     return _get_long_path_name(path)
 
 
-def unquote_filename(name, win32=(sys.platform=='win32')):
+def unquote_filename(name, win32=(sys.platform == 'win32')):
     """ On Windows, remove leading and trailing quotes from filenames.
     """
     if win32:
@@ -80,13 +83,15 @@ def unquote_filename(name, win32=(sys.platform=='win32')):
             name = name[1:-1]
     return name
 
+
 def compress_user(path):
     """Reverse of :func:`os.path.expanduser`
     """
     home = os.path.expanduser('~')
     if path.startswith(home):
-        path =  "~" + path[len(home):]
+        path = "~" + path[len(home):]
     return path
+
 
 def get_py_filename(name, force_win32=None):
     """Return a valid python filename in the current directory.
@@ -158,13 +163,14 @@ def filefind(filename, path_dirs=None):
         path_dirs = (path_dirs,)
 
     for path in path_dirs:
-        if path == '.': path = py3compat.getcwd()
+        if path == '.':
+            path = py3compat.getcwd()
         testname = expand_path(os.path.join(path, filename))
         if os.path.isfile(testname):
             return os.path.abspath(testname)
 
     raise IOError("File %r does not exist in any of the search paths: %r" %
-                  (filename, path_dirs) )
+                  (filename, path_dirs))
 
 
 class HomeDirError(Exception):
@@ -175,13 +181,13 @@ def get_home_dir(require_writable=False):
     """Return the 'home' directory, as a unicode string.
 
     Uses os.path.expanduser('~'), and checks for writability.
-    
+
     See stdlib docs for how this is determined.
     $HOME is first priority on *ALL* platforms.
-    
+
     Parameters
     ----------
-    
+
     require_writable : bool [default: False]
         if True:
             guarantees the return value is a writable directory, otherwise
@@ -194,7 +200,7 @@ def get_home_dir(require_writable=False):
     # Next line will make things work even when /home/ is a symlink to
     # /usr/home as it is on FreeBSD, for example
     homedir = os.path.realpath(homedir)
-    
+
     if not _writable_dir(homedir) and os.name == 'nt':
         # expanduser failed, use the registry to get the 'My Documents' folder.
         try:
@@ -206,16 +212,17 @@ def get_home_dir(require_writable=False):
                 wreg.HKEY_CURRENT_USER,
                 "Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders"
             )
-            homedir = wreg.QueryValueEx(key,'Personal')[0]
+            homedir = wreg.QueryValueEx(key, 'Personal')[0]
             key.Close()
         except:
             pass
-    
+
     if (not require_writable) or _writable_dir(homedir):
         return py3compat.cast_unicode(homedir, fs_encoding)
     else:
         raise HomeDirError('%s is not a writable dir, '
-                'set $HOME environment variable to override' % homedir)
+                           'set $HOME environment variable to override' % homedir)
+
 
 def get_xdg_dir():
     """Return the XDG_CONFIG_HOME, if it is defined and exists, else None.
@@ -228,7 +235,8 @@ def get_xdg_dir():
     if os.name == 'posix' and sys.platform != 'darwin':
         # Linux, Unix, AIX, etc.
         # use ~/.config if empty OR not set
-        xdg = env.get("XDG_CONFIG_HOME", None) or os.path.join(get_home_dir(), '.config')
+        xdg = env.get("XDG_CONFIG_HOME", None) or os.path.join(
+            get_home_dir(), '.config')
         if xdg and _writable_dir(xdg):
             return py3compat.cast_unicode(xdg, fs_encoding)
 
@@ -246,7 +254,8 @@ def get_xdg_cache_dir():
     if os.name == 'posix' and sys.platform != 'darwin':
         # Linux, Unix, AIX, etc.
         # use ~/.cache if empty OR not set
-        xdg = env.get("XDG_CACHE_HOME", None) or os.path.join(get_home_dir(), '.cache')
+        xdg = env.get("XDG_CACHE_HOME", None) or os.path.join(
+            get_home_dir(), '.cache')
         if xdg and _writable_dir(xdg):
             return py3compat.cast_unicode(xdg, fs_encoding)
 
@@ -263,16 +272,15 @@ def get_ipython_dir():
     env = os.environ
     pjoin = os.path.join
 
-
     ipdir_def = '.ipython'
 
     home_dir = get_home_dir()
     xdg_dir = get_xdg_dir()
-    
+
     # import pdb; pdb.set_trace()  # dbg
     if 'IPYTHON_DIR' in env:
         warn('The environment variable IPYTHON_DIR is deprecated. '
-                'Please use IPYTHONDIR instead.')
+             'Please use IPYTHONDIR instead.')
     ipdir = env.get('IPYTHONDIR', env.get('IPYTHON_DIR', None))
     if ipdir is None:
         # not set explicitly, use ~/.ipython
@@ -286,10 +294,10 @@ def get_ipython_dir():
                 cu = compress_user
                 if os.path.exists(ipdir):
                     warn(('Ignoring {0} in favour of {1}. Remove {0} to '
-                        'get rid of this message').format(cu(xdg_ipdir), cu(ipdir)))
+                          'get rid of this message').format(cu(xdg_ipdir), cu(ipdir)))
                 elif os.path.islink(xdg_ipdir):
                     warn(('{0} is deprecated. Move link to {1} to '
-                        'get rid of this message').format(cu(xdg_ipdir), cu(ipdir)))
+                          'get rid of this message').format(cu(xdg_ipdir), cu(ipdir)))
                 else:
                     warn('Moving {0} to {1}'.format(cu(xdg_ipdir), cu(ipdir)))
                     shutil.move(xdg_ipdir, ipdir)
@@ -299,14 +307,14 @@ def get_ipython_dir():
     if os.path.exists(ipdir) and not _writable_dir(ipdir):
         # ipdir exists, but is not writable
         warn("IPython dir '{0}' is not a writable location,"
-                " using a temp directory.".format(ipdir))
+             " using a temp directory.".format(ipdir))
         ipdir = tempfile.mkdtemp()
     elif not os.path.exists(ipdir):
         parent = os.path.dirname(ipdir)
         if not _writable_dir(parent):
             # ipdir does not exist and parent isn't writable
             warn("IPython parent '{0}' is not a writable location,"
-                    " using a temp directory.".format(parent))
+                 " using a temp directory.".format(parent))
             ipdir = tempfile.mkdtemp()
 
     return py3compat.cast_unicode(ipdir, fs_encoding)
@@ -346,9 +354,10 @@ def get_ipython_module_path(module_str):
     the_path = the_path.replace('.pyo', '.py')
     return py3compat.cast_unicode(the_path, fs_encoding)
 
+
 def locate_profile(profile='default'):
     """Find the path to the folder associated with a given profile.
-    
+
     I.e. find $IPYTHONDIR/profile_whatever.
     """
     from IPython.core.profiledir import ProfileDir, ProfileDirError
@@ -358,6 +367,7 @@ def locate_profile(profile='default'):
         # IOError makes more sense when people are expecting a path
         raise IOError("Couldn't find profile %r" % profile)
     return pd.location
+
 
 def expand_path(s):
     """Expand $VARS and ~names in a string, like a shell
@@ -374,10 +384,10 @@ def expand_path(s):
     # the $ to get (\\server\share\%username%). I think it considered $
     # alone an empty var. But, we need the $ to remains there (it indicates
     # a hidden share).
-    if os.name=='nt':
+    if os.name == 'nt':
         s = s.replace('$\\', 'IPYTHON_TEMP')
     s = os.path.expandvars(os.path.expanduser(s))
-    if os.name=='nt':
+    if os.name == 'nt':
         s = s.replace('IPYTHON_TEMP', '$\\')
     return s
 
@@ -407,7 +417,7 @@ def shellglob(args):
     return expanded
 
 
-def target_outdated(target,deps):
+def target_outdated(target, deps):
     """Determine whether a target is out of date.
 
     target_outdated(target,deps) -> 1/0
@@ -425,13 +435,13 @@ def target_outdated(target,deps):
     for dep in deps:
         dep_time = os.path.getmtime(dep)
         if dep_time > target_time:
-            #print "For target",target,"Dep failed:",dep # dbg
-            #print "times (dep,tar):",dep_time,target_time # dbg
+            # print "For target",target,"Dep failed:",dep # dbg
+            # print "times (dep,tar):",dep_time,target_time # dbg
             return 1
     return 0
 
 
-def target_update(target,deps,cmd):
+def target_update(target, deps, cmd):
     """Update a target with a given command given a list of dependencies.
 
     target_update(target,deps,cmd) -> runs cmd if target is outdated.
@@ -439,8 +449,9 @@ def target_update(target,deps,cmd):
     This is just a wrapper around target_outdated() which calls the given
     command if target is outdated."""
 
-    if target_outdated(target,deps):
+    if target_outdated(target, deps):
         system(cmd)
+
 
 def filehash(path):
     """Make an MD5 hash of a file, ignoring any differences in line
@@ -453,6 +464,7 @@ def filehash(path):
 # older versions.
 old_config_md5 = {'ipy_user_conf.py': 'fc108bedff4b9a00f91fa0a5999140d3',
                   'ipythonrc': '12a68954f3403eea2eec09dc8fe5a9b5'}
+
 
 def check_for_old_config(ipython_dir=None):
     """Check for old config files, and present a warning if they exist.
@@ -473,7 +485,8 @@ def check_for_old_config(ipython_dir=None):
             if filehash(f) == old_config_md5.get(cfg, ''):
                 os.unlink(f)
             else:
-                warn("Found old IPython config file {!r} (modified by user)".format(f))
+                warn(
+                    "Found old IPython config file {!r} (modified by user)".format(f))
                 warned = True
 
     if warned:
@@ -487,16 +500,17 @@ def check_for_old_config(ipython_dir=None):
   IPython and want to suppress this warning message, set
   `c.InteractiveShellApp.ignore_old_config=True` in the new config.""")
 
+
 def get_security_file(filename, profile='default'):
     """Return the absolute path of a security file given by filename and profile
-    
+
     This allows users and developers to find security files without
     knowledge of the IPython directory structure. The search path
     will be ['.', profile.security_dir]
-    
+
     Parameters
     ----------
-    
+
     filename : str
         The file to be found. If it is passed as an absolute path, it will
         simply be returned.
@@ -504,7 +518,7 @@ def get_security_file(filename, profile='default'):
         The name of the profile to search.  Leaving this unspecified
         The file to be found. If it is passed as an absolute path, fname will
         simply be returned.
-    
+
     Returns
     -------
     Raises :exc:`IOError` if file not found or returns absolute path to file.
@@ -520,6 +534,7 @@ def get_security_file(filename, profile='default'):
 
 
 ENOLINK = 1998
+
 
 def link(src, dst):
     """Hard links ``src`` to ``dst``, returning 0 or errno.
@@ -553,7 +568,7 @@ def link_or_copy(src, dst):
 
     link_errno = link(src, dst)
     if link_errno == errno.EEXIST:
-        new_dst = dst + "-temp-%04X" %(random.randint(1, 16**4), )
+        new_dst = dst + "-temp-%04X" % (random.randint(1, 16 ** 4), )
         try:
             link_or_copy(src, new_dst)
         except:
@@ -568,12 +583,13 @@ def link_or_copy(src, dst):
         # linking, or 'src' and 'dst' are on different filesystems.
         shutil.copy(src, dst)
 
+
 def ensure_dir_exists(path, mode=0o755):
     """ensure that a directory exists
-    
+
     If it doesn't exist, try to create it and protect against a race condition
     if another process is doing the same.
-    
+
     The default permissions are 755, which differ from os.makedirs default of 777.
     """
     if not os.path.exists(path):

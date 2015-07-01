@@ -6,6 +6,7 @@ import nose.tools as nt
 
 from IPython.utils.tokenutil import token_at_cursor, line_at_cursor
 
+
 def expect_token(expected, cell, cursor_pos):
     token = token_at_cursor(cell, cursor_pos)
     offset = 0
@@ -18,14 +19,16 @@ def expect_token(expected, cell, cursor_pos):
     line_with_cursor = '%s|%s' % (line[:column], line[column:])
     line
     nt.assert_equal(token, expected,
-        "Expected %r, got %r in: %r (pos %i)" % (
-        expected, token, line_with_cursor, cursor_pos)
-    )
+                    "Expected %r, got %r in: %r (pos %i)" % (
+                        expected, token, line_with_cursor, cursor_pos)
+                    )
 
-def test_simple(): 
+
+def test_simple():
     cell = "foo"
     for i in range(len(cell)):
         expect_token("foo", cell, i)
+
 
 def test_function():
     cell = "foo(a=5, b='10')"
@@ -39,6 +42,7 @@ def test_function():
     # in between `5,|` and `|b=`
     for i in range(cell.find(','), cell.find('b=')):
         expect_token("foo", cell, i)
+
 
 def test_multiline():
     cell = '\n'.join([
@@ -54,6 +58,7 @@ def test_multiline():
     for i in range(start, start + len(expected)):
         expect_token(expected, cell, i)
 
+
 def test_attrs():
     cell = "foo(a=obj.attr.subattr)"
     expected = 'obj'
@@ -68,6 +73,7 @@ def test_attrs():
     expected = 'obj.attr.subattr'
     for i in range(idx, len(cell)):
         expect_token(expected, cell, i)
+
 
 def test_line_at_cursor():
     cell = ""

@@ -16,7 +16,8 @@ class ChangeDirHooks(Plugin):
 
     def init(self):
         # FIXME: reregister it properly instead of patching it?
-        # FIXME: this check is probably no needed since patching cannot happen twice
+        # FIXME: this check is probably no needed since patching cannot happen
+        # twice
         if not getattr(self, '_already_patched', False):
             mycd = PatchCDMagic(self)
             mypushd = PatchPushdMagic(self, mycd)
@@ -32,14 +33,16 @@ class ChangeDirHooks(Plugin):
             obj = from_dotpath(val)
         except ObjectNotFound as e:
             err = 'ChangeDirHooks.change_dir_hooks: '
-            raise ObjectNotFound(err+e.message)
+            raise ObjectNotFound(err + e.message)
         self.report("retrieved from dotpath: ", obj)
         self.report("object will be subscribed to <{0}>".format(C_CHANGE_DIR))
         self.smash.bus.subscribe(C_CHANGE_DIR, obj)
 
+
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     return ChangeDirHooks(get_ipython()).install()
+
 
 def unload_ipython_extension(ip):
     original = ChangeDirHooks.original_cd_magic

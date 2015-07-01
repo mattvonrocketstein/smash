@@ -25,15 +25,18 @@ DEFAULT_DATA_FILE = 'autojump.dat'
 
 autojump = lambda x: _main(parse_arguments(args=x))
 
+
 def j_completer(self, event):
     """ tab completer that queries autojump database"""
     #tmp = event.line.split()[1:]
-    options = autojump(['--complete']+\
-                event.line.split()[1:])
+    options = autojump(['--complete'] +
+                       event.line.split()[1:])
     return [os.path.split(x.split('__')[-1])[-1] for x in options]
+
 
 @magics_class
 class AutojumpMagics(Magics):
+
     """ main magics for smash """
 
     @line_magic
@@ -43,12 +46,13 @@ class AutojumpMagics(Magics):
             return
         if not tmp[0].startswith('-'):
             result = autojump(tmp)
-            get_ipython().magic('pushd '+result)
+            get_ipython().magic('pushd ' + result)
         else:
             try:
                 return autojump(tmp)
             except SystemExit:
                 pass
+
 
 class AutojumpPlugin(Plugin):
 
@@ -67,7 +71,7 @@ class AutojumpPlugin(Plugin):
             # it must be the case that we are already *in* the
             #  directory, because we have received the C_CHANGE_DIR message.
             autojump(['--increase'])
-            self.report('autojump '+\
+            self.report('autojump ' +
                         "incremented jump-weight for '{0}' to {1}".format(
                             new_dir, '?'))
 
@@ -76,10 +80,12 @@ class AutojumpPlugin(Plugin):
         self.smash.add_completer(j_completer, str_key='j')
         return self
 
+
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     ip = get_ipython()
     return AutojumpPlugin(ip).install()
+
 
 def unload_ipython_extension(ip):
     get_smash()

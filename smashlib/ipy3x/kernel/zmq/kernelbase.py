@@ -12,7 +12,7 @@ import uuid
 
 from datetime import datetime
 from signal import (
-        signal, default_int_handler, SIGINT
+    signal, default_int_handler, SIGINT
 )
 
 import zmq
@@ -34,12 +34,13 @@ from .session import Session
 
 class Kernel(SingletonConfigurable):
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # Kernel interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     # attribute to override with a GUI
     eventloop = Any(None)
+
     def _eventloop_changed(self, name, old, new):
         """schedule call to eventloop from IOLoop"""
         loop = ioloop.IOLoop.instance()
@@ -65,13 +66,13 @@ class Kernel(SingletonConfigurable):
     language_info = {}
 
     # Private interface
-    
+
     _darwin_app_nap = Bool(True, config=True,
-        help="""Whether to use appnope for compatiblity with OS X App Nap.
+                           help="""Whether to use appnope for compatiblity with OS X App Nap.
         
         Only affects OS X >= 10.9.
         """
-    )
+                           )
 
     # track associations with current request
     _allow_stdin = Bool(False)
@@ -109,30 +110,28 @@ class Kernel(SingletonConfigurable):
     # execution count we store in the shell.
     execution_count = 0
 
-
     def __init__(self, **kwargs):
         super(Kernel, self).__init__(**kwargs)
 
         # Build dict of handlers for message types
-        msg_types = [ 'execute_request', 'complete_request',
-                      'inspect_request', 'history_request',
-                      'kernel_info_request',
-                      'connect_request', 'shutdown_request',
-                      'apply_request', 'is_complete_request',
-                    ]
+        msg_types = ['execute_request', 'complete_request',
+                     'inspect_request', 'history_request',
+                     'kernel_info_request',
+                     'connect_request', 'shutdown_request',
+                     'apply_request', 'is_complete_request',
+                     ]
         self.shell_handlers = {}
         for msg_type in msg_types:
             self.shell_handlers[msg_type] = getattr(self, msg_type)
-        
-        control_msg_types = msg_types + [ 'clear_request', 'abort_request' ]
+
+        control_msg_types = msg_types + ['clear_request', 'abort_request']
         self.control_handlers = {}
         for msg_type in control_msg_types:
             self.control_handlers[msg_type] = getattr(self, msg_type)
 
-    
     def dispatch_control(self, msg):
         """dispatch control requests"""
-        idents,msg = self.session.feed_identities(msg, copy=False)
+        idents, msg = self.session.feed_identities(msg, copy=False)
         try:
             msg = self.session.deserialize(msg, content=True, copy=False)
         except:
@@ -140,11 +139,11 @@ class Kernel(SingletonConfigurable):
             return
 
         self.log.debug("Control received: %s", msg)
-        
+
         # Set the parent message for side effects.
         self.set_parent(idents, msg)
         self._publish_status(u'busy')
-        
+
         header = msg['header']
         msg_type = header['msg_type']
 
@@ -156,18 +155,18 @@ class Kernel(SingletonConfigurable):
                 handler(self.control_stream, idents, msg)
             except Exception:
                 self.log.error("Exception in control handler:", exc_info=True)
-        
+
         sys.stdout.flush()
         sys.stderr.flush()
         self._publish_status(u'idle')
-    
+
     def dispatch_shell(self, stream, msg):
         """dispatch shell requests"""
         # flush control requests first
         if self.control_stream:
             self.control_stream.flush()
-        
-        idents,msg = self.session.feed_identities(msg, copy=False)
+
+        idents, msg = self.session.feed_identities(msg, copy=False)
         try:
             msg = self.session.deserialize(msg, content=True, copy=False)
         except:
@@ -177,11 +176,11 @@ class Kernel(SingletonConfigurable):
         # Set the parent message for side effects.
         self.set_parent(idents, msg)
         self._publish_status(u'busy')
-        
+
         header = msg['header']
         msg_id = header['msg_id']
         msg_type = msg['header']['msg_type']
-        
+
         # Print some info about this message and leave a '--->' marker, so it's
         # easier to trace visually the message chain when debugging.  Each
         # handler prints its message at the end.
@@ -192,13 +191,13 @@ class Kernel(SingletonConfigurable):
             self.aborted.remove(msg_id)
             # is it safe to assume a msg_id will not be resubmitted?
             reply_type = msg_type.split('_')[0] + '_reply'
-            status = {'status' : 'aborted'}
-            md = {'engine' : self.ident}
+            status = {'status': 'aborted'}
+            md = {'engine': self.ident}
             md.update(status)
             self.session.send(stream, reply_type, metadata=md,
-                        content=status, parent=msg, ident=idents)
+                              content=status, parent=msg, ident=idents)
             return
-        
+
         handler = self.shell_handlers.get(msg_type, None)
         if handler is None:
             self.log.error("UNKNOWN MESSAGE TYPE: %r", msg_type)
@@ -212,11 +211,11 @@ class Kernel(SingletonConfigurable):
                 self.log.error("Exception in message handler:", exc_info=True)
             finally:
                 signal(SIGINT, sig)
-        
+
         sys.stdout.flush()
         sys.stderr.flush()
         self._publish_status(u'idle')
-    
+
     def enter_eventloop(self):
         """enter eventloop"""
         self.log.info("entering eventloop %s", self.eventloop)
@@ -254,7 +253,7 @@ class Kernel(SingletonConfigurable):
 
         # publish idle status
         self._publish_status('starting')
-    
+
     def do_one_iteration(self):
         """step eventloop just once"""
         if self.control_stream:
@@ -264,7 +263,6 @@ class Kernel(SingletonConfigurable):
             stream.flush(zmq.POLLIN, 1)
             stream.flush(zmq.POLLOUT)
 
-
     def record_ports(self, ports):
         """Record the ports that this kernel is using.
 
@@ -273,29 +271,29 @@ class Kernel(SingletonConfigurable):
         """
         self._recorded_ports = ports
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # Kernel request handlers
-    #---------------------------------------------------------------------------
-    
+    #-------------------------------------------------------------------------
+
     def _make_metadata(self, other=None):
         """init metadata dict, for execute/apply_reply"""
         new_md = {
-            'dependencies_met' : True,
-            'engine' : self.ident,
+            'dependencies_met': True,
+            'engine': self.ident,
             'started': datetime.now(),
         }
         if other:
             new_md.update(other)
         return new_md
-    
+
     def _publish_execute_input(self, code, parent, execution_count):
         """Publish the code request on the iopub stream."""
 
         self.session.send(self.iopub_socket, u'execute_input',
-                            {u'code':code, u'execution_count': execution_count},
-                            parent=parent, ident=self._topic('execute_input')
-        )
-    
+                          {u'code': code, u'execution_count': execution_count},
+                          parent=parent, ident=self._topic('execute_input')
+                          )
+
     def _publish_status(self, status, parent=None):
         """send status (busy/idle) on IOPub"""
         self.session.send(self.iopub_socket,
@@ -304,35 +302,35 @@ class Kernel(SingletonConfigurable):
                           parent=parent or self._parent_header,
                           ident=self._topic('status'),
                           )
-    
+
     def set_parent(self, ident, parent):
         """Set the current parent_header
-        
+
         Side effects (IOPub messages) and replies are associated with
         the request that caused them via the parent_header.
-        
+
         The parent identity is used to route input_request messages
         on the stdin channel.
         """
         self._parent_ident = ident
         self._parent_header = parent
-    
+
     def send_response(self, stream, msg_or_type, content=None, ident=None,
-             buffers=None, track=False, header=None, metadata=None):
+                      buffers=None, track=False, header=None, metadata=None):
         """Send a response to the message we're currently processing.
-        
+
         This accepts all the parameters of :meth:`IPython.kernel.zmq.session.Session.send`
         except ``parent``.
-        
+
         This relies on :meth:`set_parent` having been called for the current
         message.
         """
         return self.session.send(stream, msg_or_type, content, self._parent_header,
                                  ident, buffers, track, header, metadata)
-    
+
     def execute_request(self, stream, ident, parent):
         """handle an execute_request"""
-        
+
         try:
             content = parent[u'content']
             code = py3compat.cast_unicode_py2(content[u'code'])
@@ -344,15 +342,15 @@ class Kernel(SingletonConfigurable):
             self.log.error("Got bad msg: ")
             self.log.error("%s", parent)
             return
-        
+
         md = self._make_metadata(parent['metadata'])
-        
+
         # Re-broadcast our input for the benefit of listening clients, and
         # start computing output
         if not silent:
             self.execution_count += 1
             self._publish_execute_input(code, parent, self.execution_count)
-        
+
         reply_content = self.do_execute(code, silent, store_history,
                                         user_expressions, allow_stdin)
 
@@ -367,16 +365,16 @@ class Kernel(SingletonConfigurable):
 
         # Send the reply.
         reply_content = json_clean(reply_content)
-        
+
         md['status'] = reply_content['status']
         if reply_content['status'] == 'error' and \
-                        reply_content['ename'] == 'UnmetDependency':
-                md['dependencies_met'] = False
+                reply_content['ename'] == 'UnmetDependency':
+            md['dependencies_met'] = False
 
         reply_msg = self.session.send(stream, u'execute_reply',
                                       reply_content, parent, metadata=md,
                                       ident=ident)
-        
+
         self.log.debug("%s", reply_msg)
 
         if not silent and reply_msg['content']['status'] == u'error':
@@ -392,7 +390,7 @@ class Kernel(SingletonConfigurable):
         content = parent['content']
         code = content['code']
         cursor_pos = content['cursor_pos']
-        
+
         matches = self.do_complete(code, cursor_pos)
         matches = json_clean(matches)
         completion_msg = self.session.send(stream, 'complete_reply',
@@ -402,15 +400,15 @@ class Kernel(SingletonConfigurable):
     def do_complete(self, code, cursor_pos):
         """Override in subclasses to find completions.
         """
-        return {'matches' : [],
-                'cursor_end' : cursor_pos,
-                'cursor_start' : cursor_pos,
-                'metadata' : {},
-                'status' : 'ok'}
+        return {'matches': [],
+                'cursor_end': cursor_pos,
+                'cursor_start': cursor_pos,
+                'metadata': {},
+                'status': 'ok'}
 
     def inspect_request(self, stream, ident, parent):
         content = parent['content']
-        
+
         reply_content = self.do_inspect(content['code'], content['cursor_pos'],
                                         content.get('detail_level', 0))
         # Before we send this object over, we scrub it for JSON usage
@@ -422,7 +420,7 @@ class Kernel(SingletonConfigurable):
     def do_inspect(self, code, cursor_pos, detail_level=0):
         """Override in subclasses to allow introspection.
         """
-        return {'status': 'ok', 'data':{}, 'metadata':{}, 'found':False}
+        return {'status': 'ok', 'data': {}, 'metadata': {}, 'found': False}
 
     def history_request(self, stream, ident, parent):
         content = parent['content']
@@ -466,42 +464,43 @@ class Kernel(SingletonConfigurable):
 
     def shutdown_request(self, stream, ident, parent):
         content = self.do_shutdown(parent['content']['restart'])
-        self.session.send(stream, u'shutdown_reply', content, parent, ident=ident)
+        self.session.send(
+            stream, u'shutdown_reply', content, parent, ident=ident)
         # same content, but different msg_id for broadcasting on IOPub
         self._shutdown_message = self.session.msg(u'shutdown_reply',
                                                   content, parent
-        )
+                                                  )
 
         self._at_shutdown()
         # call sys.exit after a short delay
         loop = ioloop.IOLoop.instance()
-        loop.add_timeout(time.time()+0.1, loop.stop)
+        loop.add_timeout(time.time() + 0.1, loop.stop)
 
     def do_shutdown(self, restart):
         """Override in subclasses to do things when the frontend shuts down the
         kernel.
         """
         return {'status': 'ok', 'restart': restart}
-    
+
     def is_complete_request(self, stream, ident, parent):
         content = parent['content']
         code = content['code']
-        
+
         reply_content = self.do_is_complete(code)
         reply_content = json_clean(reply_content)
         reply_msg = self.session.send(stream, 'is_complete_reply',
-                                           reply_content, parent, ident)
+                                      reply_content, parent, ident)
         self.log.debug("%s", reply_msg)
 
     def do_is_complete(self, code):
         """Override in subclasses to find completions.
         """
-        return {'status' : 'unknown',
+        return {'status': 'unknown',
                 }
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # Engine methods
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     def apply_request(self, stream, ident, parent):
         try:
@@ -522,18 +521,18 @@ class Kernel(SingletonConfigurable):
         # flush i/o
         sys.stdout.flush()
         sys.stderr.flush()
-        
+
         self.session.send(stream, u'apply_reply', reply_content,
-                    parent=parent, ident=ident,buffers=result_buf, metadata=md)
+                          parent=parent, ident=ident, buffers=result_buf, metadata=md)
 
     def do_apply(self, content, bufs, msg_id, reply_metadata):
         """Override in subclasses to support the IPython parallel framework.
         """
         raise NotImplementedError
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # Control messages
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     def abort_request(self, stream, ident, parent):
         """abort a specific msg by id"""
@@ -547,25 +546,25 @@ class Kernel(SingletonConfigurable):
 
         content = dict(status='ok')
         reply_msg = self.session.send(stream, 'abort_reply', content=content,
-                parent=parent, ident=ident)
+                                      parent=parent, ident=ident)
         self.log.debug("%s", reply_msg)
 
     def clear_request(self, stream, idents, parent):
         """Clear our namespace."""
         content = self.do_clear()
         self.session.send(stream, 'clear_reply', ident=idents, parent=parent,
-                content = content)
+                          content=content)
 
     def do_clear(self):
         """Override in subclasses to clear the namespace
-        
+
         This is only required for IPython.parallel.
         """
         raise NotImplementedError
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # Protected interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     def _topic(self, topic):
         """prefixed topic for IOPub messages"""
@@ -573,9 +572,9 @@ class Kernel(SingletonConfigurable):
             base = "engine.%i" % self.int_id
         else:
             base = "kernel.%s" % self.ident
-        
+
         return py3compat.cast_bytes("%s.%s" % (base, topic))
-    
+
     def _abort_queues(self):
         for stream in self.shell_streams:
             if stream:
@@ -585,7 +584,7 @@ class Kernel(SingletonConfigurable):
         poller = zmq.Poller()
         poller.register(stream.socket, zmq.POLLIN)
         while True:
-            idents,msg = self.session.recv(stream, zmq.NOBLOCK, content=True)
+            idents, msg = self.session.recv(stream, zmq.NOBLOCK, content=True)
             if msg is None:
                 return
 
@@ -594,26 +593,25 @@ class Kernel(SingletonConfigurable):
             msg_type = msg['header']['msg_type']
             reply_type = msg_type.split('_')[0] + '_reply'
 
-            status = {'status' : 'aborted'}
-            md = {'engine' : self.ident}
+            status = {'status': 'aborted'}
+            md = {'engine': self.ident}
             md.update(status)
             reply_msg = self.session.send(stream, reply_type, metadata=md,
-                        content=status, parent=msg, ident=idents)
+                                          content=status, parent=msg, ident=idents)
             self.log.debug("%s", reply_msg)
             # We need to wait a bit for requests to come in. This can probably
             # be set shorter for true asynchronous clients.
             poller.poll(50)
 
-
     def _no_raw_input(self):
         """Raise StdinNotImplentedError if active frontend doesn't support
         stdin."""
         raise StdinNotImplementedError("raw_input was called, but this "
-                                       "frontend does not support stdin.") 
-    
+                                       "frontend does not support stdin.")
+
     def getpass(self, prompt=''):
         """Forward getpass to frontends
-        
+
         Raises
         ------
         StdinNotImplentedError if active frontend doesn't support stdin.
@@ -623,14 +621,14 @@ class Kernel(SingletonConfigurable):
                 "getpass was called, but this frontend does not support input requests."
             )
         return self._input_request(prompt,
-            self._parent_ident,
-            self._parent_header,
-            password=True,
-        )
-    
+                                   self._parent_ident,
+                                   self._parent_header,
+                                   password=True,
+                                   )
+
     def raw_input(self, prompt=''):
         """Forward raw_input to frontends
-        
+
         Raises
         ------
         StdinNotImplentedError if active frontend doesn't support stdin.
@@ -640,11 +638,11 @@ class Kernel(SingletonConfigurable):
                 "raw_input was called, but this frontend does not support input requests."
             )
         return self._input_request(prompt,
-            self._parent_ident,
-            self._parent_header,
-            password=False,
-        )
-    
+                                   self._parent_ident,
+                                   self._parent_header,
+                                   password=False,
+                                   )
+
     def _input_request(self, prompt, ident, parent, password=False):
         # Flush output before making the request.
         sys.stderr.flush()
@@ -658,7 +656,7 @@ class Kernel(SingletonConfigurable):
                     break
                 else:
                     raise
-        
+
         # Send the input request.
         content = json_clean(dict(prompt=prompt, password=password))
         self.session.send(self.stdin_socket, u'input_request', content, parent,
@@ -690,6 +688,7 @@ class Kernel(SingletonConfigurable):
         """
         # io.rprint("Kernel at_shutdown") # dbg
         if self._shutdown_message is not None:
-            self.session.send(self.iopub_socket, self._shutdown_message, ident=self._topic('shutdown'))
+            self.session.send(
+                self.iopub_socket, self._shutdown_message, ident=self._topic('shutdown'))
             self.log.debug("%s", self._shutdown_message)
-        [ s.flush(zmq.POLLOUT) for s in self.shell_streams ]
+        [s.flush(zmq.POLLOUT) for s in self.shell_streams]

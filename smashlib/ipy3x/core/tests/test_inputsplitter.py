@@ -25,6 +25,7 @@ from IPython.utils.py3compat import string_types, input
 # Note: at the bottom, there's a slightly more complete version of this that
 # can be useful during development of code here.
 
+
 def mini_interactive_loop(input_func):
     """Minimal example of the logic of an interactive interpreter loop.
 
@@ -38,7 +39,7 @@ def mini_interactive_loop(input_func):
     # input indefinitely, until some exit/quit command was issued.  Here we
     # only illustrate the basic inner loop.
     while isp.push_accepts_more():
-        indent = ' '*isp.indent_spaces
+        indent = ' ' * isp.indent_spaces
         prompt = '>>> ' + indent
         line = indent + input_func(prompt)
         isp.push(line)
@@ -46,21 +47,23 @@ def mini_interactive_loop(input_func):
     # Here we just return input so we can use it in a test suite, but a real
     # interpreter would instead send it for execution somewhere.
     src = isp.source_reset()
-    #print 'Input source was:\n', src  # dbg
+    # print 'Input source was:\n', src  # dbg
     return src
 
 #-----------------------------------------------------------------------------
 # Test utilities, just for local use
 #-----------------------------------------------------------------------------
 
+
 def assemble(block):
     """Assemble a block into multi-line sub-blocks."""
-    return ['\n'.join(sub_block)+'\n' for sub_block in block]
+    return ['\n'.join(sub_block) + '\n' for sub_block in block]
 
 
 def pseudo_input(lines):
     """Return a function that acts like raw_input but feeds the input list."""
     ilines = iter(lines)
+
     def raw_in(prompt):
         try:
             return next(ilines)
@@ -71,6 +74,8 @@ def pseudo_input(lines):
 #-----------------------------------------------------------------------------
 # Tests
 #-----------------------------------------------------------------------------
+
+
 def test_spaces():
     tests = [('', 0),
              (' ', 1),
@@ -78,8 +83,8 @@ def test_spaces():
              (' \n', 1),
              ('x', 0),
              (' x', 1),
-             ('  x',2),
-             ('    x',4),
+             ('  x', 2),
+             ('    x', 4),
              # Note: tabs are counted as a single whitespace!
              ('\tx', 1),
              ('\t x', 2),
@@ -92,7 +97,7 @@ def test_remove_comments():
              ('text # comment', 'text '),
              ('text # comment\n', 'text \n'),
              ('text # comment \n', 'text \n'),
-             ('line # c \nline\n','line \nline\n'),
+             ('line # c \nline\n', 'line \nline\n'),
              ('line # c \nline#c2  \nline\nline #c\n\n',
               'line \nline\nline\nline \n\n'),
              ]
@@ -108,9 +113,12 @@ def test_get_input_encoding():
 
 
 class NoInputEncodingTestCase(unittest.TestCase):
+
     def setUp(self):
         self.old_stdin = sys.stdin
-        class X: pass
+
+        class X:
+            pass
         fake_stdin = X()
         sys.stdin = fake_stdin
 
@@ -125,6 +133,7 @@ class NoInputEncodingTestCase(unittest.TestCase):
 
 
 class InputSplitterTestCase(unittest.TestCase):
+
     def setUp(self):
         self.isp = isp.InputSplitter()
 
@@ -142,13 +151,13 @@ class InputSplitterTestCase(unittest.TestCase):
         self.isp._store('1')
         self.isp._store('2')
         self.assertEqual(self.isp.source, '1\n2\n')
-        self.assertTrue(len(self.isp._buffer)>0)
+        self.assertTrue(len(self.isp._buffer) > 0)
         self.assertEqual(self.isp.source_reset(), '1\n2\n')
         self.assertEqual(self.isp._buffer, [])
         self.assertEqual(self.isp.source, '')
 
     def test_indent(self):
-        isp = self.isp # shorthand
+        isp = self.isp  # shorthand
         isp.push('x=1')
         self.assertEqual(isp.indent_spaces, 0)
         isp.push('if 1:\n    x=1')
@@ -163,7 +172,7 @@ class InputSplitterTestCase(unittest.TestCase):
         isp.push('    x=1')
         self.assertEqual(isp.indent_spaces, 4)
         # Blank lines shouldn't change the indent level
-        isp.push(' '*2)
+        isp.push(' ' * 2)
         self.assertEqual(isp.indent_spaces, 4)
 
     def test_indent3(self):
@@ -187,7 +196,7 @@ class InputSplitterTestCase(unittest.TestCase):
         self.assertEqual(isp.indent_spaces, 0)
 
     def test_dedent_pass(self):
-        isp = self.isp # shorthand
+        isp = self.isp  # shorthand
         # should NOT cause dedent
         isp.push('if 1:\n    passes = 5')
         self.assertEqual(isp.indent_spaces, 4)
@@ -197,7 +206,7 @@ class InputSplitterTestCase(unittest.TestCase):
         self.assertEqual(isp.indent_spaces, 0)
 
     def test_dedent_break(self):
-        isp = self.isp # shorthand
+        isp = self.isp  # shorthand
         # should NOT cause dedent
         isp.push('while 1:\n    breaks = 5')
         self.assertEqual(isp.indent_spaces, 4)
@@ -207,7 +216,7 @@ class InputSplitterTestCase(unittest.TestCase):
         self.assertEqual(isp.indent_spaces, 0)
 
     def test_dedent_continue(self):
-        isp = self.isp # shorthand
+        isp = self.isp  # shorthand
         # should NOT cause dedent
         isp.push('while 1:\n    continues = 5')
         self.assertEqual(isp.indent_spaces, 4)
@@ -217,7 +226,7 @@ class InputSplitterTestCase(unittest.TestCase):
         self.assertEqual(isp.indent_spaces, 0)
 
     def test_dedent_raise(self):
-        isp = self.isp # shorthand
+        isp = self.isp  # shorthand
         # should NOT cause dedent
         isp.push('if 1:\n    raised = 4')
         self.assertEqual(isp.indent_spaces, 4)
@@ -229,7 +238,7 @@ class InputSplitterTestCase(unittest.TestCase):
         self.assertEqual(isp.indent_spaces, 0)
 
     def test_dedent_return(self):
-        isp = self.isp # shorthand
+        isp = self.isp  # shorthand
         # should NOT cause dedent
         isp.push('if 1:\n    returning = 4')
         self.assertEqual(isp.indent_spaces, 4)
@@ -345,14 +354,19 @@ class InputSplitterTestCase(unittest.TestCase):
     def test_check_complete(self):
         isp = self.isp
         self.assertEqual(isp.check_complete("a = 1"), ('complete', None))
-        self.assertEqual(isp.check_complete("for a in range(5):"), ('incomplete', 4))
+        self.assertEqual(
+            isp.check_complete("for a in range(5):"), ('incomplete', 4))
         self.assertEqual(isp.check_complete("raise = 2"), ('invalid', None))
         self.assertEqual(isp.check_complete("a = [1,\n2,"), ('incomplete', 0))
-        self.assertEqual(isp.check_complete("def a():\n x=1\n global x"), ('invalid', None))
+        self.assertEqual(
+            isp.check_complete("def a():\n x=1\n global x"), ('invalid', None))
+
 
 class InteractiveLoopTestCase(unittest.TestCase):
+
     """Tests for an interactive loop like a python shell.
     """
+
     def check_ns(self, lines, ns):
         """Validate that the given input lines produce the resulting namespace.
 
@@ -366,7 +380,7 @@ class InteractiveLoopTestCase(unittest.TestCase):
         # We can't check that the provided ns is identical to the test_ns,
         # because Python fills test_ns with extra keys (copyright, etc).  But
         # we can check that the given dict is *contained* in test_ns
-        for k,v in ns.items():
+        for k, v in ns.items():
             self.assertEqual(test_ns[k], v)
 
     def test_simple(self):
@@ -379,13 +393,14 @@ class InteractiveLoopTestCase(unittest.TestCase):
         self.check_ns(['x=1; y=2'], dict(x=1, y=2))
 
     def test_abc(self):
-        self.check_ns(['if 1:','a=1','b=2','c=3'], dict(a=1, b=2, c=3))
+        self.check_ns(['if 1:', 'a=1', 'b=2', 'c=3'], dict(a=1, b=2, c=3))
 
     def test_multi(self):
-        self.check_ns(['x =(1+','1+','2)'], dict(x=4))
+        self.check_ns(['x =(1+', '1+', '2)'], dict(x=4))
 
 
 class IPythonInputTestCase(InputSplitterTestCase):
+
     """By just creating a new class whose .isp is a different instance, we
     re-run the same test battery on the new input splitter.
 
@@ -406,11 +421,11 @@ class IPythonInputTestCase(InputSplitterTestCase):
                 if raw.startswith(' '):
                     continue
 
-                isp.push(raw+'\n')
+                isp.push(raw + '\n')
                 out_raw = isp.source_raw
                 out = isp.source_reset()
                 self.assertEqual(out.rstrip(), out_t,
-                        tt.pair_fail_msg.format("inputsplitter",raw, out_t, out))
+                                 tt.pair_fail_msg.format("inputsplitter", raw, out_t, out))
                 self.assertEqual(out_raw.rstrip(), raw.rstrip())
 
     def test_syntax_multiline(self):
@@ -422,7 +437,7 @@ class IPythonInputTestCase(InputSplitterTestCase):
                 for lraw, out_t_part in line_pairs:
                     if out_t_part is not None:
                         out_t_parts.append(out_t_part)
-                    
+
                     if lraw is not None:
                         isp.push(lraw)
                         raw_parts.append(lraw)
@@ -441,11 +456,11 @@ class IPythonInputTestCase(InputSplitterTestCase):
             out_t_parts = []
             for line_pairs in example:
                 raw = '\n'.join(r for r, _ in line_pairs if r is not None)
-                out_t = '\n'.join(t for _,t in line_pairs if t is not None)
+                out_t = '\n'.join(t for _, t in line_pairs if t is not None)
                 out = isp.transform_cell(raw)
                 # Match ignoring trailing whitespace
                 self.assertEqual(out.rstrip(), out_t.rstrip())
-    
+
     def test_cellmagic_preempt(self):
         isp = self.isp
         for raw, name, line, cell in [
@@ -464,27 +479,30 @@ class IPythonInputTestCase(InputSplitterTestCase):
 
     def test_multiline_passthrough(self):
         isp = self.isp
+
         class CommentTransformer(InputTransformer):
+
             def __init__(self):
                 self._lines = []
-            
+
             def push(self, line):
                 self._lines.append(line + '#')
-            
+
             def reset(self):
                 text = '\n'.join(self._lines)
                 self._lines = []
                 return text
-        
+
         isp.physical_line_transforms.insert(0, CommentTransformer())
-        
+
         for raw, expected in [
             ("a=5", "a=5#"),
             ("%ls foo", "get_ipython().magic(%r)" % u'ls foo#'),
             ("!ls foo\n%ls bar", "get_ipython().system(%r)\nget_ipython().magic(%r)" % (
                 u'ls foo#', u'ls bar#'
             )),
-            ("1\n2\n3\n%ls foo\n4\n5", "1#\n2#\n3#\nget_ipython().magic(%r)\n4#\n5#" % u'ls foo#'),
+            ("1\n2\n3\n%ls foo\n4\n5",
+             "1#\n2#\n3#\nget_ipython().magic(%r)\n4#\n5#" % u'ls foo#'),
         ]:
             out = isp.transform_cell(raw)
             self.assertEqual(out.rstrip(), expected.rstrip())
@@ -509,9 +527,9 @@ if __name__ == '__main__':
         while True:
             prompt = start_prompt
             while isp.push_accepts_more():
-                indent = ' '*isp.indent_spaces
+                indent = ' ' * isp.indent_spaces
                 if autoindent:
-                    line = indent + input(prompt+indent)
+                    line = indent + input(prompt + indent)
                 else:
                     line = input(prompt)
                 isp.push(line)
@@ -519,7 +537,7 @@ if __name__ == '__main__':
 
             # Here we just return input so we can use it in a test suite, but a
             # real interpreter would instead send it for execution somewhere.
-            #src = isp.source; raise EOFError # dbg
+            # src = isp.source; raise EOFError # dbg
             raw = isp.source_raw
             src = isp.source_reset()
             print('Input source was:\n', src)
@@ -528,6 +546,7 @@ if __name__ == '__main__':
         print('Bye')
 
 # Tests for cell magics support
+
 
 def test_last_blank():
     nt.assert_false(isp.last_blank(''))
@@ -571,7 +590,7 @@ class CellMagicsCommon(object):
         out = self.sp.transform_cell(src)
         ref = u"get_ipython().run_cell_magic({u}'cellm', {u}'line', {u}'body')\n"
         nt.assert_equal(out, py3compat.u_format(ref))
-    
+
     def test_cellmagic_help(self):
         self.sp.push('%%cellm?')
         nt.assert_false(self.sp.push_accepts_more())
@@ -586,12 +605,13 @@ class CellModeCellMagics(CellMagicsCommon, unittest.TestCase):
     def test_incremental(self):
         sp = self.sp
         sp.push('%%cellm firstline\n')
-        nt.assert_true(sp.push_accepts_more()) #1
+        nt.assert_true(sp.push_accepts_more())  # 1
         sp.push('line2\n')
-        nt.assert_true(sp.push_accepts_more()) #2
+        nt.assert_true(sp.push_accepts_more())  # 2
         sp.push('\n')
         # This should accept a blank line and carry on until the cell is reset
-        nt.assert_true(sp.push_accepts_more()) #3
+        nt.assert_true(sp.push_accepts_more())  # 3
+
 
 class LineModeCellMagics(CellMagicsCommon, unittest.TestCase):
     sp = isp.IPythonInputSplitter(line_input_checker=True)
@@ -599,7 +619,7 @@ class LineModeCellMagics(CellMagicsCommon, unittest.TestCase):
     def test_incremental(self):
         sp = self.sp
         sp.push('%%cellm line2\n')
-        nt.assert_true(sp.push_accepts_more()) #1
+        nt.assert_true(sp.push_accepts_more())  # 1
         sp.push('\n')
         # In this case, a blank line should end the cell magic
-        nt.assert_false(sp.push_accepts_more()) #2
+        nt.assert_false(sp.push_accepts_more())  # 2

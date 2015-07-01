@@ -12,21 +12,23 @@ from smashlib.config import SmashConfig
 from smashlib.prompt.component import PromptComponent
 
 DEFAULT_IN_TEMPLATE = u'In [\\#]: '
-DEFAULT_PROMPT  = [
+DEFAULT_PROMPT = [
     PromptComponent(type='literal',
                     color='red',
                     value='smash'),
     PromptComponent(type='literal', value='$ ')
 ]
 
+
 class SmashPrompt(Plugin):
+
     """ this extension requires ipy_cd_hook """
 
     def uninstall(self):
         super(SmashPrompt, self).uninstall()
         self.shell.prompt_manager.in_template = DEFAULT_IN_TEMPLATE
 
-    #def init_magics(self):
+    # def init_magics(self):
     #    self.contribute_magic(prompt_tag)
 
     def _load_prompt_config(self):
@@ -59,12 +61,14 @@ class SmashPrompt(Plugin):
         prompt = prompt.replace('  ', ' ')
         return prompt
 
+
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     ip = get_ipython()
     lp = SmashPrompt(ip)
     ip._smash.lp = lp
     return lp
+
 
 def unload_ipython_extension(ip):
     """ called by %unload_ext magic"""

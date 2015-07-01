@@ -13,7 +13,7 @@
 #
 
 _ = get_config()
-get_config = eval('get_config') # shut up the linter
+get_config = eval('get_config')  # shut up the linter
 
 # always inherit the default ipython profile's configuration
 #load_subconfig('ipython_config.py', profile='default')
@@ -31,7 +31,7 @@ _.ProjectManager.verbose = False
 _.ChangeDirHooks.verbose = False
 _.VirtualEnvSupport.verbose = True
 
-_.PyLinter.verbose=True
+_.PyLinter.verbose = True
 _.PyLinter.ignore_pep8 = True
 
 # begin Change-Dir-hooks configuration: add any custom hooks here

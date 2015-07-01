@@ -29,13 +29,15 @@ from goulash._os import which
 ACK_BIN_NAME = 'ack-grep'
 ACK_BIN_PATH = which(ACK_BIN_NAME)
 
+
 class pyack(object):
+
     """ thin wrapper on ack to get some of the data into python
     """
 
     def __init__(self, call_string):
         self.call_string = call_string
-        self.record = defaultdict(lambda:defaultdict(lambda:[]))
+        self.record = defaultdict(lambda: defaultdict(lambda: []))
 
     def __len__(self):
         """ """
@@ -53,13 +55,14 @@ class pyack(object):
         cmd = ACK_BIN_PATH + ' ' + self.call_string
         p = os.popen(cmd)
         for x in iter(p.readline, ''):
-            if not x: continue
+            if not x:
+                continue
             i1 = x.find(':')
-            i2 = x.find(':',i1+1) + 1
+            i2 = x.find(':', i1 + 1) + 1
             match = x[i2:]
             _file = x[:i1]
-            lineno = x[i1+1:i2-1]
-            self.record[_file][lineno]=match
+            lineno = x[i1 + 1:i2 - 1]
+            self.record[_file][lineno] = match
             if not quiet:
                 print x.strip()
 
@@ -68,9 +71,10 @@ class pyack(object):
         """ returns matching files """
         return self.record.keys()
 
+
 def main():
     import sys
     x = pyack(' '.join(sys.argv[1:]))()
     return x
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

@@ -19,7 +19,9 @@ try:
 except ImportError:
     from Queue import Empty  # Py 2
 
+
 class ZMQHistoryManager(HistoryAccessorBase):
+
     """History accessor and manager for ZMQ-based kernels"""
     input_hist_parsed = List([""])
     output_hist = Dict()
@@ -47,7 +49,7 @@ class ZMQHistoryManager(HistoryAccessorBase):
         """
         history = []
         if hasattr(self.client, "history"):
-            ## In tests, KernelClient may not have a history method
+            # In tests, KernelClient may not have a history method
             msg_id = self.client.history(raw=raw, output=output,
                                          hist_access_type=hist_access_type,
                                          **kwargs)
@@ -63,22 +65,22 @@ class ZMQHistoryManager(HistoryAccessorBase):
         return history
 
     def get_tail(self, n=10, raw=True, output=False, include_latest=False):
-        return self._load_history(hist_access_type='tail', n=n, raw=raw, 
+        return self._load_history(hist_access_type='tail', n=n, raw=raw,
                                   output=output)
 
     def search(self, pattern="*", raw=True, search_raw=True,
                output=False, n=None, unique=False):
-        return self._load_history(hist_access_type='search', pattern=pattern, 
-                                  raw=raw, search_raw=search_raw, 
+        return self._load_history(hist_access_type='search', pattern=pattern,
+                                  raw=raw, search_raw=search_raw,
                                   output=output, n=n, unique=unique)
 
-    def get_range(self, session, start=1, stop=None, raw=True,output=False):
-        return self._load_history(hist_access_type='range', raw=raw, 
+    def get_range(self, session, start=1, stop=None, raw=True, output=False):
+        return self._load_history(hist_access_type='range', raw=raw,
                                   output=output, start=start, stop=stop,
                                   session=session)
 
     def get_range_by_str(self, rangestr, raw=True, output=False):
-        return self._load_history(hist_access_type='range', raw=raw, 
+        return self._load_history(hist_access_type='range', raw=raw,
                                   output=output, rangestr=rangestr)
 
     def end_session(self):
@@ -92,4 +94,3 @@ class ZMQHistoryManager(HistoryAccessorBase):
         Nothing to do for ZMQ-based histories.
         """
         pass
-

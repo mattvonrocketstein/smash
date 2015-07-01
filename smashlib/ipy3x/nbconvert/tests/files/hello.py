@@ -1,5 +1,6 @@
 from IPython.nbconvert.writers.base import WriterBase
 
+
 class HelloWriter(WriterBase):
 
     def write(self, output, resources, notebook_name=None, **kw):

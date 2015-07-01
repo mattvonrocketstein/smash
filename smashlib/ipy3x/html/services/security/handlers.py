@@ -8,7 +8,9 @@ from tornado import gen, web
 from ...base.handlers import IPythonHandler, json_errors
 from . import csp_report_uri
 
+
 class CSPReportHandler(IPythonHandler):
+
     '''Accepts a content security policy violation report'''
     @web.authenticated
     @json_errors

@@ -3,21 +3,27 @@
 
 from IPython.utils.traitlets import EventfulList
 
+
 class EventfulMix(object):
+
     """ initialization for Eventful{List|Dict} Configurables """
+
     def _init_elist(self, name, elist):
-        insert_name = '_event_insert_'+name
-        set_name = '_event_set_'+name
-        del_name = '_event_del_'+name
+        insert_name = '_event_insert_' + name
+        set_name = '_event_set_' + name
+        del_name = '_event_del_' + name
         kls_name = self.__class__.__name__
+
         def default_insert(new):
             self.report('default add', new)
+
         def default_set(slice_or_index, val):
             msg = 'default set (override {0}.{1})'.format(
-                kls_name,set_name)
+                kls_name, set_name)
             self.report(msg, slice_or_index, val)
+
         def default_del(old):
-            self.report('default del',old)
+            self.report('default del', old)
         insert_callback = getattr(self, insert_name, default_insert)
         set_callback = getattr(self, set_name, default_set)
         kargs = dict(

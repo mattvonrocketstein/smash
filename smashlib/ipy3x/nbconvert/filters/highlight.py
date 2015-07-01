@@ -20,7 +20,9 @@ __all__ = [
     'Highlight2Latex'
 ]
 
+
 class Highlight2HTML(NbConvertBase):
+
     def __init__(self, pygments_lexer=None, **kwargs):
         self.pygments_lexer = pygments_lexer or 'ipython3'
         super(Highlight2HTML, self).__init__(**kwargs)
@@ -46,15 +48,17 @@ class Highlight2HTML(NbConvertBase):
         from pygments.formatters import HtmlFormatter
 
         if not language:
-            language=self.pygments_lexer
+            language = self.pygments_lexer
 
         return _pygments_highlight(source if len(source) > 0 else ' ',
                                    # needed to help post processors:
-                                   HtmlFormatter(cssclass=" highlight hl-"+language),
+                                   HtmlFormatter(
+                                       cssclass=" highlight hl-" + language),
                                    language, metadata)
 
 
 class Highlight2Latex(NbConvertBase):
+
     def __init__(self, pygments_lexer=None, **kwargs):
         self.pygments_lexer = pygments_lexer or 'ipython3'
         super(Highlight2Latex, self).__init__(**kwargs)
@@ -81,15 +85,16 @@ class Highlight2Latex(NbConvertBase):
         """
         from pygments.formatters import LatexFormatter
         if not language:
-            language=self.pygments_lexer
+            language = self.pygments_lexer
 
-        latex = _pygments_highlight(source, LatexFormatter(), language, metadata)
+        latex = _pygments_highlight(
+            source, LatexFormatter(), language, metadata)
         if strip_verbatim:
-            latex = latex.replace(r'\begin{Verbatim}[commandchars=\\\{\}]' + '\n', '')
+            latex = latex.replace(
+                r'\begin{Verbatim}[commandchars=\\\{\}]' + '\n', '')
             return latex.replace('\n\\end{Verbatim}\n', '')
         else:
             return latex
-
 
 
 def _pygments_highlight(source, output_formatter, language='ipython', metadata=None):
@@ -114,8 +119,8 @@ def _pygments_highlight(source, output_formatter, language='ipython', metadata=N
     # If the cell uses a magic extension language,
     # use the magic language instead.
     if language == 'ipython' \
-        and metadata \
-        and 'magics_language' in metadata:
+            and metadata \
+            and 'magics_language' in metadata:
 
         language = metadata['magics_language']
 
@@ -127,9 +132,9 @@ def _pygments_highlight(source, output_formatter, language='ipython', metadata=N
         try:
             lexer = get_lexer_by_name(language, stripall=True)
         except ClassNotFound:
-            warn("No lexer found for language %r. Treating as plain text." % language)
+            warn("No lexer found for language %r. Treating as plain text." %
+                 language)
             from pygments.lexers.special import TextLexer
             lexer = TextLexer()
-
 
     return highlight(source, lexer, output_formatter)

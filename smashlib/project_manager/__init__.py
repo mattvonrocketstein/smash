@@ -20,7 +20,7 @@ from smashlib.plugins import Plugin
 from smashlib.project_manager.magics import ProjectMagics
 
 from .interface import ProjectManagerInterface
-from .operation import OperationStep,NullOperationStep
+from .operation import OperationStep, NullOperationStep
 from .activate import Activation, NullActivation
 from .check import Check, NullCheck
 from .test import Test, NullTest
@@ -30,28 +30,27 @@ from .defaults import ACTIVATE, CHECK, TEST, DEACTIVATE
 from smashlib.aliases import AliasMixin
 from smashlib.env import EnvMixin
 
-class CommandLineMixin(object):
-    def build_argparser(self):
-        """ """
-        parser = Plugin.build_argparser(self)
-        parser.add_argument('-p', '--project', default='')
-        return parser
 
-    def parse_argv(self):
-        args, unknown = Plugin.parse_argv(self)
+class CommandLineMixin(object):
+
+    def get_cli_arguments(self):
+        return [
+            [('-p', '--project',), dict(default='')]
+            ]
+
+
+    def use_argv(self, args):
         if args.project:
             # cannot effect the change here due to some race condition.
             # smash will send a signal when it's initialization is complete
             # and we just store a variable that the signal handler can use.
             self.use_project = args.project
 
-        return args, unknown
-
     @receives_event(C_DOT_CMD)
     def consider_dot_cmd(self, line):
         tmp = line.split()
         cmd, args = tmp.pop(0), tmp
-        cmd = getattr(self.interface, '_'+cmd, None)
+        cmd = getattr(self.interface, '_' + cmd, None)
         if cmd:
             if not callable(cmd):
                 print cmd
@@ -62,7 +61,7 @@ class CommandLineMixin(object):
     @receives_event(C_SMASH_INIT_COMPLETE)
     def use_requested_project(self):
         try:
-            #self.activate_project(args.project)
+            # self.activate_project(args.project)
             getattr(self.interface, self.use_project)
             self.use_project = None
         except UnknownProjectError:
@@ -71,22 +70,23 @@ class CommandLineMixin(object):
         except AttributeError:
             pass
 
+
 class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
+
     """ """
-    search_dirs      = EventfulList(default_value=[], config=True)
-    project_map      = EventfulDict(default_value={}, config=True)
-    alias_map        = EventfulDict(default_value={}, config=True)
-    env_map          = EventfulDict(default_value={}, config=True)
-    activation_map   = EventfulDict(default_value={}, config=True)
-    check_map        = EventfulDict(default_value={}, config=True)
-    test_map         = EventfulDict(default_value={}, config=True)
+    search_dirs = EventfulList(default_value=[], config=True)
+    project_map = EventfulDict(default_value={}, config=True)
+    alias_map = EventfulDict(default_value={}, config=True)
+    env_map = EventfulDict(default_value={}, config=True)
+    activation_map = EventfulDict(default_value={}, config=True)
+    check_map = EventfulDict(default_value={}, config=True)
+    test_map = EventfulDict(default_value={}, config=True)
     deactivation_map = EventfulDict(default_value={}, config=True)
-    venv_map         = EventfulDict(default_value={}, config=True)
-    alias_map        = EventfulDict(default_value={}, config=True)
-    macro_map        = EventfulDict(default_value={}, config=True)
+    venv_map = EventfulDict(default_value={}, config=True)
+    alias_map = EventfulDict(default_value={}, config=True)
+    macro_map = EventfulDict(default_value={}, config=True)
 
     _current_project = None
-
 
     def init(self):
         # at this point project_map has been created from
@@ -96,7 +96,7 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
         # up and then bind any data set so far
         self.project_map.on_set(self._event_set_project_map)
         for x in self.project_map.copy():
-            self.project_map[x]=self.project_map[x]
+            self.project_map[x] = self.project_map[x]
         self._load_alias_group('__smash__')
         self._load_env_group('__smash__')
 
@@ -118,15 +118,15 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
 
     @property
     def reverse_project_map(self):
-        return dict([[v,k] for k,v in self.project_map.items()])
+        return dict([[v, k] for k, v in self.project_map.items()])
 
     @receives_event(C_CHANGE_DIR, quiet=True)
     def show_project_help(self, new_dir, old_dir):
         if new_dir in self.project_map.values():
             project_name = self.reverse_project_map[new_dir]
             _help = 'this directory is a project.  to activate it, type {0}'
-            _help = _help.format(green('proj.'+project_name))
-            #self.info(_help)
+            _help = _help.format(green('proj.' + project_name))
+            # self.info(_help)
 
     def _event_set_project_map(self, key, val):
         """ final word in cleaning/verifying/binding
@@ -149,14 +149,13 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
             clean_path)
         _bind_project(clean_name, clean_path)
 
-
     def _event_set_search_dirs(self, slice_or_index, base_dir):
         if isinstance(slice_or_index, slice):
-            assert isinstance(base_dir, list) #refresh, ie rehashx
+            assert isinstance(base_dir, list)  # refresh, ie rehashx
             self.refresh()
             return
         base_dir = os.path.abspath(os.path.expanduser(base_dir))
-        #if base_dir in self.search_dirs:
+        # if base_dir in self.search_dirs:
         if not os.path.exists(base_dir):
             msg = "new search_dir doesnt exist: {0}"
             self.warning(msg.format(base_dir))
@@ -165,24 +164,24 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
             self._bind_one(base_dir)
 
     #@receives_event(C_REHASH_EVENT)
-    #def refresh(self, none):
+    # def refresh(self, none):
     #    # TODO: deprecate
     #    [ self._bind_one(x) for x in set(self.search_dirs)]
 
     def _bind_one(self, base_dir):
-            base_dir = os.path.abspath(os.path.expanduser(base_dir))
-            contents = os.listdir(unicode(base_dir))
-            bind_list = []
-            for name in contents:
-                path = os.path.join(base_dir, name)
-                if name.startswith('.'):
-                    self.warning("skipping "+path)
+        base_dir = os.path.abspath(os.path.expanduser(base_dir))
+        contents = os.listdir(unicode(base_dir))
+        bind_list = []
+        for name in contents:
+            path = os.path.join(base_dir, name)
+            if name.startswith('.'):
+                self.warning("skipping " + path)
 
-                #raise Exception,path
-                self.project_map[name] = path
-            self.report("discovered {0} projects under '{1}'".format(
-                len(bind_list), base_dir))
-            self.update_interface()
+            #raise Exception,path
+            self.project_map[name] = path
+        self.report("discovered {0} projects under '{1}'".format(
+            len(bind_list), base_dir))
+        self.update_interface()
 
     def update_interface(self):
         """ so that tab-completion works on any bound projects, the
@@ -235,12 +234,12 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
             Test, NullTest)
 
     def _guess_operation_steps(
-        self, name, dir, operation_dict,
-        step_kls, default_step):
+            self, name, dir, operation_dict,
+            step_kls, default_step):
         assert all([inspect.isclass(step_kls),
                     inspect.isclass(default_step),
-                    issubclass(step_kls,OperationStep),
-                    issubclass(default_step,NullOperationStep)])
+                    issubclass(step_kls, OperationStep),
+                    issubclass(default_step, NullOperationStep)])
         steps = []
         ptype = reversed(self.guess_project_type(name))
 
@@ -249,33 +248,33 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
             steps += [
                 step_kls(
                     subtype, pm=self,
-                    fxn=fxn, args=(self,)) \
+                    fxn=fxn, args=(self,))
                 for fxn in these_steps]
         if not steps:
             steps.append(default_step(self))
         return steps
 
     def perform_operation(self, name, op_name):
-        self.report("{0}: {1}".format(op_name,name))
+        self.report("{0}: {1}".format(op_name, name))
         self._require_project(name)
         _dir = self.project_map[name]
         step_guesser = getattr(self, '_guess_{0}_steps'.format(op_name))
         default = step_guesser(name, _dir)
         op_steps = getattr(self, '{0}_map'.format(op_name)).get(name, default)
-        results=[]
+        results = []
         for fxn in op_steps:
             results.append([fxn, fxn()])
-            if not op_steps.index(fxn)==len(op_steps)-1:
+            if not op_steps.index(fxn) == len(op_steps) - 1:
                 console.draw_line()
         self.publish('post_operation', op_name, name)
         return dict(results)
 
     @receives_event('post_operation')
     def handle_post_op(self, op_name, project_name):
-        if op_name=='activation':
+        if op_name == 'activation':
             self._load_alias_group(project_name)
             self._load_env_group(project_name)
-        if op_name=='deactivation':
+        if op_name == 'deactivation':
             self._unload_env_group(project_name)
 
     def deactivate(self):
@@ -307,7 +306,7 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
         if abspath(subdir).startswith(abspath(pdir)):
             fine = guess_dir_type(subdir)
         else:
-            fine=[]
+            fine = []
         coarse = guess_dir_type(pdir)
         tmp = fine + [x for x in coarse if x not in fine]
         return tmp

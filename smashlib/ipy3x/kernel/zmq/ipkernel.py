@@ -16,16 +16,19 @@ from .kernelbase import Kernel as KernelBase
 from .serialize import serialize_object, unpack_apply_message
 from .zmqshell import ZMQInteractiveShell
 
+
 class IPythonKernel(KernelBase):
     shell = Instance('IPython.core.interactiveshell.InteractiveShellABC')
     shell_class = Type(ZMQInteractiveShell)
 
     user_module = Any()
+
     def _user_module_changed(self, name, old, new):
         if self.shell is not None:
             self.shell.user_module = new
 
     user_ns = Instance(dict, args=None, allow_none=True)
+
     def _user_ns_changed(self, name, old, new):
         if self.shell is not None:
             self.shell.user_ns = new
@@ -41,11 +44,11 @@ class IPythonKernel(KernelBase):
 
         # Initialize the InteractiveShell subclass
         self.shell = self.shell_class.instance(parent=self,
-            profile_dir = self.profile_dir,
-            user_module = self.user_module,
-            user_ns     = self.user_ns,
-            kernel      = self,
-        )
+                                               profile_dir=self.profile_dir,
+                                               user_module=self.user_module,
+                                               user_ns=self.user_ns,
+                                               kernel=self,
+                                               )
         self.shell.displayhook.session = self.session
         self.shell.displayhook.pub_socket = self.iopub_socket
         self.shell.displayhook.topic = self._topic('execute_result')
@@ -57,28 +60,31 @@ class IPythonKernel(KernelBase):
         # TMP - hack while developing
         self.shell._reply_content = None
 
-        self.comm_manager = CommManager(shell=self.shell, parent=self, 
+        self.comm_manager = CommManager(shell=self.shell, parent=self,
                                         kernel=self)
-        self.comm_manager.register_target('ipython.widget', Widget.handle_comm_opened)
+        self.comm_manager.register_target(
+            'ipython.widget', Widget.handle_comm_opened)
 
         self.shell.configurables.append(self.comm_manager)
-        comm_msg_types = [ 'comm_open', 'comm_msg', 'comm_close' ]
+        comm_msg_types = ['comm_open', 'comm_msg', 'comm_close']
         for msg_type in comm_msg_types:
-            self.shell_handlers[msg_type] = getattr(self.comm_manager, msg_type)
+            self.shell_handlers[msg_type] = getattr(
+                self.comm_manager, msg_type)
 
     # Kernel info fields
     implementation = 'ipython'
     implementation_version = release.version
     language_info = {
-                     'name': 'python',
-                     'version': sys.version.split()[0],
-                     'mimetype': 'text/x-python',
-                     'codemirror_mode': {'name': 'ipython',
-                                         'version': sys.version_info[0]},
-                     'pygments_lexer': 'ipython%d' % (3 if PY3 else 2),
-                     'nbconvert_exporter': 'python',
-                     'file_extension': '.py'
-                    }
+        'name': 'python',
+        'version': sys.version.split()[0],
+        'mimetype': 'text/x-python',
+        'codemirror_mode': {'name': 'ipython',
+                            'version': sys.version_info[0]},
+        'pygments_lexer': 'ipython%d' % (3 if PY3 else 2),
+        'nbconvert_exporter': 'python',
+        'file_extension': '.py'
+    }
+
     @property
     def banner(self):
         return self.shell.banner
@@ -134,7 +140,7 @@ class IPythonKernel(KernelBase):
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
-        shell = self.shell # we'll need this a lot here
+        shell = self.shell  # we'll need this a lot here
 
         self._forward_input(allow_stdin)
 
@@ -168,20 +174,21 @@ class IPythonKernel(KernelBase):
         # runlines.  We'll need to clean up this logic later.
         if shell._reply_content is not None:
             reply_content.update(shell._reply_content)
-            e_info = dict(engine_uuid=self.ident, engine_id=self.int_id, method='execute')
+            e_info = dict(
+                engine_uuid=self.ident, engine_id=self.int_id, method='execute')
             reply_content['engine_info'] = e_info
             # reset after use
             shell._reply_content = None
 
         if 'traceback' in reply_content:
-            self.log.info("Exception in execute request:\n%s", '\n'.join(reply_content['traceback']))
-
+            self.log.info(
+                "Exception in execute request:\n%s", '\n'.join(reply_content['traceback']))
 
         # At this point, we can tell whether the main code execution succeeded
         # or not.  If it did, we proceed to evaluate user_expressions
         if reply_content['status'] == 'ok':
             reply_content[u'user_expressions'] = \
-                         shell.user_expressions(user_expressions or {})
+                shell.user_expressions(user_expressions or {})
         else:
             # If there was an error, don't even try to compute expressions
             reply_content[u'user_expressions'] = {}
@@ -206,17 +213,17 @@ class IPythonKernel(KernelBase):
         line_cursor = cursor_pos - offset
 
         txt, matches = self.shell.complete('', line, line_cursor)
-        return {'matches' : matches,
-                'cursor_end' : cursor_pos,
-                'cursor_start' : cursor_pos - len(txt),
-                'metadata' : {},
-                'status' : 'ok'}
+        return {'matches': matches,
+                'cursor_end': cursor_pos,
+                'cursor_start': cursor_pos - len(txt),
+                'metadata': {},
+                'status': 'ok'}
 
     def do_inspect(self, code, cursor_pos, detail_level=0):
         name = token_at_cursor(code, cursor_pos)
         info = self.shell.object_inspect(name)
 
-        reply_content = {'status' : 'ok'}
+        reply_content = {'status': 'ok'}
         reply_content['data'] = data = {}
         reply_content['metadata'] = {}
         reply_content['found'] = info['found']
@@ -233,7 +240,7 @@ class IPythonKernel(KernelBase):
                    stop=None, n=None, pattern=None, unique=False):
         if hist_access_type == 'tail':
             hist = self.shell.history_manager.get_tail(n, raw=raw, output=output,
-                                                            include_latest=True)
+                                                       include_latest=True)
 
         elif hist_access_type == 'range':
             hist = self.shell.history_manager.get_range(session, start, stop,
@@ -245,14 +252,15 @@ class IPythonKernel(KernelBase):
         else:
             hist = []
 
-        return {'history' : list(hist)}
+        return {'history': list(hist)}
 
     def do_shutdown(self, restart):
         self.shell.exit_now = True
         return dict(status='ok', restart=restart)
 
     def do_is_complete(self, code):
-        status, indent_spaces = self.shell.input_transformer_manager.check_complete(code)
+        status, indent_spaces = self.shell.input_transformer_manager.check_complete(
+            code)
         r = {'status': status}
         if status == 'incomplete':
             r['indent'] = ' ' * indent_spaces
@@ -263,21 +271,22 @@ class IPythonKernel(KernelBase):
         try:
             working = shell.user_ns
 
-            prefix = "_"+str(msg_id).replace("-","")+"_"
+            prefix = "_" + str(msg_id).replace("-", "") + "_"
 
-            f,args,kwargs = unpack_apply_message(bufs, working, copy=False)
+            f, args, kwargs = unpack_apply_message(bufs, working, copy=False)
 
             fname = getattr(f, '__name__', 'f')
 
-            fname = prefix+"f"
-            argname = prefix+"args"
-            kwargname = prefix+"kwargs"
-            resultname = prefix+"result"
+            fname = prefix + "f"
+            argname = prefix + "args"
+            kwargname = prefix + "kwargs"
+            resultname = prefix + "result"
 
-            ns = { fname : f, argname : args, kwargname : kwargs , resultname : None }
+            ns = {fname: f, argname: args, kwargname: kwargs, resultname: None}
             # print ns
             working.update(ns)
-            code = "%s = %s(*%s,**%s)" % (resultname, fname, argname, kwargname)
+            code = "%s = %s(*%s,**%s)" % (resultname,
+                                          fname, argname, kwargname)
             try:
                 exec(code, shell.user_global_ns, shell.user_ns)
                 result = working.get(resultname)
@@ -286,9 +295,9 @@ class IPythonKernel(KernelBase):
                     working.pop(key)
 
             result_buf = serialize_object(result,
-                buffer_threshold=self.session.buffer_threshold,
-                item_threshold=self.session.item_threshold,
-            )
+                                          buffer_threshold=self.session.buffer_threshold,
+                                          item_threshold=self.session.item_threshold,
+                                          )
 
         except:
             # invoke IPython traceback formatting
@@ -298,20 +307,22 @@ class IPythonKernel(KernelBase):
             reply_content = {}
             if shell._reply_content is not None:
                 reply_content.update(shell._reply_content)
-                e_info = dict(engine_uuid=self.ident, engine_id=self.int_id, method='apply')
+                e_info = dict(
+                    engine_uuid=self.ident, engine_id=self.int_id, method='apply')
                 reply_content['engine_info'] = e_info
                 # reset after use
                 shell._reply_content = None
 
             self.send_response(self.iopub_socket, u'error', reply_content,
-                                ident=self._topic('error'))
-            self.log.info("Exception in apply request:\n%s", '\n'.join(reply_content['traceback']))
+                               ident=self._topic('error'))
+            self.log.info(
+                "Exception in apply request:\n%s", '\n'.join(reply_content['traceback']))
             result_buf = []
 
             if reply_content['ename'] == 'UnmetDependency':
                 reply_metadata['dependencies_met'] = False
         else:
-            reply_content = {'status' : 'ok'}
+            reply_content = {'status': 'ok'}
 
         return reply_content, result_buf
 
@@ -324,6 +335,7 @@ class IPythonKernel(KernelBase):
 
 @undoc
 class Kernel(IPythonKernel):
+
     def __init__(self, *args, **kwargs):
         import warnings
         warnings.warn('Kernel is a deprecated alias of IPython.kernel.zmq.ipkernel.IPythonKernel',

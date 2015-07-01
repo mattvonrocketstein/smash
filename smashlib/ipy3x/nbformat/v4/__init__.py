@@ -19,5 +19,3 @@ writes_json = writes
 to_notebook_json = to_notebook
 
 from .convert import downgrade, upgrade
-
-

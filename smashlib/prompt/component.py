@@ -7,8 +7,10 @@ from goulash._fabric import qlocal
 from IPython.utils import coloransi
 from smashlib.util.reflect import from_dotpath
 
+
 class PromptError(ValueError):
     pass
+
 
 class PromptComponent(addict.Dict):
 
@@ -39,11 +41,11 @@ class PromptComponent(addict.Dict):
             raise Exception(err)
         if result and \
                 self.space_margins and \
-                self.space_margins.lower()=='true':
+                self.space_margins.lower() == 'true':
             result = ' {0} '.format(result)
         if self.color:
             # have to use IPython's formatting rules so that IPython
             # can correctly calculate terminal width w/ invisible chars
-            return '{color.'+self.color.title()+'}'+result+'{color.Normal}'
+            return '{color.' + self.color.title() + '}' + result + '{color.Normal}'
         else:
             return result

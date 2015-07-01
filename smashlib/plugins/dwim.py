@@ -39,15 +39,20 @@ def is_editable(_fpath):
 
 from IPython.core.magic import Magics, magics_class, line_magic
 
+
 @magics_class
 class SmashOpenMagic(Magics):
+
     @line_magic
     def open(self, parameter_s=''):
         print 'parameter_s', parameter_s
 
+
 class SmartOpener(object):
+
     """ override open() (from __builtins__) with
         something that also functions as a macro """
+
     def __init__(self, *args, **kargs):
         pass
 
@@ -57,7 +62,9 @@ class SmartOpener(object):
     def magically(self, param_s):
         print 'magically', param_s
 
+
 class DoWhatIMean(Plugin):
+
     """ """
 
     verbose = True
@@ -91,23 +98,27 @@ class DoWhatIMean(Plugin):
         def doit(_fpath, _suffix, _opener, _rest):
             if ope(_fpath) and not isdir(_fpath):
                 if _opener is not None:
-                    self.report('Using _opener "{0}" for "{1}"'.format(_opener, _suffix))
-                    return '{0} {1}'.format(_opener, _fpath+_rest)
+                    self.report(
+                        'Using _opener "{0}" for "{1}"'.format(_opener, _suffix))
+                    return '{0} {1}'.format(_opener, _fpath + _rest)
                 else:
-                    msg = "Legit file input, but no _suffix alias could be found for "+_suffix
+                    msg = "Legit file input, but no _suffix alias could be found for " + \
+                        _suffix
                     self.report(msg)
                     if is_editable(_fpath):
-                        self.report("File looks like ASCII text, assuming I should edit it")
+                        self.report(
+                            "File looks like ASCII text, assuming I should edit it")
                         return doit(_fpath, _suffix, 'ed', _rest)
             else:
-                msg = 'Attempted file input, but path "{0}" does not exist'.format(fpath)
+                msg = 'Attempted file input, but path "{0}" does not exist'.format(
+                    fpath)
                 self.report(msg)
 
         fpath = abspath(expanduser(fpath))
 
         if isdir(fpath) and self.automatic_cd:
-            self.report('cd '+fpath)
-            self.smash.shell.magic('pushd '+fpath)
+            self.report('cd ' + fpath)
+            self.smash.shell.magic('pushd ' + fpath)
             return True
 
         # handle input like .foo/bin/python,
@@ -116,7 +127,7 @@ class DoWhatIMean(Plugin):
         if os.access(fpath, os.X_OK):
             return self.smash.shell.system(fpath)
 
-        #isolate file:col:row syntax
+        # isolate file:col:row syntax
         if not ope(fpath) and ':' in fpath:
             tmp = fpath
             fpath = tmp[:tmp.find(':')]
@@ -124,7 +135,7 @@ class DoWhatIMean(Plugin):
         else:
             rest = ''
 
-        #isolate file suffix, guess an opener
+        # isolate file suffix, guess an opener
         suffix = splitext(fpath)[-1][1:].lower()
         opener = self.suffix_aliases.get(suffix, None)
         cmd = doit(fpath, suffix, opener, rest)
@@ -133,9 +144,9 @@ class DoWhatIMean(Plugin):
             return True
 
     def init(self):
-        #def smash_open(x):
+        # def smash_open(x):
         #    webbrowser.open(x)
-        #self.contribute_magic(smash_open)
+        # self.contribute_magic(smash_open)
         if self.automatic_cd or self.automatic_edit:
             self.smash.error_handlers.append(self.handle_NameError)
 
@@ -148,6 +159,7 @@ class DoWhatIMean(Plugin):
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     return DoWhatIMean(get_ipython()).install()
+
 
 def unload_ipython_extension(ip):
     """ called by %unload_ext magic"""

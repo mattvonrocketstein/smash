@@ -66,7 +66,7 @@ cells.append(new_code_cell(
             'application/javascript': u'var i=0;'
         },
         execution_count=3
-    ),new_output(
+    ), new_output(
         output_type=u'display_data',
         data={
             'text/plain': u'<array a>',
@@ -80,15 +80,15 @@ cells.append(new_code_cell(
             },
             'application/javascript': u'var i=0;'
         },
-    ),new_output(
+    ), new_output(
         output_type=u'error',
         ename=u'NameError',
         evalue=u'NameError was here',
         traceback=[u'frame 0', u'frame 1', u'frame 2']
-    ),new_output(
+    ), new_output(
         output_type=u'stream',
         text='foo\rbar\r\n'
-    ),new_output(
+    ), new_output(
         output_type=u'stream',
         name='stderr',
         text='\rfoo\rbar\n'
@@ -96,9 +96,7 @@ cells.append(new_code_cell(
 ))
 
 nb0 = new_notebook(cells=cells,
-    metadata={
-        'language': 'python',
-    }
-)
-
-
+                   metadata={
+                       'language': 'python',
+                   }
+                   )

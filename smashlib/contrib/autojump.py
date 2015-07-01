@@ -2347,7 +2347,6 @@ import platform
 import unicodedata
 
 
-
 def create_dir(path):
     """Creates a directory atomically."""
     try:
@@ -2476,8 +2475,10 @@ def print_entry(entry):
 def print_local(string):
     print(encode_local(string))
 
+
 def _local(string):
     return (encode_local(string))
+
 
 def tab_menu(needle, tab_entries, separator):
     """
@@ -2498,6 +2499,7 @@ def tab_menu(needle, tab_entries, separator):
                 separator,
                 entry.path)))
     return out
+
 
 def sanitize(directories):
     # edge case to allow '/' as a valid path
@@ -2666,7 +2668,7 @@ TAB_SEPARATOR = '__'
 
 def set_defaults():
     config = {}
-    data_home=SMASH_DIR
+    data_home = SMASH_DIR
     config['data_path'] = os.path.join(data_home, 'autojump.txt')
     config['backup_path'] = os.path.join(data_home, 'autojump.txt.bak')
     return config
@@ -2929,7 +2931,7 @@ def print_stats(data, data_path):
 
 
 def main(args):  # noqa
-    #if not is_autojump_sourced() and not is_windows():
+    # if not is_autojump_sourced() and not is_windows():
     #    print("Please source the correct autojump file in your shell's")
     #    print("startup file. For more information, please reinstall autojump")
     #    print("and read the post installation instructions.")
@@ -2941,7 +2943,7 @@ def main(args):  # noqa
     if args.add:
         save(config, first(add_path(load(config), args.add)))
     elif args.complete:
-        out=handle_tab_completion(
+        out = handle_tab_completion(
             needle=first(chain(sanitize(args.directory), [''])),
             entries=entriefy(load(config)))
         return out

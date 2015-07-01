@@ -20,7 +20,9 @@ from IPython.utils.traitlets import Unicode
 # Classes
 #-----------------------------------------------------------------------------
 
+
 class ConvertFiguresPreprocessor(Preprocessor):
+
     """
     Converts all of the outputs in a notebook from one format to another.
     """
@@ -34,15 +36,13 @@ class ConvertFiguresPreprocessor(Preprocessor):
         """
         super(ConvertFiguresPreprocessor, self).__init__(**kw)
 
-
     def convert_figure(self, data_format, data):
         raise NotImplementedError()
-
 
     def preprocess_cell(self, cell, resources, cell_index):
         """
         Apply a transformation on each cell,
-        
+
         See base.py
         """
 
@@ -53,6 +53,6 @@ class ConvertFiguresPreprocessor(Preprocessor):
                     and self.to_format not in output.data:
 
                 output.data[self.to_format] = self.convert_figure(
-                            self.from_format, output.data[self.from_format])
+                    self.from_format, output.data[self.from_format])
 
         return cell, resources

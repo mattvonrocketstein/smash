@@ -20,15 +20,20 @@ from IPython.utils.warn import DeprecatedClass
 #-----------------------------------------------------------------------------
 # Classes
 #-----------------------------------------------------------------------------
+
+
 class _Bool(DOMWidget):
+
     """A base class for creating widgets that represent booleans."""
     value = Bool(False, help="Bool value", sync=True)
-    description = Unicode('', help="Description of the boolean (label).", sync=True)
+    description = Unicode(
+        '', help="Description of the boolean (label).", sync=True)
     disabled = Bool(False, help="Enable or disable user changes.", sync=True)
 
 
 @register('IPython.Checkbox')
 class Checkbox(_Bool):
+
     """Displays a boolean `value` in the form of a checkbox.
 
        Parameters
@@ -36,13 +41,14 @@ class Checkbox(_Bool):
        value : {True,False}
            value of the checkbox: True-checked, False-unchecked
        description : str
-	   description displayed next to the checkbox
+           description displayed next to the checkbox
 """
     _view_name = Unicode('CheckboxView', sync=True)
 
 
 @register('IPython.ToggleButton')
 class ToggleButton(_Bool):
+
     """Displays a boolean `value` in the form of a toggle button.
 
        Parameters
@@ -50,14 +56,14 @@ class ToggleButton(_Bool):
        value : {True,False}
            value of the toggle button: True-pressed, False-unpressed
        description : str
-	   description displayed next to the button
+           description displayed next to the button
 """
-    
+
     _view_name = Unicode('ToggleButtonView', sync=True)
     tooltip = Unicode(help="Tooltip caption of the toggle button.", sync=True)
 
     button_style = CaselessStrEnum(
-        values=['primary', 'success', 'info', 'warning', 'danger', ''], 
+        values=['primary', 'success', 'info', 'warning', 'danger', ''],
         default_value='', allow_none=True, sync=True, help="""Use a
         predefined styling for the button.""")
 

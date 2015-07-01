@@ -37,6 +37,7 @@ from .managerabc import (
 
 
 class KernelManager(ConnectionFileMixin):
+
     """Manages a single kernel in a subprocess on this host.
 
     This version starts kernels with Popen.
@@ -44,31 +45,34 @@ class KernelManager(ConnectionFileMixin):
 
     # The PyZMQ Context to use for communication with the kernel.
     context = Instance(zmq.Context)
+
     def _context_default(self):
         return zmq.Context.instance()
 
     # the class to create with our `client` method
-    client_class = DottedObjectName('IPython.kernel.blocking.BlockingKernelClient')
+    client_class = DottedObjectName(
+        'IPython.kernel.blocking.BlockingKernelClient')
     client_factory = Type()
+
     def _client_class_changed(self, name, old, new):
         self.client_factory = import_item(str(new))
 
     # The kernel process with which the KernelManager is communicating.
     # generally a Popen instance
     kernel = Any()
-    
+
     kernel_spec_manager = Instance(kernelspec.KernelSpecManager)
-    
+
     def _kernel_spec_manager_default(self):
         return kernelspec.KernelSpecManager(ipython_dir=self.ipython_dir)
-    
+
     kernel_name = Unicode(kernelspec.NATIVE_KERNEL_NAME)
-    
+
     kernel_spec = Instance(kernelspec.KernelSpec)
-    
+
     def _kernel_spec_default(self):
         return self.kernel_spec_manager.get_kernel_spec(self.kernel_name)
-    
+
     def _kernel_name_changed(self, name, old, new):
         if new == 'python':
             self.kernel_name = kernelspec.NATIVE_KERNEL_NAME
@@ -78,7 +82,7 @@ class KernelManager(ConnectionFileMixin):
         self.ipython_kernel = new in {'python', 'python2', 'python3'}
 
     kernel_cmd = List(Unicode, config=True,
-        help="""DEPRECATED: Use kernel_name instead.
+                      help="""DEPRECATED: Use kernel_name instead.
         
         The Popen Command to launch the kernel.
         Override this if you have a custom kernel.
@@ -89,7 +93,7 @@ class KernelManager(ConnectionFileMixin):
         this means that the kernel does not receive the
         option --debug if it given on the IPython command line.
         """
-    )
+                      )
 
     def _kernel_cmd_changed(self, name, old, new):
         warnings.warn("Setting kernel_cmd is deprecated, use kernel_spec to "
@@ -97,8 +101,9 @@ class KernelManager(ConnectionFileMixin):
         self.ipython_kernel = False
 
     ipython_kernel = Bool(True)
-    
+
     ipython_dir = Unicode()
+
     def _ipython_dir_default(self):
         return get_ipython_dir()
 
@@ -109,8 +114,8 @@ class KernelManager(ConnectionFileMixin):
     _restarter = Any()
 
     autorestart = Bool(False, config=True,
-        help="""Should we autorestart the kernel if it dies."""
-    )
+                       help="""Should we autorestart the kernel if it dies."""
+                       )
 
     def __del__(self):
         self._close_control_socket()
@@ -173,13 +178,14 @@ class KernelManager(ConnectionFileMixin):
 
         ns = dict(connection_file=self.connection_file)
         ns.update(self._launch_args)
-        
+
         pat = re.compile(r'\{([A-Za-z0-9_]+)\}')
+
         def from_ns(match):
             """Get the key out of ns if it's there, otherwise no change."""
             return ns.get(match.group(1), match.group())
-        
-        return [ pat.sub(from_ns, arg) for arg in cmd ]
+
+        return [pat.sub(from_ns, arg) for arg in cmd]
 
     def _launch_kernel(self, kernel_cmd, **kw):
         """actually launch the kernel
@@ -237,13 +243,13 @@ class KernelManager(ConnectionFileMixin):
             env.update(self.kernel_spec.env or {})
         # launch the kernel subprocess
         self.kernel = self._launch_kernel(kernel_cmd, env=env,
-                                    **kw)
+                                          **kw)
         self.start_restarter()
         self._connect_control_socket()
 
     def request_shutdown(self, restart=False):
         """Send a shutdown request via control channel
-        
+
         On Windows, this just kills kernels instead, because the shutdown
         messages don't work.
         """
@@ -253,11 +259,11 @@ class KernelManager(ConnectionFileMixin):
 
     def finish_shutdown(self, waittime=1, pollinterval=0.1):
         """Wait for kernel shutdown, then kill process if it doesn't shutdown.
-        
+
         This does not send shutdown requests - use :meth:`request_shutdown`
         first.
         """
-        for i in range(int(waittime/pollinterval)):
+        for i in range(int(waittime / pollinterval)):
             if self.is_alive():
                 time.sleep(pollinterval)
             else:
@@ -386,7 +392,8 @@ class KernelManager(ConnectionFileMixin):
             else:
                 self.kernel.send_signal(signal.SIGINT)
         else:
-            raise RuntimeError("Cannot interrupt kernel. No kernel is running!")
+            raise RuntimeError(
+                "Cannot interrupt kernel. No kernel is running!")
 
     def signal_kernel(self, signum):
         """Sends a signal to the kernel.
@@ -433,12 +440,13 @@ def start_new_kernel(startup_timeout=60, kernel_name='python', **kwargs):
                 break
     return km, kc
 
+
 @contextmanager
 def run_kernel(**kwargs):
     """Context manager to create a kernel in a subprocess.
-    
+
     The kernel is shut down when the context exits.
-    
+
     Returns
     -------
     kernel_client: connected KernelClient instance

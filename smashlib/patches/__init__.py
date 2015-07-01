@@ -5,4 +5,4 @@ from smashlib.patches.pushd import PatchPushdMagic
 __all__ = [
     PatchCDMagic.__name__,
     PatchPushdMagic.__name__,
-    ]
+]

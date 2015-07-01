@@ -2,19 +2,19 @@
 """
 __version__ = 0.1
 import os
-
+from goulash._inspect import get_caller
 from smashlib.import_hooks import hijack_ipython_module
+
 
 def start_ipython(argv=None, **kwargs):
     from smashlib.overrides import launch_new_instance
     return launch_new_instance(argv=argv, **kwargs)
 
+
 def embed(argv=tuple(), **kargs):
     hijack_ipython_module()
-    #if os.environ.get('SMASH', None):
+    # if os.environ.get('SMASH', None):
     #    print "..detected nesting.. this may cause problems"
-
-    from goulash._inspect import get_caller
     context = kargs.pop('user_ns', {})
     caller_context = get_caller(2)
     if context is not None:
@@ -26,6 +26,7 @@ def embed(argv=tuple(), **kargs):
         start_ipython(argv=argv, user_ns=context, **kargs)
     except KeyboardInterrupt:
         print 'caught kbi'
+
 
 def get_smash():
     try:

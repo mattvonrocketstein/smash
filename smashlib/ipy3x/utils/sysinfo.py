@@ -27,6 +27,7 @@ from IPython.utils import py3compat, _sysinfo, encoding
 # Code
 #-----------------------------------------------------------------------------
 
+
 def pkg_commit_hash(pkg_path):
     """Get short form of commit hash given directory `pkg_path`
 
@@ -90,13 +91,15 @@ def pkg_info(pkg_path):
         platform=platform.platform(),
         os_name=os.name,
         default_encoding=encoding.DEFAULT_ENCODING,
-        )
+    )
+
 
 def get_sys_info():
     """Return useful information about IPython and the system, as a dict."""
     p = os.path
     path = p.realpath(p.dirname(p.abspath(p.join(__file__, '..'))))
     return pkg_info(path)
+
 
 @py3compat.doctest_refactor_print
 def sys_info():
@@ -105,7 +108,7 @@ def sys_info():
     Examples
     --------
     ::
-    
+
         In [2]: print sys_info()
         {'commit_hash': '144fdae',      # random
          'commit_source': 'repository',
@@ -119,6 +122,7 @@ def sys_info():
     """
     return pprint.pformat(get_sys_info())
 
+
 def _num_cpus_unix():
     """Return the number of active CPUs on a Unix system."""
     return os.sysconf("SC_NPROCESSORS_ONLN")
@@ -126,7 +130,7 @@ def _num_cpus_unix():
 
 def _num_cpus_darwin():
     """Return the number of active CPUs on a Darwin system."""
-    p = subprocess.Popen(['sysctl','-n','hw.ncpu'],stdout=subprocess.PIPE)
+    p = subprocess.Popen(['sysctl', '-n', 'hw.ncpu'], stdout=subprocess.PIPE)
     return p.stdout.read()
 
 
@@ -136,32 +140,31 @@ def _num_cpus_windows():
 
 
 def num_cpus():
-   """Return the effective number of CPUs in the system as an integer.
+    """Return the effective number of CPUs in the system as an integer.
 
-   This cross-platform function makes an attempt at finding the total number of
-   available CPUs in the system, as returned by various underlying system and
-   python calls.
+    This cross-platform function makes an attempt at finding the total number of
+    available CPUs in the system, as returned by various underlying system and
+    python calls.
 
-   If it can't find a sensible answer, it returns 1 (though an error *may* make
-   it return a large positive number that's actually incorrect).
-   """
+    If it can't find a sensible answer, it returns 1 (though an error *may* make
+    it return a large positive number that's actually incorrect).
+    """
 
-   # Many thanks to the Parallel Python project (http://www.parallelpython.com)
-   # for the names of the keys we needed to look up for this function.  This
-   # code was inspired by their equivalent function.
+    # Many thanks to the Parallel Python project (http://www.parallelpython.com)
+    # for the names of the keys we needed to look up for this function.  This
+    # code was inspired by their equivalent function.
 
-   ncpufuncs = {'Linux':_num_cpus_unix,
-                'Darwin':_num_cpus_darwin,
-                'Windows':_num_cpus_windows
-                }
+    ncpufuncs = {'Linux': _num_cpus_unix,
+                 'Darwin': _num_cpus_darwin,
+                 'Windows': _num_cpus_windows
+                 }
 
-   ncpufunc = ncpufuncs.get(platform.system(),
-                            # default to unix version (Solaris, AIX, etc)
-                            _num_cpus_unix)
+    ncpufunc = ncpufuncs.get(platform.system(),
+                             # default to unix version (Solaris, AIX, etc)
+                             _num_cpus_unix)
 
-   try:
-       ncpus = max(1,int(ncpufunc()))
-   except:
-       ncpus = 1
-   return ncpus
-
+    try:
+        ncpus = max(1, int(ncpufunc()))
+    except:
+        ncpus = 1
+    return ncpus

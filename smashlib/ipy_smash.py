@@ -7,6 +7,7 @@
 """
 import os
 import cyrusbus
+import argparse
 from collections import defaultdict
 
 from goulash._fabric import qlocal
@@ -28,17 +29,18 @@ from smashlib.patches.pinfo import PatchPinfoMagic
 
 from .aliases import AliasInterface
 
+
 class Smash(Plugin):
-    plugins             = List(default_value=[], config=True)
-    verbose_events      = Bool(True, config=True)
-    ignore_warnings     = Bool(False, config=True)
-    load_bash_aliases   = Bool(False, config=True)
+    plugins = List(default_value=[], config=True)
+    verbose_events = Bool(True, config=True)
+    ignore_warnings = Bool(False, config=True)
+    load_bash_aliases = Bool(False, config=True)
     load_bash_functions = Bool(False, config=True)
 
-    bus                = cyrusbus.Bus()
-    error_handlers     = []
+    bus = cyrusbus.Bus()
+    error_handlers = []
     _installed_plugins = {}
-    completers         = defaultdict(list)
+    completers = defaultdict(list)
 
     def _repr_pretty_(self, p, cycle):
         """ demo that behaves just like repr()"""
@@ -66,8 +68,8 @@ class Smash(Plugin):
             ext_name = dotpath.split('.')[-1]
             ext_obj = mod.load_ipython_extension(self.shell)
             assert isinstance(ext_obj, Plugin), \
-                   ("error with extension '{0}': smash requires load_ipython_extension()"
-                    " to return plugin object ").format(ext_name)
+                ("error with extension '{0}': smash requires load_ipython_extension()"
+                 " to return plugin object ").format(ext_name)
             _installed_plugins[ext_name] = ext_obj
             if ext_obj is None:
                 msg = '{0}.load_ipython_extension should return an object'
@@ -85,21 +87,46 @@ class Smash(Plugin):
         self.report("loaded plugins:", _installed_plugins.keys())
 
     def build_argparser(self):
-        parser = super(Smash, self).build_argparser()
+        parser = argparse.ArgumentParser()
+        for plugin in self._installed_plugins.values():
+            clopts = plugin.get_cli_arguments()
+            for clopt in clopts:
+                args, kargs = clopt
+                if not isinstance(args, (list, tuple)) or \
+                   not isinstance(kargs, dict):
+                    err = "{0} has not implemented get_cli_arguments correctly"
+                    err = err.format(plugin)
+                    raise SystemExit(err)
+                parser.add_argument(*args, **kargs)
         # thinking of adding extra parsing here?  think twice.
-        # whatever you're doing probably belongs in a plugin
+        # whatever you're doing probably belongs in a separate plugin
         return parser
+
+    def parse_argv(self):
+        parser = self.build_argparser()
+        try:
+            args, unknown = parser.parse_known_args(sys.argv[1:])
+        except SystemExit:
+            self.die('exiting at request of argparser')
+        if len(vars(args)):
+            self.report("parsed argv: " + str(args))
+        return args, unknown
 
     def parse_argv(self):
         """ parse arguments recognized by myself,
             then let all the plugins take a stab
             at it.
         """
-        main_args, unknown = super(Smash,self).parse_argv()
-        ext_objs = self._installed_plugins.values()
-        for obj in ext_objs:
-            if obj:
-                args, unknown = obj.parse_argv()
+        parser = self.build_argparser()
+        args = parser.parse_args()
+        for plugin in self._installed_plugins.values():
+            plugin.use_argv(args)
+        return args
+        #main_args, unknown = super(Smash,self).parse_argv()
+        #ext_objs = self._installed_plugins.values()
+        # for obj in ext_objs:
+        #    if obj:
+        #        args, unknown = obj.parse_argv()
 
     @property
     def project_manager(self):
@@ -109,7 +136,10 @@ class Smash(Plugin):
         self.shell._smash = self
         self.init_bus()
         self.init_plugins()
-        self.parse_argv()
+        try:
+            self.parse_argv()
+        except SystemExit:
+            self.die()
         self.init_macros()
         self.init_config_inheritance()
         if data.SMASH_BIN not in os.environ['PATH']:
@@ -140,14 +170,15 @@ class Smash(Plugin):
                 # this check is a hack, but users will frequently override
                 # cd to pushd which is already done in smash anyway
                 if alias not in 'ed cd'.split():
-                    self.shell.magic("alias {0} {1}".format(alias,cmd))
+                    self.shell.magic("alias {0} {1}".format(alias, cmd))
 
         if self.load_bash_functions:
             fxns = bash.get_functions()
             for fxn_name in fxns:
                 cmd = bash.FunctionMagic(fxn_name)
-                self.shell.magics_manager.register_function(cmd, magic_name=fxn_name)
-            self.report("registered magic for bash functions: ",fxns)
+                self.shell.magics_manager.register_function(
+                    cmd, magic_name=fxn_name)
+            self.report("registered magic for bash functions: ", fxns)
 
     def init_patches(self):
         PatchEdit(self).install()
@@ -166,11 +197,13 @@ class Smash(Plugin):
         self.completers[get_caller(2)['class']].append(fxn)
         get_ipython().set_hook('complete_command', fxn, **kargs)
 
+
 def load_ipython_extension(ip):
     """ called by %load_ext magic """
     ip = get_ipython()
     ip._smash = Smash(ip)
     return ip._smash
+
 
 def unload_ipython_extension(ip):
     del ip._smash

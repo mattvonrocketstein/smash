@@ -11,13 +11,13 @@ from .test import python_test
 ACTIVATE = dict(
     python=[activate_python_venv],
     vagrant=[activate_vagrant],
-    )
+)
 
 CHECK = dict(
     python=[python_lint],
     haskell=[haskell_lint],
     puppet=[puppet_lint],
-    )
+)
 
 TEST = dict(
     python=[python_test])

@@ -16,28 +16,30 @@ from IPython.utils.traitlets import (
 
 
 class KernelRestarter(LoggingConfigurable):
+
     """Monitor and autorestart a kernel."""
 
     kernel_manager = Instance('IPython.kernel.KernelManager')
-    
+
     debug = Bool(False, config=True,
-        help="""Whether to include every poll event in debugging output.
+                 help="""Whether to include every poll event in debugging output.
         
         Has to be set explicitly, because there will be *a lot* of output.
         """
-    )
-    
+                 )
+
     time_to_dead = Float(3.0, config=True,
-        help="""Kernel heartbeat interval in seconds."""
-    )
+                         help="""Kernel heartbeat interval in seconds."""
+                         )
 
     restart_limit = Integer(5, config=True,
-        help="""The number of consecutive autorestarts before the kernel is presumed dead."""
-    )
+                            help="""The number of consecutive autorestarts before the kernel is presumed dead."""
+                            )
     _restarting = Bool(False)
     _restart_count = Integer(0)
 
     callbacks = Dict()
+
     def _callbacks_default(self):
         return dict(restart=[], dead=[])
 
@@ -80,7 +82,8 @@ class KernelRestarter(LoggingConfigurable):
             try:
                 callback()
             except Exception as e:
-                self.log.error("KernelRestarter: %s callback %r failed", event, callback, exc_info=True)
+                self.log.error(
+                    "KernelRestarter: %s callback %r failed", event, callback, exc_info=True)
 
     def poll(self):
         if self.debug:
@@ -99,9 +102,9 @@ class KernelRestarter(LoggingConfigurable):
                 self.stop()
             else:
                 self.log.info('KernelRestarter: restarting kernel (%i/%i)',
-                    self._restart_count,
-                    self.restart_limit
-                )
+                              self._restart_count,
+                              self.restart_limit
+                              )
                 self._fire_callbacks('restart')
                 self.kernel_manager.restart_kernel(now=True)
                 self._restarting = True

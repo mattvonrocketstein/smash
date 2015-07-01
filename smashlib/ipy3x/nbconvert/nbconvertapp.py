@@ -31,11 +31,13 @@ from .utils.exceptions import ConversionException
 #Classes and functions
 #-----------------------------------------------------------------------------
 
+
 class DottedOrNone(DottedObjectName):
+
     """
     A string holding a valid dotted object name in Python, such as A.b3._c
     Also allows for None type."""
-    
+
     default_value = u''
 
     def validate(self, obj, value):
@@ -43,13 +45,13 @@ class DottedOrNone(DottedObjectName):
             return super(DottedOrNone, self).validate(obj, value)
         else:
             return value
-            
+
 nbconvert_aliases = {}
 nbconvert_aliases.update(base_aliases)
 nbconvert_aliases.update({
-    'to' : 'NbConvertApp.export_format',
-    'template' : 'TemplateExporter.template_file',
-    'writer' : 'NbConvertApp.writer_class',
+    'to': 'NbConvertApp.export_format',
+    'template': 'TemplateExporter.template_file',
+    'writer': 'NbConvertApp.writer_class',
     'post': 'NbConvertApp.postprocessor_class',
     'output': 'NbConvertApp.output_base',
     'reveal-prefix': 'RevealHelpPreprocessor.url_prefix',
@@ -59,27 +61,28 @@ nbconvert_aliases.update({
 nbconvert_flags = {}
 nbconvert_flags.update(base_flags)
 nbconvert_flags.update({
-    'execute' : (
-        {'ExecutePreprocessor' : {'enabled' : True}},
+    'execute': (
+        {'ExecutePreprocessor': {'enabled': True}},
         "Execute the notebook prior to export."
-        ),
-    'stdout' : (
-        {'NbConvertApp' : {'writer_class' : "StdoutWriter"}},
+    ),
+    'stdout': (
+        {'NbConvertApp': {'writer_class': "StdoutWriter"}},
         "Write notebook output to stdout instead of files."
-        )
+    )
 })
 
 
 class NbConvertApp(BaseIPythonApplication):
+
     """Application used to convert from notebook file type (``*.ipynb``)"""
 
     name = 'ipython-nbconvert'
     aliases = nbconvert_aliases
     flags = nbconvert_flags
-    
+
     def _log_level_default(self):
         return logging.INFO
-    
+
     def _classes_default(self):
         classes = [NbConvertBase, ProfileDir]
         for pkg in (exporters, preprocessors, writers, postprocessors):
@@ -87,7 +90,7 @@ class NbConvertApp(BaseIPythonApplication):
                 cls = getattr(pkg, name)
                 if isinstance(cls, type) and issubclass(cls, Configurable):
                     classes.append(cls)
-        
+
         return classes
 
     description = Unicode(
@@ -144,10 +147,10 @@ class NbConvertApp(BaseIPythonApplication):
         """.format(get_export_names()))
 
     # Writer specific variables
-    writer = Instance('IPython.nbconvert.writers.base.WriterBase',  
+    writer = Instance('IPython.nbconvert.writers.base.WriterBase',
                       help="""Instance of the writer class used to write the 
                       results of the conversion.""")
-    writer_class = DottedObjectName('FilesWriter', config=True, 
+    writer_class = DottedObjectName('FilesWriter', config=True,
                                     help="""Writer class used to write the 
                                     results of the conversion""")
     writer_aliases = {'fileswriter': 'IPython.nbconvert.writers.files.FilesWriter',
@@ -161,14 +164,15 @@ class NbConvertApp(BaseIPythonApplication):
         self.writer_factory = import_item(new)
 
     # Post-processor specific variables
-    postprocessor = Instance('IPython.nbconvert.postprocessors.base.PostProcessorBase',  
-                      help="""Instance of the PostProcessor class used to write the 
+    postprocessor = Instance('IPython.nbconvert.postprocessors.base.PostProcessorBase',
+                             help="""Instance of the PostProcessor class used to write the 
                       results of the conversion.""")
 
-    postprocessor_class = DottedOrNone(config=True, 
-                                    help="""PostProcessor class used to write the 
+    postprocessor_class = DottedOrNone(config=True,
+                                       help="""PostProcessor class used to write the 
                                     results of the conversion""")
-    postprocessor_aliases = {'serve': 'IPython.nbconvert.postprocessors.serve.ServePostProcessor'}
+    postprocessor_aliases = {
+        'serve': 'IPython.nbconvert.postprocessors.serve.ServePostProcessor'}
     postprocessor_factory = Type()
 
     def _postprocessor_class_changed(self, name, old, new):
@@ -177,13 +181,12 @@ class NbConvertApp(BaseIPythonApplication):
         if new:
             self.postprocessor_factory = import_item(new)
 
-
     # Other configurable variables
     export_format = CaselessStrEnum(get_export_names(),
-        default_value="html",
-        config=True,
-        help="""The export format to be used."""
-    )
+                                    default_value="html",
+                                    config=True,
+                                    help="""The export format to be used."""
+                                    )
 
     notebooks = List([], config=True, help="""List of notebooks to convert.
                      Wildcards are supported.
@@ -198,14 +201,11 @@ class NbConvertApp(BaseIPythonApplication):
         self.init_writer()
         self.init_postprocessor()
 
-
-
     def init_syspath(self):
         """
         Add the cwd to the sys.path ($PYTHONPATH)
         """
         sys.path.insert(0, os.getcwd())
-        
 
     def init_notebooks(self):
         """Construct the list of notebooks.
@@ -224,8 +224,8 @@ class NbConvertApp(BaseIPythonApplication):
         # Use glob to replace all the notebook patterns with filenames.
         filenames = []
         for pattern in patterns:
-            
-            # Use glob to find matching filenames.  Allow the user to convert 
+
+            # Use glob to find matching filenames.  Allow the user to convert
             # notebooks without having to type the extension.
             globbed_files = glob.glob(pattern)
             globbed_files.extend(glob.glob(pattern + '.ipynb'))
@@ -248,8 +248,8 @@ class NbConvertApp(BaseIPythonApplication):
         """
         Initialize the postprocessor (which is stateless)
         """
-        self._postprocessor_class_changed(None, self.postprocessor_class, 
-            self.postprocessor_class)
+        self._postprocessor_class_changed(None, self.postprocessor_class,
+                                          self.postprocessor_class)
         if self.postprocessor_factory:
             self.postprocessor = self.postprocessor_factory(parent=self)
 
@@ -269,21 +269,24 @@ class NbConvertApp(BaseIPythonApplication):
 
         if self.output_base != '' and len(self.notebooks) > 1:
             self.log.error(
-            """UsageError: --output flag or `NbConvertApp.output_base` config option
+                """UsageError: --output flag or `NbConvertApp.output_base` config option
             cannot be used when converting multiple notebooks.
             """)
             self.exit(1)
-        
+
         exporter = exporter_map[self.export_format](config=self.config)
 
         for notebook_filename in self.notebooks:
-            self.log.info("Converting notebook %s to %s", notebook_filename, self.export_format)
+            self.log.info(
+                "Converting notebook %s to %s", notebook_filename, self.export_format)
 
-            # Get a unique key for the notebook and set it in the resources object.
+            # Get a unique key for the notebook and set it in the resources
+            # object.
             basename = os.path.basename(notebook_filename)
             notebook_name = basename[:basename.rfind('.')]
             if self.output_base:
-                # strip duplicate extension from output_base, to avoid Basname.ext.ext
+                # strip duplicate extension from output_base, to avoid
+                # Basname.ext.ext
                 if getattr(exporter, 'file_extension', False):
                     base, ext = os.path.splitext(self.output_base)
                     if ext == exporter.file_extension:
@@ -293,21 +296,24 @@ class NbConvertApp(BaseIPythonApplication):
             resources['profile_dir'] = self.profile_dir.location
             resources['unique_key'] = notebook_name
             resources['output_files_dir'] = '%s_files' % notebook_name
-            self.log.info("Support files will be in %s", os.path.join(resources['output_files_dir'], ''))
+            self.log.info("Support files will be in %s", os.path.join(
+                resources['output_files_dir'], ''))
 
             # Try to export
             try:
-                output, resources = exporter.from_filename(notebook_filename, resources=resources)
+                output, resources = exporter.from_filename(
+                    notebook_filename, resources=resources)
             except ConversionException as e:
                 self.log.error("Error while converting '%s'", notebook_filename,
-                      exc_info=True)
+                               exc_info=True)
                 self.exit(1)
             else:
                 if 'output_suffix' in resources and not self.output_base:
                     notebook_name += resources['output_suffix']
-                write_results = self.writer.write(output, resources, notebook_name=notebook_name)
+                write_results = self.writer.write(
+                    output, resources, notebook_name=notebook_name)
 
-                #Post-process if post processor has been defined.
+                # Post-process if post processor has been defined.
                 if hasattr(self, 'postprocessor') and self.postprocessor:
                     self.postprocessor(write_results)
                 conversion_success += 1
@@ -316,7 +322,7 @@ class NbConvertApp(BaseIPythonApplication):
         if conversion_success == 0:
             self.print_help()
             sys.exit(-1)
-            
+
 #-----------------------------------------------------------------------------
 # Main entry point
 #-----------------------------------------------------------------------------

@@ -13,13 +13,14 @@ from IPython.utils.traitlets import Instance, Dict, Unicode, Bool
 
 from .kernelspec import KernelSpecManager, _pythonfirst
 
+
 class ListKernelSpecs(BaseIPythonApplication):
     description = """List installed kernel specifications."""
     kernel_spec_manager = Instance(KernelSpecManager)
 
     # Not all of the base aliases are meaningful (e.g. profile)
     aliases = {k: base_aliases[k] for k in ['ipython-dir', 'log-level']}
-    flags = {'debug': base_flags['debug'],}
+    flags = {'debug': base_flags['debug'], }
 
     def _kernel_spec_manager_default(self):
         return KernelSpecManager(ipython_dir=self.ipython_dir)
@@ -40,31 +41,32 @@ class InstallKernelSpec(BaseIPythonApplication):
 
     sourcedir = Unicode()
     kernel_name = Unicode("", config=True,
-        help="Install the kernel spec with this name"
-    )
+                          help="Install the kernel spec with this name"
+                          )
+
     def _kernel_name_default(self):
         return os.path.basename(self.sourcedir)
 
     system = Bool(False, config=True,
-        help="""
+                  help="""
         Try to install the kernel spec to the systemwide directory instead of
         the per-user directory.
         """
-    )
+                  )
     replace = Bool(False, config=True,
-        help="Replace any existing kernel spec with this name."
-    )
+                   help="Replace any existing kernel spec with this name."
+                   )
 
     aliases = {'name': 'InstallKernelSpec.kernel_name'}
     for k in ['ipython-dir', 'log-level']:
         aliases[k] = base_aliases[k]
 
     flags = {'system': ({'InstallKernelSpec': {'system': True}},
-                "Install to the systemwide kernel registry"),
+                        "Install to the systemwide kernel registry"),
              'replace': ({'InstallKernelSpec': {'replace': True}},
-                "Replace any existing kernel spec with this name."),
+                         "Replace any existing kernel spec with this name."),
              'debug': base_flags['debug'],
-            }
+             }
 
     def parse_command_line(self, argv):
         super(InstallKernelSpec, self).parse_command_line(argv)
@@ -78,10 +80,10 @@ class InstallKernelSpec(BaseIPythonApplication):
     def start(self):
         try:
             self.kernel_spec_manager.install_kernel_spec(self.sourcedir,
-                                                 kernel_name=self.kernel_name,
-                                                 system=self.system,
-                                                 replace=self.replace,
-                                                )
+                                                         kernel_name=self.kernel_name,
+                                                         system=self.system,
+                                                         replace=self.replace,
+                                                         )
         except OSError as e:
             if e.errno == errno.EACCES:
                 print("Permission denied")
@@ -91,6 +93,7 @@ class InstallKernelSpec(BaseIPythonApplication):
                 self.exit(1)
             raise
 
+
 class InstallNativeKernelSpec(BaseIPythonApplication):
     description = """Install the native kernel spec directory for this Python."""
     kernel_spec_manager = Instance(KernelSpecManager)
@@ -99,24 +102,26 @@ class InstallNativeKernelSpec(BaseIPythonApplication):
         return KernelSpecManager(ipython_dir=self.ipython_dir)
 
     system = Bool(False, config=True,
-        help="""
+                  help="""
         Try to install the kernel spec to the systemwide directory instead of
         the per-user directory.
         """
-    )
+                  )
 
     # Not all of the base aliases are meaningful (e.g. profile)
     aliases = {k: base_aliases[k] for k in ['ipython-dir', 'log-level']}
     flags = {'system': ({'InstallNativeKernelSpec': {'system': True}},
-                "Install to the systemwide kernel registry"),
+                        "Install to the systemwide kernel registry"),
              'debug': base_flags['debug'],
-            }
+             }
 
     def start(self):
         try:
-            self.kernel_spec_manager.install_native_kernel_spec(system=self.system)
+            self.kernel_spec_manager.install_native_kernel_spec(
+                system=self.system)
         except OSError as e:
             self.exit(e)
+
 
 class KernelSpecApp(Application):
     name = "ipython kernelspec"
@@ -133,7 +138,8 @@ class KernelSpecApp(Application):
 
     def start(self):
         if self.subapp is None:
-            print("No subcommand specified. Must specify one of: %s"% list(self.subcommands))
+            print("No subcommand specified. Must specify one of: %s" %
+                  list(self.subcommands))
             print()
             self.print_description()
             self.print_subcommands()

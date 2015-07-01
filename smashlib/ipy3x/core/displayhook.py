@@ -22,7 +22,9 @@ from IPython.utils.warn import warn
 # of these are also attributes of InteractiveShell. They should be on ONE object
 # only and the other objects should ask that one object for their values.
 
+
 class DisplayHook(Configurable):
+
     """The custom IPython displayhook to replace sys.displayhook.
 
     This class does many things, but the basic idea is that it is a callable
@@ -42,7 +44,7 @@ class DisplayHook(Configurable):
             self.do_full_cache = 0
             cache_size = 0
             warn('caching was disabled (min value for cache size is %s).' %
-                 cache_size_min,level=3)
+                 cache_size_min, level=3)
         else:
             self.do_full_cache = 1
 
@@ -50,11 +52,11 @@ class DisplayHook(Configurable):
 
         # we need a reference to the user-level namespace
         self.shell = shell
-        
-        self._,self.__,self.___ = '','',''
+
+        self._, self.__, self.___ = '', '', ''
 
         # these are deliberately global:
-        to_user_ns = {'_':self._,'__':self.__,'___':self.___}
+        to_user_ns = {'_': self._, '__': self.__, '___': self.___}
         self.shell.user_ns.update(to_user_ns)
 
     @property
@@ -81,7 +83,8 @@ class DisplayHook(Configurable):
         """Should we silence the display hook because of ';'?"""
         # do not print output if input ends in ';'
         try:
-            cell = self.shell.history_manager.input_hist_parsed[self.prompt_count]
+            cell = self.shell.history_manager.input_hist_parsed[
+                self.prompt_count]
             return cell.rstrip().endswith(';')
         except IndexError:
             # some uses of ipshellembed may fail here
@@ -131,7 +134,7 @@ class DisplayHook(Configurable):
             MIME type representation of the object.
             md_dict is a :class:`dict` with the same MIME type keys
             of metadata associated with each output.
-            
+
         """
         return self.shell.display_formatter.format(result)
 
@@ -186,14 +189,15 @@ class DisplayHook(Configurable):
                 self.___ = self.__
                 self.__ = self._
                 self._ = result
-                self.shell.push({'_':self._,
-                                 '__':self.__,
-                                '___':self.___}, interactive=False)
+                self.shell.push({'_': self._,
+                                 '__': self.__,
+                                 '___': self.___}, interactive=False)
 
-            # hackish access to top-level  namespace to create _1,_2... dynamically
+            # hackish access to top-level  namespace to create _1,_2...
+            # dynamically
             to_main = {}
             if self.do_full_cache:
-                new_result = '_'+repr(self.prompt_count)
+                new_result = '_' + repr(self.prompt_count)
                 to_main[new_result] = result
                 self.shell.push(to_main, interactive=False)
                 self.shell.user_ns['_oh'][self.prompt_count] = result
@@ -206,7 +210,7 @@ class DisplayHook(Configurable):
         if self.shell.logger.log_output:
             self.shell.logger.log_write(format_dict['text/plain'], 'output')
         self.shell.history_manager.output_hist_reprs[self.prompt_count] = \
-                                                    format_dict['text/plain']
+            format_dict['text/plain']
 
     def finish_displayhook(self):
         """Finish up all displayhook activities."""
@@ -222,13 +226,14 @@ class DisplayHook(Configurable):
         self.check_for_underscore()
         if result is not None and not self.quiet():
             # If _ipython_display_ is defined, use that to display this object.
-            display_method = _safe_get_formatter_method(result, '_ipython_display_')
+            display_method = _safe_get_formatter_method(
+                result, '_ipython_display_')
             if display_method is not None:
                 try:
                     return display_method()
                 except NotImplementedError:
                     pass
-            
+
             self.start_displayhook()
             self.write_output_prompt()
             format_dict, md_dict = self.compute_format_data(result)
@@ -244,13 +249,12 @@ class DisplayHook(Configurable):
         cull_count = max(int(sz * self.cull_fraction), 2)
         warn('Output cache limit (currently {sz} entries) hit.\n'
              'Flushing oldest {cull_count} entries.'.format(sz=sz, cull_count=cull_count))
-        
+
         for i, n in enumerate(sorted(oh)):
             if i >= cull_count:
                 break
             self.shell.user_ns.pop('_%i' % n, None)
             oh.pop(n, None)
-        
 
     def flush(self):
         if not self.do_full_cache:
@@ -258,11 +262,12 @@ class DisplayHook(Configurable):
                              "if full caching is not enabled!")
         # delete auto-generated vars from global namespace
 
-        for n in range(1,self.prompt_count + 1):
-            key = '_'+repr(n)
+        for n in range(1, self.prompt_count + 1):
+            key = '_' + repr(n)
             try:
                 del self.shell.user_ns[key]
-            except: pass
+            except:
+                pass
         # In some embedded circumstances, the user_ns doesn't have the
         # '_oh' key set up.
         oh = self.shell.user_ns.get('_oh', None)
@@ -273,10 +278,9 @@ class DisplayHook(Configurable):
         self._, self.__, self.___ = '', '', ''
 
         if '_' not in builtin_mod.__dict__:
-            self.shell.user_ns.update({'_':None,'__':None, '___':None})
+            self.shell.user_ns.update({'_': None, '__': None, '___': None})
         import gc
         # TODO: Is this really needed?
         # IronPython blocks here forever
         if sys.platform != "cli":
             gc.collect()
-

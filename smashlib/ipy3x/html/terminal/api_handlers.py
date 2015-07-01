@@ -3,7 +3,9 @@ from tornado import web
 from ..base.handlers import IPythonHandler, json_errors
 from ..utils import url_path_join
 
+
 class TerminalRootHandler(IPythonHandler):
+
     @web.authenticated
     @json_errors
     def get(self):

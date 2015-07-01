@@ -18,10 +18,11 @@ def _on_os_x_10_9():
     from distutils.version import LooseVersion as V
     return sys.platform == 'darwin' and V(platform.mac_ver()[0]) >= V('10.9')
 
+
 def _notify_stream_qt(kernel, stream):
-    
+
     from IPython.external.qt_for_kernel import QtCore
-    
+
     if _on_os_x_10_9() and kernel._darwin_app_nap:
         from IPython.external.appnope import nope_scope as context
     else:
@@ -31,28 +32,30 @@ def _notify_stream_qt(kernel, stream):
         while stream.getsockopt(zmq.EVENTS) & zmq.POLLIN:
             with context():
                 kernel.do_one_iteration()
-    
+
     fd = stream.getsockopt(zmq.FD)
-    notifier = QtCore.QSocketNotifier(fd, QtCore.QSocketNotifier.Read, kernel.app)
+    notifier = QtCore.QSocketNotifier(
+        fd, QtCore.QSocketNotifier.Read, kernel.app)
     notifier.activated.connect(process_stream_events)
 
 # mapping of keys to loop functions
 loop_map = {
     'inline': None,
     'nbagg': None,
-    None : None,
+    None: None,
 }
+
 
 def register_integration(*toolkitnames):
     """Decorator to register an event loop to integrate with the IPython kernel
-    
+
     The decorator takes names to register the event loop as for the %gui magic.
     You can provide alternative names for the same toolkit.
-    
+
     The decorated function should take a single argument, the IPython kernel
     instance, arrange for the event loop to call ``kernel.do_one_iteration()``
     at least every ``kernel._poll_interval`` seconds, and start the event loop.
-    
+
     :mod:`IPython.kernel.zmq.eventloops` provides and registers such functions
     for a few common event loops.
     """
@@ -60,7 +63,7 @@ def register_integration(*toolkitnames):
         for name in toolkitnames:
             loop_map[name] = func
         return func
-    
+
     return decorator
 
 
@@ -72,11 +75,12 @@ def loop_qt4(kernel):
 
     kernel.app = get_app_qt4([" "])
     kernel.app.setQuitOnLastWindowClosed(False)
-    
+
     for s in kernel.shell_streams:
         _notify_stream_qt(kernel, s)
-    
+
     start_event_loop_qt4(kernel.app)
+
 
 @register_integration('qt5')
 def loop_qt5(kernel):
@@ -91,7 +95,7 @@ def loop_wx(kernel):
 
     import wx
     from IPython.lib.guisupport import start_event_loop_wx
-    
+
     if _on_os_x_10_9() and kernel._darwin_app_nap:
         # we don't hook up App Nap contexts for Wx,
         # just disable it outright.
@@ -99,12 +103,13 @@ def loop_wx(kernel):
         nope()
 
     doi = kernel.do_one_iteration
-     # Wx uses milliseconds
-    poll_interval = int(1000*kernel._poll_interval)
+    # Wx uses milliseconds
+    poll_interval = int(1000 * kernel._poll_interval)
 
     # We have to put the wx.Timer in a wx.Frame for it to fire properly.
     # We make the Frame hidden when we create it in the main app below.
     class TimerFrame(wx.Frame):
+
         def __init__(self, func):
             wx.Frame.__init__(self, None, -1)
             self.timer = wx.Timer(self)
@@ -119,6 +124,7 @@ def loop_wx(kernel):
     # We need a custom wx.App to create our Frame subclass that has the
     # wx.Timer to drive the ZMQ event loop.
     class IPWxApp(wx.App):
+
         def OnInit(self):
             self.frame = TimerFrame(doi)
             self.frame.Show(False)
@@ -148,9 +154,11 @@ def loop_tk(kernel):
         from Tkinter import Tk  # Py 2
     doi = kernel.do_one_iteration
     # Tk uses milliseconds
-    poll_interval = int(1000*kernel._poll_interval)
+    poll_interval = int(1000 * kernel._poll_interval)
     # For Tkinter, we create a Tk object and call its withdraw method.
+
     class Timer(object):
+
         def __init__(self, func):
             self.app = Tk()
             self.app.withdraw()
@@ -194,20 +202,21 @@ def loop_cocoa(kernel):
     import matplotlib
     if matplotlib.__version__ < '1.1.0':
         kernel.log.warn(
-        "MacOSX backend in matplotlib %s doesn't have a Timer, "
-        "falling back on Tk for CFRunLoop integration.  Note that "
-        "even this won't work if Tk is linked against X11 instead of "
-        "Cocoa (e.g. EPD).  To use the MacOSX backend in the kernel, "
-        "you must use matplotlib >= 1.1.0, or a native libtk."
+            "MacOSX backend in matplotlib %s doesn't have a Timer, "
+            "falling back on Tk for CFRunLoop integration.  Note that "
+            "even this won't work if Tk is linked against X11 instead of "
+            "Cocoa (e.g. EPD).  To use the MacOSX backend in the kernel, "
+            "you must use matplotlib >= 1.1.0, or a native libtk."
         )
         return loop_tk(kernel)
-    
+
     from matplotlib.backends.backend_macosx import TimerMac, show
 
     # scale interval for sec->ms
-    poll_interval = int(1000*kernel._poll_interval)
+    poll_interval = int(1000 * kernel._poll_interval)
 
     real_excepthook = sys.excepthook
+
     def handle_int(etype, value, tb):
         """don't let KeyboardInterrupts look like crashes"""
         if etype is KeyboardInterrupt:
@@ -246,7 +255,7 @@ def loop_cocoa(kernel):
                 sys.excepthook = real_excepthook
                 # use poller if mainloop returned (no windows)
                 # scale by extra factor of 10, since it's a real poll
-                poller.poll(10*poll_interval)
+                poller.poll(10 * poll_interval)
                 kernel.do_one_iteration()
             except:
                 raise
@@ -258,19 +267,19 @@ def loop_cocoa(kernel):
             sys.excepthook = real_excepthook
 
 
-
 def enable_gui(gui, kernel=None):
     """Enable integration with a given GUI"""
     if gui not in loop_map:
-        e = "Invalid GUI request %r, valid ones are:%s" % (gui, loop_map.keys())
+        e = "Invalid GUI request %r, valid ones are:%s" % (
+            gui, loop_map.keys())
         raise ValueError(e)
     if kernel is None:
         if Application.initialized():
             kernel = getattr(Application.instance(), 'kernel', None)
         if kernel is None:
             raise RuntimeError("You didn't specify a kernel,"
-                " and no IPython Application with a kernel appears to be running."
-            )
+                               " and no IPython Application with a kernel appears to be running."
+                               )
     loop = loop_map[gui]
     if loop and kernel.eventloop is not None and kernel.eventloop is not loop:
         raise RuntimeError("Cannot activate multiple GUI eventloops")

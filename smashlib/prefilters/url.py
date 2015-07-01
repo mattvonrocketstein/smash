@@ -7,7 +7,7 @@ from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
 from smashlib import get_smash
 from smashlib.channels import C_URL_INPUT
 
-HANDLER_NAME   = 'URLHandler'
+HANDLER_NAME = 'URLHandler'
 PROTOS = 'http https ssh ftp'.split()
 
 
@@ -22,10 +22,13 @@ class URLHandler(PrefilterHandler):
             dot-cmd can receive the signal.
         """
         line = line_info.line.strip()
-        get_smash().publish(C_URL_INPUT, line, urlparse.urlparse(line_info.line))
+        get_smash().publish(
+            C_URL_INPUT, line, urlparse.urlparse(line_info.line))
         return ""
 
+
 class URLChecker(PrefilterChecker):
+
     """ url checker should run before most other checkers! """
 
     priority = 1

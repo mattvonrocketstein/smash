@@ -6,6 +6,7 @@ from smashlib.channels import C_REHASH_EVENT
 
 
 class PatchRehash(PatchMagic):
+
     """ patches the builtin ipython rehashx so that a post-rehash
         event can be sent to anyone who wants to subscribe
     """

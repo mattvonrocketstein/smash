@@ -21,6 +21,7 @@ from .connect import ConnectionFileMixin
 
 
 class KernelClient(ConnectionFileMixin):
+
     """Communicates with a single kernel on any host via zmq channels.
 
     There are four channels associated with each kernel:
@@ -38,6 +39,7 @@ class KernelClient(ConnectionFileMixin):
 
     # The PyZMQ Context to use for communication with the kernel.
     context = Instance(zmq.Context)
+
     def _context_default(self):
         return zmq.Context.instance()
 

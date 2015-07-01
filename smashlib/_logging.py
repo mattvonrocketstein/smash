@@ -25,11 +25,11 @@ LOG_FMT = ('[%(name)s:%(levelname)s:%(process)d] '
 LOG_SETTINGS = {
     'version': 1,
     'handlers': {
-       # 'console': {
-       #     'class': 'logging.StreamHandler',
-       #     'level': 'DEBUG',
-       #     'formatter': 'detailed',
-       #     'stream': 'ext://sys.stdout',},
+        # 'console': {
+        #     'class': 'logging.StreamHandler',
+        #     'level': 'DEBUG',
+        #     'formatter': 'detailed',
+        #     'stream': 'ext://sys.stdout',},
         'event_file': {
             'class': 'logging.handlers.RotatingFileHandler',
             'level': 'INFO',
@@ -37,7 +37,7 @@ LOG_SETTINGS = {
             'filename': event_file,
             'mode': 'a',
             'maxBytes': 10485760,
-            'backupCount': 5,},
+            'backupCount': 5, },
         'default_file': {
             'class': 'logging.handlers.RotatingFileHandler',
             'level': 'INFO',
@@ -45,33 +45,35 @@ LOG_SETTINGS = {
             'filename': default_file,
             'mode': 'a',
             'maxBytes': 10485760,
-            'backupCount': 5,},
-        },
+            'backupCount': 5, },
+    },
     'formatters': {
         'detailed': {
             'format': LOG_FMT,
-            },
         },
+    },
     'loggers': {
         'smash': {
-            'level':'DEBUG',
-            'handlers': ['default_file',]
-            },
+            'level': 'DEBUG',
+            'handlers': ['default_file', ]
+        },
         'smash_events': {
-            'level':'DEBUG',
-            'handlers': ['event_file',]
-            },
-        }
+            'level': 'DEBUG',
+            'handlers': ['event_file', ]
+        },
     }
+}
 
 last_change = None
+
+
 def reset_logs():
     def ignoreHandlers(*args, **kargs):
         from goulash._inspect import get_caller
         caller_context = get_caller(4)
         global last_change
-        last_change=caller_context
-        print 'LOGGING SETUP CHANGED BY:',caller_context['__file__']
+        last_change = caller_context
+        print 'LOGGING SETUP CHANGED BY:', caller_context['__file__']
     # instantiate root logger & remove all old handlers
     log = logging.getLogger()
     for hdlr in log.handlers:
@@ -92,7 +94,9 @@ logger.info("Initializing smash default logger")
 events_log = logging.getLogger('smash_events')
 events_log.info("Initializing smash_events log")
 
+
 class Logger(object):
+
     def __init__(self, component):
         self.component = component
         self.info = smash_log.info
@@ -107,11 +111,11 @@ class Logger(object):
     def report(self, msg, *args, **kargs):
         force = kargs.pop('force', False)
         if self.verbose or force:
-            header = kargs.pop('header','')
+            header = kargs.pop('header', '')
             header = self.component.__class__.__name__ + ':' + header
             header = TermColors.Blue + header
             content = TermColors.Red + msg
             print "{0}: {1} {2}".format(
                 header, content, TermColors.Normal)
             if args:
-                print '  ',args
+                print '  ', args

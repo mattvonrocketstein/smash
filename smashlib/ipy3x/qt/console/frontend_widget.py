@@ -26,11 +26,13 @@ from .pygments_highlighter import PygmentsHighlighter
 
 
 class FrontendHighlighter(PygmentsHighlighter):
+
     """ A PygmentsHighlighter that understands and ignores prompts.
     """
 
     def __init__(self, frontend, lexer=None):
-        super(FrontendHighlighter, self).__init__(frontend._control.document(), lexer=lexer)
+        super(FrontendHighlighter, self).__init__(
+            frontend._control.document(), lexer=lexer)
         self._current_offset = 0
         self._frontend = frontend
         self.highlighting_on = False
@@ -76,6 +78,7 @@ class FrontendHighlighter(PygmentsHighlighter):
 
 
 class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
+
     """ A Qt frontend for a generic Python kernel.
     """
 
@@ -96,28 +99,30 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
 
     # Whether to automatically show calltips on open-parentheses.
     enable_calltips = Bool(True, config=True,
-        help="Whether to draw information calltips on open-parentheses.")
+                           help="Whether to draw information calltips on open-parentheses.")
 
     clear_on_kernel_restart = Bool(True, config=True,
-        help="Whether to clear the console when the kernel is restarted")
+                                   help="Whether to clear the console when the kernel is restarted")
 
     confirm_restart = Bool(True, config=True,
-        help="Whether to ask for user confirmation when restarting kernel")
-    
+                           help="Whether to ask for user confirmation when restarting kernel")
+
     lexer_class = DottedObjectName(config=True,
-        help="The pygments lexer class to use."
-    )
+                                   help="The pygments lexer class to use."
+                                   )
+
     def _lexer_class_changed(self, name, old, new):
         lexer_class = import_item(new)
         self.lexer = lexer_class()
-    
+
     def _lexer_class_default(self):
         if py3compat.PY3:
             return 'pygments.lexers.Python3Lexer'
         else:
             return 'pygments.lexers.PythonLexer'
-    
+
     lexer = Any()
+
     def _lexer_default(self):
         lexer_class = import_item(self.lexer_class)
         return lexer_class()
@@ -127,7 +132,8 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
     executing = QtCore.Signal(object)
 
     # Emitted when a user-visible 'execute_reply' has been received from the
-    # kernel and processed by the FrontendWidget. Contains the response message.
+    # kernel and processed by the FrontendWidget. Contains the response
+    # message.
     executed = QtCore.Signal(object)
 
     # Emitted when an exit request has been received from the kernel.
@@ -137,7 +143,7 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
     _prompt_transformer = IPythonInputSplitter(physical_line_transforms=[classic_prompt()],
                                                logical_line_transforms=[],
                                                python_line_transforms=[],
-                                              )
+                                               )
     _CallTipRequest = namedtuple('_CallTipRequest', ['id', 'pos'])
     _CompletionRequest = namedtuple('_CompletionRequest', ['id', 'pos'])
     _ExecutionRequest = namedtuple('_ExecutionRequest', ['id', 'kind'])
@@ -145,9 +151,9 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
     _local_kernel = False
     _highlighter = Instance(FrontendHighlighter)
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # 'object' interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     def __init__(self, *args, **kw):
         super(FrontendWidget, self).__init__(*args, **kw)
@@ -155,8 +161,9 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         # forcefully disable calltips if PySide is < 1.0.7, because they crash
         if qt.QT_API == qt.QT_API_PYSIDE:
             import PySide
-            if PySide.__version_info__ < (1,0,7):
-                self.log.warn("PySide %s < 1.0.7 detected, disabling calltips" % PySide.__version__)
+            if PySide.__version_info__ < (1, 0, 7):
+                self.log.warn(
+                    "PySide %s < 1.0.7 detected, disabling calltips" % PySide.__version__)
                 self.enable_calltips = False
 
         # FrontendWidget protected variables.
@@ -169,7 +176,7 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         self._kernel_manager = None
         self._kernel_client = None
         self._request_info = {}
-        self._request_info['execute'] = {};
+        self._request_info['execute'] = {}
         self._callback_dict = {}
         self._display_banner = True
 
@@ -202,9 +209,9 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         # Whether or not a clear_output call is pending new output.
         self._pending_clearoutput = False
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # 'ConsoleWidget' public interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     def copy(self):
         """ Copy the currently selected text to the clipboard, removing prompts.
@@ -216,15 +223,15 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
             if text:
                 was_newline = text[-1] == '\n'
                 text = self._prompt_transformer.transform_cell(text)
-                if not was_newline: # user doesn't need newline
+                if not was_newline:  # user doesn't need newline
                     text = text[:-1]
                 QtGui.QApplication.clipboard().setText(text)
         else:
             self.log.debug("frontend widget : unknown copy target")
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # 'ConsoleWidget' abstract interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     def _is_complete(self, source, interactive):
         """ Returns whether 'source' can be completely processed and a new
@@ -246,7 +253,8 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         See parent class :meth:`execute` docstring for full details.
         """
         msg_id = self.kernel_client.execute(source, hidden)
-        self._request_info['execute'][msg_id] = self._ExecutionRequest(msg_id, 'user')
+        self._request_info['execute'][
+            msg_id] = self._ExecutionRequest(msg_id, 'user')
         self._hidden = hidden
         if not hidden:
             self.executing.emit(source)
@@ -283,9 +291,9 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
             self._complete()
         return not complete
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # 'ConsoleWidget' protected interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     def _context_menu_make(self, pos):
         """ Reimplemented to add an action for raw copy.
@@ -344,9 +352,9 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         super(FrontendWidget, self)._insert_continuation_prompt(cursor)
         cursor.insertText(' ' * self._input_splitter.indent_spaces)
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # 'BaseFrontendMixin' abstract interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     def _handle_clear_output(self, msg):
         """Handle clear output messages."""
         if include_output(msg):
@@ -384,9 +392,10 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         # not the unique request originated from here (can use msg id ?)
         local_uuid = str(uuid.uuid1())
         msg_id = self.kernel_client.execute('',
-            silent=True, user_expressions={ local_uuid:expr })
+                                            silent=True, user_expressions={local_uuid: expr})
         self._callback_dict[local_uuid] = callback
-        self._request_info['execute'][msg_id] = self._ExecutionRequest(msg_id, 'silent_exec_callback')
+        self._request_info['execute'][msg_id] = self._ExecutionRequest(
+            msg_id, 'silent_exec_callback')
 
     def _handle_exec_callback(self, msg):
         """Execute `callback` corresponding to `msg` reply, after ``_silent_exec_callback``
@@ -457,7 +466,8 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         """
         self.log.debug("input: %s", msg.get('content', ''))
         if self._hidden:
-            raise RuntimeError('Request for raw input during hidden execution.')
+            raise RuntimeError(
+                'Request for raw input during hidden execution.')
 
         # Make sure that all output from the SUB channel has been processed
         # before entering readline mode.
@@ -466,15 +476,16 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         def callback(line):
             self.kernel_client.stdin_channel.input(line)
         if self._reading:
-            self.log.debug("Got second input request, assuming first was interrupted.")
+            self.log.debug(
+                "Got second input request, assuming first was interrupted.")
             self._reading = False
         self._readline(msg['content']['prompt'], callback=callback)
 
     def _kernel_restarted_message(self, died=True):
         msg = "Kernel died, restarting" if died else "Kernel restarting"
         self._append_html("<br>%s<hr><br>" % msg,
-            before_prompt=False
-        )
+                          before_prompt=False
+                          )
 
     def _handle_kernel_died(self, since_last_heartbeat):
         """Handle the kernel's death (if we do not own the kernel).
@@ -543,9 +554,9 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
                 else:
                     title = self.window().windowTitle()
                     reply = QtGui.QMessageBox.question(self, title,
-                        "Kernel has been shutdown permanently. "
-                        "Close the Console?",
-                        QtGui.QMessageBox.Yes,QtGui.QMessageBox.No)
+                                                       "Kernel has been shutdown permanently. "
+                                                       "Close the Console?",
+                                                       QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
                     if reply == QtGui.QMessageBox.Yes:
                         self.exit_requested.emit(self)
 
@@ -569,9 +580,9 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         """
         self.reset(clear=True)
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # 'FrontendWidget' public interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     def copy_raw(self):
         """ Copy the currently selected text to the clipboard without attempting
@@ -587,7 +598,7 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
 
     def interrupt_kernel(self):
         """ Attempts to interrupt the running kernel.
-        
+
         Also unsets _reading flag, to avoid runtime errors
         if raw_input is called again.
         """
@@ -598,7 +609,8 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
             self._reading = False
             self.kernel_manager.interrupt_kernel()
         else:
-            self._append_plain_text('Cannot interrupt a kernel I did not start.\n')
+            self._append_plain_text(
+                'Cannot interrupt a kernel I did not start.\n')
 
     def reset(self, clear=False):
         """ Resets the widget to its initial state if ``clear`` parameter
@@ -665,8 +677,8 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
                     )
                 else:
                     self._append_html("<br>Restarting kernel...\n<hr><br>",
-                        before_prompt=True,
-                    )
+                                      before_prompt=True,
+                                      )
             else:
                 self.kernel_client.hb_channel.unpause()
 
@@ -699,13 +711,13 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         cursor.insertText('')
         cursor.endEditBlock()
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # 'FrontendWidget' protected interface
-    #---------------------------------------------------------------------------
-    
+    #-------------------------------------------------------------------------
+
     def _auto_call_tip(self):
         """Trigger call tip automatically on open parenthesis
-        
+
         Call tips can be requested explcitly with `_call_tip`.
         """
         cursor = self._get_cursor()
@@ -713,7 +725,7 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         if cursor.document().characterAt(cursor.position()) == '(':
             # trigger auto call tip on open paren
             self._call_tip()
-    
+
     def _call_tip(self):
         """Shows a call tip, if appropriate, at the current cursor location."""
         # Decide if it makes sense to show a call tip
@@ -751,8 +763,9 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         # If a SystemExit is passed along, this means exit() was called - also
         # all the ipython %exit magic syntax of '-k' to be used to keep
         # the kernel running
-        if content['ename']=='SystemExit':
-            keepkernel = content['evalue']=='-k' or content['evalue']=='True'
+        if content['ename'] == 'SystemExit':
+            keepkernel = content[
+                'evalue'] == '-k' or content['evalue'] == 'True'
             self._keep_kernel_on_exit = keepkernel
             self.exit_requested.emit(self)
         else:
@@ -786,7 +799,7 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         """
         self._show_interpreter_prompt()
 
-    #------ Signal handlers ----------------------------------------------------
+    #------ Signal handlers --------------------------------------------------
 
     def _document_contents_change(self, position, removed, added):
         """ Called whenever the document's content changes. Display a call tip
@@ -799,7 +812,7 @@ class FrontendWidget(HistoryConsoleWidget, BaseFrontendMixin):
         if position == self._get_cursor().position():
             self._auto_call_tip()
 
-    #------ Trait default initializers -----------------------------------------
+    #------ Trait default initializers ---------------------------------------
 
     def _banner_default(self):
         """ Returns the standard Python banner.

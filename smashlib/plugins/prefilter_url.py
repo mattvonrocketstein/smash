@@ -5,8 +5,11 @@ from smashlib.prefilters.url import URLChecker, URLHandler
 from smashlib.plugins import Plugin
 from smashlib.util.ipy import uninstall_prefilter
 
+
 class URLPlugin(Plugin):
+
     """ installs the IPython prefilter which handles urls """
+
     def install(self):
         register_prefilter(URLChecker, URLHandler)
         return self
@@ -14,9 +17,11 @@ class URLPlugin(Plugin):
     def uninstall(self):
         return uninstall_prefilter(URLChecker, URLHandler)
 
+
 def load_ipython_extension(ip):
     """ called by %load_ext magic """
     return URLPlugin(get_ipython()).install()
+
 
 def unload_ipython_extension(ip):
     """ called by %unload_ext magic """

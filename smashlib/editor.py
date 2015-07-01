@@ -3,7 +3,8 @@
 
 from smashlib.config import SmashConfig
 
-is_windowing_env = lambda: True # placeholder
+is_windowing_env = lambda: True  # placeholder
+
 
 def get_editor():
     user_editor = None

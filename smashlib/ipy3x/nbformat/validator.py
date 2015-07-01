@@ -25,6 +25,7 @@ from IPython.utils.importstring import import_item
 
 validators = {}
 
+
 def _relax_additional_properties(obj):
     """relax any `additionalProperties`"""
     if isinstance(obj, dict):
@@ -39,6 +40,7 @@ def _relax_additional_properties(obj):
             obj[i] = _relax_additional_properties(value)
     return obj
 
+
 def _allow_undefined(schema):
     schema['definitions']['cell']['oneOf'].append(
         {"$ref": "#/definitions/unrecognized_cell"}
@@ -47,6 +49,7 @@ def _allow_undefined(schema):
         {"$ref": "#/definitions/unrecognized_output"}
     )
     return schema
+
 
 def get_validator(version=None, version_minor=None):
     """Load the JSON schema into a Validator"""
@@ -67,18 +70,21 @@ def get_validator(version=None, version_minor=None):
         except AttributeError:
             # no validator
             return None
-        schema_path = os.path.join(os.path.dirname(v.__file__), v.nbformat_schema)
+        schema_path = os.path.join(
+            os.path.dirname(v.__file__), v.nbformat_schema)
         with open(schema_path) as f:
             schema_json = json.load(f)
 
         if current_minor < version_minor:
-            # notebook from the future, relax all `additionalProperties: False` requirements
+            # notebook from the future, relax all `additionalProperties: False`
+            # requirements
             schema_json = _relax_additional_properties(schema_json)
             # and allow undefined cell types and outputs
             schema_json = _allow_undefined(schema_json)
 
         validators[version_tuple] = Validator(schema_json)
     return validators[version_tuple]
+
 
 def isvalid(nbjson, ref=None, version=None, version_minor=None):
     """Checks whether the given notebook JSON conforms to the current
@@ -116,10 +122,10 @@ def better_validation_error(error, version, version_minor):
         if ref:
             try:
                 validate(error.instance,
-                    ref,
-                    version=version,
-                    version_minor=version_minor,
-                )
+                         ref,
+                         version=version,
+                         version_minor=version_minor,
+                         )
             except ValidationError as e:
                 return better_validation_error(e, version, version_minor)
             except:
@@ -144,14 +150,14 @@ def validate(nbjson, ref=None, version=None, version_minor=None):
 
     if validator is None:
         # no validator
-        warnings.warn("No schema for validating v%s notebooks" % version, UserWarning)
+        warnings.warn("No schema for validating v%s notebooks" %
+                      version, UserWarning)
         return
 
     try:
         if ref:
-            return validator.validate(nbjson, {'$ref' : '#/definitions/%s' % ref})
+            return validator.validate(nbjson, {'$ref': '#/definitions/%s' % ref})
         else:
             return validator.validate(nbjson)
     except ValidationError as e:
         raise better_validation_error(e, version, version_minor)
-

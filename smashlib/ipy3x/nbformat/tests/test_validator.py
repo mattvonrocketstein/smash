@@ -52,7 +52,6 @@ class TestValidator(TestsBase):
             nb = read(f, as_version=4)
         with self.assertRaises(ValidationError):
             validate(nb, version=4)
-        
+
         self.assertEqual(isvalid(nb, version=4), False)
         self.assertEqual(isvalid(nb), True)
-

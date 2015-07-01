@@ -11,7 +11,9 @@ from ..notebook import NotebookExporter
 from IPython.nbformat import validate
 from IPython.testing.tools import assert_big_text_equal
 
+
 class TestNotebookExporter(ExportersTestsBase):
+
     """Contains test functions for notebook.py"""
 
     exporter_class = NotebookExporter
@@ -22,7 +24,8 @@ class TestNotebookExporter(ExportersTestsBase):
         """
         with open(self._get_notebook()) as f:
             file_contents = f.read()
-        (output, resources) = self.exporter_class().from_filename(self._get_notebook())
+        (output, resources) = self.exporter_class().from_filename(
+            self._get_notebook())
         assert len(output) > 0
         assert_big_text_equal(output, file_contents)
 

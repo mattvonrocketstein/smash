@@ -8,6 +8,7 @@ from IPython.utils.traitlets import Bool
 
 
 class Preprocessor(NbConvertBase):
+
     """ A configurable preprocessor
 
     Inherit from this class if you wish to have configurability for your
@@ -23,13 +24,13 @@ class Preprocessor(NbConvertBase):
     Disabled by default and can be enabled via the config by
         'c.YourPreprocessorName.enabled = True'
     """
-    
+
     enabled = Bool(False, config=True)
 
     def __init__(self, **kw):
         """
         Public constructor
-        
+
         Parameters
         ----------
         config : Config
@@ -37,27 +38,26 @@ class Preprocessor(NbConvertBase):
         **kw : misc
             Additional arguments
         """
-        
+
         super(Preprocessor, self).__init__(**kw)
 
-       
     def __call__(self, nb, resources):
         if self.enabled:
-            self.log.debug("Applying preprocessor: %s", self.__class__.__name__)
-            return self.preprocess(nb,resources)
+            self.log.debug(
+                "Applying preprocessor: %s", self.__class__.__name__)
+            return self.preprocess(nb, resources)
         else:
             return nb, resources
-
 
     def preprocess(self, nb, resources):
         """
         Preprocessing to apply on each notebook.
-        
+
         Must return modified nb, resources.
-        
+
         If you wish to apply your preprocessing to each cell, you might want
         to override preprocess_cell method instead.
-        
+
         Parameters
         ----------
         nb : NotebookNode
@@ -67,15 +67,15 @@ class Preprocessor(NbConvertBase):
             preprocessors to pass variables into the Jinja engine.
         """
         for index, cell in enumerate(nb.cells):
-            nb.cells[index], resources = self.preprocess_cell(cell, resources, index)
+            nb.cells[index], resources = self.preprocess_cell(
+                cell, resources, index)
         return nb, resources
-
 
     def preprocess_cell(self, cell, resources, index):
         """
         Override if you want to apply some preprocessing to each cell.
         Must return modified cell and resource dictionary.
-        
+
         Parameters
         ----------
         cell : NotebookNode cell
@@ -89,4 +89,3 @@ class Preprocessor(NbConvertBase):
 
         raise NotImplementedError('should be implemented by subclass')
         return cell, resources
-

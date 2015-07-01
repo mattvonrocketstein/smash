@@ -27,12 +27,18 @@ num_tests = 0
 # Test functions
 #-----------------------------------------------------------------------------
 
+
 class CallableIndexable(object):
-    def __getitem__(self, idx): return True
-    def __call__(self, *args, **kws): return True
+
+    def __getitem__(self, idx):
+        return True
+
+    def __call__(self, *args, **kws):
+        return True
 
 
 class Autocallable(autocall.IPyAutocall):
+
     def __call__(self):
         return "called"
 
@@ -51,11 +57,11 @@ def test_handlers():
     # For many of the below, we're also checking that leading whitespace
     # turns off the esc char, which it should unless there is a continuation
     # line.
-    run([(i,py3compat.u_format(o)) for i,o in \
-        [('"no change"', '"no change"'),             # normal
-         (u"lsmagic",     "get_ipython().magic({u}'lsmagic ')"),   # magic
-         #("a = b # PYTHON-MODE", '_i'),          # emacs -- avoids _in cache
-         ]])
+    run([(i, py3compat.u_format(o)) for i, o in
+         [('"no change"', '"no change"'),             # normal
+          (u"lsmagic",     "get_ipython().magic({u}'lsmagic ')"),   # magic
+          #("a = b # PYTHON-MODE", '_i'),          # emacs -- avoids _in cache
+          ]])
 
     # Objects which are instances of IPyAutocall are *always* autocalled
     autocallable = Autocallable()
@@ -70,7 +76,7 @@ def test_handlers():
         ('autocallable',    'autocallable()'),
         # Don't add extra brackets (gh-1117)
         ('autocallable()',    'autocallable()'),
-        ])
+    ])
     ip.magic('autocall 1')
     run([
         ('len "abc"', 'len("abc")'),
@@ -78,10 +84,10 @@ def test_handlers():
         # Autocall is turned off if first arg is [] and the object
         # is both callable and indexable.  Like so:
         ('len [1,2]', 'len([1,2])'),      # len doesn't support __getitem__...
-        ('call_idx [1]', 'call_idx [1]'), # call_idx *does*..
+        ('call_idx [1]', 'call_idx [1]'),  # call_idx *does*..
         ('call_idx 1', 'call_idx(1)'),
-        ('len', 'len'), # only at 2 does it auto-call on single args
-        ])
+        ('len', 'len'),  # only at 2 does it auto-call on single args
+    ])
     ip.magic('autocall 2')
     run([
         ('len "abc"', 'len("abc")'),
@@ -90,8 +96,8 @@ def test_handlers():
         ('call_idx [1]', 'call_idx [1]'),
         ('call_idx 1', 'call_idx(1)'),
         # This is what's different:
-        ('len', 'len()'), # only at 2 does it auto-call on single args
-        ])
+        ('len', 'len()'),  # only at 2 does it auto-call on single args
+    ])
     ip.magic('autocall 1')
 
     nt.assert_equal(failures, [])

@@ -6,6 +6,7 @@ from goulash.python import ope
 from goulash.venv import find_venvs
 from goulash._fabric import require_bin
 
+
 def require_active_project(fxn):
     def newf(self, *args, **kargs):
         pname = self._project_manager._current_project
@@ -16,7 +17,9 @@ def require_active_project(fxn):
             return fxn(self, *args, **kargs)
     return newf
 
+
 class ProjectManagerInterface(object):
+
     """ This object should be a singleton and will be assigned to
         that main namespace as "proj".  In addition to the methods
         you see below, The ProjectManager extension
@@ -50,8 +53,8 @@ class ProjectManagerInterface(object):
         if ope(gitignore):
             with open(gitignore) as fhandle:
                 patterns += [x.strip() for x in fhandle.readlines()]
-        patterns = ' -and '.join( ['! -wholename "{0}"'.format(p) \
-                                   for p in patterns ] )
+        patterns = ' -and '.join(['! -wholename "{0}"'.format(p)
+                                  for p in patterns])
         if patterns:
             patterns = '\\( {0} \\)'.format(patterns)
         sed = """| sed 's/[^[:space:]]\+ //';"""
@@ -74,7 +77,7 @@ class ProjectManagerInterface(object):
         if '|' in pat:
             tmp = pat.split('|')
             pat = tmp.pop(0)
-            post_process = '|'+'|'.join(tmp)#ie "| grep foo" or whatever
+            post_process = '|' + '|'.join(tmp)  # ie "| grep foo" or whatever
         else:
             post_process = ''
         require_bin('ack-grep')
@@ -82,7 +85,7 @@ class ProjectManagerInterface(object):
         cmd = 'ack-grep "{0}" "{1}" {2}'
         pdir = self._project_manager.project_map[
             self._project_manager._current_project]
-        junk = venvs+['.tox']
+        junk = venvs + ['.tox']
         ignores = ['--ignore-dir="{0}"'.format(j) for j in junk]
         ignores = ' '.join(ignores)
         cmd = cmd.format(pat, pdir, ignores)
@@ -115,11 +118,11 @@ class ProjectManagerInterface(object):
 
         if aliases:
             lst = [
-                [group,len(cmds)] for group,cmds in \
-                                             aliases.items()]
+                [group, len(cmds)] for group, cmds in
+                aliases.items()]
             out += ['   alias groupings: ']
             for g in lst:
-                out+=['       : {0} (with {1} aliases)'.format(*g)]
+                out += ['       : {0} (with {1} aliases)'.format(*g)]
         sdirs = self._project_manager.search_dirs
         if sdirs:
             out += ['   search_dirs:']

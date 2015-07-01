@@ -39,7 +39,7 @@ class EmbeddedMagics(Magics):
         """
 
         kill = ask_yes_no("Are you sure you want to kill this embedded instance "
-                         "(y/n)? [y/N] ",'n')
+                          "(y/n)? [y/N] ", 'n')
         if kill:
             self.shell.embedded_active = False
             print ("This embedded IPython will not reactivate anymore "
@@ -56,16 +56,14 @@ class InteractiveShellEmbed(TerminalInteractiveShell):
     # is True by default.
     display_banner = CBool(True)
     exit_msg = Unicode()
-    
 
     def __init__(self, **kw):
-        
-    
+
         if kw.get('user_global_ns', None) is not None:
             warnings.warn("user_global_ns has been replaced by user_module. The\
                            parameter will be ignored.", DeprecationWarning)
 
-        super(InteractiveShellEmbed,self).__init__(**kw)
+        super(InteractiveShellEmbed, self).__init__(**kw)
 
         # don't use the ipython crash handler so that user exceptions aren't
         # trapped
@@ -156,15 +154,16 @@ class InteractiveShellEmbed(TerminalInteractiveShell):
           the shell was called.
 
         """
-        
+
         if (global_ns is not None) and (module is None):
-            warnings.warn("global_ns is deprecated, use module instead.", DeprecationWarning)
+            warnings.warn(
+                "global_ns is deprecated, use module instead.", DeprecationWarning)
             module = DummyMod()
             module.__dict__ = global_ns
 
         # Get locals and globals from caller
         if ((local_ns is None or module is None or compile_flags is None)
-            and self.default_user_namespaces):
+                and self.default_user_namespaces):
             call_frame = sys._getframe(stack_depth).f_back
 
             if local_ns is None:
@@ -175,15 +174,15 @@ class InteractiveShellEmbed(TerminalInteractiveShell):
             if compile_flags is None:
                 compile_flags = (call_frame.f_code.co_flags &
                                  compilerop.PyCF_MASK)
-        
-        # Save original namespace and module so we can restore them after 
+
+        # Save original namespace and module so we can restore them after
         # embedding; otherwise the shell doesn't shut down correctly.
         orig_user_module = self.user_module
         orig_user_ns = self.user_ns
         orig_compile_flags = self.compile.flags
-        
+
         # Update namespaces and fire up interpreter
-        
+
         # The global one is easy, we can just throw it in
         if module is not None:
             self.user_module = module
@@ -193,7 +192,8 @@ class InteractiveShellEmbed(TerminalInteractiveShell):
         # like _ih and get_ipython() into the local namespace, but delete them
         # later.
         if local_ns is not None:
-            reentrant_local_ns = {k: v for (k, v) in local_ns.items() if k not in self.user_ns_hidden.keys()}
+            reentrant_local_ns = {
+                k: v for (k, v) in local_ns.items() if k not in self.user_ns_hidden.keys()}
             self.user_ns = reentrant_local_ns
             self.init_user_ns()
 
@@ -207,12 +207,12 @@ class InteractiveShellEmbed(TerminalInteractiveShell):
 
         with self.builtin_trap, self.display_trap:
             self.interact(display_banner=display_banner)
-        
+
         # now, purge out the local namespace of IPython's hidden variables.
         if local_ns is not None:
-            local_ns.update({k: v for (k, v) in self.user_ns.items() if k not in self.user_ns_hidden.keys()})
+            local_ns.update(
+                {k: v for (k, v) in self.user_ns.items() if k not in self.user_ns_hidden.keys()})
 
-        
         # Restore original namespace so shell can shut down when we exit.
         self.user_module = orig_user_module
         self.user_ns = orig_user_ns
@@ -251,7 +251,7 @@ def embed(**kwargs):
         config = load_default_config()
         config.InteractiveShellEmbed = config.TerminalInteractiveShell
         kwargs['config'] = config
-    #save ps1/ps2 if defined
+    # save ps1/ps2 if defined
     ps1 = None
     ps2 = None
     try:
@@ -259,7 +259,7 @@ def embed(**kwargs):
         ps2 = sys.ps2
     except AttributeError:
         pass
-    #save previous instance
+    # save previous instance
     saved_shell_instance = InteractiveShell._instance
     if saved_shell_instance is not None:
         cls = type(saved_shell_instance)
@@ -267,7 +267,7 @@ def embed(**kwargs):
     shell = InteractiveShellEmbed.instance(**kwargs)
     shell(header=header, stack_depth=2, compile_flags=compile_flags)
     InteractiveShellEmbed.clear_instance()
-    #restore previous instance
+    # restore previous instance
     if saved_shell_instance is not None:
         cls = type(saved_shell_instance)
         cls.clear_instance()

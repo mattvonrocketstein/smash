@@ -18,14 +18,15 @@ from IPython.utils.traitlets import Integer
 
 
 class ExecutePreprocessor(Preprocessor):
+
     """
     Executes all the cells in a notebook
     """
-    
+
     timeout = Integer(30, config=True,
-        help="The time to wait (in seconds) for output from executions."
-    )
-    
+                      help="The time to wait (in seconds) for output from executions."
+                      )
+
     extra_arguments = List(Unicode)
 
     def preprocess(self, nb, resources):
@@ -36,7 +37,8 @@ class ExecutePreprocessor(Preprocessor):
                         extra_arguments=self.extra_arguments,
                         stderr=open(os.devnull, 'w')) as kc:
             self.kc = kc
-            nb, resources = super(ExecutePreprocessor, self).preprocess(nb, resources)
+            nb, resources = super(
+                ExecutePreprocessor, self).preprocess(nb, resources)
         return nb, resources
 
     def preprocess_cell(self, cell, resources, cell_index):
@@ -46,7 +48,8 @@ class ExecutePreprocessor(Preprocessor):
         if cell.cell_type != 'code':
             return cell, resources
         try:
-            outputs = self.run_cell(self.kc.shell_channel, self.kc.iopub_channel, cell)
+            outputs = self.run_cell(
+                self.kc.shell_channel, self.kc.iopub_channel, cell)
         except Exception as e:
             self.log.error("failed to run cell: " + repr(e))
             self.log.error(str(cell.source))
@@ -69,7 +72,7 @@ class ExecutePreprocessor(Preprocessor):
             else:
                 # not our reply
                 continue
-        
+
         outs = []
 
         while True:

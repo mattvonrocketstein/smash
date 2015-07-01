@@ -10,17 +10,20 @@ from . import nbexamples
 from IPython.nbformat.v3.tests import nbexamples as v3examples
 from IPython.nbformat import v3, v4
 
+
 def test_upgrade_notebook():
     nb03 = copy.deepcopy(v3examples.nb0)
     validate(nb03)
     nb04 = convert.upgrade(nb03)
     validate(nb04)
 
+
 def test_downgrade_notebook():
     nb04 = copy.deepcopy(nbexamples.nb0)
     validate(nb04)
     nb03 = convert.downgrade(nb04)
     validate(nb03)
+
 
 def test_upgrade_heading():
     v3h = v3.new_heading_cell
@@ -41,6 +44,7 @@ def test_upgrade_heading():
     ]:
         upgraded = convert.upgrade_cell(v3cell)
         nt.assert_equal(upgraded, expected)
+
 
 def test_downgrade_heading():
     v3h = v3.new_heading_cell

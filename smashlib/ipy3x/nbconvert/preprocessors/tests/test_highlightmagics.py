@@ -5,8 +5,8 @@ from ..highlightmagics import HighlightMagicsPreprocessor
 
 
 class TestHighlightMagics(PreprocessorTestsBase):
-    """Contains test functions for highlightmagics.py"""
 
+    """Contains test functions for highlightmagics.py"""
 
     def build_preprocessor(self):
         """Make an instance of a preprocessor"""

@@ -1,6 +1,8 @@
 """ ipy_project_manager
 
-    Defines the project manager extension.  Features:
+    Defines the project manager extension.
+
+    http://mattvonrocketstein.github.io/smash/project_manager/
 
 """
 from smashlib.project_manager import (

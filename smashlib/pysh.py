@@ -3,10 +3,12 @@
 from smashlib.util.ipy import register_prefilter
 from smashlib.prefilters.shell import ShellHandler, ShellChecker
 
+
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
-    checker,handler = register_prefilter(ShellChecker, ShellHandler)
-    return checker,handler
+    checker, handler = register_prefilter(ShellChecker, ShellHandler)
+    return checker, handler
+
 
 def unload_ipython_extension(ip):
     """ called by %unload_ext magic"""

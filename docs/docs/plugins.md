@@ -77,6 +77,17 @@ This plugin provides prompt rendering via the wonderfully dynamic [liquidprompt 
 
 -------------------------------------------------------------------------------
 
+####<a id="autojump">Enhanced "which"</a>
+
+This plugin replaces the system "which" command.
+
+#####Commands:
+* `which *module_or_cmd*`: display information about a system command or python module
+
+
+-------------------------------------------------------------------------------
+
+
 ####<a id="cd-hooks">Change directory hooks</a>
 
 The CD hooks feature is mostly a service for other plugins to use. It adds a "directory changed" event to smash, which is useful for building stuff like automatic-activation rules (see for example the [project manager](project_manager.html).  New plugins can build hooks and subscribe to CD events, or you can just register a callback without writing a new plugin.  Here's a minimal example of what a callback would look like:

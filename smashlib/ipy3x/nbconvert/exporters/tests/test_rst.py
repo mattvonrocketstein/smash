@@ -14,6 +14,7 @@ from IPython.testing.decorators import onlyif_cmds_exist
 
 
 class TestRSTExporter(ExportersTestsBase):
+
     """Tests for RSTExporter"""
 
     exporter_class = RSTExporter
@@ -25,7 +26,6 @@ class TestRSTExporter(ExportersTestsBase):
         """
         RSTExporter()
 
-
     @onlyif_cmds_exist('pandoc')
     def test_export(self):
         """
@@ -33,16 +33,16 @@ class TestRSTExporter(ExportersTestsBase):
         """
         (output, resources) = RSTExporter().from_filename(self._get_notebook())
         assert len(output) > 0
-        
+
     @onlyif_cmds_exist('pandoc')
     def test_empty_code_cell(self):
         """No empty code cells in rst"""
         nbname = self._get_notebook()
         with io.open(nbname, encoding='utf8') as f:
             nb = nbformat.read(f, 4)
-        
+
         exporter = self.exporter_class()
-        
+
         (output, resources) = exporter.from_notebook_node(nb)
         # add an empty code cell
         nb.cells.append(
@@ -51,4 +51,3 @@ class TestRSTExporter(ExportersTestsBase):
         (output2, resources) = exporter.from_notebook_node(nb)
         # adding an empty code cell shouldn't change output
         self.assertEqual(output.strip(), output2.strip())
-        

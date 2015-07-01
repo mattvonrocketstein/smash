@@ -35,6 +35,7 @@ from IPython.utils.py3compat import bytes_to_str
 
 
 class LaTeXTool(SingletonConfigurable):
+
     """An object to store configuration of the LaTeX tool."""
 
     backends = List(
@@ -134,7 +135,8 @@ def latex_to_png_dvipng(s, wrap):
 
         with open(os.devnull, 'w') as devnull:
             subprocess.check_call(
-                ["latex", "-halt-on-error", "-interaction", "batchmode", tmpfile],
+                ["latex", "-halt-on-error",
+                    "-interaction", "batchmode", tmpfile],
                 cwd=workdir, stdout=devnull, stderr=devnull)
 
             subprocess.check_call(
@@ -188,6 +190,7 @@ def genelatex(body, wrap):
 
 _data_uri_template_png = """<img src="data:image/png;base64,%s" alt=%s />"""
 
+
 def latex_to_html(s, alt='image'):
     """Render LaTeX to HTML with embedded PNG data using data URIs.
 
@@ -200,7 +203,7 @@ def latex_to_html(s, alt='image'):
     """
     base64_data = bytes_to_str(latex_to_png(s, encode=True), 'ascii')
     if base64_data:
-        return _data_uri_template_png  % (base64_data, alt)
+        return _data_uri_template_png % (base64_data, alt)
 
 
 # From matplotlib, thanks to mdboom. Once this is in matplotlib releases, we
@@ -243,9 +246,8 @@ def math_to_image(s, filename_or_obj, prop=None, dpi=None, format=None):
     width, height, depth, _, _ = parser.parse(s, dpi=72, prop=prop)
 
     fig = figure.Figure(figsize=(width / 72.0, height / 72.0))
-    fig.text(0, depth/height, s, fontproperties=prop)
+    fig.text(0, depth / height, s, fontproperties=prop)
     backend_agg.FigureCanvasAgg(fig)
     fig.savefig(filename_or_obj, dpi=dpi, format=format)
 
     return depth
-

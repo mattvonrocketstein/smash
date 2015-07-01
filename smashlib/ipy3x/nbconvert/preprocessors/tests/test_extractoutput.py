@@ -8,12 +8,14 @@ from ..extractoutput import ExtractOutputPreprocessor
 
 
 class TestExtractOutput(PreprocessorTestsBase):
+
     """Contains test functions for extractoutput.py"""
 
     def build_preprocessor(self):
         """Make an instance of a preprocessor"""
         preprocessor = ExtractOutputPreprocessor()
-        preprocessor.extract_output_types = {'text/plain', 'image/png', 'application/pdf'}
+        preprocessor.extract_output_types = {
+            'text/plain', 'image/png', 'application/pdf'}
         preprocessor.enabled = True
         return preprocessor
 
@@ -38,7 +40,7 @@ class TestExtractOutput(PreprocessorTestsBase):
         self.assertIn('filenames', output.metadata)
         self.assertIn('image/png', output.metadata.filenames)
         png_filename = output.metadata.filenames['image/png']
-        
+
         # Check that pdf was extracted
         output = nb.cells[0].outputs[7]
         self.assertIn('filenames', output.metadata)

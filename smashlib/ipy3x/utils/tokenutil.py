@@ -14,6 +14,7 @@ from .py3compat import cast_unicode_py2
 
 Token = namedtuple('Token', ['token', 'text', 'start', 'end', 'line'])
 
+
 def generate_tokens(readline):
     """wrap generate_tokens to catch EOF errors"""
     try:
@@ -23,22 +24,23 @@ def generate_tokens(readline):
         # catch EOF error
         return
 
+
 def line_at_cursor(cell, cursor_pos=0):
     """Return the line in a cell at a given cursor position
-    
+
     Used for calling line-based APIs that don't support multi-line input, yet.
-    
+
     Parameters
     ----------
-    
+
     cell: text
         multiline block of text
     cursor_pos: integer
         the cursor position
-    
+
     Returns
     -------
-    
+
     (line, offset): (text, integer)
         The line with the current cursor, and the character offset of the start of the line.
     """
@@ -53,14 +55,15 @@ def line_at_cursor(cell, cursor_pos=0):
         line = ""
     return (line, offset)
 
+
 def token_at_cursor(cell, cursor_pos=0):
     """Get the token at a given cursor
-    
+
     Used for introspection.
-    
+
     Parameters
     ----------
-    
+
     cell : unicode
         A block of Python code
     cursor_pos : int
@@ -71,9 +74,9 @@ def token_at_cursor(cell, cursor_pos=0):
     tokens = []
     offset = 0
     for tup in generate_tokens(StringIO(cell).readline):
-        
+
         tok = Token(*tup)
-        
+
         # token, text, start, end, line = tup
         start_col = tok.start[1]
         end_col = tok.end[1]
@@ -83,7 +86,7 @@ def token_at_cursor(cell, cursor_pos=0):
             # current token starts after the cursor,
             # don't consume it
             break
-        
+
         if tok.token == tokenize2.NAME and not iskeyword(tok.text):
             if names and tokens and tokens[-1].token == tokenize2.OP and tokens[-1].text == '.':
                 names[-1] = "%s.%s" % (names[-1], tok.text)
@@ -93,18 +96,16 @@ def token_at_cursor(cell, cursor_pos=0):
             if tok.text == '=' and names:
                 # don't inspect the lhs of an assignment
                 names.pop(-1)
-        
+
         if offset + end_col > cursor_pos:
             # we found the cursor, stop reading
             break
-        
+
         tokens.append(tok)
         if tok.token == tokenize2.NEWLINE:
             offset += len(tok.line)
-    
+
     if names:
         return names[-1]
     else:
         return ''
-    
-

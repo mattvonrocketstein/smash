@@ -70,6 +70,7 @@ def strip_transient(nb):
 
 
 class NotebookReader(object):
+
     """A class for reading notebooks."""
 
     def reads(self, s, **kwargs):
@@ -83,6 +84,7 @@ class NotebookReader(object):
 
 
 class NotebookWriter(object):
+
     """A class for writing notebooks."""
 
     def writes(self, nb, **kwargs):

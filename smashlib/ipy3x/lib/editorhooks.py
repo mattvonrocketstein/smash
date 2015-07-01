@@ -50,7 +50,8 @@ def install_editor(template, wait=False):
             line = 0
         cmd = template.format(filename=pipes.quote(filename), line=line)
         print(">", cmd)
-        # pipes.quote doesn't work right on Windows, but it does after splitting
+        # pipes.quote doesn't work right on Windows, but it does after
+        # splitting
         if sys.platform.startswith('win'):
             cmd = shlex.split(cmd)
         proc = subprocess.Popen(cmd, shell=True)

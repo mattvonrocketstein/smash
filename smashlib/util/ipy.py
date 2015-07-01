@@ -9,8 +9,10 @@ from IPython.utils.coloransi import TermColors
 from peak.util.imports import lazyModule
 logging = lazyModule('smashlib._logging')
 
+
 def green(txt):
     return TermColors.Green + txt + TermColors.Normal
+
 
 def uninstall_prefilter(HandlerOrCheckerClass):
     """ uninstalls argument from running IPython instance,
@@ -37,13 +39,11 @@ r_cmd = re.compile('^[\w-]+$')
 
 from goulash.cache import MWT
 
+
 @MWT(timeout=500)
 def have_command_alias(x):
     """ this helper function is fairly expensive to be running on
-        (almost) every input line.  perhaps it should be cached, but
-
-          a) answers would have to be kept in sync with rehashx calls
-          b) the alias list must be getting checked all the time anyway?
+        (almost) every input line.  caching seems tricky but necessary
     """
     if not r_cmd.match(x):
         return False
@@ -55,17 +55,18 @@ def have_command_alias(x):
 
         # often used as in ip=get_ipython()
         'ip',
-        ] + keyword.kwlist
+    ] + keyword.kwlist
     if x in blacklist:
         return False
     else:
         alias_list = get_ipython().alias_manager.aliases
         cmd_list = set()
         for alias, cmd in alias_list:
-            if alias==cmd:
+            if alias == cmd:
                 cmd_list = cmd_list.union(set([alias]))
         return x in cmd_list
 have_alias = have_command_alias
+
 
 def register_prefilter(Checker, Handler):
     ip = get_ipython()
@@ -75,10 +76,10 @@ def register_prefilter(Checker, Handler):
         prefilter_manager=pm,
         config=pm.config)
     handler = Handler(**kargs)
-    if Checker is not None:#hack, remove with dotchecker exists
+    if Checker is not None:  # hack, remove with dotchecker exists
         checker = Checker(**kargs)
         ip.prefilter_manager.register_checker(checker)
     else:
-        checker=None
+        checker = None
     ip.prefilter_manager.register_handler(Handler.handler_name, handler, [])
     return checker, handler

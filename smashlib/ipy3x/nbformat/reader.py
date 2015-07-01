@@ -5,19 +5,24 @@
 
 import json
 
+
 class NotJSONError(ValueError):
     pass
+
 
 def parse_json(s, **kwargs):
     """Parse a JSON string into a dict."""
     try:
         nb_dict = json.loads(s, **kwargs)
     except ValueError:
-        # Limit the error message to 80 characters.  Display whatever JSON will fit.
-        raise NotJSONError(("Notebook does not appear to be JSON: %r" % s)[:77] + "...")
+        # Limit the error message to 80 characters.  Display whatever JSON will
+        # fit.
+        raise NotJSONError(
+            ("Notebook does not appear to be JSON: %r" % s)[:77] + "...")
     return nb_dict
 
 # High level API
+
 
 def get_version(nb):
     """Get the version of a notebook.
@@ -54,7 +59,7 @@ def reads(s, **kwargs):
         The notebook that was read.
     """
     from . import versions, NBFormatError
-    
+
     nb_dict = parse_json(s, **kwargs)
     (major, minor) = get_version(nb_dict)
     if major in versions:

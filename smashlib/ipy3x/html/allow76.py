@@ -20,12 +20,14 @@ from tornado.util import bytes_type, unicode_type
 
 from tornado.websocket import WebSocketHandler, WebSocketProtocol13
 
+
 class AllowDraftWebSocketHandler(WebSocketHandler):
+
     """Restore Draft76 support for tornado 4
-    
+
     Remove when we can run tests without phantomjs + qt4
     """
-    
+
     # get is unmodified except between the BEGIN/END PATCH lines
     @tornado.web.asynchronous
     def get(self, *args, **kwargs):
@@ -41,7 +43,8 @@ class AllowDraftWebSocketHandler(WebSocketHandler):
         # Connection header should be upgrade. Some proxy servers/load balancers
         # might mess with it.
         headers = self.request.headers
-        connection = map(lambda s: s.strip().lower(), headers.get("Connection", "").split(","))
+        connection = map(
+            lambda s: s.strip().lower(), headers.get("Connection", "").split(","))
         if 'upgrade' not in connection:
             self.set_status(400)
             self.finish("\"Connection\" must be \"Upgrade\".")
@@ -55,7 +58,6 @@ class AllowDraftWebSocketHandler(WebSocketHandler):
             origin = self.request.headers.get("Origin")
         else:
             origin = self.request.headers.get("Sec-Websocket-Origin", None)
-
 
         # If there was an origin header, check to make sure it matches
         # according to check_origin. When the origin is None, we assume it
@@ -83,12 +85,12 @@ class AllowDraftWebSocketHandler(WebSocketHandler):
                     "HTTP/1.1 426 Upgrade Required\r\n"
                     "Sec-WebSocket-Version: 8\r\n\r\n"))
                 self.stream.close()
-    
+
     # 3.2 methods removed in 4.0:
     def allow_draft76(self):
         """Using this class allows draft76 connections by default"""
         return True
-    
+
     def get_websocket_scheme(self):
         """Return the url scheme used for this request, either "ws" or "wss".
         This is normally decided by HTTPServer, but applications
@@ -98,14 +100,15 @@ class AllowDraftWebSocketHandler(WebSocketHandler):
         Note that this is only used by the draft76 protocol.
         """
         return "wss" if self.request.protocol == "https" else "ws"
-    
 
 
 # No modifications from tornado-3.2.2 below this line
 
 class WebSocketProtocol(object):
+
     """Base class for WebSocket protocol versions.
     """
+
     def __init__(self, handler):
         self.handler = handler
         self.request = handler.request
@@ -143,12 +146,14 @@ class WebSocketProtocol(object):
 
 
 class WebSocketProtocol76(WebSocketProtocol):
+
     """Implementation of the WebSockets protocol, version hixie-76.
 
     This class provides basic functionality to process WebSockets requests as
     specified in
     http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-76
     """
+
     def __init__(self, handler):
         WebSocketProtocol.__init__(self, handler)
         self.challenge = None
@@ -220,7 +225,8 @@ class WebSocketProtocol76(WebSocketProtocol):
 
     def _write_response(self, challenge):
         self.stream.write(challenge)
-        self.async_callback(self.handler.open)(*self.handler.open_args, **self.handler.open_kwargs)
+        self.async_callback(self.handler.open)(
+            *self.handler.open_args, **self.handler.open_kwargs)
         self._receive_message()
 
     def _handle_websocket_headers(self):
@@ -238,7 +244,8 @@ class WebSocketProtocol76(WebSocketProtocol):
         """Processes the key headers and calculates their key value.
 
         Raises ValueError when feed invalid key."""
-        # pyflakes complains about variable reuse if both of these lines use 'c'
+        # pyflakes complains about variable reuse if both of these lines use
+        # 'c'
         number = int(''.join(c for c in key if c.isdigit()))
         spaces = len([c2 for c2 in key if c2.isspace()])
         try:
@@ -292,7 +299,8 @@ class WebSocketProtocol76(WebSocketProtocol):
 
     def write_ping(self, data):
         """Send ping frame."""
-        raise ValueError("Ping messages not supported by this version of websockets")
+        raise ValueError(
+            "Ping messages not supported by this version of websockets")
 
     def close(self):
         """Closes the WebSocket connection."""
@@ -308,4 +316,3 @@ class WebSocketProtocol76(WebSocketProtocol):
         elif self._waiting is None:
             self._waiting = self.stream.io_loop.add_timeout(
                 time.time() + 5, self._abort)
-

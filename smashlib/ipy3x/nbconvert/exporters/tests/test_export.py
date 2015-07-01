@@ -15,8 +15,8 @@ from ..python import PythonExporter
 
 
 class TestExport(ExportersTestsBase):
-    """Contains test functions for export.py"""
 
+    """Contains test functions for export.py"""
 
     def test_export_wrong_name(self):
         """
@@ -27,14 +27,12 @@ class TestExport(ExportersTestsBase):
         except ExporterNameError as e:
             pass
 
-
     def test_export_filename(self):
         """
         Can a notebook be exported by filename?
         """
         (output, resources) = export_by_name('python', self._get_notebook())
         assert len(output) > 0
-
 
     def test_export_nbnode(self):
         """
@@ -45,7 +43,6 @@ class TestExport(ExportersTestsBase):
             (output, resources) = export_by_name('python', notebook)
         assert len(output) > 0
 
-
     def test_export_filestream(self):
         """
         Can a notebook be exported by a filesteam?
@@ -54,14 +51,12 @@ class TestExport(ExportersTestsBase):
             (output, resources) = export_by_name('python', f)
         assert len(output) > 0
 
-
     def test_export_using_exporter(self):
         """
         Can a notebook be exported using an instanciated exporter?
         """
         (output, resources) = export(PythonExporter(), self._get_notebook())
         assert len(output) > 0
-
 
     def test_export_using_exporter_class(self):
         """
@@ -70,14 +65,13 @@ class TestExport(ExportersTestsBase):
         (output, resources) = export(PythonExporter, self._get_notebook())
         assert len(output) > 0
 
-
     def test_export_resources(self):
         """
         Can a notebook be exported along with a custom resources dict?
         """
-        (output, resources) = export(PythonExporter, self._get_notebook(), resources={})
+        (output, resources) = export(
+            PythonExporter, self._get_notebook(), resources={})
         assert len(output) > 0
-
 
     def test_no_exporter(self):
         """
@@ -87,4 +81,3 @@ class TestExport(ExportersTestsBase):
             (output, resources) = export(None, self._get_notebook())
         except TypeError:
             pass
-                

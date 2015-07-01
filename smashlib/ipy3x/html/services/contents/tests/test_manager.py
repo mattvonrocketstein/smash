@@ -34,7 +34,8 @@ class TestFileContentsManager(TestCase):
 
     def test_invalid_root_dir(self):
         with NamedTemporaryFile() as tf:
-            self.assertRaises(TraitError, FileContentsManager, root_dir=tf.name)
+            self.assertRaises(
+                TraitError, FileContentsManager, root_dir=tf.name)
 
     def test_get_os_path(self):
         # full filesystem path should be returned with correct operating system
@@ -43,7 +44,7 @@ class TestFileContentsManager(TestCase):
             root = td
             fm = FileContentsManager(root_dir=root)
             path = fm._get_os_path('/path/to/notebook/test.ipynb')
-            rel_path_list =  '/path/to/notebook/test.ipynb'.split('/')
+            rel_path_list = '/path/to/notebook/test.ipynb'.split('/')
             fs_path = os.path.join(fm.root_dir, *rel_path_list)
             self.assertEqual(path, fs_path)
 
@@ -67,8 +68,10 @@ class TestFileContentsManager(TestCase):
             cp_dir = fm.get_checkpoint_path('cp', 'test.ipynb')
             cp_subdir = fm.get_checkpoint_path('cp', '/%s/test.ipynb' % subd)
         self.assertNotEqual(cp_dir, cp_subdir)
-        self.assertEqual(cp_dir, os.path.join(root, fm.checkpoint_dir, cp_name))
-        self.assertEqual(cp_subdir, os.path.join(root, subd, fm.checkpoint_dir, cp_name))
+        self.assertEqual(
+            cp_dir, os.path.join(root, fm.checkpoint_dir, cp_name))
+        self.assertEqual(
+            cp_subdir, os.path.join(root, subd, fm.checkpoint_dir, cp_name))
 
 
 class TestContentsManager(TestCase):
@@ -95,7 +98,8 @@ class TestContentsManager(TestCase):
         return os_path
 
     def add_code_cell(self, nb):
-        output = nbformat.new_output("display_data", {'application/javascript': "alert('hi');"})
+        output = nbformat.new_output(
+            "display_data", {'application/javascript': "alert('hi');"})
         cell = nbformat.new_code_cell("print('hi')", outputs=[output])
         nb.cells.append(cell)
 
@@ -134,7 +138,7 @@ class TestContentsManager(TestCase):
         self.assertEqual(model['name'], 'Untitled Folder')
         self.assertEqual(model['path'], 'Untitled Folder')
         sub_dir = model['path']
-        
+
         model = cm.new_untitled(path=sub_dir)
         assert isinstance(model, dict)
         self.assertIn('name', model)
@@ -165,7 +169,8 @@ class TestContentsManager(TestCase):
         self.assertEqual(nb_as_file['format'], 'text')
         self.assertNotIsInstance(nb_as_file['content'], dict)
 
-        nb_as_bin_file = cm.get(path, content=True, type_='file', format='base64')
+        nb_as_bin_file = cm.get(
+            path, content=True, type_='file', format='base64')
         self.assertEqual(nb_as_bin_file['format'], 'base64')
 
         # Test in sub-directory
@@ -178,7 +183,8 @@ class TestContentsManager(TestCase):
         self.assertIn('path', model2)
         self.assertIn('content', model2)
         self.assertEqual(model2['name'], 'Untitled.ipynb')
-        self.assertEqual(model2['path'], '{0}/{1}'.format(sub_dir.strip('/'), name))
+        self.assertEqual(
+            model2['path'], '{0}/{1}'.format(sub_dir.strip('/'), name))
 
         # Test getting directory model
         dirmodel = cm.get('foo')
@@ -187,20 +193,19 @@ class TestContentsManager(TestCase):
         with self.assertRaises(HTTPError):
             cm.get('foo', type_='file')
 
-    
     @dec.skip_win32
     def test_bad_symlink(self):
         cm = self.contents_manager
         path = 'test bad symlink'
         os_path = self.make_dir(cm.root_dir, path)
-        
+
         file_model = cm.new_untitled(path=path, ext='.txt')
-        
+
         # create a broken symlink
         os.symlink("target", os.path.join(os_path, "bad symlink"))
         model = cm.get(path)
         self.assertEqual(model['content'], [file_model])
-    
+
     @dec.skip_win32
     def test_good_symlink(self):
         cm = self.contents_manager
@@ -208,9 +213,9 @@ class TestContentsManager(TestCase):
         name = 'good symlink'
         path = '{0}/{1}'.format(parent, name)
         os_path = self.make_dir(cm.root_dir, parent)
-        
+
         file_model = cm.new(path=parent + '/zfoo.txt')
-        
+
         # create a good symlink
         os.symlink(file_model['name'], os.path.join(os_path, name))
         symlink_model = cm.get(path, content=False)
@@ -219,7 +224,7 @@ class TestContentsManager(TestCase):
             sorted(dir_model['content'], key=lambda x: x['name']),
             [symlink_model, file_model],
         )
-    
+
     def test_update(self):
         cm = self.contents_manager
         # Create a notebook
@@ -315,7 +320,8 @@ class TestContentsManager(TestCase):
 
         # copy with unspecified name
         copy = cm.copy(path)
-        self.assertEqual(copy['name'], orig['name'].replace('.ipynb', '-Copy1.ipynb'))
+        self.assertEqual(
+            copy['name'], orig['name'].replace('.ipynb', '-Copy1.ipynb'))
 
         # copy with specified name
         copy2 = cm.copy(path, u'å b/copy 2.ipynb')

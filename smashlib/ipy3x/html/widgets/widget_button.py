@@ -21,8 +21,11 @@ from IPython.utils.warn import DeprecatedClass
 #-----------------------------------------------------------------------------
 # Classes
 #-----------------------------------------------------------------------------
+
+
 @register('IPython.Button')
 class Button(DOMWidget):
+
     """Button widget.
 
     This widget has an `on_click` method that allows you to listen for the 
@@ -35,10 +38,10 @@ class Button(DOMWidget):
     disabled = Bool(False, help="Enable or disable user changes.", sync=True)
 
     button_style = CaselessStrEnum(
-        values=['primary', 'success', 'info', 'warning', 'danger', ''], 
+        values=['primary', 'success', 'info', 'warning', 'danger', ''],
         default_value='', allow_none=True, sync=True, help="""Use a
         predefined styling for the button.""")
-    
+
     def __init__(self, **kwargs):
         """Constructor"""
         super(Button, self).__init__(**kwargs)

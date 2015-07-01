@@ -19,6 +19,7 @@ from IPython.utils.py3compat import getcwd
 
 
 class MappingKernelManager(MultiKernelManager):
+
     """A KernelManager that handles notebook mapping and HTTP error handling"""
 
     def _kernel_manager_class_default(self):
@@ -81,14 +82,15 @@ class MappingKernelManager(MultiKernelManager):
             if path is not None:
                 kwargs['cwd'] = self.cwd_for_path(path)
             kernel_id = super(MappingKernelManager, self).start_kernel(
-                                            kernel_name=kernel_name, **kwargs)
+                kernel_name=kernel_name, **kwargs)
             self.log.info("Kernel started: %s" % kernel_id)
             self.log.debug("Kernel args: %r" % kwargs)
             # register callback for failed auto-restart
             self.add_restart_callback(kernel_id,
-                lambda : self._handle_kernel_died(kernel_id),
-                'dead',
-            )
+                                      lambda: self._handle_kernel_died(
+                                          kernel_id),
+                                      'dead',
+                                      )
         else:
             self._check_kernel_id(kernel_id)
             self.log.info("Using existing kernel: %s" % kernel_id)
@@ -103,7 +105,7 @@ class MappingKernelManager(MultiKernelManager):
         """Return a dictionary of kernel information described in the
         JSON standard model."""
         self._check_kernel_id(kernel_id)
-        model = {"id":kernel_id,
+        model = {"id": kernel_id,
                  "name": self._kernels[kernel_id].kernel_name}
         return model
 

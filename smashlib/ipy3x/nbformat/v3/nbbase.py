@@ -24,6 +24,7 @@ nbformat = 3
 nbformat_minor = 0
 nbformat_schema = 'nbformat.v3.schema.json'
 
+
 class NotebookNode(Struct):
     pass
 
@@ -31,7 +32,7 @@ class NotebookNode(Struct):
 def from_dict(d):
     if isinstance(d, dict):
         newd = NotebookNode()
-        for k,v in d.items():
+        for k, v in d.items():
             newd[k] = from_dict(v)
         return newd
     elif isinstance(d, (tuple, list)):
@@ -41,9 +42,9 @@ def from_dict(d):
 
 
 def new_output(output_type, output_text=None, output_png=None,
-    output_html=None, output_svg=None, output_latex=None, output_json=None,
-    output_javascript=None, output_jpeg=None, prompt_number=None,
-    ename=None, evalue=None, traceback=None, stream=None, metadata=None):
+               output_html=None, output_svg=None, output_latex=None, output_json=None,
+               output_javascript=None, output_jpeg=None, prompt_number=None,
+               ename=None, evalue=None, traceback=None, stream=None, metadata=None):
     """Create a new output, to go in the ``cell.outputs`` list of a code cell.
     """
     output = NotebookNode()
@@ -53,7 +54,6 @@ def new_output(output_type, output_text=None, output_png=None,
         metadata = {}
     if not isinstance(metadata, dict):
         raise TypeError("metadata must be dict")
-
 
     if output_type in {u'pyout', 'display_data'}:
         output.metadata = metadata
@@ -86,16 +86,17 @@ def new_output(output_type, output_text=None, output_png=None,
         if evalue is not None:
             output.evalue = cast_unicode(evalue)
         if traceback is not None:
-            output.traceback = [cast_unicode(frame) for frame in list(traceback)]
+            output.traceback = [cast_unicode(frame)
+                                for frame in list(traceback)]
 
     if output_type == u'stream':
         output.stream = 'stdout' if stream is None else cast_unicode(stream)
-    
+
     return output
 
 
 def new_code_cell(input=None, prompt_number=None, outputs=None,
-    language=u'python', collapsed=False, metadata=None):
+                  language=u'python', collapsed=False, metadata=None):
     """Create a new code cell with input and output"""
     cell = NotebookNode()
     cell.cell_type = u'code'
@@ -114,6 +115,7 @@ def new_code_cell(input=None, prompt_number=None, outputs=None,
     cell.metadata = NotebookNode(metadata or {})
 
     return cell
+
 
 def new_text_cell(cell_type, source=None, rendered=None, metadata=None):
     """Create a new text cell."""
@@ -170,7 +172,7 @@ def new_notebook(name=None, metadata=None, worksheets=None):
 
 
 def new_metadata(name=None, authors=None, license=None, created=None,
-    modified=None, gistid=None):
+                 modified=None, gistid=None):
     """Create a new metadata node."""
     metadata = NotebookNode()
     if name is not None:
@@ -187,6 +189,7 @@ def new_metadata(name=None, authors=None, license=None, created=None,
         metadata.gistid = cast_unicode(gistid)
     return metadata
 
+
 def new_author(name=None, email=None, affiliation=None, url=None):
     """Create a new author."""
     author = NotebookNode()
@@ -199,4 +202,3 @@ def new_author(name=None, email=None, affiliation=None, url=None):
     if url is not None:
         author.url = cast_unicode(url)
     return author
-

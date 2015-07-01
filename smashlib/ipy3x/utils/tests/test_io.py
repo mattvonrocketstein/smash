@@ -47,7 +47,7 @@ def test_tee_simple():
     text = 'Hello'
     tee = Tee(chan, channel='stdout')
     print(text, file=chan)
-    nt.assert_equal(chan.getvalue(), text+"\n")
+    nt.assert_equal(chan.getvalue(), text + "\n")
 
 
 class TeeTestCase(unittest.TestCase):
@@ -56,7 +56,7 @@ class TeeTestCase(unittest.TestCase):
         trap = StringIO()
         chan = StringIO()
         text = 'Hello'
-        
+
         std_ori = getattr(sys, channel)
         setattr(sys, channel, trap)
 
@@ -65,7 +65,7 @@ class TeeTestCase(unittest.TestCase):
         setattr(sys, channel, std_ori)
         trap_val = trap.getvalue()
         nt.assert_equal(chan.getvalue(), text)
-        if check=='close':
+        if check == 'close':
             tee.close()
         else:
             del tee
@@ -75,27 +75,31 @@ class TeeTestCase(unittest.TestCase):
             for check in ['close', 'del']:
                 self.tchan(chan, check)
 
+
 def test_io_init():
     """Test that io.stdin/out/err exist at startup"""
     for name in ('stdin', 'stdout', 'stderr'):
-        cmd = doctest_refactor_print("from IPython.utils import io;print io.%s.__class__"%name)
+        cmd = doctest_refactor_print(
+            "from IPython.utils import io;print io.%s.__class__" % name)
         p = Popen([sys.executable, '-c', cmd],
-                    stdout=PIPE)
+                  stdout=PIPE)
         p.wait()
         classname = p.stdout.read().strip().decode('ascii')
         # __class__ is a reference to the class object in Python 3, so we can't
         # just test for string equality.
         assert 'IPython.utils.io.IOStream' in classname, classname
 
+
 def test_capture_output():
     """capture_output() context works"""
-    
+
     with capture_output() as io:
         print('hi, stdout')
         print('hi, stderr', file=sys.stderr)
-    
+
     nt.assert_equal(io.stdout, 'hi, stdout\n')
     nt.assert_equal(io.stderr, 'hi, stderr\n')
+
 
 def test_UnicodeStdStream():
     # Test wrapping a bytes-level stdout
@@ -117,6 +121,7 @@ def test_UnicodeStdStream():
     finally:
         sys.stdout = orig_stdout
 
+
 @skipif(not PY3, "Not applicable on Python 2")
 def test_UnicodeStdStream_nowrap():
     # If we replace stdout with a StringIO, it shouldn't get wrapped.
@@ -128,14 +133,16 @@ def test_UnicodeStdStream_nowrap():
     finally:
         sys.stdout = orig_stdout
 
+
 def test_atomic_writing():
-    class CustomExc(Exception): pass
+    class CustomExc(Exception):
+        pass
 
     with TemporaryDirectory() as td:
         f1 = os.path.join(td, 'penguin')
         with stdlib_io.open(f1, 'w') as f:
             f.write(u'Before')
-        
+
         if os.name != 'nt':
             os.chmod(f1, 0o701)
             orig_mode = stat.S_IMODE(os.stat(f1).st_mode)
@@ -173,39 +180,40 @@ def test_atomic_writing():
             # Check that writing over a file preserves a symlink
             with atomic_writing(f2) as f:
                 f.write(u'written from symlink')
-            
+
             with stdlib_io.open(f1, 'r') as f:
                 nt.assert_equal(f.read(), u'written from symlink')
+
 
 def test_atomic_writing_newlines():
     with TemporaryDirectory() as td:
         path = os.path.join(td, 'testfile')
-        
+
         lf = u'a\nb\nc\n'
         plat = lf.replace(u'\n', os.linesep)
         crlf = lf.replace(u'\n', u'\r\n')
-        
+
         # test default
         with stdlib_io.open(path, 'w') as f:
             f.write(lf)
         with stdlib_io.open(path, 'r', newline='') as f:
             read = f.read()
         nt.assert_equal(read, plat)
-        
+
         # test newline=LF
         with stdlib_io.open(path, 'w', newline='\n') as f:
             f.write(lf)
         with stdlib_io.open(path, 'r', newline='') as f:
             read = f.read()
         nt.assert_equal(read, lf)
-        
+
         # test newline=CRLF
         with atomic_writing(path, newline='\r\n') as f:
             f.write(lf)
         with stdlib_io.open(path, 'r', newline='') as f:
             read = f.read()
         nt.assert_equal(read, crlf)
-        
+
         # test newline=no convert
         text = u'crlf\r\ncr\rlf\n'
         with atomic_writing(path, newline='') as f:

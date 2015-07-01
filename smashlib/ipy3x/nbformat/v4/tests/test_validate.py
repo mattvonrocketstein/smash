@@ -16,12 +16,15 @@ from ..nbbase import (
     new_output, new_raw_cell,
 )
 
+
 def validate4(obj, ref=None):
     return validate(obj, ref, version=nbformat)
+
 
 def test_valid_code_cell():
     cell = new_code_cell()
     validate4(cell, 'code_cell')
+
 
 def test_invalid_code_cell():
     cell = new_code_cell()
@@ -48,6 +51,7 @@ def test_invalid_code_cell():
     with nt.assert_raises(ValidationError):
         validate4(cell, 'code_cell')
 
+
 def test_invalid_markdown_cell():
     cell = new_markdown_cell()
 
@@ -73,6 +77,7 @@ def test_invalid_markdown_cell():
     with nt.assert_raises(ValidationError):
         validate4(cell, 'markdown_cell')
 
+
 def test_invalid_raw_cell():
     cell = new_raw_cell()
 
@@ -97,6 +102,7 @@ def test_invalid_raw_cell():
 
     with nt.assert_raises(ValidationError):
         validate4(cell, 'raw_cell')
+
 
 def test_sample_notebook():
     here = os.path.dirname(__file__)

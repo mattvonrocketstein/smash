@@ -14,6 +14,7 @@ from .nbbase import (
 from IPython.nbformat import v3
 from IPython.utils.log import get_logger
 
+
 def _warn_if_invalid(nb, version):
     """Log validation errors, if there are any."""
     from IPython.nbformat import validate, ValidationError
@@ -21,6 +22,7 @@ def _warn_if_invalid(nb, version):
         validate(nb, version=version)
     except ValidationError as e:
         get_logger().error("Notebook JSON is not valid v%i: %s", version, e)
+
 
 def upgrade(nb, from_version=3, from_minor=0):
     """Convert a notebook to v4.
@@ -67,8 +69,9 @@ def upgrade(nb, from_version=3, from_minor=0):
 
         return nb
     else:
-        raise ValueError('Cannot convert a notebook directly from v%s to v4.  ' \
-                'Try using the IPython.nbformat.convert module.' % from_version)
+        raise ValueError('Cannot convert a notebook directly from v%s to v4.  '
+                         'Try using the IPython.nbformat.convert module.' % from_version)
+
 
 def upgrade_cell(cell):
     """upgrade a cell from v3 to v4
@@ -94,12 +97,13 @@ def upgrade_cell(cell):
         level = cell.pop('level', 1)
         cell.source = u'{hashes} {single_line}'.format(
             hashes='#' * level,
-            single_line = ' '.join(cell.get('source', '').splitlines()),
+            single_line=' '.join(cell.get('source', '').splitlines()),
         )
     elif cell.cell_type == 'html':
         # Technically, this exists. It will never happen in practice.
         cell.cell_type = 'markdown'
     return cell
+
 
 def downgrade_cell(cell):
     """downgrade a cell from v4 to v3
@@ -128,15 +132,16 @@ def downgrade_cell(cell):
     return cell
 
 _mime_map = {
-    "text" : "text/plain",
-    "html" : "text/html",
-    "svg" : "image/svg+xml",
-    "png" : "image/png",
-    "jpeg" : "image/jpeg",
-    "latex" : "text/latex",
-    "json" : "application/json",
-    "javascript" : "application/javascript",
-};
+    "text": "text/plain",
+    "html": "text/html",
+    "svg": "image/svg+xml",
+    "png": "image/png",
+    "jpeg": "image/jpeg",
+    "latex": "text/latex",
+    "json": "application/json",
+    "javascript": "application/javascript",
+}
+
 
 def to_mime_key(d):
     """convert dict with v3 aliases to plain mime-type keys"""
@@ -145,12 +150,14 @@ def to_mime_key(d):
             d[mime] = d.pop(alias)
     return d
 
+
 def from_mime_key(d):
     """convert dict with mime-type keys to v3 aliases"""
     for alias, mime in _mime_map.items():
         if mime in d:
             d[alias] = d.pop(mime)
     return d
+
 
 def upgrade_output(output):
     """upgrade a single code cell output from v3 to v4
@@ -188,6 +195,7 @@ def upgrade_output(output):
         output['name'] = output.pop('stream')
     return output
 
+
 def downgrade_output(output):
     """downgrade a single code cell output to v3 from v4
 
@@ -215,13 +223,16 @@ def downgrade_output(output):
         output['stream'] = output.pop('name')
     return output
 
+
 def upgrade_outputs(outputs):
     """upgrade outputs of a code cell from v3 to v4"""
     return [upgrade_output(op) for op in outputs]
 
+
 def downgrade_outputs(outputs):
     """downgrade outputs of a code cell to v3 from v4"""
     return [downgrade_output(op) for op in outputs]
+
 
 def downgrade(nb):
     """Convert a v4 notebook to v3.
@@ -239,14 +250,15 @@ def downgrade(nb):
 
     nb.nbformat = v3.nbformat
     nb.nbformat_minor = v3.nbformat_minor
-    cells = [ downgrade_cell(cell) for cell in nb.pop('cells') ]
+    cells = [downgrade_cell(cell) for cell in nb.pop('cells')]
     nb.worksheets = [v3.new_worksheet(cells=cells)]
     nb.metadata.setdefault('name', '')
-    
+
     # Validate the converted notebook before returning it
     _warn_if_invalid(nb, v3.nbformat)
-    
+
     nb.orig_nbformat = nb.metadata.pop('orig_nbformat', nbformat)
-    nb.orig_nbformat_minor = nb.metadata.pop('orig_nbformat_minor', nbformat_minor)
-    
+    nb.orig_nbformat_minor = nb.metadata.pop(
+        'orig_nbformat_minor', nbformat_minor)
+
     return nb

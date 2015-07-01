@@ -18,7 +18,9 @@ from IPython.utils.traitlets import Instance, Unicode, List
 
 copy_pat = re.compile(r'\-Copy\d*\.')
 
+
 class ContentsManager(LoggingConfigurable):
+
     """Base class for serving files and directories.
 
     This serves any text or binary file,
@@ -38,27 +40,28 @@ class ContentsManager(LoggingConfigurable):
     """
 
     notary = Instance(sign.NotebookNotary)
+
     def _notary_default(self):
         return sign.NotebookNotary(parent=self)
 
     hide_globs = List(Unicode, [
-            u'__pycache__', '*.pyc', '*.pyo',
-            '.DS_Store', '*.so', '*.dylib', '*~',
-        ], config=True, help="""
+        u'__pycache__', '*.pyc', '*.pyo',
+        '.DS_Store', '*.so', '*.dylib', '*~',
+    ], config=True, help="""
         Glob patterns to hide in file and directory listings.
     """)
 
     untitled_notebook = Unicode("Untitled", config=True,
-        help="The base name used when creating untitled notebooks."
-    )
+                                help="The base name used when creating untitled notebooks."
+                                )
 
     untitled_file = Unicode("untitled", config=True,
-        help="The base name used when creating untitled files."
-    )
+                            help="The base name used when creating untitled files."
+                            )
 
     untitled_directory = Unicode("Untitled Folder", config=True,
-        help="The base name used when creating untitled directories."
-    )
+                                 help="The base name used when creating untitled directories."
+                                 )
 
     # ContentsManager API part 1: methods that must be
     # implemented in subclasses.
@@ -184,7 +187,7 @@ class ContentsManager(LoggingConfigurable):
 
     def get_kernel_path(self, path, model=None):
         """Return the API path for the kernel
-        
+
         KernelManagers can turn this value into a filesystem path,
         or ignore it altogether.
 
@@ -217,7 +220,7 @@ class ContentsManager(LoggingConfigurable):
             else:
                 insert_i = ''
             name = u'{basename}{insert}{ext}'.format(basename=basename,
-                insert=insert_i, ext=ext)
+                                                     insert=insert_i, ext=ext)
             if not self.exists(u'{}/{}'.format(path, name)):
                 break
         return name
@@ -228,32 +231,33 @@ class ContentsManager(LoggingConfigurable):
             validate(model['content'])
         except ValidationError as e:
             model['message'] = u'Notebook Validation failed: {}:\n{}'.format(
-                e.message, json.dumps(e.instance, indent=1, default=lambda obj: '<UNKNOWN>'),
+                e.message, json.dumps(
+                    e.instance, indent=1, default=lambda obj: '<UNKNOWN>'),
             )
         return model
-    
+
     def new_untitled(self, path='', type='', ext=''):
         """Create a new untitled file or directory in path
-        
+
         path must be a directory
-        
+
         File extension can be specified.
-        
+
         Use `new` to create files with a fully specified path (including filename).
         """
         path = path.strip('/')
         if not self.dir_exists(path):
             raise HTTPError(404, 'No such directory: %s' % path)
-        
+
         model = {}
         if type:
             model['type'] = type
-        
+
         if ext == '.ipynb':
             model.setdefault('type', 'notebook')
         else:
             model.setdefault('type', 'file')
-        
+
         insert = ''
         if model['type'] == 'directory':
             untitled = self.untitled_directory
@@ -265,25 +269,25 @@ class ContentsManager(LoggingConfigurable):
             untitled = self.untitled_file
         else:
             raise HTTPError(400, "Unexpected model type: %r" % model['type'])
-        
+
         name = self.increment_filename(untitled + ext, path, insert=insert)
         path = u'{0}/{1}'.format(path, name)
         return self.new(model, path)
-    
+
     def new(self, model=None, path=''):
         """Create a new file or directory and return its model with no content.
-        
+
         To create a new untitled entity in a directory, use `new_untitled`.
         """
         path = path.strip('/')
         if model is None:
             model = {}
-        
+
         if path.endswith('.ipynb'):
             model.setdefault('type', 'notebook')
         else:
             model.setdefault('type', 'file')
-        
+
         # no content, not a directory, so fill out new-file model
         if 'content' not in model and model['type'] != 'directory':
             if model['type'] == 'notebook':
@@ -293,7 +297,7 @@ class ContentsManager(LoggingConfigurable):
                 model['content'] = ''
                 model['type'] = 'file'
                 model['format'] = 'text'
-        
+
         model = self.save(model, path)
         return model
 
@@ -311,20 +315,20 @@ class ContentsManager(LoggingConfigurable):
         else:
             from_dir = ''
             from_name = path
-        
+
         model = self.get(path)
         model.pop('path', None)
         model.pop('name', None)
         if model['type'] == 'directory':
             raise HTTPError(400, "Can't copy directories")
-        
+
         if not to_path:
             to_path = from_dir
         if self.dir_exists(to_path):
             name = copy_pat.sub(u'.', from_name)
             to_name = self.increment_filename(name, to_path, insert='-Copy')
             to_path = u'{0}/{1}'.format(to_path, to_name)
-        
+
         model = self.save(model, to_path)
         return model
 

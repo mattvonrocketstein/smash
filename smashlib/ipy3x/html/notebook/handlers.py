@@ -22,19 +22,19 @@ class NotebookHandler(IPythonHandler):
         redirects to the '/files/' handler if the name is not given."""
         path = path.strip('/')
         cm = self.contents_manager
-        
+
         # a .ipynb filename was given
         if not cm.file_exists(path):
             raise web.HTTPError(404, u'Notebook does not exist: %s' % path)
         name = url_escape(path.rsplit('/', 1)[-1])
         path = url_escape(path)
         self.write(self.render_template('notebook.html',
-            notebook_path=path,
-            notebook_name=name,
-            kill_kernel=False,
-            mathjax_url=self.mathjax_url,
-            )
-        )
+                                        notebook_path=path,
+                                        notebook_name=name,
+                                        kill_kernel=False,
+                                        mathjax_url=self.mathjax_url,
+                                        )
+                   )
 
 
 #-----------------------------------------------------------------------------
@@ -46,4 +46,3 @@ default_handlers = [
     (r"/notebooks%s" % notebook_path_regex, NotebookHandler),
     (r"/notebooks%s" % path_regex, FilesRedirectHandler),
 ]
-

@@ -29,9 +29,9 @@ class ChannelQObject(SuperQObject):
         super(ChannelQObject, self).stop()
         self.stopped.emit()
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # InProcessChannel interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
     def call_handlers_later(self, *args, **kwds):
         """ Call the message handlers later.
@@ -50,7 +50,8 @@ class QtShellChannelMixin(ChannelQObject):
     # Emitted when any message is received.
     message_received = QtCore.Signal(object)
 
-    # Emitted when a reply has been received for the corresponding request type.
+    # Emitted when a reply has been received for the corresponding request
+    # type.
     execute_reply = QtCore.Signal(object)
     complete_reply = QtCore.Signal(object)
     inspect_reply = QtCore.Signal(object)
@@ -67,7 +68,7 @@ class QtShellChannelMixin(ChannelQObject):
         msg_type = msg['header']['msg_type']
         if msg_type == 'kernel_info_reply':
             self._handle_kernel_info_reply(msg)
-        
+
         signal = getattr(self, msg_type, None)
         if signal:
             signal.emit(msg)
@@ -155,6 +156,7 @@ class QtKernelRestarterMixin(MetaQObjectHasTraits('NewBase', (HasTraits, SuperQO
 
 
 class QtKernelManagerMixin(MetaQObjectHasTraits('NewBase', (HasTraits, SuperQObject), {})):
+
     """ A KernelClient that provides signals and slots.
     """
 
@@ -162,6 +164,7 @@ class QtKernelManagerMixin(MetaQObjectHasTraits('NewBase', (HasTraits, SuperQObj
 
 
 class QtKernelClientMixin(MetaQObjectHasTraits('NewBase', (HasTraits, SuperQObject), {})):
+
     """ A KernelClient that provides signals and slots.
     """
 
@@ -177,11 +180,11 @@ class QtKernelClientMixin(MetaQObjectHasTraits('NewBase', (HasTraits, SuperQObje
     stdin_channel_class = Type(QtStdInChannelMixin)
     hb_channel_class = Type(QtHBChannelMixin)
 
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
     # 'KernelClient' interface
-    #---------------------------------------------------------------------------
+    #-------------------------------------------------------------------------
 
-    #------ Channel management -------------------------------------------------
+    #------ Channel management -----------------------------------------------
 
     def start_channels(self, *args, **kw):
         """ Reimplemented to emit signal.

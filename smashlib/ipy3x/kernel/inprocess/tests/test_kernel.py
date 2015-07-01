@@ -69,6 +69,7 @@ class InProcessKernelTestCase(unittest.TestCase):
 # Utility functions
 #-----------------------------------------------------------------------------
 
+
 def get_stream_message(kernel_client, timeout=5):
     """ Gets a single stream message synchronously from the sub channel.
     """

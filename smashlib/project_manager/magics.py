@@ -2,12 +2,14 @@
 """
 from IPython.core.magic import Magics, magics_class, line_magic
 
+
 @magics_class
 class ProjectMagics(Magics):
+
     def _run_op(self, op_name, parameter_s):
         parameter_s = parameter_s or self.project_manager._current_project
         if parameter_s:
-            op=getattr(self.project_manager,op_name)
+            op = getattr(self.project_manager, op_name)
             op(parameter_s)
 
     @line_magic
@@ -24,8 +26,8 @@ class ProjectMagics(Magics):
         parameter_s = parameter_s or self.project_manager._current_project
         if parameter_s:
             name = parameter_s.split()[0]
-            path = parameter_s[len(name)+1:]
-            self.project_manager.project_map[name]=path
+            path = parameter_s[len(name) + 1:]
+            self.project_manager.project_map[name] = path
 
     @line_magic
     def check_project(self, parameter_s=''):
@@ -34,7 +36,6 @@ class ProjectMagics(Magics):
     @line_magic
     def build_project(self, parameter_s=''):
         self._run_op('build', parameter_s)
-
 
     @line_magic
     def test_project(self, parameter_s=''):

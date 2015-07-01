@@ -28,8 +28,8 @@ def activate_python_venv(project_manager):
             report=project_manager.report,
             # typically ignoring tox is a good idea.  but maybe
             # someone wants to specifically use the tox dir?
-            #ignore_dirs='.tox'
-            )
+            # ignore_dirs='.tox'
+        )
         if not default_venv:
             msg = ("ProjectManager.venv_map uses {0}, "
                    "but no venv was found")
@@ -43,15 +43,16 @@ def activate_python_venv(project_manager):
         found_venv = contains_venv(
             _dir, report=project_manager.report,
             ignore_dirs=['.tox'],
-            )
+        )
 
     if found_venv:
         project_manager.shell.magic('venv_activate {0}'.format(found_venv))
 
+
 def activate_vagrant(pm):
     try:
         require_bin('vagrant')
-    except MissingSystemCommand,e:
+    except MissingSystemCommand, e:
         pm.warning("{0}: cannot execute activate_vagrant".format(e))
     else:
         pm.smash.system('vagrant list')

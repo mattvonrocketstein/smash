@@ -546,7 +546,7 @@ default_banner_parts = [
     'Type "copyright", "credits" or "license" for more information.\n\n',
     'IPython {version} -- An enhanced Interactive Python.\n'.format(
         version=release.version,
-        ),
+    ),
     quick_guide
 ]
 
@@ -558,8 +558,8 @@ default_gui_banner = ''.join(default_gui_banner_parts)
 
 # page GUI Reference, for use as a magic:
 
+
 def page_guiref(arg_s=None):
     """Show a basic reference about the GUI Console."""
     from IPython.core import page
     page.page(gui_reference)
-

@@ -11,6 +11,7 @@ from tornado import web
 from IPython.utils.py3compat import PY3
 from ...base.handlers import IPythonHandler, json_errors
 
+
 class ConfigHandler(IPythonHandler):
     SUPPORTED_METHODS = ('GET', 'PUT', 'PATCH')
 
@@ -23,7 +24,8 @@ class ConfigHandler(IPythonHandler):
     @web.authenticated
     @json_errors
     def put(self, section_name):
-        data = self.get_json_body()  # Will raise 400 if content is not valid JSON
+        # Will raise 400 if content is not valid JSON
+        data = self.get_json_body()
         self.config_manager.set(section_name, data)
         self.set_status(204)
 

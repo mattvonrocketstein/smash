@@ -23,7 +23,8 @@ class TestAPI(TestsBase):
         with self.fopen(u'test2.ipynb', 'r') as f:
             nb = read(f, as_version=current_nbformat)
 
-        # Check that the notebook was upgraded to the latest version automatically.
+        # Check that the notebook was upgraded to the latest version
+        # automatically.
         (major, minor) = get_version(nb)
         self.assertEqual(major, current_nbformat)
 

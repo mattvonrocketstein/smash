@@ -17,8 +17,9 @@ REHASH_IF = [
     'setup.py develop',
     'pip install',
     'setup.py install',
-    'apt-get install', 
+    'apt-get install',
     'puppet apply']
+
 
 class PostInput(Plugin):
     verbose = True
@@ -31,13 +32,16 @@ class PostInput(Plugin):
                 self.report("detected possible $PATH changes (rehashing)")
                 self.smash.shell.magic('rehashx')
 
+
 def load_ipython_extension(ip):
     ip = get_ipython()
     return PostInput(ip).install()
 
 
 from smashlib import get_smash
-from goulash.python import splitext,ops
+from goulash.python import splitext, ops
+
+
 def unload_ipython_extension(ip):
     plugin_name = splitext(ops(__file__)[-1])[0]
     raise Exception(plugin_name)

@@ -1,7 +1,9 @@
 """ smashlib.patches.base
 """
 
+
 class PatchMagic(object):
+
     """ helper for patching ipython builtin line magics.
         it has to be done this way because ipy.shell.magics_manager
         is no help: the register_function() call can only change
@@ -18,5 +20,5 @@ class PatchMagic(object):
         self.patched = True
 
     def install(self):
-        #if not self.patched:
+        # if not self.patched:
         self.component.shell.magics_manager.magics['line'][self.name] = self

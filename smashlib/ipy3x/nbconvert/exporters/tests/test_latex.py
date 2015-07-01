@@ -16,6 +16,7 @@ from IPython.utils.tempdir import TemporaryDirectory
 
 
 class TestLatexExporter(ExportersTestsBase):
+
     """Contains test functions for latex.py"""
 
     exporter_class = LatexExporter
@@ -27,40 +28,40 @@ class TestLatexExporter(ExportersTestsBase):
         """
         LatexExporter()
 
-
     @onlyif_cmds_exist('pandoc')
     def test_export(self):
         """
         Can a LatexExporter export something?
         """
-        (output, resources) = LatexExporter().from_filename(self._get_notebook())
+        (output, resources) = LatexExporter().from_filename(
+            self._get_notebook())
         assert len(output) > 0
-
 
     @onlyif_cmds_exist('pandoc')
     def test_export_book(self):
         """
         Can a LatexExporter export using 'report' template?
         """
-        (output, resources) = LatexExporter(template_file='report').from_filename(self._get_notebook())
+        (output, resources) = LatexExporter(
+            template_file='report').from_filename(self._get_notebook())
         assert len(output) > 0
-
 
     @onlyif_cmds_exist('pandoc')
     def test_export_basic(self):
         """
         Can a LatexExporter export using 'article' template?
         """
-        (output, resources) = LatexExporter(template_file='article').from_filename(self._get_notebook())
+        (output, resources) = LatexExporter(
+            template_file='article').from_filename(self._get_notebook())
         assert len(output) > 0
-
 
     @onlyif_cmds_exist('pandoc')
     def test_export_article(self):
         """
         Can a LatexExporter export using 'article' template?
         """
-        (output, resources) = LatexExporter(template_file='article').from_filename(self._get_notebook())
+        (output, resources) = LatexExporter(
+            template_file='article').from_filename(self._get_notebook())
         assert len(output) > 0
 
     @onlyif_cmds_exist('pandoc')
@@ -82,13 +83,13 @@ class TestLatexExporter(ExportersTestsBase):
           at nec tellus. Fusce feugiat lacus quis urna sollicitudin volutpat.
           Quisque at sapien non nibh feugiat tempus ac ultricies purus.
            """)
-        lorem_ipsum_text = lorem_ipsum_text.replace("\n"," ") + "\n\n"
-        large_lorem_ipsum_text = "".join([lorem_ipsum_text]*3000)
+        lorem_ipsum_text = lorem_ipsum_text.replace("\n", " ") + "\n\n"
+        large_lorem_ipsum_text = "".join([lorem_ipsum_text] * 3000)
 
         notebook_name = "lorem_ipsum_long.ipynb"
         nb = v4.new_notebook(
             cells=[
-                    v4.new_markdown_cell(source=large_lorem_ipsum_text)
+                v4.new_markdown_cell(source=large_lorem_ipsum_text)
             ]
         )
 
@@ -97,7 +98,8 @@ class TestLatexExporter(ExportersTestsBase):
             with open(nbfile, 'w') as f:
                 write(nb, f, 4)
 
-            (output, resources) = LatexExporter(template_file='article').from_filename(nbfile)
+            (output, resources) = LatexExporter(
+                template_file='article').from_filename(nbfile)
             assert len(output) > 0
 
     @onlyif_cmds_exist('pandoc')

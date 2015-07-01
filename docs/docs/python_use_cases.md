@@ -1,8 +1,5 @@
-title: Use Cases: Python
-menu-position: 3
----
 
-This section is just an overview.  You could also jump directly to the plugin documentation for the relevant plugins: [Python Tools Completion](plugins.html#ptc), [Python Virtual Environments](plugins.html#virtualenv), [Project Manager](project_manager.html)
+You can also jump directly to the plugin documentation for the relevant plugins: [Python Tools Completion](plugins.html#ptc), [Python Virtual Environments](plugins.html#virtualenv), [Project Manager](project_manager.html)
 
 <a id="smash-for-python-devs"></a>
 ####Smash is a python interpretter

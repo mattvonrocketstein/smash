@@ -7,6 +7,7 @@ from smashlib.channels import C_CHANGE_DIR
 
 
 class PatchCDMagic(PatchMagic):
+
     """ patches the builtin ipython cd magic so that a post-dir-change
         event can be sent to anyone who wants to subscribe, and so that
         the "cd" command is quiet by default.
@@ -16,7 +17,7 @@ class PatchCDMagic(PatchMagic):
 
     def __call__(self, parameter_s=''):
         try:
-            self.original('-q '+parameter_s)
+            self.original('-q ' + parameter_s)
         except Exception:
             self.component.report("error with cd.")
             raise

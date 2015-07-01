@@ -7,8 +7,10 @@ from smashlib.plugins import Plugin
 
 
 class OperationStep(Plugin):
+
     """ thin wrapper, basically a named lambda. """
     #verbose = True
+
     def __init__(self, name, fxn=None, pm=None, args=tuple(), ):
         self.project_manager = pm
         self.name = self.project_manager._current_project
@@ -25,7 +27,7 @@ class OperationStep(Plugin):
     def operation_name(self):
         """ really dumb heuristic.. subclassers can just set this as a
             class property """
-        return self.__class__.__name__.lower().replace('step','')
+        return self.__class__.__name__.lower().replace('step', '')
 
     def __repr__(self):
         return '<{0}:{1}>'.format(
@@ -33,19 +35,23 @@ class OperationStep(Plugin):
             self.name)
     __str__ = __repr__
 
+
 class NullOperationStep(OperationStep):
+
     """ Activation step used when literally no
         other activation steps could be guessed at
     """
+
     def __init__(self, project_manager):
         self.project_manager = project_manager
         name = self.__call__.__name__
         _callable = lambda: \
-                   self.project_manager.report(
-            'no project {0} steps are understood for "{1}"'.format(
-                self.operation_name, self.project_manager._current_project))
+            self.project_manager.report(
+                'no project {0} steps are understood for "{1}"'.format(
+                    self.operation_name, self.project_manager._current_project))
         super(NullOperationStep, self).__init__(
             name, _callable, pm=project_manager)
+
 
 def require_active_project(fxn):
     def newf(project_manager, *args, **kargs):
@@ -56,7 +62,8 @@ def require_active_project(fxn):
         else:
             pdir = project_manager.project_map[pname]
             if not os.path.exists(pdir):
-                project_manager.warning("require that project dir should exist")
+                project_manager.warning(
+                    "require that project dir should exist")
                 return None
             else:
                 return fxn(project_manager, *args, **kargs)

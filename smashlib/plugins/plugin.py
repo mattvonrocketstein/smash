@@ -3,6 +3,7 @@
     NB: plugin related obviously, but this is not a plugin.
         it's the abstract classes for creating subclasses
 """
+import os
 import sys
 import argparse
 
@@ -14,11 +15,12 @@ from IPython.config.configurable import Configurable
 from smashlib._logging import Logger
 from smashlib.bases.eventful import EventfulMix
 
+
 class APlugin(object):
+
     """ """
-    def build_argparser(self):
-        parser = argparse.ArgumentParser()
-        return parser
+    def get_cli_arguments(self):
+        return []
 
     def __qmark__(self):
         return self.__doc__ or '{0} has no __qmark__(), no __doc__()'.format(self)
@@ -32,7 +34,7 @@ class APlugin(object):
 
     def contribute_magic(self, fxn):
         # TODO: verify signature?
-        self.installation_record['magics']+=[fxn]
+        self.installation_record['magics'] += [fxn]
         return self.smash.shell.magics_manager.register_function(fxn)
 
     def contribute_macro(self, name, macro):
@@ -48,7 +50,7 @@ class APlugin(object):
             raise TypeError(err)
         macro.name = name
         self.shell.user_ns[name] = macro
-        self.installation_record['macros']+=[macro]
+        self.installation_record['macros'] += [macro]
 
     def contribute_hook(self, name, fxn):
         """ contributes a hook to ipython and
@@ -76,7 +78,7 @@ class APlugin(object):
             for priority, cfxn in callchain:
                 if cfxn.__name__ == fxn.__name__:
                     continue
-                new_callback.append([priority,cfxn])
+                new_callback.append([priority, cfxn])
         self.shell.hooks[name].chain = new_callback
 
     def _uninstall_magics(self):
@@ -87,21 +89,10 @@ class APlugin(object):
             del self.shell.magics_manager.magics['line'][m.__name__]
 
     def die(self, msg=''):
-        import os
         if msg:
-            print msg
+            smash_log.debug(msg)
         self.smash.shell.run_cell('exit')
         os.system('kill -KILL {0}'.format(os.getpid()))
-
-    def parse_argv(self):
-        parser = self.build_argparser()
-        try:
-            args, unknown = parser.parse_known_args(sys.argv[1:])
-        except SystemExit:
-            self.die('exiting at request of argparser')
-        if len(vars(args)):
-            self.report("parsed argv: "+str(args))
-        return args, unknown
 
     @property
     def smash(self):
@@ -116,6 +107,8 @@ class APlugin(object):
 
 from IPython.utils.traitlets import Bool
 from smashlib._logging import smash_log
+
+
 class SmashPlugin(APlugin, EventfulMix, Configurable, ):
 
     verbose = Bool(False, config=True)
@@ -139,6 +132,9 @@ class SmashPlugin(APlugin, EventfulMix, Configurable, ):
     def init_magics(self):
         pass
 
+    def use_argv(self, args):
+        pass
+
     def init_logger(self):
         self.logger = Logger(self)
         self.report = self.logger.report
@@ -148,7 +144,6 @@ class SmashPlugin(APlugin, EventfulMix, Configurable, ):
     def __str__(self):
         return '<SmashExtension: {0}>'.format(self.__class__.__name__)
     __repr__ = __str__
-
 
     def init(self):
         pass

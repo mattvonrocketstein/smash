@@ -22,7 +22,8 @@ from .utils import (new_kernel, kernel, TIMEOUT, assemble_output, execute,
 def _check_mp_mode(kc, expected=False, stream="stdout"):
     execute(kc=kc, code="import sys")
     flush_channels(kc)
-    msg_id, content = execute(kc=kc, code="print (sys.%s._check_mp_mode())" % stream)
+    msg_id, content = execute(
+        kc=kc, code="print (sys.%s._check_mp_mode())" % stream)
     stdout, stderr = assemble_output(kc.iopub_channel)
     nt.assert_equal(eval(stdout.strip()), expected)
 
@@ -43,24 +44,28 @@ def test_simple_print():
 def test_sys_path():
     """test that sys.path doesn't get messed up by default"""
     with kernel() as kc:
-        msg_id, content = execute(kc=kc, code="import sys; print (repr(sys.path[0]))")
+        msg_id, content = execute(
+            kc=kc, code="import sys; print (repr(sys.path[0]))")
         stdout, stderr = assemble_output(kc.iopub_channel)
         nt.assert_equal(stdout, "''\n")
 
+
 def test_sys_path_profile_dir():
     """test that sys.path doesn't get messed up when `--profile-dir` is specified"""
-    
+
     with new_kernel(['--profile-dir', locate_profile('default')]) as kc:
-        msg_id, content = execute(kc=kc, code="import sys; print (repr(sys.path[0]))")
+        msg_id, content = execute(
+            kc=kc, code="import sys; print (repr(sys.path[0]))")
         stdout, stderr = assemble_output(kc.iopub_channel)
         nt.assert_equal(stdout, "''\n")
+
 
 @dec.knownfailureif(sys.platform == 'win32', "subprocess prints fail on Windows")
 def test_subprocess_print():
     """printing from forked mp.Process"""
     with new_kernel() as kc:
         iopub = kc.iopub_channel
-        
+
         _check_mp_mode(kc, expected=False)
         flush_channels(kc)
         np = 5
@@ -71,11 +76,11 @@ def test_subprocess_print():
             "for p in pool: p.start()",
             "for p in pool: p.join()"
         ])
-        
+
         expected = '\n'.join([
             "hello %s" % i for i in range(np)
         ]) + '\n'
-        
+
         msg_id, content = execute(kc=kc, code=code)
         stdout, stderr = assemble_output(iopub)
         nt.assert_equal(stdout.count("hello"), np, stdout)
@@ -90,7 +95,7 @@ def test_subprocess_noprint():
     """mp.Process without print doesn't trigger iostream mp_mode"""
     with kernel() as kc:
         iopub = kc.iopub_channel
-        
+
         np = 5
         code = '\n'.join([
             "import multiprocessing as mp",
@@ -98,7 +103,7 @@ def test_subprocess_noprint():
             "for p in pool: p.start()",
             "for p in pool: p.join()"
         ])
-        
+
         msg_id, content = execute(kc=kc, code=code)
         stdout, stderr = assemble_output(iopub)
         nt.assert_equal(stdout, '')
@@ -113,14 +118,14 @@ def test_subprocess_error():
     """error in mp.Process doesn't crash"""
     with new_kernel() as kc:
         iopub = kc.iopub_channel
-        
+
         code = '\n'.join([
             "import multiprocessing as mp",
             "p = mp.Process(target=int, args=('hi',))",
             "p.start()",
             "p.join()",
         ])
-        
+
         msg_id, content = execute(kc=kc, code=code)
         stdout, stderr = assemble_output(iopub)
         nt.assert_equal(stdout, '')
@@ -131,11 +136,12 @@ def test_subprocess_error():
 
 # raw_input tests
 
+
 def test_raw_input():
     """test [raw_]input"""
     with kernel() as kc:
         iopub = kc.iopub_channel
-        
+
         input_f = "input" if py3compat.PY3 else "raw_input"
         theprompt = "prompt> "
         code = 'print({input_f}("{theprompt}"))'.format(**locals())
@@ -157,7 +163,7 @@ def test_eval_input():
     """test input() on Python 2"""
     with kernel() as kc:
         iopub = kc.iopub_channel
-        
+
         input_f = "input" if py3compat.PY3 else "raw_input"
         theprompt = "prompt> "
         code = 'print(input("{theprompt}"))'.format(**locals())
@@ -189,9 +195,11 @@ def test_save_history():
         nt.assert_in(u'a=1', content)
         nt.assert_in(u'b=u"abcþ"', content)
 
+
 def test_help_output():
     """ipython kernel --help-all works"""
     tt.help_all_output_test('kernel')
+
 
 def test_is_complete():
     with kernel() as kc:
@@ -205,11 +213,12 @@ def test_is_complete():
         kc.is_complete('raise = 2')
         reply = kc.get_shell_msg(block=True, timeout=TIMEOUT)
         assert reply['content']['status'] == 'invalid'
-        
+
         kc.is_complete('a = [1,\n2,')
         reply = kc.get_shell_msg(block=True, timeout=TIMEOUT)
         assert reply['content']['status'] == 'incomplete'
         assert reply['content']['indent'] == ''
+
 
 def test_complete():
     with kernel() as kc:

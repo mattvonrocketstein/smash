@@ -25,16 +25,19 @@ pjoin = os.path.join
 # Code
 #-----------------------------------------------------------------------------
 
+
 def ipython_parent():
     """return IPython's parent (i.e. root if run from git)"""
     from IPython.utils.path import get_ipython_package_dir
     return os.path.abspath(os.path.dirname(get_ipython_package_dir()))
+
 
 def ipython_submodules(root):
     """return IPython submodules relative to root"""
     return [
         pjoin(root, 'IPython', 'html', 'static', 'components'),
     ]
+
 
 def is_repo(d):
     """is d a git repo?"""
@@ -45,9 +48,10 @@ def is_repo(d):
                             stderr=subprocess.PIPE,
                             shell=True,
                             cwd=d,
-    )
+                            )
     status, _ = proc.communicate()
     return status == 0
+
 
 def check_submodule_status(root=None):
     """check submodule status
@@ -65,7 +69,7 @@ def check_submodule_status(root=None):
 
     if not root:
         root = ipython_parent()
-    
+
     if not is_repo(root):
         # not in git, assume clean
         return 'clean'
@@ -75,10 +79,10 @@ def check_submodule_status(root=None):
     for submodule in submodules:
         if not os.path.exists(submodule):
             return 'missing'
-    
+
     # Popen can't handle unicode cwd on Windows Python 2
     if sys.platform == 'win32' and sys.version_info[0] < 3 \
-        and not isinstance(root, bytes):
+            and not isinstance(root, bytes):
         root = root.encode(sys.getfilesystemencoding() or 'ascii')
     # check with git submodule status
     proc = subprocess.Popen('git submodule status',
@@ -86,7 +90,7 @@ def check_submodule_status(root=None):
                             stderr=subprocess.PIPE,
                             shell=True,
                             cwd=root,
-    )
+                            )
     status, _ = proc.communicate()
     status = status.decode("ascii", "replace")
 
@@ -98,8 +102,9 @@ def check_submodule_status(root=None):
 
     return 'clean'
 
+
 def update_submodules(repo_dir):
     """update submodules in a repo"""
     subprocess.check_call("git submodule init", cwd=repo_dir, shell=True)
-    subprocess.check_call("git submodule update --recursive", cwd=repo_dir, shell=True)
-
+    subprocess.check_call(
+        "git submodule update --recursive", cwd=repo_dir, shell=True)

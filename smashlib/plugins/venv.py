@@ -12,7 +12,9 @@
     Also sets up tab completion over virtualenv command line options.
 """
 import inspect
-import os, sys, glob
+import os
+import sys
+import glob
 
 from IPython.core.magic import Magics, magics_class, line_magic
 
@@ -23,7 +25,7 @@ from smashlib import get_smash
 from smashlib.plugins import Plugin
 from smashlib.data import SMASH_DIR
 from goulash.python import opj, ope, abspath, expanduser
-from smashlib.completion  import opt_completer
+from smashlib.completion import opt_completer
 
 
 # "real_prefix" is set by virtualenv itself. this
@@ -34,11 +36,13 @@ from smashlib.channels import (
     C_POST_ACTIVATE, C_PRE_ACTIVATE,
     C_POST_DEACTIVATE, C_PRE_DEACTIVATE)
 
+
 @magics_class
 class VirtualEnvMagics(Magics):
+
     @line_magic
     def venv_activate(self, parameter_s=''):
-        self.report("venv_activate: "+parameter_s)
+        self.report("venv_activate: " + parameter_s)
         self.vext.activate(parameter_s)
 
     @line_magic
@@ -49,9 +53,11 @@ class VirtualEnvMagics(Magics):
     def report(self):
         return self.vext.report
 
+
 @opt_completer('virtualenv')
 def virtualenv_completer(self, event):
     return []
+
 
 class VirtualEnvSupport(Plugin):
     sys_path_changes = []
@@ -65,12 +71,12 @@ class VirtualEnvSupport(Plugin):
         else:
             if not venv:
                 return False
-            self.report("venv_deactivate: "+venv)
+            self.report("venv_deactivate: " + venv)
             self.publish(C_PRE_DEACTIVATE, venv)
 
             if not ope(venv):
                 self.warning('refusing to deactivate (relocated?) venv')
-                return #raise RuntimeError(err)
+                return  # raise RuntimeError(err)
 
             del os.environ['VIRTUAL_ENV']
             path = get_path()
@@ -88,7 +94,7 @@ class VirtualEnvSupport(Plugin):
 
             # clean sys.path according to python..
             # stupid, but this seems to work
-            self.report('resetting sys.path')#,sys.path_changes)
+            self.report('resetting sys.path')  # ,sys.path_changes)
             reset_path = getattr(self, 'reset_path', None)
             if reset_path is not None:
                 sys.path = reset_path
@@ -98,39 +104,39 @@ class VirtualEnvSupport(Plugin):
             return True
 
     def _clean_user_namespace(self, venv):
-            """ clean ipython username to remove old project's code
-                TODO: document and refactor
-            """
-            self.report("cleaning user namespace")
-            names = []
-            pm = get_smash().project_manager
-            pdir = pm._current_project and pm.project_map[pm._current_project]
-            namespace = get_smash().shell.user_ns
-            for name,obj in namespace.items():
-                try:
-                    fname = inspect.getfile(obj)
-                except TypeError:
-                    # happens for anything that's not a module, class
-                    # method, function, traceback, frame or code object
-                    fname = None
-                if fname:
-                    test = fname.startswith(venv)
-                    if pdir is not None:
-                        test = test or fname.startswith(pdir)
-                    if test and \
+        """ clean ipython username to remove old project's code
+            TODO: document and refactor
+        """
+        self.report("cleaning user namespace")
+        names = []
+        pm = get_smash().project_manager
+        pdir = pm._current_project and pm.project_map[pm._current_project]
+        namespace = get_smash().shell.user_ns
+        for name, obj in namespace.items():
+            try:
+                fname = inspect.getfile(obj)
+            except TypeError:
+                # happens for anything that's not a module, class
+                # method, function, traceback, frame or code object
+                fname = None
+            if fname:
+                test = fname.startswith(venv)
+                if pdir is not None:
+                    test = test or fname.startswith(pdir)
+                if test and \
                         not name.startswith('_') and \
                         not name.startswith(SMASH_DIR):
-                        names.append(name)
-            for name in names:
-                del self.smash.shell.user_ns[name]
-            self.report("wiped from namespace: {0}".format(names))
+                    names.append(name)
+        for name in names:
+            del self.smash.shell.user_ns[name]
+        self.report("wiped from namespace: {0}".format(names))
 
     def activate(self, path):
         self.deactivate()
         #old_sys_path = [x for x in sys.path]
         self._activate(path)
         #sys.path_changes = set(sys.path) - set(old_sys_path)
-        #print 'that added',sys.path_changes
+        # print 'that added',sys.path_changes
 
     def _activate(self, path):
         absfpath = abspath(expanduser(path))
@@ -143,7 +149,7 @@ class VirtualEnvSupport(Plugin):
             # we call bullshit if they have a more than one dir;
             # it might be a chroot but i dont think it's a venv
             python_dir = glob.glob(opj(vlib, 'python*/'))
-            if len(python_dir)==0:
+            if len(python_dir) == 0:
                 raise RuntimeError('no python dir in {0}'.format(vlib))
             if len(python_dir) > 1:
                 err = "multiple python dirs matching in {0}".format(vlib)
@@ -157,7 +163,7 @@ class VirtualEnvSupport(Plugin):
             #assert ope(site_file)
             #tmp = dict(__file__=site_file)
             #execfile(site_file, tmp)
-            #tmp['main']()
+            # tmp['main']()
 
             # some environment variable manipulation that would
             # normally be done by 'source bin/activate', but is
@@ -165,7 +171,7 @@ class VirtualEnvSupport(Plugin):
             #path = get_path().split(':')
             os.environ['VIRTUAL_ENV'] = absfpath
 
-            sandbox = dict(__file__ = opj(vbin, 'activate_this.py'))
+            sandbox = dict(__file__=opj(vbin, 'activate_this.py'))
             execfile(opj(vbin, 'activate_this.py'), sandbox)
             self.reset_path = sandbox['prev_sys_path']
 
@@ -182,6 +188,7 @@ class VirtualEnvSupport(Plugin):
             self.report(msg)
             self.shell.magic('rehashx')
             self.publish(C_POST_ACTIVATE, absfpath)
+
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""

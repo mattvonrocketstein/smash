@@ -16,7 +16,7 @@ class RevealHelpPreprocessor(Preprocessor):
                          
                          For speaker notes to work, a local reveal.js prefix must be used.
                          """
-    )
+                         )
 
     def preprocess(self, nb, resources):
         """
@@ -33,8 +33,9 @@ class RevealHelpPreprocessor(Preprocessor):
 
         for index, cell in enumerate(nb.cells):
 
-            #Make sure the cell has slideshow metadata.
-            cell.metadata.slide_type = cell.get('metadata', {}).get('slideshow', {}).get('slide_type', '-')
+            # Make sure the cell has slideshow metadata.
+            cell.metadata.slide_type = cell.get('metadata', {}).get(
+                'slideshow', {}).get('slide_type', '-')
 
             # Get the slide type. If type is start, subslide, or slide,
             # end the last subslide/slide.

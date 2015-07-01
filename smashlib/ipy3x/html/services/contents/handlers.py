@@ -19,11 +19,12 @@ def sort_key(model):
     """key function for case-insensitive sort by name and type"""
     iname = model['name'].lower()
     type_key = {
-        'directory' : '0',
-        'notebook'  : '1',
-        'file'      : '2',
+        'directory': '0',
+        'notebook': '1',
+        'file': '2',
     }.get(model['type'], '9')
     return u'%s%s' % (type_key, iname)
+
 
 class ContentsHandler(IPythonHandler):
 
@@ -62,11 +63,12 @@ class ContentsHandler(IPythonHandler):
         if type_ not in {None, 'directory', 'file', 'notebook'}:
             raise web.HTTPError(400, u'Type %r is invalid' % type_)
 
-        format = self.get_query_argument('format', default=None)#
+        format = self.get_query_argument('format', default=None)
         if format not in {None, 'text', 'base64'}:
             raise web.HTTPError(400, u'Format %r is invalid' % format)
 
-        model = self.contents_manager.get(path=path, type_=type_, format=format)
+        model = self.contents_manager.get(
+            path=path, type_=type_, format=format)
         if model['type'] == 'directory':
             # group listing by type, then by name (case-insensitive)
             # FIXME: sorting should be done in the frontends
@@ -100,11 +102,12 @@ class ContentsHandler(IPythonHandler):
         model = self.contents_manager.new(model, path)
         self.set_status(201)
         self._finish_model(model)
-        
+
     def _new_untitled(self, path, type='', ext=''):
         """Create a new, empty untitled entity"""
         self.log.info(u"Creating new %s in %s", type or 'file', path)
-        model = self.contents_manager.new_untitled(path=path, type=type, ext=ext)
+        model = self.contents_manager.new_untitled(
+            path=path, type=type, ext=ext)
         self.set_status(201)
         self._finish_model(model)
 
@@ -205,7 +208,7 @@ class CheckpointsHandler(IPythonHandler):
         checkpoint = cm.create_checkpoint(path)
         data = json.dumps(checkpoint, default=date_default)
         location = url_path_join(self.base_url, 'api/contents',
-            path, 'checkpoints', checkpoint['id'])
+                                 path, 'checkpoints', checkpoint['id'])
         self.set_header('Location', url_escape(location))
         self.set_status(201)
         self.finish(data)
@@ -235,6 +238,7 @@ class ModifyCheckpointsHandler(IPythonHandler):
 
 
 class NotebooksRedirectHandler(IPythonHandler):
+
     """Redirect /api/notebooks to /api/contents"""
     SUPPORTED_METHODS = ('GET', 'PUT', 'PATCH', 'POST', 'DELETE')
 

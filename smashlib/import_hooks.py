@@ -2,15 +2,18 @@
 """
 
 import imp
-import os, sys
+import os
+import sys
 import logging
 import importlib
 
+
 class RewriteIPythonImport(object):
+
     def find_module(self, fullname, path=None):
         if fullname.startswith('IPython'):
-            new_fullname = ['smashlib','ipy3x']+fullname.split('.')[1:]
-            new_fullname='.'.join(new_fullname)
+            new_fullname = ['smashlib', 'ipy3x'] + fullname.split('.')[1:]
+            new_fullname = '.'.join(new_fullname)
             #logging.warning("import : {0}->{1}".format(fullname, new_fullname))
             self.path = path
             self.original_name = fullname
@@ -23,6 +26,7 @@ class RewriteIPythonImport(object):
         sys.modules[name] = result
         return result
 
+
 def hijack_ipython_module():
     found = False
     for x in sys.meta_path:
@@ -31,4 +35,4 @@ def hijack_ipython_module():
             break
     if not found:
         sys.meta_path.append(RewriteIPythonImport())
-hijack_ipython=hijack_ipython_module
+hijack_ipython = hijack_ipython_module

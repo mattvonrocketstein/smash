@@ -1,9 +1,14 @@
 """Contains eventful dict and list implementations."""
 
 # void function used as a callback placeholder.
-def _void(*p, **k): return None
+
+
+def _void(*p, **k):
+    return None
+
 
 class EventfulDict(dict):
+
     """Eventful dictionary.
 
     This class inherits from the Python intrinsic dictionary class, dict.  It
@@ -63,7 +68,7 @@ class EventfulDict(dict):
             callback should return a boolean True if the deletion should be
             canceled, False or None otherwise."""
         self._del_callback = callback if callable(callback) else _void
-        
+
     def on_set(self, callback):
         """Register a callback for when an item is changed in the dict.
 
@@ -76,14 +81,15 @@ class EventfulDict(dict):
             callback should return a boolean True if the change should be
             canceled, False or None otherwise."""
         self._set_callback = callback if callable(callback) else _void
-        
+
     def pop(self, key):
         """Returns the value of an item in the dictionary and then deletes the
         item from the dictionary."""
         if self._can_del(key):
             return dict.pop(self, key)
         else:
-            raise Exception('Cannot `pop`, deletion of key "{}" failed.'.format(key))
+            raise Exception(
+                'Cannot `pop`, deletion of key "{}" failed.'.format(key))
 
     def popitem(self):
         """Pop the next key/value pair from the dictionary."""
@@ -95,7 +101,7 @@ class EventfulDict(dict):
         overwriting any conflicting keys in this dictionary."""
         for (key, value) in other_dict.items():
             self[key] = value
-            
+
     def clear(self):
         """Clear the dictionary."""
         for key in list(self.keys()):
@@ -103,9 +109,9 @@ class EventfulDict(dict):
 
     def __setitem__(self, key, value):
         if (key in self and self._can_set(key, value)) or \
-        (key not in self and self._can_add(key, value)):
+                (key not in self and self._can_add(key, value)):
             return dict.__setitem__(self, key, value)
-        
+
     def __delitem__(self, key):
         if self._can_del(key):
             return dict.__delitem__(self, key)
@@ -124,6 +130,7 @@ class EventfulDict(dict):
 
 
 class EventfulList(list):
+
     """Eventful list.
 
     This class inherits from the Python intrinsic `list` class.  It adds events 
@@ -145,8 +152,8 @@ class EventfulList(list):
         self._reverse_callback = _void
         list.__init__(self, *pargs, **kwargs)
 
-    def on_events(self, insert_callback=None, set_callback=None, 
-        del_callback=None, reverse_callback=None, sort_callback=None):
+    def on_events(self, insert_callback=None, set_callback=None,
+                  del_callback=None, reverse_callback=None, sort_callback=None):
         """Register callbacks for add, set, and del actions.
 
         See the doctstrings for on_(insert/set/del/reverse/sort) for details 
@@ -175,7 +182,7 @@ class EventfulList(list):
             callback should return a boolean True if the insertion should be
             canceled, False or None otherwise."""
         self._insert_callback = callback if callable(callback) else _void
-        
+
     def on_del(self, callback):
         """Register a callback for item deletion.
 
@@ -188,7 +195,7 @@ class EventfulList(list):
             callback should return a boolean True if the deletion should be
             canceled, False or None otherwise."""
         self._del_callback = callback if callable(callback) else _void
-        
+
     def on_set(self, callback):
         """Register a callback for items are set.
 
@@ -202,7 +209,7 @@ class EventfulList(list):
             callback should return a boolean True if the set should be
             canceled, False or None otherwise."""
         self._set_callback = callback if callable(callback) else _void
-        
+
     def on_reverse(self, callback):
         """Register a callback for list reversal.
 
@@ -212,7 +219,7 @@ class EventfulList(list):
             callback should return a boolean True if the reverse should be
             canceled, False or None otherwise."""
         self._reverse_callback = callback if callable(callback) else _void
-        
+
     def on_sort(self, callback):
         """Register a callback for sortting of the list.
 
@@ -223,7 +230,7 @@ class EventfulList(list):
             should return a boolean True if the reverse should be canceled, 
             False or None otherwise."""
         self._sort_callback = callback if callable(callback) else _void
-        
+
     def append(self, x):
         """Add an item to the end of the list."""
         self[len(self):] = [x]
@@ -236,7 +243,7 @@ class EventfulList(list):
         """Remove the first item from the list whose value is x. It is an error 
         if there is no such item."""
         del self[self.index(x)]
-        
+
     def pop(self, i=None):
         """Remove the item at the given position in the list, and return it. If 
         no index is specified, a.pop() removes and returns the last item in the 
@@ -251,7 +258,7 @@ class EventfulList(list):
         """Reverse the elements of the list, in place."""
         if self._can_reverse():
             list.reverse(self)
-    
+
     def insert(self, index, value):
         """Insert an item at a given position. The first argument is the index 
         of the element before which to insert, so a.insert(0, x) inserts at the 
@@ -277,7 +284,7 @@ class EventfulList(list):
     def __setslice__(self, start, end, value):
         if self._can_set(slice(start, end), value):
             list.__setslice__(self, start, end, value)
-    
+
     def _can_insert(self, index, value):
         """Check if the item can be inserted."""
         return not bool(self._insert_callback(index, value))

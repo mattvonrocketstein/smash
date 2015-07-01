@@ -18,14 +18,14 @@ ENV_CONFIG_PATH = os.path.join(SMASH_ETC, 'env.json')
 PROMPT_CONFIG_PATH = os.path.join(SMASH_ETC, 'prompt.json')
 
 P_CODE_FILE = {
-    '.py':'python',
-    '.pp':'puppet',
-    '.md':'docs',
-    '.rst':'docs',
-    '.hs':'haskell',
-    'Vagrantfile':'vagrant',
-    'tox.ini':'tox',
-    }
+    '.py': 'python',
+    '.pp': 'puppet',
+    '.md': 'docs',
+    '.rst': 'docs',
+    '.hs': 'haskell',
+    'Vagrantfile': 'vagrant',
+    'tox.ini': 'tox',
+}
 """
 lcfg =  {
     'version': 1,

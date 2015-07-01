@@ -20,8 +20,11 @@ C_POST_DEACTIVATE = 'post_deactivate_venv'
 C_PRE_DEACTIVATE = 'pre_deactivate'
 
 # just examples
+
+
 def post_run_cell(bus, finished_input_interpretted):
-    print 'prc-',finished_input_interpretted
+    print 'prc-', finished_input_interpretted
+
 
 def post_run_input(bus, raw_finished_input):
     print 'pri-', raw_finished_input

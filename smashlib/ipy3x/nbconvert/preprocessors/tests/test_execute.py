@@ -20,7 +20,9 @@ from IPython.nbconvert.filters import strip_ansi
 
 addr_pat = re.compile(r'0x[0-9a-f]{7,9}')
 
+
 class TestExecute(PreprocessorTestsBase):
+
     """Contains test functions for execute.py"""
 
     @staticmethod
@@ -41,9 +43,8 @@ class TestExecute(PreprocessorTestsBase):
             for line in output['traceback']:
                 tb.append(strip_ansi(line))
             output['traceback'] = tb
-            
-        return output
 
+        return output
 
     def assert_notebooks_equal(self, expected, actual):
         expected_cells = expected['cells']
@@ -53,14 +54,17 @@ class TestExecute(PreprocessorTestsBase):
         for expected_cell, actual_cell in zip(expected_cells, actual_cells):
             expected_outputs = expected_cell.get('outputs', [])
             actual_outputs = actual_cell.get('outputs', [])
-            normalized_expected_outputs = list(map(self.normalize_output, expected_outputs))
-            normalized_actual_outputs = list(map(self.normalize_output, actual_outputs))
-            self.assertEqual(normalized_expected_outputs, normalized_actual_outputs)
+            normalized_expected_outputs = list(
+                map(self.normalize_output, expected_outputs))
+            normalized_actual_outputs = list(
+                map(self.normalize_output, actual_outputs))
+            self.assertEqual(
+                normalized_expected_outputs, normalized_actual_outputs)
 
-            expected_execution_count = expected_cell.get('execution_count', None)
+            expected_execution_count = expected_cell.get(
+                'execution_count', None)
             actual_execution_count = actual_cell.get('execution_count', None)
             self.assertEqual(expected_execution_count, actual_execution_count)
-
 
     def build_preprocessor(self):
         """Make an instance of a preprocessor"""
@@ -68,11 +72,9 @@ class TestExecute(PreprocessorTestsBase):
         preprocessor.enabled = True
         return preprocessor
 
-
     def test_constructor(self):
         """Can a ExecutePreprocessor be constructed?"""
         self.build_preprocessor()
-
 
     def test_run_notebooks(self):
         """Runs a series of test notebooks and compares them to their actual output"""

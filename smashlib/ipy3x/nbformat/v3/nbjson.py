@@ -16,7 +16,9 @@ from IPython.utils import py3compat
 
 
 class BytesEncoder(json.JSONEncoder):
+
     """A JSON encoder that accepts b64 (and other *ascii*) bytestrings."""
+
     def default(self, obj):
         if isinstance(obj, bytes):
             return obj.decode('ascii')
@@ -41,13 +43,13 @@ class JSONWriter(NotebookWriter):
         kwargs['cls'] = BytesEncoder
         kwargs['indent'] = 1
         kwargs['sort_keys'] = True
-        kwargs['separators'] = (',',': ')
+        kwargs['separators'] = (',', ': ')
         nb = copy.deepcopy(nb)
         nb = strip_transient(nb)
         if kwargs.pop('split_lines', True):
             nb = split_lines(nb)
         return py3compat.str_to_unicode(json.dumps(nb, **kwargs), 'utf-8')
-    
+
 
 _reader = JSONReader()
 _writer = JSONWriter()
@@ -57,4 +59,3 @@ read = _reader.read
 to_notebook = _reader.to_notebook
 write = _writer.write
 writes = _writer.writes
-

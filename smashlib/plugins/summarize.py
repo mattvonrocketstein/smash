@@ -24,12 +24,13 @@ def sloccount(_dir):
     tmp = tmp.split('Computing results.\n')[1:][0]
     tmp = [x for x in tmp.split('\n\n') if x]
     # strip leading newline from each section
-    tmp = [ (x if not x.startswith('\n') else x[1:]) for x in tmp ]
-    one,two,three = tmp
-    one = [x for x in one.split('\n') if x[0]!='0']
-    one= '\n'.join(one)
-    tmp = [x.strip() for x in [three, one, two,]]
+    tmp = [(x if not x.startswith('\n') else x[1:]) for x in tmp]
+    one, two, three = tmp
+    one = [x for x in one.split('\n') if x[0] != '0']
+    one = '\n'.join(one)
+    tmp = [x.strip() for x in [three, one, two, ]]
     return tmp
+
 
 def summarize(parameter_s=''):
     _dir = parameter_s or os.getcwd()
@@ -47,14 +48,18 @@ def summarize(parameter_s=''):
         print report_section.strip()
     console.draw_line()
 
+
 class Summarize(Plugin):
+
     def init(self):
         self.contribute_magic(summarize)
-        #self.contribute_magic(sloccount)
+        # self.contribute_magic(sloccount)
+
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     return Summarize(get_ipython()).install()
+
 
 def unload_ipython_extension(ip):
     """ called by %unload_ext magic"""

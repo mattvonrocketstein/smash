@@ -8,7 +8,9 @@ from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
 #from smashlib._logger import smash_log
 HANDLER_NAME = 'ShellHandler'
 
+
 class ShellHandler(PrefilterHandler):
+
     """ ShellHandler changes certain lines to system calls """
     handler_name = Unicode(HANDLER_NAME)
 
@@ -17,7 +19,9 @@ class ShellHandler(PrefilterHandler):
         #smash_log.info("shellhandler: {0}".format(cmd))
         return 'get_ipython().system(%r)' % (cmd, )
 
+
 class ShellChecker(PrefilterChecker):
+
     """ shell checker should really run before anything else """
 
     priority = 50

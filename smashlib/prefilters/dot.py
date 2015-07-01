@@ -7,7 +7,8 @@ from smashlib import get_smash
 from smashlib.channels import C_DOT_CMD
 from goulash.python import ope
 
-DOT_HANDLER_NAME   = 'DotHandler'
+DOT_HANDLER_NAME = 'DotHandler'
+
 
 class DotHandler(PrefilterHandler):
 
@@ -23,7 +24,9 @@ class DotHandler(PrefilterHandler):
         get_smash().publish(C_DOT_CMD, line)
         return ""
 
+
 class DotChecker(PrefilterChecker):
+
     """ shell checker should run before most other checkers! """
 
     priority = 50

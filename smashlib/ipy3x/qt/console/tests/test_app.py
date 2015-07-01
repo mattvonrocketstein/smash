@@ -20,8 +20,8 @@ from IPython.testing.decorators import skip_if_no_x11
 # Test functions
 #-----------------------------------------------------------------------------
 
+
 @skip_if_no_x11
 def test_help_output():
     """ipython qtconsole --help-all works"""
     tt.help_all_output_test('qtconsole')
-

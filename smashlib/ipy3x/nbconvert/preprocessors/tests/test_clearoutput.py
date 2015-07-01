@@ -10,8 +10,8 @@ from ..clearoutput import ClearOutputPreprocessor
 
 
 class TestClearOutput(PreprocessorTestsBase):
-    """Contains test functions for clearoutput.py"""
 
+    """Contains test functions for clearoutput.py"""
 
     def build_preprocessor(self):
         """Make an instance of a preprocessor"""

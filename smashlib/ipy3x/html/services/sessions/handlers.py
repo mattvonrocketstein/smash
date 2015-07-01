@@ -38,7 +38,8 @@ class SessionRootHandler(IPythonHandler):
         try:
             path = model['notebook']['path']
         except KeyError:
-            raise web.HTTPError(400, "Missing field in JSON data: notebook.path")
+            raise web.HTTPError(
+                400, "Missing field in JSON data: notebook.path")
         try:
             kernel_name = model['kernel']['name']
         except KeyError:
@@ -57,13 +58,15 @@ class SessionRootHandler(IPythonHandler):
                 status_msg = '%s not found' % kernel_name
                 self.log.warn('Kernel not found: %s' % kernel_name)
                 self.set_status(501)
-                self.finish(json.dumps(dict(message=msg, short_message=status_msg)))
+                self.finish(
+                    json.dumps(dict(message=msg, short_message=status_msg)))
                 return
 
         location = url_path_join(self.base_url, 'api', 'sessions', model['id'])
         self.set_header('Location', url_escape(location))
         self.set_status(201)
         self.finish(json.dumps(model, default=date_default))
+
 
 class SessionHandler(IPythonHandler):
 
@@ -119,4 +122,3 @@ default_handlers = [
     (r"/api/sessions/%s" % _session_id_regex, SessionHandler),
     (r"/api/sessions",  SessionRootHandler)
 ]
-

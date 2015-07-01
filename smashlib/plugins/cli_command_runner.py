@@ -5,7 +5,9 @@ from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 
+
 class RunCommand(Plugin):
+
     """ This plugin is responsible for doing the
         work whenever smash is invoked with "-c".
         Semantics are the same as "python -c" or
@@ -14,22 +16,21 @@ class RunCommand(Plugin):
     verbose = True
     command = None
 
-    def build_argparser(self):
-        parser = super(RunCommand, self).build_argparser()
-        parser.add_argument('-c','--command', default='')
-        return parser
+    def get_cli_arguments(self):
+        return [
+            [['-c', '--command'], dict(default='')]
+            ]
 
-    def parse_argv(self):
-        args, unknown = super(RunCommand, self).parse_argv()
+    def use_argv(self, args):
         if args.command:
             self.command = args.command
-        return args, unknown
 
     @receives_event(C_SMASH_INIT_COMPLETE)
     def run_command(self):
         if self.command is not None:
             self.smash.shell.run_cell(self.command)
             self.smash.shell.run_cell('exit')
+
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
@@ -39,6 +40,8 @@ def load_ipython_extension(ip):
 
 from smashlib import get_smash
 from goulash.python import splitext, ops
+
+
 def unload_ipython_extension(ip):
     plugin_name = splitext(ops(__file__)[-1])[0]
     raise Exception(plugin_name)

@@ -1,7 +1,9 @@
 """ smashlib.config
 """
-import os, shutil
-import demjson, voluptuous
+import os
+import shutil
+import demjson
+import voluptuous
 
 from IPython.core.profiledir import ProfileDir
 
@@ -15,6 +17,7 @@ from smashlib.exceptions import ConfigError
 
 report = Reporter("SmashConfig")
 
+
 def _find_schema(fname):
     fname = os.path.split(fname)[-1]
     fname = os.path.splitext(fname)[0]
@@ -22,6 +25,7 @@ def _find_schema(fname):
 
 
 class SmashConfig(object):
+
     """
     """
 
@@ -39,7 +43,7 @@ class SmashConfig(object):
                 data = demjson.decode(fhandle.read())
         except demjson.JSONDecodeError:
             err = "file is not json: {0}".format(absf)
-            #boot_log.critical(err)
+            # boot_log.critical(err)
             raise ConfigError(err)
         except IOError:
             report("{0} does not exist..".format(absf))
@@ -49,18 +53,17 @@ class SmashConfig(object):
                 if not isinstance(default, basestring):
                     default = demjson.encode(schema.default)
 
-
                 with open(absf, 'w') as fhandle:
                     fhandle.write(default)
                 return self.load_from_etc(fname, schema)
             else:
                 err = ("{0} does not exist, and no default"
                        " is defined").format(absf)
-                #boot_log.critical(err)
+                # boot_log.critical(err)
                 raise SystemExit(err)
         try:
             schema(data)
-        except voluptuous.Invalid,e:
+        except voluptuous.Invalid, e:
             raise SystemExit("error validating {0}\n\t{1}".format(absf, e))
         return data
 
@@ -85,7 +88,7 @@ class SmashConfig(object):
         """ """
         canonical_prof = os.path.join(SMASHLIB_DIR, 'ipython_config.py')
         ProfileDir.create_profile_dir_by_name(SMASH_DIR, main_profile_name)
-        profile_dir = os.path.join(SMASH_DIR, 'profile_'+main_profile_name)
+        profile_dir = os.path.join(SMASH_DIR, 'profile_' + main_profile_name)
         config_file = os.path.join(profile_dir, 'ipython_config.py')
         shutil.copy(canonical_prof, config_file,)
         return profile_dir
@@ -94,9 +97,11 @@ class SmashConfig(object):
     def ensure():
         smash_dir = SmashConfig.ensure_base_dir()
         smash_prof = SmashConfig.ensure_profile()
-        return dict(profile=smash_prof,dir=smash_dir)
+        return dict(profile=smash_prof, dir=smash_dir)
+
 
 class SmashUserConfig(object):
+
     @staticmethod
     def ensure():
         canonical_user_prof = os.path.join(
@@ -107,7 +112,7 @@ class SmashUserConfig(object):
     @staticmethod
     def load(env):
         print '..loading SmaSh user-config from:', USER_CONFIG_PATH
-        sandbox = env.copy();
+        sandbox = env.copy()
         sandbox.update(__file__=USER_CONFIG_PATH)
         execfile(USER_CONFIG_PATH, sandbox)
         return sandbox

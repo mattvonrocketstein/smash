@@ -25,6 +25,7 @@ from .utils import TIMEOUT, start_global_kernel, flush_channels, execute
 #-----------------------------------------------------------------------------
 KC = None
 
+
 def setup():
     global KC
     KC = start_global_kernel()
@@ -32,6 +33,7 @@ def setup():
 #-----------------------------------------------------------------------------
 # Message Spec References
 #-----------------------------------------------------------------------------
+
 
 class Reference(HasTraits):
 
@@ -59,12 +61,13 @@ class Reference(HasTraits):
 
 
 class Version(Unicode):
+
     def __init__(self, *args, **kwargs):
         self.min = kwargs.pop('min', None)
         self.max = kwargs.pop('max', None)
         kwargs['default_value'] = self.min
         super(Version, self).__init__(*args, **kwargs)
-    
+
     def validate(self, obj, value):
         if self.min and V(value) < V(self.min):
             raise TraitError("bad version: %s < %s" % (value, self.min))
@@ -78,12 +81,13 @@ class RMessage(Reference):
     header = Dict()
     parent_header = Dict()
     content = Dict()
-    
+
     def check(self, d):
         super(RMessage, self).check(d)
         RHeader().check(self.header)
         if self.parent_header:
             RHeader().check(self.parent_header)
+
 
 class RHeader(Reference):
     msg_id = Unicode()
@@ -94,20 +98,23 @@ class RHeader(Reference):
 
 mime_pat = re.compile(r'^[\w\-\+\.]+/[\w\-\+\.]+$')
 
+
 class MimeBundle(Reference):
     metadata = Dict()
     data = Dict()
+
     def _data_changed(self, name, old, new):
-        for k,v in iteritems(new):
+        for k, v in iteritems(new):
             assert mime_pat.match(k)
             nt.assert_is_instance(v, string_types)
 
 # shell replies
 
+
 class ExecuteReply(Reference):
     execution_count = Integer()
     status = Enum((u'ok', u'error'))
-    
+
     def check(self, d):
         Reference.check(self, d)
         if d['status'] == 'ok':
@@ -148,9 +155,11 @@ class CompleteReply(Reference):
     cursor_end = Integer()
     status = Unicode()
 
+
 class LanguageInfo(Reference):
     name = Unicode('python')
     version = Unicode(sys.version.split()[0])
+
 
 class KernelInfoReply(Reference):
     protocol_version = Version(min='5.0')
@@ -158,7 +167,7 @@ class KernelInfoReply(Reference):
     implementation_version = Version(min='2.1')
     language_info = Dict()
     banner = Unicode()
-    
+
     def check(self, d):
         Reference.check(self, d)
         LanguageInfo().check(d['language_info'])
@@ -166,11 +175,12 @@ class KernelInfoReply(Reference):
 
 class IsCompleteReply(Reference):
     status = Enum((u'complete', u'incomplete', u'invalid', u'unknown'))
-    
+
     def check(self, d):
         Reference.check(self, d)
         if d['status'] == 'incomplete':
             IsCompleteReplyIncomplete().check(d)
+
 
 class IsCompleteReplyIncomplete(Reference):
     indent = Unicode()
@@ -200,18 +210,18 @@ class ExecuteResult(MimeBundle):
 
 
 references = {
-    'execute_reply' : ExecuteReply(),
-    'inspect_reply' : InspectReply(),
-    'status' : Status(),
-    'complete_reply' : CompleteReply(),
+    'execute_reply': ExecuteReply(),
+    'inspect_reply': InspectReply(),
+    'status': Status(),
+    'complete_reply': CompleteReply(),
     'kernel_info_reply': KernelInfoReply(),
     'is_complete_reply': IsCompleteReply(),
-    'execute_input' : ExecuteInput(),
-    'execute_result' : ExecuteResult(),
-    'error' : Error(),
-    'stream' : Stream(),
-    'display_data' : DisplayData(),
-    'header' : RHeader(),
+    'execute_input': ExecuteInput(),
+    'execute_result': ExecuteResult(),
+    'error': Error(),
+    'stream': Stream(),
+    'display_data': DisplayData(),
+    'header': RHeader(),
 }
 """
 Specifications of `content` part of the reply messages.
@@ -220,10 +230,10 @@ Specifications of `content` part of the reply messages.
 
 def validate_message(msg, msg_type=None, parent=None):
     """validate a message
-    
+
     This is a generator, and must be iterated through to actually
     trigger each test.
-    
+
     If msg_type and/or parent are given, the msg_type and/or parent msg_id
     are compared with the given values.
     """
@@ -245,7 +255,7 @@ def validate_message(msg, msg_type=None, parent=None):
 
 def test_execute():
     flush_channels()
-    
+
     msg_id = KC.execute(code='x=1')
     reply = KC.get_shell_msg(timeout=TIMEOUT)
     validate_message(reply, 'execute_reply', msg_id)
@@ -254,7 +264,7 @@ def test_execute():
 def test_execute_silent():
     flush_channels()
     msg_id, reply = execute(code='x=1', silent=True)
-    
+
     # flush status=idle
     status = KC.iopub_channel.get_msg(timeout=TIMEOUT)
     validate_message(status, 'status', msg_id)
@@ -262,14 +272,14 @@ def test_execute_silent():
 
     nt.assert_raises(Empty, KC.iopub_channel.get_msg, timeout=0.1)
     count = reply['execution_count']
-    
+
     msg_id, reply = execute(code='x=2', silent=True)
-    
+
     # flush status=idle
     status = KC.iopub_channel.get_msg(timeout=TIMEOUT)
     validate_message(status, 'status', msg_id)
     nt.assert_equal(status['content']['execution_state'], 'idle')
-    
+
     nt.assert_raises(Empty, KC.iopub_channel.get_msg, timeout=0.1)
     count_2 = reply['execution_count']
     nt.assert_equal(count_2, count)
@@ -277,11 +287,11 @@ def test_execute_silent():
 
 def test_execute_error():
     flush_channels()
-    
+
     msg_id, reply = execute(code='1/0')
     nt.assert_equal(reply['status'], 'error')
     nt.assert_equal(reply['ename'], 'ZeroDivisionError')
-    
+
     error = KC.iopub_channel.get_msg(timeout=TIMEOUT)
     validate_message(error, 'error', msg_id)
 
@@ -292,12 +302,12 @@ def test_execute_inc():
 
     msg_id, reply = execute(code='x=1')
     count = reply['execution_count']
-    
+
     flush_channels()
-    
+
     msg_id, reply = execute(code='x=2')
     count_2 = reply['execution_count']
-    nt.assert_equal(count_2, count+1)
+    nt.assert_equal(count_2, count + 1)
 
 
 def test_user_expressions():
@@ -315,7 +325,8 @@ def test_user_expressions():
 def test_user_expressions_fail():
     flush_channels()
 
-    msg_id, reply = execute(code='x=0', user_expressions=dict(foo='nosuchname'))
+    msg_id, reply = execute(
+        code='x=0', user_expressions=dict(foo='nosuchname'))
     user_expressions = reply['user_expressions']
     foo = user_expressions['foo']
     nt.assert_equal(foo['status'], 'error')
@@ -334,7 +345,7 @@ def test_oinfo_found():
     flush_channels()
 
     msg_id, reply = execute(code='a=5')
-    
+
     msg_id = KC.inspect('a')
     reply = KC.get_shell_msg(timeout=TIMEOUT)
     validate_message(reply, 'inspect_reply', msg_id)
@@ -349,7 +360,7 @@ def test_oinfo_detail():
     flush_channels()
 
     msg_id, reply = execute(code='ip=get_ipython()')
-    
+
     msg_id = KC.inspect('ip.object_inspect', cursor_pos=10, detail_level=1)
     reply = KC.get_shell_msg(timeout=TIMEOUT)
     validate_message(reply, 'inspect_reply', msg_id)
@@ -374,7 +385,7 @@ def test_complete():
     flush_channels()
 
     msg_id, reply = execute(code="alpha = albert = 5")
-    
+
     msg_id = KC.complete('al', 2)
     reply = KC.get_shell_msg(timeout=TIMEOUT)
     validate_message(reply, 'complete_reply', msg_id)
@@ -393,15 +404,16 @@ def test_kernel_info_request():
 
 def test_single_payload():
     flush_channels()
-    msg_id, reply = execute(code="for i in range(3):\n"+
+    msg_id, reply = execute(code="for i in range(3):\n" +
                                  "   x=range?\n")
     payload = reply['payload']
     next_input_pls = [pl for pl in payload if pl["source"] == "set_next_input"]
     nt.assert_equal(len(next_input_pls), 1)
 
+
 def test_is_complete():
     flush_channels()
-    
+
     msg_id = KC.is_complete("a = 1")
     reply = KC.get_shell_msg(timeout=TIMEOUT)
     validate_message(reply, 'is_complete_reply', msg_id)
@@ -423,10 +435,10 @@ def test_stream():
 def test_display_data():
     flush_channels()
 
-    msg_id, reply = execute("from IPython.core.display import display; display(1)")
-    
+    msg_id, reply = execute(
+        "from IPython.core.display import display; display(1)")
+
     display = KC.iopub_channel.get_msg(timeout=TIMEOUT)
     validate_message(display, 'display_data', parent=msg_id)
     data = display['content']['data']
     nt.assert_equal(data['text/plain'], u'1')
-

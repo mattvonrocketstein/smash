@@ -62,26 +62,26 @@ def output_from_msg(msg):
 
     if msg_type == 'execute_result':
         return new_output(output_type=msg_type,
-            metadata=content['metadata'],
-            data=content['data'],
-            execution_count=content['execution_count'],
-        )
+                          metadata=content['metadata'],
+                          data=content['data'],
+                          execution_count=content['execution_count'],
+                          )
     elif msg_type == 'stream':
         return new_output(output_type=msg_type,
-            name=content['name'],
-            text=content['text'],
-        )
+                          name=content['name'],
+                          text=content['text'],
+                          )
     elif msg_type == 'display_data':
         return new_output(output_type=msg_type,
-            metadata=content['metadata'],
-            data=content['data'],
-        )
+                          metadata=content['metadata'],
+                          data=content['data'],
+                          )
     elif msg_type == 'error':
         return new_output(output_type=msg_type,
-            ename=content['ename'],
-            evalue=content['evalue'],
-            traceback=content['traceback'],
-        )
+                          ename=content['ename'],
+                          evalue=content['evalue'],
+                          traceback=content['traceback'],
+                          )
     else:
         raise ValueError("Unrecognized output msg type: %r" % msg_type)
 
@@ -100,6 +100,7 @@ def new_code_cell(source='', **kwargs):
     validate(cell, 'code_cell')
     return cell
 
+
 def new_markdown_cell(source='', **kwargs):
     """Create a new markdown cell"""
     cell = NotebookNode(
@@ -112,6 +113,7 @@ def new_markdown_cell(source='', **kwargs):
     validate(cell, 'markdown_cell')
     return cell
 
+
 def new_raw_cell(source='', **kwargs):
     """Create a new raw cell"""
     cell = NotebookNode(
@@ -123,6 +125,7 @@ def new_raw_cell(source='', **kwargs):
 
     validate(cell, 'raw_cell')
     return cell
+
 
 def new_notebook(**kwargs):
     """Create a new notebook"""

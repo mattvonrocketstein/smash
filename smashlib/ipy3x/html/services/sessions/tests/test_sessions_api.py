@@ -14,14 +14,17 @@ from IPython.html.tests.launchnotebook import NotebookTestBase, assert_http_erro
 from IPython.nbformat.v4 import new_notebook
 from IPython.nbformat import write
 
+
 class SessionAPI(object):
+
     """Wrapper for notebook API calls."""
+
     def __init__(self, base_url):
         self.base_url = base_url
 
     def _req(self, verb, path, body=None):
         response = requests.request(verb,
-                url_path_join(self.base_url, 'api/sessions', path), data=body)
+                                    url_path_join(self.base_url, 'api/sessions', path), data=body)
 
         if 400 <= response.status_code < 600:
             try:
@@ -39,19 +42,22 @@ class SessionAPI(object):
         return self._req('GET', id)
 
     def create(self, path, kernel_name='python'):
-        body = json.dumps({'notebook': {'path':path},
+        body = json.dumps({'notebook': {'path': path},
                            'kernel': {'name': kernel_name}})
         return self._req('POST', '', body)
 
     def modify(self, id, path):
-        body = json.dumps({'notebook': {'path':path}})
+        body = json.dumps({'notebook': {'path': path}})
         return self._req('PATCH', id, body)
 
     def delete(self, id):
         return self._req('DELETE', id)
 
+
 class SessionAPITest(NotebookTestBase):
+
     """Test the sessions web service API"""
+
     def setUp(self):
         nbdir = self.notebook_dir.name
         try:
@@ -83,7 +89,8 @@ class SessionAPITest(NotebookTestBase):
         newsession = resp.json()
         self.assertIn('id', newsession)
         self.assertEqual(newsession['notebook']['path'], 'foo/nb1.ipynb')
-        self.assertEqual(resp.headers['Location'], '/api/sessions/{0}'.format(newsession['id']))
+        self.assertEqual(
+            resp.headers['Location'], '/api/sessions/{0}'.format(newsession['id']))
 
         sessions = self.sess_api.list().json()
         self.assertEqual(sessions, [newsession])

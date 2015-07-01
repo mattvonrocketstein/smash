@@ -29,15 +29,16 @@ from IPython.utils.py3compat import (string_types, cast_bytes_py2, cast_unicode,
 from IPython.testing.skipdoctest import skip_doctest
 
 __all__ = ['display', 'display_pretty', 'display_html', 'display_markdown',
-'display_svg', 'display_png', 'display_jpeg', 'display_latex', 'display_json',
-'display_javascript', 'display_pdf', 'DisplayObject', 'TextDisplayObject',
-'Pretty', 'HTML', 'Markdown', 'Math', 'Latex', 'SVG', 'JSON', 'Javascript',
-'Image', 'clear_output', 'set_matplotlib_formats', 'set_matplotlib_close',
-'publish_display_data']
+           'display_svg', 'display_png', 'display_jpeg', 'display_latex', 'display_json',
+           'display_javascript', 'display_pdf', 'DisplayObject', 'TextDisplayObject',
+           'Pretty', 'HTML', 'Markdown', 'Math', 'Latex', 'SVG', 'JSON', 'Javascript',
+           'Image', 'clear_output', 'set_matplotlib_formats', 'set_matplotlib_close',
+           'publish_display_data']
 
 #-----------------------------------------------------------------------------
 # utility functions
 #-----------------------------------------------------------------------------
+
 
 def _safe_exists(path):
     """Check path, but don't let exceptions raise"""
@@ -45,6 +46,7 @@ def _safe_exists(path):
         return os.path.exists(path)
     except Exception:
         return False
+
 
 def _merge(d1, d2):
     """Like update, but merges sub-dicts instead of clobbering at the top level.
@@ -57,6 +59,7 @@ def _merge(d1, d2):
     for key, value in d2.items():
         d1[key] = _merge(d1.get(key), value)
     return d1
+
 
 def _display_mimetype(mimetype, objs, raw=False, metadata=None):
     """internal implementation of all display_foo methods
@@ -78,12 +81,13 @@ def _display_mimetype(mimetype, objs, raw=False, metadata=None):
         metadata = {mimetype: metadata}
     if raw:
         # turn list of pngdata into list of { 'image/png': pngdata }
-        objs = [ {mimetype: obj} for obj in objs ]
+        objs = [{mimetype: obj} for obj in objs]
     display(*objs, raw=raw, metadata=metadata, include=[mimetype])
 
 #-----------------------------------------------------------------------------
 # Main functions
 #-----------------------------------------------------------------------------
+
 
 def publish_display_data(data, metadata=None, source=None):
     """Publish data and metadata to all frontends.
@@ -126,6 +130,7 @@ def publish_display_data(data, metadata=None, source=None):
         data=data,
         metadata=metadata,
     )
+
 
 def display(*objs, **kwargs):
     """Display a Python object in all frontends.
@@ -177,7 +182,8 @@ def display(*objs, **kwargs):
         if raw:
             publish_display_data(data=obj, metadata=metadata)
         else:
-            format_dict, md_dict = format(obj, include=include, exclude=exclude)
+            format_dict, md_dict = format(
+                obj, include=include, exclude=exclude)
             if metadata:
                 # kwarg-specified metadata gets precedence
                 _merge(md_dict, metadata)
@@ -363,6 +369,7 @@ def display_pdf(*objs, **kwargs):
 
 
 class DisplayObject(object):
+
     """An object that wraps data to be displayed."""
 
     _read_flags = 'r'
@@ -442,11 +449,16 @@ class DisplayObject(object):
             except:
                 self.data = None
 
+
 class TextDisplayObject(DisplayObject):
+
     """Validate that display data is text"""
+
     def _check_data(self):
         if self.data is not None and not isinstance(self.data, string_types):
-            raise TypeError("%s expects text, not %r" % (self.__class__.__name__, self.data))
+            raise TypeError("%s expects text, not %r" %
+                            (self.__class__.__name__, self.data))
+
 
 class Pretty(TextDisplayObject):
 
@@ -538,6 +550,7 @@ lib_t1 = """$.getScript("%s", function () {
 lib_t2 = """});
 """
 
+
 class Javascript(TextDisplayObject):
 
     def __init__(self, data=None, url=None, filename=None, lib=None, css=None):
@@ -578,9 +591,9 @@ class Javascript(TextDisplayObject):
             css = [css]
         elif css is None:
             css = []
-        if not isinstance(lib, (list,tuple)):
+        if not isinstance(lib, (list, tuple)):
             raise TypeError('expected sequence, got: %r' % lib)
-        if not isinstance(css, (list,tuple)):
+        if not isinstance(css, (list, tuple)):
             raise TypeError('expected sequence, got: %r' % css)
         self.lib = lib
         self.css = css
@@ -593,29 +606,31 @@ class Javascript(TextDisplayObject):
         for l in self.lib:
             r += lib_t1 % l
         r += self.data
-        r += lib_t2*len(self.lib)
+        r += lib_t2 * len(self.lib)
         return r
 
 # constants for identifying png/jpeg data
 _PNG = b'\x89PNG\r\n\x1a\n'
 _JPEG = b'\xff\xd8'
 
+
 def _pngxy(data):
     """read the (width, height) from a PNG header"""
     ihdr = data.index(b'IHDR')
     # next 8 bytes are width/height
-    w4h4 = data[ihdr+4:ihdr+12]
+    w4h4 = data[ihdr + 4:ihdr + 12]
     return struct.unpack('>ii', w4h4)
+
 
 def _jpegxy(data):
     """read the (width, height) from a JPEG header"""
     # adapted from http://www.64lines.com/jpeg-width-height
-    
+
     idx = 4
     while True:
-        block_size = struct.unpack('>H', data[idx:idx+2])[0]
+        block_size = struct.unpack('>H', data[idx:idx + 2])[0]
         idx = idx + block_size
-        if data[idx:idx+2] == b'\xFF\xC0':
+        if data[idx:idx + 2] == b'\xFF\xC0':
             # found Start of Frame
             iSOF = idx
             break
@@ -623,8 +638,9 @@ def _jpegxy(data):
             # read another block
             idx += 2
 
-    h, w = struct.unpack('>HH', data[iSOF+5:iSOF+9])
+    h, w = struct.unpack('>HH', data[iSOF + 5:iSOF + 9])
     return w, h
+
 
 class Image(DisplayObject):
 
@@ -696,7 +712,8 @@ class Image(DisplayObject):
         elif url is not None:
             ext = self._find_ext(url)
         elif data is None:
-            raise ValueError("No image data found. Expecting filename, url, or data.")
+            raise ValueError(
+                "No image data found. Expecting filename, url, or data.")
         elif isinstance(data, string_types) and (
             data.startswith('http') or _safe_exists(data)
         ):
@@ -720,15 +737,16 @@ class Image(DisplayObject):
         self.embed = embed if embed is not None else (url is None)
 
         if self.embed and self.format not in self._ACCEPTABLE_EMBEDDINGS:
-            raise ValueError("Cannot embed the '%s' image format" % (self.format))
+            raise ValueError(
+                "Cannot embed the '%s' image format" % (self.format))
         self.width = width
         self.height = height
         self.retina = retina
         super(Image, self).__init__(data=data, url=url, filename=filename)
-        
+
         if retina:
             self._retina_shape()
-    
+
     def _retina_shape(self):
         """load pixel-doubled width and height from image data"""
         if not self.embed:
@@ -746,7 +764,7 @@ class Image(DisplayObject):
     def reload(self):
         """Reload the raw data from file or URL."""
         if self.embed:
-            super(Image,self).reload()
+            super(Image, self).reload()
             if self.retina:
                 self._retina_shape()
 
@@ -781,6 +799,7 @@ class Image(DisplayObject):
 
     def _find_ext(self, s):
         return unicode_type(s.split('.')[-1].lower())
+
 
 class Video(DisplayObject):
 
@@ -863,9 +882,11 @@ class Video(DisplayObject):
     def _repr_png_(self):
         # TODO
         pass
+
     def _repr_jpeg_(self):
         # TODO
         pass
+
 
 def clear_output(wait=False):
     """Clear the output of the current cell receiving output.
@@ -894,7 +915,7 @@ def set_matplotlib_formats(*formats, **kwargs):
         In [1]: set_matplotlib_formats('png', 'jpeg', quality=90)
 
     To set this in your config files use the following::
-    
+
         c.InlineBackend.figure_formats = {'png', 'jpeg'}
         c.InlineBackend.print_figure_kwargs.update({'quality' : 90})
 
@@ -916,22 +937,23 @@ def set_matplotlib_formats(*formats, **kwargs):
     shell = InteractiveShell.instance()
     select_figure_formats(shell, formats, **kw)
 
+
 @skip_doctest
 def set_matplotlib_close(close=True):
     """Set whether the inline backend closes all figures automatically or not.
-    
+
     By default, the inline backend used in the IPython Notebook will close all
     matplotlib figures automatically after each cell is run. This means that
     plots in different cells won't interfere. Sometimes, you may want to make
     a plot in one cell and then refine it in later cells. This can be accomplished
     by::
-    
+
         In [1]: set_matplotlib_close(False)
-    
+
     To set this in your config files use the following::
-    
+
         c.InlineBackend.close_figures = False
-    
+
     Parameters
     ----------
     close : bool
@@ -941,4 +963,3 @@ def set_matplotlib_close(close=True):
     from IPython.kernel.zmq.pylab.config import InlineBackend
     cfg = InlineBackend.instance()
     cfg.close_figures = close
-

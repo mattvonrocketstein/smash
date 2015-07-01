@@ -14,7 +14,9 @@ from .socket import DummySocket
 # Channel classes
 #-----------------------------------------------------------------------------
 
+
 class InProcessChannel(object):
+
     """Base class for in-process channels."""
     proxy_methods = []
 
@@ -41,7 +43,8 @@ class InProcessChannel(object):
 
         Subclasses should override this method to handle incoming messages.
         """
-        raise NotImplementedError('call_handlers must be defined in a subclass.')
+        raise NotImplementedError(
+            'call_handlers must be defined in a subclass.')
 
     #--------------------------------------------------------------------------
     # InProcessChannel interface
@@ -66,6 +69,7 @@ class InProcessChannel(object):
 
 
 class InProcessShellChannel(InProcessChannel):
+
     """See `IPython.kernel.channels.ShellChannel` for docstrings."""
 
     # flag for whether execute requests should be allowed to call raw_input
@@ -106,8 +110,8 @@ class InProcessShellChannel(InProcessChannel):
         if cursor_pos is None:
             cursor_pos = len(code)
         content = dict(code=code, cursor_pos=cursor_pos,
-            detail_level=detail_level,
-        )
+                       detail_level=detail_level,
+                       )
         msg = self.client.session.msg('inspect_request', content)
         self._dispatch_to_kernel(msg)
         return msg['header']['msg_id']
@@ -150,6 +154,7 @@ class InProcessShellChannel(InProcessChannel):
 
 
 class InProcessIOPubChannel(InProcessChannel):
+
     """See `IPython.kernel.channels.IOPubChannel` for docstrings."""
 
     def flush(self, timeout=1.0):
@@ -157,6 +162,7 @@ class InProcessIOPubChannel(InProcessChannel):
 
 
 class InProcessStdInChannel(InProcessChannel):
+
     """See `IPython.kernel.channels.StdInChannel` for docstrings."""
 
     proxy_methods = ['input']
@@ -169,6 +175,7 @@ class InProcessStdInChannel(InProcessChannel):
 
 
 class InProcessHBChannel(InProcessChannel):
+
     """See `IPython.kernel.channels.HBChannel` for docstrings."""
 
     time_to_dead = 3.0

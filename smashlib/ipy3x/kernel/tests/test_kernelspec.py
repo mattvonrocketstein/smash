@@ -7,11 +7,13 @@ from IPython.testing.decorators import onlyif
 from IPython.utils.tempdir import TemporaryDirectory
 from IPython.kernel import kernelspec
 
-sample_kernel_json = {'argv':['cat', '{connection_file}'],
-                      'display_name':'Test kernel',
-                     }
+sample_kernel_json = {'argv': ['cat', '{connection_file}'],
+                      'display_name': 'Test kernel',
+                      }
+
 
 class KernelSpecTests(unittest.TestCase):
+
     def setUp(self):
         td = TemporaryDirectory()
         self.addCleanup(td.cleanup)
@@ -22,7 +24,7 @@ class KernelSpecTests(unittest.TestCase):
             json.dump(sample_kernel_json, f)
 
         self.ksm = kernelspec.KernelSpecManager(ipython_dir=td.name)
-        
+
         td2 = TemporaryDirectory()
         self.addCleanup(td2.cleanup)
         self.installable_kernel = td2.name
@@ -39,21 +41,21 @@ class KernelSpecTests(unittest.TestCase):
         self.assertEqual(ks.argv, sample_kernel_json['argv'])
         self.assertEqual(ks.display_name, sample_kernel_json['display_name'])
         self.assertEqual(ks.env, {})
-    
+
     def test_install_kernel_spec(self):
         self.ksm.install_kernel_spec(self.installable_kernel,
                                      kernel_name='tstinstalled')
         self.assertIn('tstinstalled', self.ksm.find_kernel_specs())
-        
+
         with self.assertRaises(OSError):
             self.ksm.install_kernel_spec(self.installable_kernel,
                                          kernel_name='tstinstalled')
-        
+
         # Smoketest that this succeeds
         self.ksm.install_kernel_spec(self.installable_kernel,
                                      kernel_name='tstinstalled',
                                      replace=True)
-    
+
     @onlyif(os.name != 'nt' and not os.access('/usr/local/share', os.W_OK), "needs Unix system without root privileges")
     def test_cant_install_kernel_spec(self):
         with self.assertRaises(OSError):

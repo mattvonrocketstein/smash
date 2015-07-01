@@ -13,9 +13,10 @@ from report import report
 
 from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 from IPython.terminal.interactiveshell import \
-     TerminalInteractiveShell as BaseTIS
+    TerminalInteractiveShell as BaseTIS
 from IPython.utils.traitlets import Instance, Type
 from IPython.core.displayhook import DisplayHook
+from IPython.utils.strdispatch import StrDispatch
 
 from smashlib import get_smash
 from smashlib._logging import smash_log
@@ -25,11 +26,13 @@ from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_COMMAND_FAIL
 from smashlib.util import split_on_unquoted_semicolons, is_path
 from smashlib.bin.pybcompgen import complete
 
+
 class SmashDisplayHook(DisplayHook):
+
     def finish_displayhook(self):
         """Finish up all displayhook activities."""
         try:
-            super(SmashDisplayHook,self).finish_displayhook()
+            super(SmashDisplayHook, self).finish_displayhook()
         except AttributeError, e:
             # occasionally throws
             # IOStream instance has no attribute 'flush'
@@ -40,7 +43,8 @@ class SmashDisplayHook(DisplayHook):
 
 def smash_bash_complete(*args, **kargs):
     result = complete(*args, **kargs)
-    return [ x for x in result if x not in keyword.kwlist ]
+    return [x for x in result if x not in keyword.kwlist]
+
 
 class SmashTerminalInteractiveShell(BaseTIS):
 
@@ -49,6 +53,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
     input_splitter = Instance('smashlib.inputsplitter.SmashInputSplitter',
                               (), {'line_input_checker': True})
     displayhook_class = Type(SmashDisplayHook)
+
     def showsyntaxerror(self, filename=None):
         """ when a syntax error is encountered,
             consider just broadcasting a signal instead
@@ -66,7 +71,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
             sooper = super(SmashTerminalInteractiveShell, self)
             return sooper.showsyntaxerror(filename=filename)
 
-    def __init__(self,*args,**kargs):
+    def __init__(self, *args, **kargs):
         sooper = super(SmashTerminalInteractiveShell, self)
         sooper.__init__(*args, **kargs)
         self._smash_last_input = ""
@@ -95,7 +100,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
                     self._smash_last_input, etype, evalue)
                 if handled:
                     return
-        return sooper._showtraceback(etype,evalue,stb)
+        return sooper._showtraceback(etype, evalue, stb)
 
     # NOTE: when run-cell runs, input is finished
     def run_cell(self, raw_cell, store_history=False,
@@ -122,24 +127,61 @@ class SmashTerminalInteractiveShell(BaseTIS):
                 # translated-input
                 this = self.user_ns['In'][-1].strip()
                 # untranslated-input
-                last_input=self._smash_last_input
+                last_input = self._smash_last_input
                 self.smash.publish(C_POST_RUN_CELL, this)
                 self.smash.publish(C_POST_RUN_INPUT, last_input)
             self._smash_last_input = ""
         return [out]
 
     def system(self, cmd, quiet=False, **kargs):
-        #print 'wrapping system call',cmd
-        result = super(SmashTerminalInteractiveShell,self).system(cmd,**kargs)
-        error = self.user_ns['_exit_code'] # put exit code into bash for lp?s
-        #if error:
+        # print 'wrapping system call',cmd
+        result = super(SmashTerminalInteractiveShell, self).system(
+            cmd, **kargs)
+        error = self.user_ns['_exit_code']  # put exit code into bash for lp?s
+        # if error:
         #    get_smash().publish(C_COMMAND_FAIL, cmd, error)
         if not quiet and result:
             print result
-TerminalInteractiveShell=SmashTerminalInteractiveShell
+
+    def init_completer(self):
+        #
+        # copied for modification from smashlib.ipy3x.core.interactiveshell
+        #
+        from smashlib.completion import SmashCompleter
+        from IPython.core.completerlib import (module_completer,
+                                               magic_run_completer, cd_completer, reset_completer)
+
+        self.Completer = SmashCompleter(
+            shell=self,
+            namespace=self.user_ns,
+            global_namespace=self.user_global_ns,
+            use_readline=self.has_readline,
+            parent=self,)
+
+        self.configurables.append(self.Completer)
+
+        # Add custom completers to the basic ones built into IPCompleter
+        sdisp = self.strdispatchers.get('complete_command', StrDispatch())
+        self.strdispatchers['complete_command'] = sdisp
+        self.Completer.custom_completers = sdisp
+
+        self.set_hook('complete_command', module_completer, str_key='import')
+        self.set_hook('complete_command', module_completer, str_key='from')
+        self.set_hook('complete_command', magic_run_completer, str_key='%run')
+        self.set_hook('complete_command', cd_completer, str_key='%cd')
+        self.set_hook('complete_command', reset_completer, str_key='%reset')
+
+        # Only configure readline if we truly are using readline.  IPython can
+        # do tab-completion over the network, in GUIs, etc, where readline
+        # itself may be absent
+        if self.has_readline:
+            self.set_readline_completer()
+
+TerminalInteractiveShell = SmashTerminalInteractiveShell
 
 
 class SmashTerminalIPythonApp(BaseTIA):
+
     @classmethod
     def launch_instance(cls, argv=None, **kwargs):
         app = cls.instance(**kwargs)
@@ -154,20 +196,24 @@ class SmashTerminalIPythonApp(BaseTIA):
             ipython_dir=self.ipython_dir,
             user_ns=self.user_ns)
         self.shell.configurables.append(self)
+
         def smash_matcher(text):
-            #print 'smash_matcher',text #dbg
+            # print 'smash_matcher',text #dbg
             line = self.shell.Completer.readline.get_line_buffer()
+            if not line.strip():
+                return []
             first_word = line.split()[0]
             magic_command_alias = first_word.startswith('%') and \
-                                  have_command_alias(first_word[1:])
+                have_command_alias(first_word[1:])
             naked_command_alias = have_command_alias(first_word)
-            #print 'smash_matcher',text,naked_command_alias,magic_command_alias #dbg
+            # print
+            # 'smash_matcher',text,naked_command_alias,magic_command_alias #dbg
             if naked_command_alias:
                 return smash_bash_complete(line)
             if magic_command_alias:
                 return smash_bash_complete(line[1:])
             return []
         self.shell.Completer.matchers = [smash_matcher] + \
-                                        self.shell.Completer.matchers
+            self.shell.Completer.matchers
 TerminalIPythonApp = SmashTerminalIPythonApp
 launch_new_instance = TerminalIPythonApp.launch_instance

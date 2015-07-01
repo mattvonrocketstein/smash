@@ -7,9 +7,11 @@ from smashlib.channels import C_REHASH_EVENT
 from smashlib.util.events import receives_event
 
 from goulash.util import summarize_fpath
+from goulash._fabric import qlocal
 from report import Reporter as R
 
 report = R("which")
+
 
 class EnhancedWhich(Plugin):
 
@@ -19,14 +21,20 @@ class EnhancedWhich(Plugin):
         self._install('fake_bus')
 
     def which(self, query):
-        system_result = self.smash.system('which {0}'.format(query)).strip()
+        #system_result = self.smash.system('which {0}'.format(query)).strip()
+        system_result = qlocal('which {0}'.format(query), capture=True).strip()
         try:
-            python_result = __import__(query) #sys.modules.get(query, None)
+            python_result = __import__(query)  # sys.modules.get(query, None)
         except ImportError, e:
-            self.report("error importing: "+str(e))
+            #self.report("error importing: "+str(e))
             python_result = None
         if system_result:
-            report.system("{0}".format(system_result))
+            report.system('{0}'.format(system_result))
+            finfo = qlocal('file "{0}"'.format(system_result), capture=True)
+            finfo = finfo.strip()
+            if finfo:
+                finfo = ' '.join(finfo.split()[1:])
+                report.system('  type: {0}'.format(finfo))
         if python_result:
             fpath = getattr(python_result, '__file__', '__builtin__')
             fpath = summarize_fpath(fpath)
@@ -55,12 +63,14 @@ class EnhancedWhich(Plugin):
                 "tmp = _smash.shell._last_input_line",
                 "himself.which(tmp.split()[-1])",
                 #"print tmp.split()[-1]"
-                ])
+            ])
+
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     ip = get_ipython()
     return EnhancedWhich(ip)
+
 
 def unload_ipython_extension(ip):
     pass

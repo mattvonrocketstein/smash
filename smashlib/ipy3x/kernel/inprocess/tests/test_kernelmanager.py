@@ -12,6 +12,7 @@ from IPython.kernel.inprocess.manager import InProcessKernelManager
 # Test case
 #-----------------------------------------------------------------------------
 
+
 class InProcessKernelManagerTestCase(unittest.TestCase):
 
     def test_interface(self):
@@ -66,7 +67,7 @@ class InProcessKernelManagerTestCase(unittest.TestCase):
         msg = kc.get_shell_msg()
         self.assertEqual(msg['header']['msg_type'], 'complete_reply')
         self.assertEqual(sorted(msg['content']['matches']),
-                          ['my_bar', 'my_baz'])
+                         ['my_bar', 'my_baz'])
 
     def test_inspect(self):
         """ Does requesting object information from an in-process kernel work?

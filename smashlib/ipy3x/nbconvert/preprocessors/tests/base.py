@@ -10,8 +10,8 @@ from ...exporters.exporter import ResourcesDict
 
 
 class PreprocessorTestsBase(TestsBase):
-    """Contains test functions preprocessor tests"""
 
+    """Contains test functions preprocessor tests"""
 
     def build_notebook(self):
         """Build a notebook in memory for use with preprocessor tests"""
@@ -23,19 +23,20 @@ class PreprocessorTestsBase(TestsBase):
             nbformat.new_output("stream", name="stdout", text="d"),
             nbformat.new_output("stream", name="stderr", text="e"),
             nbformat.new_output("stream", name="stderr", text="f"),
-            nbformat.new_output("display_data", data={'image/png': 'Zw=='}), # g
-            nbformat.new_output("display_data", data={'application/pdf': 'aA=='}), # h
+            nbformat.new_output(
+                "display_data", data={'image/png': 'Zw=='}),  # g
+            nbformat.new_output(
+                "display_data", data={'application/pdf': 'aA=='}),  # h
         ]
-        
-        cells=[nbformat.new_code_cell(source="$ e $", execution_count=1, outputs=outputs),
-               nbformat.new_markdown_cell(source="$ e $")]
+
+        cells = [nbformat.new_code_cell(source="$ e $", execution_count=1, outputs=outputs),
+                 nbformat.new_markdown_cell(source="$ e $")]
 
         return nbformat.new_notebook(cells=cells)
 
-
     def build_resources(self):
         """Build an empty resources dictionary."""
-        
+
         res = ResourcesDict()
         res['metadata'] = ResourcesDict()
         return res

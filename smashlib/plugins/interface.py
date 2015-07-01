@@ -2,8 +2,11 @@
     NB: plugin-related obviously, but this is not a plugin
 """
 
+
 class AbstractInterface(object):
+
     """ """
+
     def __repr__(self):
         return self.__class__.__name__
 
@@ -15,6 +18,7 @@ class AbstractInterface(object):
     @property
     def __doc__(self):
         self.update()
+
 
 class PluginInterface(AbstractInterface):
 
@@ -38,6 +42,7 @@ class PluginInterface(AbstractInterface):
 
     def update(self):
         tmp = self._plugins
+
         def fxn(name):
             return self.smash._installed_plugins[name]
         for name in tmp:
@@ -46,9 +51,9 @@ class PluginInterface(AbstractInterface):
             tmp2.__doc__ = tmp3
             prop = property(tmp2)
             setattr(self.__class__, name, prop)
-        whitelist = ['edit','smash', 'update']
+        whitelist = ['edit', 'smash', 'update']
         for x in dir(self):
             if not x.startswith('_') and \
-                   x not in tmp and \
-                   x not in whitelist:
+                    x not in tmp and \
+                    x not in whitelist:
                 raise ValueError("interface is not clean")

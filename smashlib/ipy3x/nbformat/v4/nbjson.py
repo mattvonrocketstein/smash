@@ -15,7 +15,9 @@ from .rwbase import (
 
 
 class BytesEncoder(json.JSONEncoder):
+
     """A JSON encoder that accepts b64 (and other *ascii*) bytestrings."""
+
     def default(self, obj):
         if isinstance(obj, bytes):
             return obj.decode('ascii')
@@ -32,7 +34,7 @@ class JSONReader(NotebookReader):
 
     def to_notebook(self, d, **kwargs):
         """Convert a disk-format notebook dict to in-memory NotebookNode
-        
+
         handles multi-line values as strings, scrubbing of transient values, etc.
         """
         nb = from_dict(d)
@@ -48,7 +50,7 @@ class JSONWriter(NotebookWriter):
         kwargs['cls'] = BytesEncoder
         kwargs['indent'] = 1
         kwargs['sort_keys'] = True
-        kwargs['separators'] = (',',': ')
+        kwargs['separators'] = (',', ': ')
         # don't modify in-memory dict
         nb = copy.deepcopy(nb)
         if kwargs.pop('split_lines', True):

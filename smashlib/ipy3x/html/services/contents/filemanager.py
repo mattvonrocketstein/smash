@@ -32,7 +32,7 @@ class FileContentsManager(ContentsManager):
             return self.parent.notebook_dir
         except AttributeError:
             return getcwd()
-    
+
     @contextmanager
     def perm_to_403(self, os_path=''):
         """context manager for turning permission errors into 403"""
@@ -49,22 +49,23 @@ class FileContentsManager(ContentsManager):
                 raise web.HTTPError(403, u'Permission denied: %s' % path)
             else:
                 raise
-    
+
     @contextmanager
     def open(self, os_path, *args, **kwargs):
         """wrapper around io.open that turns permission errors into 403"""
         with self.perm_to_403(os_path):
             with io.open(os_path, *args, **kwargs) as f:
                 yield f
-    
+
     @contextmanager
     def atomic_writing(self, os_path, *args, **kwargs):
         """wrapper around atomic_writing that turns permission errors into 403"""
         with self.perm_to_403(os_path):
             with atomic_writing(os_path, *args, **kwargs) as f:
                 yield f
-    
+
     save_script = Bool(False, config=True, help='DEPRECATED, IGNORED')
+
     def _save_script_changed(self):
         self.log.warn("""
         Automatically saving notebooks as scripts has been removed.
@@ -81,13 +82,13 @@ class FileContentsManager(ContentsManager):
             raise TraitError("%r is not a directory" % new)
 
     checkpoint_dir = Unicode('.ipynb_checkpoints', config=True,
-        help="""The directory name in which to keep file checkpoints
+                             help="""The directory name in which to keep file checkpoints
 
         This is a path relative to the file's own directory.
 
         By default, it is .ipynb_checkpoints
         """
-    )
+                             )
 
     def _copy(self, src, dest):
         """copy src to dest
@@ -226,8 +227,8 @@ class FileContentsManager(ContentsManager):
             raise web.HTTPError(404, four_o_four)
         elif is_hidden(os_path, self.root_dir):
             self.log.info("Refusing to serve hidden directory %r, via 404 Error",
-                os_path
-            )
+                          os_path
+                          )
             raise web.HTTPError(404, four_o_four)
 
         model = self._base_model(path)
@@ -273,7 +274,8 @@ class FileContentsManager(ContentsManager):
         if content:
             if not os.path.isfile(os_path):
                 # could be FIFO
-                raise web.HTTPError(400, "Cannot get content of non-file %s" % os_path)
+                raise web.HTTPError(
+                    400, "Cannot get content of non-file %s" % os_path)
             with self.open(os_path, 'rb') as f:
                 bcontent = f.read()
 
@@ -282,16 +284,17 @@ class FileContentsManager(ContentsManager):
                     model['content'] = bcontent.decode('utf8')
                 except UnicodeError as e:
                     if format == 'text':
-                        raise web.HTTPError(400, "%s is not UTF-8 encoded" % path)
+                        raise web.HTTPError(
+                            400, "%s is not UTF-8 encoded" % path)
                 else:
                     model['format'] = 'text'
 
             if model['content'] is None:
-                model['content'] = base64.encodestring(bcontent).decode('ascii')
+                model['content'] = base64.encodestring(
+                    bcontent).decode('ascii')
                 model['format'] = 'base64'
 
         return model
-
 
     def _notebook_model(self, path, content=True):
         """Build a notebook model
@@ -307,7 +310,8 @@ class FileContentsManager(ContentsManager):
                 try:
                     nb = nbformat.read(f, as_version=4)
                 except Exception as e:
-                    raise web.HTTPError(400, u"Unreadable Notebook: %s %r" % (os_path, e))
+                    raise web.HTTPError(
+                        400, u"Unreadable Notebook: %s %r" % (os_path, e))
             self.mark_trusted_cells(nb, path)
             model['content'] = nb
             model['format'] = 'json'
@@ -345,14 +349,14 @@ class FileContentsManager(ContentsManager):
         if os.path.isdir(os_path):
             if type_ not in (None, 'directory'):
                 raise web.HTTPError(400,
-                                u'%s is a directory, not a %s' % (path, type_))
+                                    u'%s is a directory, not a %s' % (path, type_))
             model = self._dir_model(path, content=content)
         elif type_ == 'notebook' or (type_ is None and path.endswith('.ipynb')):
             model = self._notebook_model(path, content=content)
         else:
             if type_ == 'directory':
                 raise web.HTTPError(400,
-                                u'%s is not a directory')
+                                    u'%s is not a directory')
             model = self._file_model(path, content=content, format=format)
         return model
 
@@ -370,7 +374,8 @@ class FileContentsManager(ContentsManager):
         """save a non-notebook file"""
         fmt = model.get('format', None)
         if fmt not in {'text', 'base64'}:
-            raise web.HTTPError(400, "Must specify format of file contents as 'text' or 'base64'")
+            raise web.HTTPError(
+                400, "Must specify format of file contents as 'text' or 'base64'")
         try:
             content = model['content']
             if fmt == 'text':
@@ -379,14 +384,16 @@ class FileContentsManager(ContentsManager):
                 b64_bytes = content.encode('ascii')
                 bcontent = base64.decodestring(b64_bytes)
         except Exception as e:
-            raise web.HTTPError(400, u'Encoding error saving %s: %s' % (os_path, e))
+            raise web.HTTPError(
+                400, u'Encoding error saving %s: %s' % (os_path, e))
         with self.atomic_writing(os_path, text=False) as f:
             f.write(bcontent)
 
     def _save_directory(self, os_path, model, path=''):
         """create a directory"""
         if is_hidden(os_path, self.root_dir):
-            raise web.HTTPError(400, u'Cannot create hidden directory %r' % os_path)
+            raise web.HTTPError(
+                400, u'Cannot create hidden directory %r' % os_path)
         if not os.path.exists(os_path):
             with self.perm_to_403():
                 os.mkdir(os_path)
@@ -418,12 +425,15 @@ class FileContentsManager(ContentsManager):
             elif model['type'] == 'directory':
                 self._save_directory(os_path, model, path)
             else:
-                raise web.HTTPError(400, "Unhandled contents type: %s" % model['type'])
+                raise web.HTTPError(
+                    400, "Unhandled contents type: %s" % model['type'])
         except web.HTTPError:
             raise
         except Exception as e:
-            self.log.error(u'Error while saving file: %s %s', path, e, exc_info=True)
-            raise web.HTTPError(500, u'Unexpected error while saving file: %s %s' % (path, e))
+            self.log.error(
+                u'Error while saving file: %s %s', path, e, exc_info=True)
+            raise web.HTTPError(
+                500, u'Unexpected error while saving file: %s %s' % (path, e))
 
         validation_message = None
         if model['type'] == 'notebook':
@@ -455,7 +465,8 @@ class FileContentsManager(ContentsManager):
         rm = os.unlink
         if os.path.isdir(os_path):
             listing = os.listdir(os_path)
-            # don't delete non-empty directories (checkpoints dir doesn't count)
+            # don't delete non-empty directories (checkpoints dir doesn't
+            # count)
             if listing and listing != [self.checkpoint_dir]:
                 raise web.HTTPError(400, u'Directory %s not empty' % os_path)
         elif not os.path.isfile(os_path):
@@ -500,7 +511,8 @@ class FileContentsManager(ContentsManager):
         except web.HTTPError:
             raise
         except Exception as e:
-            raise web.HTTPError(500, u'Unknown error renaming file: %s %s' % (old_path, e))
+            raise web.HTTPError(
+                500, u'Unknown error renaming file: %s %s' % (old_path, e))
 
         # Move the checkpoints
         old_checkpoints = self.list_checkpoints(old_path)
@@ -509,7 +521,8 @@ class FileContentsManager(ContentsManager):
             old_cp_path = self.get_checkpoint_path(checkpoint_id, old_path)
             new_cp_path = self.get_checkpoint_path(checkpoint_id, new_path)
             if os.path.isfile(old_cp_path):
-                self.log.debug("Renaming checkpoint %s -> %s", old_cp_path, new_cp_path)
+                self.log.debug(
+                    "Renaming checkpoint %s -> %s", old_cp_path, new_cp_path)
                 with self.perm_to_403():
                     shutil.move(old_cp_path, new_cp_path)
 
@@ -540,8 +553,8 @@ class FileContentsManager(ContentsManager):
         stats = os.stat(cp_path)
         last_modified = tz.utcfromtimestamp(stats.st_mtime)
         info = dict(
-            id = checkpoint_id,
-            last_modified = last_modified,
+            id=checkpoint_id,
+            last_modified=last_modified,
         )
         return info
 
@@ -576,7 +589,6 @@ class FileContentsManager(ContentsManager):
         else:
             return [self.get_checkpoint_model(checkpoint_id, path)]
 
-
     def restore_checkpoint(self, checkpoint_id, path):
         """restore a file to a checkpointed state"""
         path = path.strip('/')
@@ -586,9 +598,11 @@ class FileContentsManager(ContentsManager):
         if not os.path.isfile(cp_path):
             self.log.debug("checkpoint file does not exist: %s", cp_path)
             raise web.HTTPError(404,
-                u'checkpoint does not exist: %s@%s' % (path, checkpoint_id)
-            )
-        # ensure notebook is readable (never restore from an unreadable notebook)
+                                u'checkpoint does not exist: %s@%s' % (
+                                    path, checkpoint_id)
+                                )
+        # ensure notebook is readable (never restore from an unreadable
+        # notebook)
         if cp_path.endswith('.ipynb'):
             with self.open(cp_path, 'r', encoding='utf-8') as f:
                 nbformat.read(f, as_version=4)
@@ -602,8 +616,9 @@ class FileContentsManager(ContentsManager):
         cp_path = self.get_checkpoint_path(checkpoint_id, path)
         if not os.path.isfile(cp_path):
             raise web.HTTPError(404,
-                u'Checkpoint does not exist: %s@%s' % (path, checkpoint_id)
-            )
+                                u'Checkpoint does not exist: %s@%s' % (
+                                    path, checkpoint_id)
+                                )
         self.log.debug("unlinking %s", cp_path)
         os.unlink(cp_path)
 

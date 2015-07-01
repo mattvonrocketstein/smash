@@ -15,14 +15,16 @@ from IPython.utils.traitlets import Instance
 
 class SessionManager(LoggingConfigurable):
 
-    kernel_manager = Instance('IPython.html.services.kernels.kernelmanager.MappingKernelManager')
-    contents_manager = Instance('IPython.html.services.contents.manager.ContentsManager', args=())
-    
+    kernel_manager = Instance(
+        'IPython.html.services.kernels.kernelmanager.MappingKernelManager')
+    contents_manager = Instance(
+        'IPython.html.services.contents.manager.ContentsManager', args=())
+
     # Session database initialized below
     _cursor = None
     _connection = None
     _columns = {'session_id', 'path', 'kernel_id'}
-    
+
     @property
     def cursor(self):
         """Start a cursor and create a database called 'session'"""
@@ -39,7 +41,7 @@ class SessionManager(LoggingConfigurable):
             self._connection = sqlite3.connect(':memory:')
             self._connection.row_factory = sqlite3.Row
         return self._connection
-        
+
     def __del__(self):
         """Close connection once SessionManager closes"""
         self.cursor.close()
@@ -69,11 +71,11 @@ class SessionManager(LoggingConfigurable):
 
     def save_session(self, session_id, path=None, kernel_id=None):
         """Saves the items for the session with the given session_id
-        
+
         Given a session_id (and any other of the arguments), this method
         creates a row in the sqlite session database that holds the information
         for a session.
-        
+
         Parameters
         ----------
         session_id : str
@@ -82,20 +84,20 @@ class SessionManager(LoggingConfigurable):
             the path for the given notebook
         kernel_id : str
             a uuid for the kernel associated with this session
-        
+
         Returns
         -------
         model : dict
             a dictionary of the session model
         """
         self.cursor.execute("INSERT INTO session VALUES (?,?,?)",
-            (session_id, path, kernel_id)
-        )
+                            (session_id, path, kernel_id)
+                            )
         return self.get_session(session_id=session_id)
 
     def get_session(self, **kwargs):
         """Returns the model for a particular session.
-        
+
         Takes a keyword argument and searches for the value in the session
         database, then returns the rest of the session's info.
 
@@ -140,10 +142,10 @@ class SessionManager(LoggingConfigurable):
 
     def update_session(self, session_id, **kwargs):
         """Updates the values in the session database.
-        
+
         Changes the values of the session with the given session_id
         with the values from the keyword arguments. 
-        
+
         Parameters
         ----------
         session_id : str
@@ -173,7 +175,7 @@ class SessionManager(LoggingConfigurable):
             # The kernel was killed or died without deleting the session.
             # We can't use delete_session here because that tries to find
             # and shut down the kernel.
-            self.cursor.execute("DELETE FROM session WHERE session_id=?", 
+            self.cursor.execute("DELETE FROM session WHERE session_id=?",
                                 (row['session_id'],))
             raise KeyError
 
@@ -205,4 +207,5 @@ class SessionManager(LoggingConfigurable):
         # Check that session exists before deleting
         session = self.get_session(session_id=session_id)
         self.kernel_manager.shutdown_kernel(session['kernel']['id'])
-        self.cursor.execute("DELETE FROM session WHERE session_id=?", (session_id,))
+        self.cursor.execute(
+            "DELETE FROM session WHERE session_id=?", (session_id,))

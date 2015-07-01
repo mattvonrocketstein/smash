@@ -120,15 +120,16 @@ else:
 
 
 __all__ = ['pretty', 'pprint', 'PrettyPrinter', 'RepresentationPrinter',
-    'for_type', 'for_type_by_name']
+           'for_type', 'for_type_by_name']
 
 
 MAX_SEQ_LENGTH = 1000
 _re_pattern_type = type(re.compile(''))
 
+
 def _safe_getattr(obj, attr, default=None):
     """Safe version of getattr.
-    
+
     Same as getattr, but will return ``default`` on any Exception,
     rather than raising.
     """
@@ -137,12 +138,14 @@ def _safe_getattr(obj, attr, default=None):
     except Exception:
         return default
 
+
 def pretty(obj, verbose=False, max_width=79, newline='\n', max_seq_length=MAX_SEQ_LENGTH):
     """
     Pretty print the object's representation.
     """
     stream = StringIO()
-    printer = RepresentationPrinter(stream, verbose, max_width, newline, max_seq_length)
+    printer = RepresentationPrinter(
+        stream, verbose, max_width, newline, max_seq_length)
     printer.pretty(obj)
     printer.flush()
     return stream.getvalue()
@@ -152,11 +155,13 @@ def pprint(obj, verbose=False, max_width=79, newline='\n', max_seq_length=MAX_SE
     """
     Like `pretty` but print to stdout.
     """
-    printer = RepresentationPrinter(sys.stdout, verbose, max_width, newline, max_seq_length)
+    printer = RepresentationPrinter(
+        sys.stdout, verbose, max_width, newline, max_seq_length)
     printer.pretty(obj)
     printer.flush()
     sys.stdout.write(newline)
     sys.stdout.flush()
+
 
 class _PrettyPrinterBase(object):
 
@@ -178,7 +183,9 @@ class _PrettyPrinterBase(object):
         finally:
             self.end_group(indent, close)
 
+
 class PrettyPrinter(_PrettyPrinterBase):
+
     """
     Baseclass for the `RepresentationPrinter` prettyprinter that is used to
     generate pretty reprs of objects.  Contrary to the `RepresentationPrinter`
@@ -247,7 +254,7 @@ class PrettyPrinter(_PrettyPrinterBase):
             self.buffer.append(Breakable(sep, width, self))
             self.buffer_width += width
             self._break_outer_groups()
-            
+
     def break_(self):
         """
         Explicitly insert a newline into the output, maintaining correct indentation.
@@ -257,7 +264,6 @@ class PrettyPrinter(_PrettyPrinterBase):
         self.output.write(' ' * self.indentation)
         self.output_width = self.indentation
         self.buffer_width = 0
-        
 
     def begin_group(self, indent=0, open=''):
         """
@@ -283,7 +289,7 @@ class PrettyPrinter(_PrettyPrinterBase):
         self.group_stack.append(group)
         self.group_queue.enq(group)
         self.indentation += indent
-    
+
     def _enumerate(self, seq):
         """like enumerate, but with an upper limit on the number of items"""
         for idx, x in enumerate(seq):
@@ -293,7 +299,7 @@ class PrettyPrinter(_PrettyPrinterBase):
                 self.text('...')
                 raise StopIteration
             yield idx, x
-    
+
     def end_group(self, dedent=0, close=''):
         """End a group. See `begin_group` for more details."""
         self.indentation -= dedent
@@ -331,6 +337,7 @@ def _get_mro(obj_class):
 
 
 class RepresentationPrinter(PrettyPrinter):
+
     """
     Special pretty printer that has a `pretty` method that calls the pretty
     printer for a python object.
@@ -346,10 +353,11 @@ class RepresentationPrinter(PrettyPrinter):
     """
 
     def __init__(self, output, verbose=False, max_width=79, newline='\n',
-        singleton_pprinters=None, type_pprinters=None, deferred_pprinters=None,
-        max_seq_length=MAX_SEQ_LENGTH):
+                 singleton_pprinters=None, type_pprinters=None, deferred_pprinters=None,
+                 max_seq_length=MAX_SEQ_LENGTH):
 
-        PrettyPrinter.__init__(self, output, max_width, newline, max_seq_length=max_seq_length)
+        PrettyPrinter.__init__(
+            self, output, max_width, newline, max_seq_length=max_seq_length)
         self.verbose = verbose
         self.stack = []
         if singleton_pprinters is None:
@@ -593,7 +601,8 @@ def _set_pprinter_factory(start, end, basetype):
         else:
             step = len(start)
             p.begin_group(step, start)
-            # Like dictionary keys, we will try to sort the items if there aren't too many
+            # Like dictionary keys, we will try to sort the items if there
+            # aren't too many
             items = obj
             if not (p.max_seq_length and len(obj) >= p.max_seq_length):
                 try:
@@ -625,7 +634,8 @@ def _dict_pprinter_factory(start, end, basetype=None):
             return p.text('{...}')
         p.begin_group(1, start)
         keys = obj.keys()
-        # if dict isn't large enough to be truncated, sort keys before displaying
+        # if dict isn't large enough to be truncated, sort keys before
+        # displaying
         if not (p.max_seq_length and len(obj) >= p.max_seq_length):
             try:
                 keys = sorted(keys)
@@ -669,7 +679,7 @@ def _re_pattern_pprint(obj, p, cycle):
         p.breakable()
         done_one = False
         for flag in ('TEMPLATE', 'IGNORECASE', 'LOCALE', 'MULTILINE', 'DOTALL',
-            'UNICODE', 'VERBOSE', 'DEBUG'):
+                     'UNICODE', 'VERBOSE', 'DEBUG'):
             if obj.flags & getattr(re, flag):
                 if done_one:
                     p.text('|')
@@ -701,7 +711,7 @@ def _repr_pprint(obj, p, cycle):
     """A pprint that just redirects to the normal repr function."""
     # Find newlines and replace them with p.break_()
     output = repr(obj)
-    for idx,output_line in enumerate(output.splitlines()):
+    for idx, output_line in enumerate(output.splitlines()):
         if idx:
             p.break_()
         p.text(output_line)
@@ -746,7 +756,7 @@ _type_pprinters = {
     tuple:                      _seq_pprinter_factory('(', ')', tuple),
     list:                       _seq_pprinter_factory('[', ']', list),
     dict:                       _dict_pprinter_factory('{', '}', dict),
-    
+
     set:                        _set_pprinter_factory('{', '}', set),
     frozenset:                  _set_pprinter_factory('frozenset({', '})', frozenset),
     super:                      _super_pprint,
@@ -755,19 +765,20 @@ _type_pprinters = {
     types.FunctionType:         _function_pprint,
     types.BuiltinFunctionType:  _function_pprint,
     types.MethodType:           _repr_pprint,
-    
+
     datetime.datetime:          _repr_pprint,
     datetime.timedelta:         _repr_pprint,
     _exception_base:            _exception_pprint
 }
 
 try:
-    _type_pprinters[types.DictProxyType] = _dict_pprinter_factory('<dictproxy {', '}>')
+    _type_pprinters[types.DictProxyType] = _dict_pprinter_factory(
+        '<dictproxy {', '}>')
     _type_pprinters[types.ClassType] = _type_pprint
     _type_pprinters[types.SliceType] = _repr_pprint
-except AttributeError: # Python 3
+except AttributeError:  # Python 3
     _type_pprinters[slice] = _repr_pprint
-    
+
 try:
     _type_pprinters[xrange] = _repr_pprint
     _type_pprinters[long] = _repr_pprint
@@ -780,15 +791,18 @@ except NameError:
 _deferred_type_pprinters = {
 }
 
+
 def for_type(typ, func):
     """
     Add a pretty printer for a given type.
     """
     oldfunc = _type_pprinters.get(typ, None)
     if func is not None:
-        # To support easy restoration of old pprinters, we need to ignore Nones.
+        # To support easy restoration of old pprinters, we need to ignore
+        # Nones.
         _type_pprinters[typ] = func
     return oldfunc
+
 
 def for_type_by_name(type_module, type_name, func):
     """
@@ -798,19 +812,22 @@ def for_type_by_name(type_module, type_name, func):
     key = (type_module, type_name)
     oldfunc = _deferred_type_pprinters.get(key, None)
     if func is not None:
-        # To support easy restoration of old pprinters, we need to ignore Nones.
+        # To support easy restoration of old pprinters, we need to ignore
+        # Nones.
         _deferred_type_pprinters[key] = func
     return oldfunc
 
 
 #: printers for the default singletons
 _singleton_pprinters = dict.fromkeys(map(id, [None, True, False, Ellipsis,
-                                      NotImplemented]), _repr_pprint)
+                                              NotImplemented]), _repr_pprint)
 
 
 if __name__ == '__main__':
     from random import randrange
+
     class Foo(object):
+
         def __init__(self):
             self.foo = 1
             self.bar = re.compile(r'\s+')

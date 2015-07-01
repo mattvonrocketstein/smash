@@ -27,6 +27,7 @@ from IPython.utils.localinterfaces import localhost
 
 
 class Heartbeat(Thread):
+
     "A simple ping-pong style heartbeat that runs in a thread."
 
     def __init__(self, context, addr=None):
@@ -55,7 +56,8 @@ class Heartbeat(Thread):
         self.socket = self.context.socket(zmq.REP)
         self.socket.linger = 1000
         c = ':' if self.transport == 'tcp' else '-'
-        self.socket.bind('%s://%s' % (self.transport, self.ip) + c + str(self.port))
+        self.socket.bind('%s://%s' %
+                         (self.transport, self.ip) + c + str(self.port))
         while True:
             try:
                 zmq.device(zmq.FORWARDER, self.socket, self.socket)

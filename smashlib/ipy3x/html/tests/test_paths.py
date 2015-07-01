@@ -4,10 +4,10 @@ import nose.tools as nt
 
 from IPython.html.base.handlers import path_regex, notebook_path_regex
 
-try: # py3
+try:  # py3
     assert_regex = nt.assert_regex
     assert_not_regex = nt.assert_not_regex
-except AttributeError: # py2
+except AttributeError:  # py2
     assert_regex = nt.assert_regexp_matches
     assert_not_regex = nt.assert_not_regexp_matches
 
@@ -15,6 +15,7 @@ except AttributeError: # py2
 # build regexps that tornado uses:
 path_pat = re.compile('^' + '/x%s' % path_regex + '$')
 nb_path_pat = re.compile('^' + '/y%s' % notebook_path_regex + '$')
+
 
 def test_path_regex():
     for path in (
@@ -26,6 +27,7 @@ def test_path_regex():
         '/x/foo/bar.txt',
     ):
         assert_regex(path, path_pat)
+
 
 def test_path_regex_bad():
     for path in (
@@ -40,6 +42,7 @@ def test_path_regex_bad():
     ):
         assert_not_regex(path, path_pat)
 
+
 def test_notebook_path_regex():
     for path in (
         '/y/asdf.ipynb',
@@ -47,6 +50,7 @@ def test_notebook_path_regex():
         '/y/a/b/c/d/e.ipynb',
     ):
         assert_regex(path, nb_path_pat)
+
 
 def test_notebook_path_regex_bad():
     for path in (

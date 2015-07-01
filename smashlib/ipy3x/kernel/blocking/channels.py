@@ -63,6 +63,7 @@ class BlockingIOPubChannel(BlockingChannelMixin, IOPubChannel):
 
 
 class BlockingShellChannel(BlockingChannelMixin, ShellChannel):
+
     def call_handlers(self, msg):
         if msg['msg_type'] == 'kernel_info_reply':
             self._handle_kernel_info_reply(msg)
