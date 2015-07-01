@@ -18,7 +18,7 @@ import glob
 
 from IPython.core.magic import Magics, magics_class, line_magic
 
-from goulash.util import summarize_fpath
+from goulash._os import summarize_fpath
 from goulash.venv import get_venv, to_vbin, to_vlib, get_path
 
 from smashlib import get_smash

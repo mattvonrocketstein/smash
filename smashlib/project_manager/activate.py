@@ -2,7 +2,7 @@
 """
 
 from goulash.venv import contains_venv
-from goulash.util import summarize_fpath
+from goulash._os import summarize_fpath
 from goulash._fabric import require_bin, MissingSystemCommand
 
 from .operation import OperationStep, NullOperationStep

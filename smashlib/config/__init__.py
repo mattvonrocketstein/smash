@@ -47,9 +47,9 @@ class SmashConfig(object):
             # boot_log.critical(err)
             raise ConfigError(err)
         except IOError:
-            report("{0} does not exist..".format(absf))
+            self.log.debug("{0} does not exist..".format(absf))
             if getattr(schema, 'default', None) is not None:
-                report("..but a default is defined.  writing file")
+                self.log.debug("..but a default is defined.  writing file")
                 default = schema.default
                 if not isinstance(default, basestring):
                     default = demjson.encode(schema.default)
@@ -61,6 +61,7 @@ class SmashConfig(object):
                 err = ("{0} does not exist, and no default"
                        " is defined").format(absf)
                 # boot_log.critical(err)
+                self.log.critical(err)
                 raise SystemExit(err)
         try:
             schema(data)

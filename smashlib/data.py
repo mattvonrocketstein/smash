@@ -2,6 +2,7 @@
 """
 import os
 from goulash.python import expanduser, opj, dirname
+from goulash._os import home
 
 main_profile_name = 'SmaSh'
 user_config_name = 'config.py'
