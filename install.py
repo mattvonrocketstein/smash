@@ -26,7 +26,7 @@ from fabric import api as fab_api
 from goulash.venv import is_venv, to_vbin
 
 DOT_SMASH = os.path.abspath(os.path.expanduser('~/.smash'))
-IPY_VERSION = '3.0.0-dev'
+
 SMASH_SETUP_PY = os.path.abspath(os.path.join(
     os.path.dirname(__file__),
     'setup.py'))
@@ -43,66 +43,6 @@ class InstallCommand(install):
         else:
             self.report("creating smash venv")
             self.fab_api.local('virtualenv --no-site-packages '+DOT_SMASH)
-
-    def venv_ipython(self):
-        venv_ipython = os.path.join(DOT_SMASH, 'bin', 'ipython')
-        with fab_api.quiet():
-            result =  fab_api.local(
-                '{0} --version'.format(venv_ipython),
-                capture=True)
-        return result
-
-    def add_ipython(self):
-        pass #self.report("smash requires dev version of ipython.  looking for it..")
-        #result = self.venv_ipython()
-        #have_ipy = result.succeeded
-        #good_IPY_VERSION = result.succeeded and (result.strip()==IPY_VERSION)
-        #if have_ipy:
-        #    self.report("{0} has ipython..".format(DOT_SMASH))
-        #    if good_IPY_VERSION:
-        #        self.report(".. and the version is correct")
-        #    else:
-        #        msg = "..but the version is wrong. getting the correct version"
-        #        self.report(msg)
-        #        self.clone_ipython(IPY_VERSION)
-        #else:
-        #    msg = "ipython not found.  getting the correct version"
-        #    self.report(msg)
-        #    self.clone_ipython(IPY_VERSION)
-
-        if not good_IPY_VERSION:
-            self.report("installing ipython into smash venv")
-            if self.__class__==InstallCommand:
-                cmd = "cd {0} && {1} setup.py install"
-            elif self.__class__==DevelopCommand:
-                cmd = "cd {0} && {1} setup.py develop"
-            fab_api.local(cmd.format(
-                os.path.join(DOT_SMASH,'ipython'),
-                os.path.join(DOT_SMASH, 'bin','python')))
-
-#    def clone_ipython(self, version):
-#        return
-#        url = 'http://github.com/ipython/ipython.git'
-#        #or..  https://github.com/ipython/ipython/archive/master.zip
-#        self.report("cloning the official repo.  this might take a while")
-#        self.report("clone url: "+url)
-#        ipy_clone_path = os.path.join(DOT_SMASH, 'ipython')
-#        if not os.path.exists(ipy_clone_path):
-#            with fab_api.settings(warn_only=True):
-#                cmd = ('cd {0} && '
-#                       'git clone --verbose --branch master '
-#                       '--single-branch --depth 1 {1}')
-#                result = fab_api.local(
-#                    cmd.format(DOT_SMASH, url),
-#                    capture=True)
-#            if not result.succeeded:
-#                print result
-#                err = 'failed to clone.  check your network connection?'
-#                self.report(err)
-#                raise SystemExit()
-#        else:
-#            self.report('official repo is already already cloned..')
-#            self.report('.. will not update it')
 
     def report(self, msg):
         red(msg)
@@ -170,7 +110,6 @@ class InstallCommand(install):
         self._require_bin('virtualenv', 'python-virtualenv')
         self._require_bin('git', 'git-core')
         self.build_smash_venv()
-        #self.add_ipython()
         self.add_smashlib()
 
 class DevelopCommand(InstallCommand):

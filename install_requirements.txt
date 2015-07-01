@@ -1,2 +1,2 @@
 fabric
-goulash==0.66
+goulash

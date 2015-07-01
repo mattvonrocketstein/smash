@@ -39,7 +39,6 @@ class CommandLineMixin(object):
             [('-p', '--project',), dict(default='')]
             ]
 
-
     def use_argv(self, args):
         if args.project:
             # cannot effect the change here due to some race condition.
@@ -163,11 +162,6 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
             return
         else:
             self._bind_one(base_dir)
-
-    #@receives_event(C_REHASH_EVENT)
-    # def refresh(self, none):
-    #    # TODO: deprecate
-    #    [ self._bind_one(x) for x in set(self.search_dirs)]
 
     def _bind_one(self, base_dir):
         base_dir = os.path.abspath(os.path.expanduser(base_dir))

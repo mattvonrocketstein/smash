@@ -10,7 +10,7 @@ from smashlib.util.events import receives_event
 from smashlib.channels import C_UPDATE_PROMPT_REQUEST
 from smashlib.config import SmashConfig
 from smashlib.prompt.component import PromptComponent
-
+from smashlib._logging import smash_log
 DEFAULT_IN_TEMPLATE = u'In [\\#]: '
 DEFAULT_PROMPT = [
     PromptComponent(type='literal',
@@ -35,14 +35,12 @@ class SmashPrompt(Plugin):
         c = SmashConfig()
         components = c.load_from_etc('prompt.json')
         if not components:
-            components = [
-                DEFAULT_PROMPT
-            ]
-        else:
-            out = []
-            for component in components:
-                out.append(PromptComponent(**component))
-            components = out
+            components = DEFAULT_PROMPT
+
+        out = []
+        for component in components:
+            out.append(PromptComponent(**component))
+        components = out
         self.prompt_components = components
 
     def init(self):
@@ -57,6 +55,8 @@ class SmashPrompt(Plugin):
     def get_prompt(self):
         prompt = '\n'
         for component in self.prompt_components:
+            smash_log.debug("calling prompt component: "+str(component))
+            assert callable(component),str("bad prompt component: " + str(component))
             prompt += component()
         prompt = prompt.replace('  ', ' ')
         return prompt
