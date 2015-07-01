@@ -14,6 +14,7 @@ from smashlib.data import USER_CONFIG_PATH
 from smashlib.data import SMASH_ETC, SMASH_DIR, SMASHLIB_DIR, main_profile_name
 from smashlib._logging import smash_log
 from smashlib.exceptions import ConfigError
+from smashlib._logging import smash_log
 
 report = Reporter("SmashConfig")
 
@@ -111,7 +112,9 @@ class SmashUserConfig(object):
 
     @staticmethod
     def load(env):
-        print '..loading SmaSh user-config from:', USER_CONFIG_PATH
+        msg = '..loading SmaSh user-config from: {0}'
+        msg = msg.format(USER_CONFIG_PATH)
+        smash_log.debug(msg)
         sandbox = env.copy()
         sandbox.update(__file__=USER_CONFIG_PATH)
         execfile(USER_CONFIG_PATH, sandbox)

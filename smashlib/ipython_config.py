@@ -10,7 +10,6 @@
 from smashlib.editor import get_editor
 from smashlib._logging import smash_log
 msg = '..loading system config: ' + __file__
-print msg
 smash_log.debug(msg)
 
 _ = get_config()  # NOQA
@@ -131,14 +130,14 @@ config.update_from_etc(projects.venv_map, 'venvs.json')
 # configure the ipython app
 ##########################################################################
 app = _.InteractiveShellApp
-app.extensions.append("autoreload")
 app.exec_lines.append("""%rehashx""")
 app.exec_lines.append("""ip = get_ipython()""")
 app.exec_lines.append("""cfg = ip.config""")
 app.exec_lines.append("""_smash = ip._smash""")
-app.exec_lines.append('%autoreload 2')
-app.exec_lines.append(
-    'print("Warning: disable autoreload in ipython_config.py to improve performance.")')
+#app.extensions.append("autoreload")
+#app.exec_lines.append('%autoreload 2')
+# app.exec_lines.append(
+#    'print("Warning: disable autoreload in ipython_config.py to improve performance.")')
 
 
 # load smash user config.  NB: this must happen last!

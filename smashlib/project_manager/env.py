@@ -2,7 +2,7 @@
 """
 import os
 
-
+from smashlib.ipy3x.core.magics.osm import OSMagics
 class EnvMixin(object):
 
     """ EnvMixin provides env.json-reading
@@ -16,7 +16,7 @@ class EnvMixin(object):
         tmp = self._get_env_group(group_name)
         for k, v in tmp:
             self.report("setting {0} {1}".format(k, v))
-            self.smash.shell.magic("env {0} {1}".format(k, v))
+            OSMagics().set_env("{0} {1}".format(k, v), quiet=True)
         self.report("Loaded {0} env-vars".format(len(tmp)))
 
     def _unload_env_group(self, group_name):

@@ -47,7 +47,7 @@ class Smash(Plugin):
         p.text(repr(self))
 
     def system(self, cmd, quiet=False):
-        self.report("run: " + cmd, force=True)
+        #self.report("run: " + cmd, force=True)
         return qlocal(cmd, capture=True)
 
     def init_magics(self):
@@ -86,9 +86,20 @@ class Smash(Plugin):
         get_ipython().user_ns.update(plugins=plugin_iface)
         self.report("loaded plugins:", _installed_plugins.keys())
 
+    def get_cli_arguments(self):
+        return [[['--version', ], dict(default=False, action='store_true')]]
+
     def build_argparser(self):
+        """ builds the main smash cl-option parser,
+            based on data from plugins.  this is weird,
+            because we have to bootstrap all the plugins
+            long before parsing command line options, but
+            is very flexible since it allows the plugins
+            themselves to modify command line options.
+        """
         parser = argparse.ArgumentParser()
-        for plugin in self._installed_plugins.values():
+        plugins = [self] + self._installed_plugins.values()
+        for plugin in plugins:
             clopts = plugin.get_cli_arguments()
             for clopt in clopts:
                 args, kargs = clopt
@@ -102,15 +113,11 @@ class Smash(Plugin):
         # whatever you're doing probably belongs in a separate plugin
         return parser
 
-    def parse_argv(self):
-        parser = self.build_argparser()
-        try:
-            args, unknown = parser.parse_known_args(sys.argv[1:])
-        except SystemExit:
-            self.die('exiting at request of argparser')
-        if len(vars(args)):
-            self.report("parsed argv: " + str(args))
-        return args, unknown
+    def use_argv(self, args):
+        if args.version:
+            from smashlib.version import __version__ as version
+            print version
+            self.die()
 
     def parse_argv(self):
         """ parse arguments recognized by myself,
@@ -119,7 +126,8 @@ class Smash(Plugin):
         """
         parser = self.build_argparser()
         args = parser.parse_args()
-        for plugin in self._installed_plugins.values():
+        plugins = [self] + self._installed_plugins.values()
+        for plugin in plugins:
             plugin.use_argv(args)
         return args
         #main_args, unknown = super(Smash,self).parse_argv()

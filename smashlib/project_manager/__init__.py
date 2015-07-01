@@ -26,9 +26,10 @@ from .check import Check, NullCheck
 from .test import Test, NullTest
 from .deactivate import Deactivation, NullDeactivation
 from .defaults import ACTIVATE, CHECK, TEST, DEACTIVATE
+from .env import EnvMixin
 
 from smashlib.aliases import AliasMixin
-from smashlib.env import EnvMixin
+
 
 
 class CommandLineMixin(object):

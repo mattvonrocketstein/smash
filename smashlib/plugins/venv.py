@@ -129,7 +129,8 @@ class VirtualEnvSupport(Plugin):
                     names.append(name)
         for name in names:
             del self.smash.shell.user_ns[name]
-        self.report("wiped from namespace: {0}".format(names))
+        if names:
+            self.report("wiped from namespace: {0}".format(names))
 
     def activate(self, path):
         self.deactivate()

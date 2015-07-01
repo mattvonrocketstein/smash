@@ -400,7 +400,7 @@ class OSMagics(Magics):
         return dict(os.environ)
 
     @line_magic
-    def set_env(self, parameter_s):
+    def set_env(self, parameter_s, quiet=False):
         """Set environment variables.  Assumptions are that either "val" is a
         name in the user namespace, or val is something that evaluates to a
         string.
@@ -426,7 +426,8 @@ class OSMagics(Magics):
             raise UsageError(err)
         os.environ[
             py3compat.cast_bytes_py2(var)] = py3compat.cast_bytes_py2(val)
-        print('env: {0}={1}'.format(var, val))
+        if not quiet:
+            print('env: {0}={1}'.format(var, val))
 
     @line_magic
     def pushd(self, parameter_s=''):
