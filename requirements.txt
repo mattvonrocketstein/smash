@@ -11,7 +11,7 @@ asciitable
 fabric
 flake8
 pywhich
-goulash==0.64
+goulash==0.66
 reporting==0.32
 voluptuous==0.8.6
 Importing==1.10
