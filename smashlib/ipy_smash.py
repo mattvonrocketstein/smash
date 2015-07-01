@@ -117,7 +117,7 @@ class Smash(Plugin):
         if args.version:
             from smashlib.version import __version__ as version
             print version
-            self.die()
+            self.shell.exit()
 
     def parse_argv(self):
         """ parse arguments recognized by myself,
@@ -147,7 +147,7 @@ class Smash(Plugin):
         try:
             self.parse_argv()
         except SystemExit:
-            self.die()
+            self.shell.exit()
         self.init_macros()
         self.init_config_inheritance()
         if data.SMASH_BIN not in os.environ['PATH']:

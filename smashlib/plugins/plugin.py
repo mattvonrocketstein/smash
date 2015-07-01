@@ -88,11 +88,11 @@ class APlugin(object):
             self.report("uninstalling magic: {0}".format(m))
             del self.shell.magics_manager.magics['line'][m.__name__]
 
-    def die(self, msg=''):
-        if msg:
-            smash_log.debug(msg)
-        self.smash.shell.run_cell('exit')
-        os.system('kill -KILL {0}'.format(os.getpid()))
+    #def die(self, msg=''):
+    #    if msg:
+    #        smash_log.debug(msg)
+    #    self.smash.shell.run_cell('exit')
+    #    os.system('kill -KILL {0}'.format(os.getpid()))
 
     @property
     def smash(self):
