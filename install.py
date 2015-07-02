@@ -42,7 +42,7 @@ class InstallCommand(install):
                 DOT_SMASH))
         else:
             self.report("creating smash venv")
-            self.fab_api.local('virtualenv --no-site-packages '+DOT_SMASH)
+            fab_api.local('virtualenv --no-site-packages '+DOT_SMASH)
 
     def report(self, msg):
         red(msg)
