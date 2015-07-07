@@ -14,7 +14,7 @@ from IPython.utils.traitlets import EventfulDict
 from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_FILE_INPUT, C_URL_INPUT
-
+from smashlib._logging import smash_log
 
 def is_editable(_fpath):
     """ guess whether _fpath can be edited, based on
@@ -110,9 +110,9 @@ class DoWhatIMean(Plugin):
                             "File looks like ASCII text, assuming I should edit it")
                         return doit(_fpath, _suffix, 'ed', _rest)
             else:
-                msg = 'Attempted file input, but path "{0}" does not exist'.format(
-                    fpath)
-                self.report(msg)
+                msg = 'Attempted file input, but path "{0}" does not exist'
+                msg = msg.format(fpath)
+                smash_log.info(msg)
 
         fpath = abspath(expanduser(fpath))
 

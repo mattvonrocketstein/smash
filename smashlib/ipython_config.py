@@ -107,6 +107,7 @@ _.PyLinter.ignore_undefined_names = [
 ##########################################################################
 _.PromptManager.justify = False
 _.Smash.plugins.append('smashlib.plugins.prompt')
+_.Smash.plugins.append('smashlib.plugins.history_completer')
 
 # configure the project manager extension
 ##########################################################################
@@ -130,14 +131,11 @@ config.update_from_etc(projects.venv_map, 'venvs.json')
 # configure the ipython app
 ##########################################################################
 app = _.InteractiveShellApp
-app.exec_lines.append("""%rehashx""")
-app.exec_lines.append("""ip = get_ipython()""")
-app.exec_lines.append("""cfg = ip.config""")
-app.exec_lines.append("""_smash = ip._smash""")
-#app.extensions.append("autoreload")
-#app.exec_lines.append('%autoreload 2')
-# app.exec_lines.append(
-#    'print("Warning: disable autoreload in ipython_config.py to improve performance.")')
+
+# NB: Here's an easy way to issue adhoc
+#     commands, or modify the user namespace:
+# app.exec_lines.append("print 'hello world!'")
+# app.exec_lines.append("side_effect='whatever'")
 
 
 # load smash user config.  NB: this must happen last!

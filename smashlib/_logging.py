@@ -19,8 +19,8 @@ if not ope(SMASH_LOGS):
 touch_file(default_file)
 touch_file(event_file)
 LOG_FMT = ('[%(name)s:%(levelname)s:%(process)d] '
-           '%(pathname)s:%(lineno)-4d \n'
-           '  - %(funcName)s: %(message)s')
+           '%(pathname)s:%(lineno)-4d'
+           ' - %(funcName)s: %(message)s')
 
 LOG_SETTINGS = {
     'version': 1,
@@ -57,10 +57,6 @@ LOG_SETTINGS = {
             'level': 'DEBUG',
             'handlers': ['default_file', ]
         },
-        'smash_events': {
-            'level': 'DEBUG',
-            'handlers': ['event_file', ]
-        },
     }
 }
 
@@ -90,9 +86,6 @@ dictConfig(LOG_SETTINGS)
 log = reset_logs()
 smash_log = logger = logging.getLogger('smash')
 logger.info("Initializing smash default logger")
-
-events_log = logging.getLogger('smash_events')
-events_log.info("Initializing smash_events log")
 
 
 class Logger(object):

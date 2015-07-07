@@ -1,15 +1,17 @@
-""" smashlib.ipy_venv
+""" smashlib.plugins.venv
 
-    Defines the ipy_venv extensions, which (usually) allows dynamically
-    switching virtualenv's without leaving your shell.  The implementation
-    tries to clear any and all side-effects from the old virtual environment.
+    Defines the venv extension, which (usually) allows dynamically
+    switching between virtualenv's with usual side effects in the
+    shell environment, the executable path, the module path, and the
+    python namespace.. all without leaving your shell.
 
+    Caveats: This approach works pretty well and is mostly unsurprising,
+    but, things are going to get hairy if you're using multiple python
+    distributions in multiple venv's, and if you're mixing global/nonglobal
+    options for the virtualenv "use site env".
 
-    Caveats: Things are going to get hairy if you're using multiple python
-    distributions and possibly if you're mixing global/nonglobal options for
-    use-site-env.
-
-    Also sets up tab completion over virtualenv command line options.
+    Additionally, the plugin will set up tab completion over virtualenv
+    the usual command line options.
 """
 import inspect
 import os
@@ -26,6 +28,7 @@ from smashlib.plugins import Plugin
 from smashlib.data import SMASH_DIR
 from goulash.python import opj, ope, abspath, expanduser
 from smashlib.completion import opt_completer
+from smashlib._logging import smash_log
 
 
 # "real_prefix" is set by virtualenv itself. this
@@ -42,7 +45,9 @@ class VirtualEnvMagics(Magics):
 
     @line_magic
     def venv_activate(self, parameter_s=''):
-        self.report("venv_activate: " + parameter_s)
+        msg = "venv_activate: " + parameter_s
+        smash_log.info(msg)
+        self.report(msg)
         self.vext.activate(parameter_s)
 
     @line_magic
@@ -94,11 +99,19 @@ class VirtualEnvSupport(Plugin):
 
             # clean sys.path according to python..
             # stupid, but this seems to work
-            self.report('resetting sys.path')  # ,sys.path_changes)
+            msg = 'clean sys.path'  # ,sys.path_changes)
+            self.report(msg)
+            smash_log.info(msg)
             reset_path = getattr(self, 'reset_path', None)
             if reset_path is not None:
+                msg = str(set(sys.path) ^ set(reset_path))
+                msg = 'sys.path difference: {0}'.format(msg)
+                self.report(msg)
+                smash_log.debug(msg)
                 sys.path = reset_path
-
+                self.reset_path = sys.path
+            else:
+                self.reset_path = sys.path
             self._clean_user_namespace(venv)
             self.publish(C_POST_DEACTIVATE, venv)
             return True
@@ -107,7 +120,9 @@ class VirtualEnvSupport(Plugin):
         """ clean ipython username to remove old project's code
             TODO: document and refactor
         """
-        self.report("cleaning user namespace")
+        msg = "cleaning user namespace"
+        smash_log.info(msg)
+        self.report(msg)
         names = []
         pm = get_smash().project_manager
         pdir = pm._current_project and pm.project_map[pm._current_project]
@@ -159,12 +174,12 @@ class VirtualEnvSupport(Plugin):
 
             # this bit might enable switching between two venv's
             # that are be "no-global-site" vs "use-global-site"
-            # tabling it for now
-            #site_file = opj(python_dir, 'site.py')
-            #assert ope(site_file)
-            #tmp = dict(__file__=site_file)
-            #execfile(site_file, tmp)
-            # tmp['main']()
+            # .. tabling it for now
+            # site_file = opj(python_dir, 'site.py')
+            # assert ope(site_file)
+            # tmp = dict(__file__=site_file)
+            # execfile(site_file, tmp)
+            #  tmp['main']()
 
             # some environment variable manipulation that would
             # normally be done by 'source bin/activate', but is
@@ -185,8 +200,11 @@ class VirtualEnvSupport(Plugin):
             # sys.path.append(dynload)
 
             # NB: this rehash will update bins but iirc kills aliases!
-            msg = '$PATH was adjusted; rehashing aliases'
-            self.report(msg)
+            msg = '$PATH was adjusted to {0}'.format(os.environ['PATH'])
+            smash_log.debug(msg)
+            self.report('Adjusting $PATH')
+            msg = 'rehashing aliases'
+            smash_log.info(msg)
             self.shell.magic('rehashx')
             self.publish(C_POST_ACTIVATE, absfpath)
 

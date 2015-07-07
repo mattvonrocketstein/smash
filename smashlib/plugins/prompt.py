@@ -55,8 +55,9 @@ class SmashPrompt(Plugin):
     def get_prompt(self):
         prompt = '\n'
         for component in self.prompt_components:
-            smash_log.debug("calling prompt component: "+str(component))
-            assert callable(component),str("bad prompt component: " + str(component))
+            smash_log.debug("calling prompt component: " + str(component))
+            assert callable(component), str(
+                "bad prompt component: " + str(component))
             prompt += component()
         prompt = prompt.replace('  ', ' ')
         return prompt

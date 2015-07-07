@@ -2,9 +2,15 @@
 """
 import os
 
+from report import console
 from goulash._fabric import qlocal
-
+from goulash._os import get_term_size
 MAX_LENGTH = 25
+
+
+def div():
+    lines, cols = get_term_size()
+    return '-' * cols
 
 
 def user_symbol():

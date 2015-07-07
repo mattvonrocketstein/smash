@@ -7,10 +7,8 @@ import os
 from smashlib import get_smash
 from smashlib.plugins import Plugin
 from smashlib.util._tox import get_tox_envs
+
 from smashlib.completion import opt_completer
-
-#@opt_completer('python setup.py')
-
 
 def setup_completer(self, event):
     return 'install develop build'.split()

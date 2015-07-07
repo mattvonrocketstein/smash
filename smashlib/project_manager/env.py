@@ -3,6 +3,8 @@
 import os
 
 from smashlib.ipy3x.core.magics.osm import OSMagics
+
+
 class EnvMixin(object):
 
     """ EnvMixin provides env.json-reading

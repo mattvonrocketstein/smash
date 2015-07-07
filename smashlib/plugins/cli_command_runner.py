@@ -19,7 +19,7 @@ class RunCommand(Plugin):
     def get_cli_arguments(self):
         return [
             [['-c', '--command'], dict(default='')]
-            ]
+        ]
 
     def use_argv(self, args):
         if args.command:

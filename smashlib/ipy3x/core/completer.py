@@ -1098,6 +1098,7 @@ class IPCompleter(Completer):
                     except:
                         # Show the ugly traceback if the matcher causes an
                         # exception, but do NOT crash the kernel!
+                        raise
                         sys.excepthook(*sys.exc_info())
             else:
                 for matcher in self.matchers:

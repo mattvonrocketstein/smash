@@ -3,6 +3,9 @@
 
 import re
 import subprocess
+from smashlib._logging import smash_log
+from smashlib.util.ipy import have_command_alias
+from smashlib.ipy3x.core.completer import IPCompleter as IPCompleter
 
 
 def complete_long_opts(cmd):
@@ -17,26 +20,27 @@ def complete_long_opts(cmd):
     return out
 
 
+#FIXME: deprecated?
 class opt_completer(object):
-
     """ """
 
     def __init__(self, cmd_name):
         self.cmd = cmd_name
 
     def __call__(self, fxn):
-        def newf(himself, event):
+        def OptCompleter(himself, event):
             line = event.line
             if line and line.split()[-1].startswith('-'):
                 return complete_long_opts(self.cmd)
             return fxn(himself, event)
-        return newf
-
-from smashlib.util.ipy import have_command_alias
-from smashlib.ipy3x.core.completer import IPCompleter as IPCompleter
+        return OptCompleter
 
 
 class SmashCompleter(IPCompleter):
+
+    def asdasdcomplete(self, text, state):
+        smash_log.debug("received data: [{0}]".format([text, state]))
+        return super(SmashCompleter, self).complete(text, state)
 
     def magic_matches(self, text):
         # print 'Completer->magic_matches:',text,'lb',self.text_until_cursor # dbg

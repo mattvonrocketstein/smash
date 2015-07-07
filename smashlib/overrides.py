@@ -17,14 +17,23 @@ from IPython.terminal.interactiveshell import \
 from IPython.utils.traitlets import Instance, Type
 from IPython.core.displayhook import DisplayHook
 from IPython.utils.strdispatch import StrDispatch
+from IPython.core.completerlib import (
+    module_completer, magic_run_completer,
+    cd_completer, reset_completer)
 
-from smashlib import get_smash
+
 from smashlib._logging import smash_log
 from smashlib.util.ipy import have_command_alias
 from smashlib.channels import C_FILE_INPUT
-from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL, C_COMMAND_FAIL
+from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL
 from smashlib.util import split_on_unquoted_semicolons, is_path
 from smashlib.bin.pybcompgen import complete
+from smashlib.completion import SmashCompleter
+
+
+def smash_bash_complete(*args, **kargs):
+    result = complete(*args, **kargs)
+    return [x for x in result if x not in keyword.kwlist]
 
 
 class SmashDisplayHook(DisplayHook):
@@ -41,11 +50,6 @@ class SmashDisplayHook(DisplayHook):
             report(str(e))
 
 
-def smash_bash_complete(*args, **kargs):
-    result = complete(*args, **kargs)
-    return [x for x in result if x not in keyword.kwlist]
-
-
 class SmashTerminalInteractiveShell(BaseTIS):
 
     # Input splitter, to transform input line by line and detect when a block
@@ -59,15 +63,23 @@ class SmashTerminalInteractiveShell(BaseTIS):
             consider just broadcasting a signal instead
             of showing a traceback.
         """
+        smash_log.info(
+            "last efforts to do something "
+            "meaningful with input before "
+            "syntax error")
         lastline = self._smash_last_input
         clean_line = lastline.strip()
         if not clean_line:
             return
         if is_path(clean_line):
+            # NB: in this case a regex looks like a path or URL,
+            # but it's not necessarily true that the endpoint
+            # actuals exists
             self.smash.publish(C_FILE_INPUT, clean_line)
         elif is_path(clean_line.split()[0]):
             self.system(clean_line)
         else:
+            smash_log.info('nothing to do but call super()')
             sooper = super(SmashTerminalInteractiveShell, self)
             return sooper.showsyntaxerror(filename=filename)
 
@@ -100,16 +112,25 @@ class SmashTerminalInteractiveShell(BaseTIS):
                     self._smash_last_input, etype, evalue)
                 if handled:
                     return
-        return sooper._showtraceback(etype, evalue, stb)
+        if etype == NameError:
+            if len(self._smash_last_input.split('\n'))==1:
+              msg = 'smash: {0}: command not found'
+              msg = msg.format(
+                  self._smash_last_input.strip());
+              print msg
+              return
+        else:
+            return sooper._showtraceback(etype, evalue, stb)
 
     # NOTE: when run-cell runs, input is finished
     def run_cell(self, raw_cell, store_history=False,
                  silent=False, shell_futures=True):
-        smash_log.info("running raw_cell: {0}".format(raw_cell))
+        smash_log.info("[{0}]".format(raw_cell.strip()))
         # as long as the expressions are semicolon separated,
         # this section allows hybrid bash/python expressions
         bits = split_on_unquoted_semicolons(raw_cell)
         if len(bits) > 1:
+            smash_log.info("detected chaining with this input")
             out = []
             for x in bits:
                 out.append(
@@ -137,7 +158,9 @@ class SmashTerminalInteractiveShell(BaseTIS):
         # print 'wrapping system call',cmd
         result = super(SmashTerminalInteractiveShell, self).system(
             cmd, **kargs)
-        error = self.user_ns['_exit_code']  # put exit code into bash for lp?s
+        # put exit code into os.environ?
+        error = self.user_ns['_exit_code']
+        smash_log.info("exit code: {0}".format(error))
         # if error:
         #    get_smash().publish(C_COMMAND_FAIL, cmd, error)
         if not quiet and result:
@@ -147,10 +170,6 @@ class SmashTerminalInteractiveShell(BaseTIS):
         #
         # copied for modification from smashlib.ipy3x.core.interactiveshell
         #
-        from smashlib.completion import SmashCompleter
-        from IPython.core.completerlib import (module_completer,
-                                               magic_run_completer, cd_completer, reset_completer)
-
         self.Completer = SmashCompleter(
             shell=self,
             namespace=self.user_ns,
@@ -180,19 +199,23 @@ class SmashTerminalInteractiveShell(BaseTIS):
 TerminalInteractiveShell = SmashTerminalInteractiveShell
 import traceback
 
+
 class SmashTerminalIPythonApp(BaseTIA):
+
     def init_extensions(self):
         try:
-            self.log.debug("Loading IPython extensions...")
+            self.log.info("Loading IPython extensions...")
             extensions = self.default_extensions + self.extensions
             for ext in extensions:
                 try:
-                    self.log.info("Loading IPython extension into Smash: %s" % ext)
+                    self.log.info(
+                        "Loading IPython extension into Smash: %s" % ext)
                     self.shell.extension_manager.load_extension(ext)
                 except:
-                    self.log.warn("Error in loading extension: %s" % ext +
-                                  "\nCheck your config files in %s" % self.profile_dir.location
-                                  )
+                    msg = ("Error in loading extension: {0}"
+                           "\nCheck your config files in %s")
+                    msg = msg.format(ext, self.profile_dir.location)
+                    self.log.warn(msg)
                     smash_log.critical(traceback.format_exc())
                     self.shell.showtraceback()
         except:
@@ -213,9 +236,9 @@ class SmashTerminalIPythonApp(BaseTIA):
             ipython_dir=self.ipython_dir,
             user_ns=self.user_ns)
         self.shell.configurables.append(self)
-
         def smash_matcher(text):
-            # print 'smash_matcher',text #dbg
+            smash_log.info("[{0}]".format(text))
+            # FIXME: move into plugin
             line = self.shell.Completer.readline.get_line_buffer()
             if not line.strip():
                 return []
@@ -223,8 +246,6 @@ class SmashTerminalIPythonApp(BaseTIA):
             magic_command_alias = first_word.startswith('%') and \
                 have_command_alias(first_word[1:])
             naked_command_alias = have_command_alias(first_word)
-            # print
-            # 'smash_matcher',text,naked_command_alias,magic_command_alias #dbg
             if naked_command_alias:
                 return smash_bash_complete(line)
             if magic_command_alias:

@@ -31,13 +31,12 @@ from .env import EnvMixin
 from smashlib.aliases import AliasMixin
 
 
-
 class CommandLineMixin(object):
 
     def get_cli_arguments(self):
         return [
             [('-p', '--project',), dict(default='')]
-            ]
+        ]
 
     def use_argv(self, args):
         if args.project:

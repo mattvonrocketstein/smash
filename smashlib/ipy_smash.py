@@ -8,6 +8,9 @@
 import os
 import cyrusbus
 import argparse
+
+from itertools import imap
+from operator import itemgetter
 from collections import defaultdict
 
 from goulash._fabric import qlocal
@@ -25,9 +28,9 @@ from smashlib.plugins.interface import PluginInterface
 from smashlib.patches.edit import PatchEdit
 from smashlib.patches.rehash import PatchRehash
 from smashlib.patches.pinfo import PatchPinfoMagic
+from smashlib._logging import smash_log
 
-
-from .aliases import AliasInterface
+from smashlib.aliases import AliasInterface
 
 
 class Smash(Plugin):
@@ -109,6 +112,9 @@ class Smash(Plugin):
                     err = err.format(plugin)
                     raise SystemExit(err)
                 parser.add_argument(*args, **kargs)
+        #import argcomplete
+        # argcomplete.autocomplete(parser)
+
         # thinking of adding extra parsing here?  think twice.
         # whatever you're doing probably belongs in a separate plugin
         return parser
@@ -121,8 +127,7 @@ class Smash(Plugin):
 
     def parse_argv(self):
         """ parse arguments recognized by myself,
-            then let all the plugins take a stab
-            at it.
+            then let all the plugins take a stab at it.
         """
         parser = self.build_argparser()
         args = parser.parse_args()
@@ -130,11 +135,6 @@ class Smash(Plugin):
         for plugin in plugins:
             plugin.use_argv(args)
         return args
-        #main_args, unknown = super(Smash,self).parse_argv()
-        #ext_objs = self._installed_plugins.values()
-        # for obj in ext_objs:
-        #    if obj:
-        #        args, unknown = obj.parse_argv()
 
     @property
     def project_manager(self):
@@ -152,9 +152,20 @@ class Smash(Plugin):
         self.init_config_inheritance()
         if data.SMASH_BIN not in os.environ['PATH']:
             os.environ['PATH'] = data.SMASH_BIN + ':' + os.environ['PATH']
-
         self.init_patches()
         self.publish(C_SMASH_INIT_COMPLETE)
+        self.shell.user_ns['_smash'] = self
+        self.shell.run_cell('rehashx')
+
+    def recent_commands(self, num):
+        tmp = self.history(num)
+        return set(list(tmp))
+
+    def history(self, num):
+        tmp = self.shell.history_manager.get_tail(num)
+        # ipython history includes session id and input number,
+        # whereas this only returns the input-lines
+        return imap(itemgetter(-1), tmp)
 
     def init_macros(self):
         # suport export foo=bar
@@ -167,7 +178,8 @@ class Smash(Plugin):
 
         # use bash reset instead of python reset.
         # a macro is used here because macros are honored
-        # before aliases and this overrides a builtin alias
+        # before aliases and this overrides a preexisting
+        # (but less useful) ipython alias
         self.contribute_macro(
             'reset',
             "get_ipython().system('reset')")
@@ -181,12 +193,15 @@ class Smash(Plugin):
                     self.shell.magic("alias {0} {1}".format(alias, cmd))
 
         if self.load_bash_functions:
+            smash_log.info("Loading bash functions")
             fxns = bash.get_functions()
             for fxn_name in fxns:
                 cmd = bash.FunctionMagic(fxn_name)
                 self.shell.magics_manager.register_function(
                     cmd, magic_name=fxn_name)
-            self.report("registered magic for bash functions: ", fxns)
+            msg = "registered magic for bash functions: " + str(fxns)
+            smash_log.info(msg)
+            self.report(msg)
 
     def init_patches(self):
         PatchEdit(self).install()
@@ -202,6 +217,7 @@ class Smash(Plugin):
         super(Smash, self).init_bus()
 
     def add_completer(self, fxn, **kargs):
+        smash_log.info("akdding new completer: {0}".format(fxn))
         self.completers[get_caller(2)['class']].append(fxn)
         get_ipython().set_hook('complete_command', fxn, **kargs)
 
@@ -211,7 +227,3 @@ def load_ipython_extension(ip):
     ip = get_ipython()
     ip._smash = Smash(ip)
     return ip._smash
-
-
-def unload_ipython_extension(ip):
-    del ip._smash

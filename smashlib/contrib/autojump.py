@@ -2469,8 +2469,11 @@ def move_file(src, dst):
 
 
 from smashlib._logging import smash_log
+
+
 def print_entry(entry):
-    smash_log.info("autojump weight update: %.1f:\t%s" % (entry.weight, entry.path))
+    smash_log.info("autojump weight update: %.1f:\t%s" %
+                   (entry.weight, entry.path))
     #print_local("%.1f:\t%s" % (entry.weight, entry.path))
 
 

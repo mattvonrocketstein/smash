@@ -19,6 +19,7 @@ from smashlib.bases.eventful import EventfulMix
 class APlugin(object):
 
     """ """
+
     def get_cli_arguments(self):
         return []
 
@@ -88,7 +89,7 @@ class APlugin(object):
             self.report("uninstalling magic: {0}".format(m))
             del self.shell.magics_manager.magics['line'][m.__name__]
 
-    #def die(self, msg=''):
+    # def die(self, msg=''):
     #    if msg:
     #        smash_log.debug(msg)
     #    self.smash.shell.run_cell('exit')

@@ -7,14 +7,18 @@ import voluptuous
 
 from IPython.core.profiledir import ProfileDir
 
-from goulash.python import create_dir_if_not_exists, ope, opj
+from goulash.python import (
+    create_dir_if_not_exists, ope, opj)
+
+from smashlib.data import (
+    SMASH_ETC, SMASH_DIR,
+    SMASHLIB_DIR, main_profile_name)
+
 from smashlib.util import Reporter
 from smashlib.config import schemas
+from smashlib._logging import smash_log
 from smashlib.data import USER_CONFIG_PATH
-from smashlib.data import SMASH_ETC, SMASH_DIR, SMASHLIB_DIR, main_profile_name
-from smashlib._logging import smash_log
 from smashlib.exceptions import ConfigError
-from smashlib._logging import smash_log
 
 report = Reporter("SmashConfig")
 

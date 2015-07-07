@@ -1,9 +1,11 @@
 """ smashlib.util.events
 """
 
+from functools import wraps
+
 from smashlib import get_smash
 from smashlib.util.ipy import TermColors
-from smashlib._logging import events_log
+from smashlib._logging import smash_log
 
 
 class receives_event(object):
@@ -26,11 +28,12 @@ class receives_event(object):
         if msg[:77] != msg:
             msg += '...'
             msg = msg[:77]
-        events_log.info(msg)
+        smash_log.info(msg)
 
     def __call__(self, fxn):
         self.fxn = fxn
 
+        @wraps(fxn)
         def newf(himself, bus, *args, **kargs):
             if not self.quiet and get_smash() and get_smash().verbose_events:
                 self.report(args)

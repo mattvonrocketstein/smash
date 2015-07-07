@@ -1,7 +1,7 @@
 ###System Shell + Python
 Smash functions as a normal system shell, but it also has full fledged python interpretter.  The goal is to be unsurprising and seamless, doing shell stuff in the shell places and python stuff in the python places.  If you're a bash user or an ipython user, many aspects of your existing configuration efforts can also be [inherited automatically](configuration.html#inheritance).
 
-![screenshot1](scr/demo-python-bash.png "screenshot1")
+<img src="../scr/python_and_shell.gif" alt="alt text" style="width:800px">
 
 If you don't care anything about python, you can ignore the python features of Smash completely.  If you *are* a python programmer, then you probably spend as much time in a python interpretter as you do in shell.  Why not trade those two windows for just one and reduce your screen clutter? You can start reading [here](#smash-for-python-devs) to find out some of the other python friendly features of smash.
 
