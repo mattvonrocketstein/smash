@@ -156,7 +156,7 @@ class Smash(Plugin):
         self.publish(C_SMASH_INIT_COMPLETE)
         self.shell.user_ns['_smash'] = self
         self.shell.run_cell('rehashx')
-
+        #self.user_ns.pop('')
     def recent_commands(self, num):
         tmp = self.history(num)
         return set(list(tmp))

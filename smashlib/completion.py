@@ -43,6 +43,7 @@ class SmashCompleter(IPCompleter):
         return super(SmashCompleter, self).complete(text, state)
 
     def magic_matches(self, text):
+        smash_log.debug("completing [{0}]".format(text))
         # print 'Completer->magic_matches:',text,'lb',self.text_until_cursor # dbg
         # Get all shell magics now rather than statically, so magics loaded at
         # runtime show up too.

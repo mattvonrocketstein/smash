@@ -32,8 +32,10 @@ from smashlib.completion import SmashCompleter
 
 
 def smash_bash_complete(*args, **kargs):
+    smash_log.info("calling pybcompgen")
     result = complete(*args, **kargs)
-    return [x for x in result if x not in keyword.kwlist]
+    result = [x for x in result if x not in keyword.kwlist]
+    return result
 
 
 class SmashDisplayHook(DisplayHook):
@@ -114,11 +116,11 @@ class SmashTerminalInteractiveShell(BaseTIS):
                     return
         if etype == NameError:
             if len(self._smash_last_input.split('\n'))==1:
-              msg = 'smash: {0}: command not found'
-              msg = msg.format(
-                  self._smash_last_input.strip());
-              print msg
-              return
+                msg = 'smash: {0}: command not found'
+                msg = msg.format(
+                    self._smash_last_input.strip());
+                print msg
+                return
         else:
             return sooper._showtraceback(etype, evalue, stb)
 
@@ -228,6 +230,23 @@ class SmashTerminalIPythonApp(BaseTIA):
         app.initialize(argv)
         app.start()
 
+ #   def smash_matcher(self, text):
+ #       smash_log.info("[{0}]".format(text))
+ #       # FIXME: move into plugin
+ #       line = self.shell.Completer.readline.get_line_buffer()
+ #       if not line.strip():
+ #           return []
+ #
+ #       first_word = line.split()[0]
+ #       magic_command_alias = first_word.startswith('%') and \
+ #           have_command_alias(first_word[1:])
+ #       naked_command_alias = have_command_alias(first_word)
+ #       if naked_command_alias:
+ #           return smash_bash_complete(line)
+ #       if magic_command_alias:
+ #           return smash_bash_complete(line[1:])
+ #       return []
+
     def init_shell(self):
         """function override so we can use SmashTerminalInteractiveShell """
         self.shell = TerminalInteractiveShell.instance(
@@ -236,22 +255,7 @@ class SmashTerminalIPythonApp(BaseTIA):
             ipython_dir=self.ipython_dir,
             user_ns=self.user_ns)
         self.shell.configurables.append(self)
-        def smash_matcher(text):
-            smash_log.info("[{0}]".format(text))
-            # FIXME: move into plugin
-            line = self.shell.Completer.readline.get_line_buffer()
-            if not line.strip():
-                return []
-            first_word = line.split()[0]
-            magic_command_alias = first_word.startswith('%') and \
-                have_command_alias(first_word[1:])
-            naked_command_alias = have_command_alias(first_word)
-            if naked_command_alias:
-                return smash_bash_complete(line)
-            if magic_command_alias:
-                return smash_bash_complete(line[1:])
-            return []
-        self.shell.Completer.matchers = [smash_matcher] + \
-            self.shell.Completer.matchers
+        #self.shell.Completer.matchers = [self.smash_matcher] + \
+        #    self.shell.Completer.matchers
 TerminalIPythonApp = SmashTerminalIPythonApp
 launch_new_instance = TerminalIPythonApp.launch_instance

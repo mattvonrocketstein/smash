@@ -4,6 +4,8 @@ from smashlib import get_smash
 from smashlib.plugins import Plugin
 
 # FIXME: deprecate?
+
+
 class UninstallPlugins(Plugin):
 
     def install(self):
@@ -11,7 +13,8 @@ class UninstallPlugins(Plugin):
             tmp = get_smash()._installed_plugins.keys()
             print tmp
         self.contribute_completer('uninstall_plugin .*', plugin_name_completer)
-        self.contribute_completer('%uninstall_plugin .*', plugin_name_completer)
+        self.contribute_completer(
+            '%uninstall_plugin .*', plugin_name_completer)
         return self
 
 

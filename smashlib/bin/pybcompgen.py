@@ -34,6 +34,7 @@ import sys
 import json
 import unicodedata
 from subprocess import Popen, PIPE
+from smashlib._logging import smash_log
 
 # possibly this should be all vt100 codes, idk
 # http://ascii-table.com/ansi-escape-sequences-vt-100.php
@@ -82,6 +83,7 @@ def complete(to_complete):
            execution of the line because we are dealing with pipes, whereas
            control-c is processed only by proper tty's.
     """
+    smash_log.info("[{0}]".format(to_complete))
     if not to_complete:
         return []
     cmd = '''bash -c "printf 'PS1=\"\";echo MARKER\n{complete}\t\t\x01#\necho MARKER'|bash -i"'''.format(
@@ -89,7 +91,7 @@ def complete(to_complete):
     p1 = Popen(cmd, shell=True, stdout=PIPE, stdin=PIPE, stderr=PIPE)
     out, err = p1.communicate()
     lines = err.split('\n')
-
+    #smash_log.info(err)
     first_marker = None
     last_marker = None
     for i in range(len(lines)):

@@ -108,6 +108,7 @@ _.PyLinter.ignore_undefined_names = [
 _.PromptManager.justify = False
 _.Smash.plugins.append('smashlib.plugins.prompt')
 _.Smash.plugins.append('smashlib.plugins.history_completer')
+_.Smash.plugins.append('smashlib.plugins.smash_completer')
 
 # configure the project manager extension
 ##########################################################################

@@ -16,6 +16,7 @@ from smashlib.util.events import receives_event
 from smashlib.channels import C_FILE_INPUT, C_URL_INPUT
 from smashlib._logging import smash_log
 
+
 def is_editable(_fpath):
     """ guess whether _fpath can be edited, based on
         the output of the file(1) utility.  this function

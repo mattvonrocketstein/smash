@@ -10,6 +10,7 @@ from smashlib.util._tox import get_tox_envs
 
 from smashlib.completion import opt_completer
 
+
 def setup_completer(self, event):
     return 'install develop build'.split()
 

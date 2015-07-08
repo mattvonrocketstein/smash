@@ -16,7 +16,7 @@ class HistoryCompleter(Plugin):
 
     verbose = True
     MAX_SIZE = 3
-    MAX_MATCH=5
+    MAX_MATCH = 5
     db = []
 
     def init(self):
@@ -24,21 +24,19 @@ class HistoryCompleter(Plugin):
         #self.smash.shell.Completer.matchers += [self.history_matcher]
         self.contribute_completer('.*', self.history_matcher)
 
-
     def history_matcher(self, shell, event):
         """ """
         #print ('event: {0}'.format(event.__dict__))
-        smash_log.info('completing event: {0}'.format(event.__dict__))
-        #event attributes: text_until_cursor, line, command, symbol
+        smash_log.info('invoked')
+        # event attributes: text_until_cursor, line, command, symbol
         #smash_log.debug('matching {0}'.format(event.__dict__))
         if not event.symbol.strip():
-            return []
+            raise TryNext()
         tmp = [x for x in self.db if x.startswith(event.symbol)]
         if not tmp:
             raise TryNext()
         else:
             return tmp[:self.MAX_MATCH]
-
 
     @receives_event(C_POST_RUN_INPUT, quiet=True)
     def history_completion_update(self, line):
@@ -55,6 +53,7 @@ class HistoryCompleter(Plugin):
             smash_log.info('eating token: {0}'.format(token))
             if full:
                 self.db.pop(0)
+
 
 def load_ipython_extension(ip):
     ip = get_ipython()

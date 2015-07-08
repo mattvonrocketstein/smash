@@ -1,7 +1,5 @@
 """ smashlib.plugins.which
 """
-import sys
-
 from smashlib.plugins import Plugin
 from smashlib.channels import C_REHASH_EVENT
 from smashlib.util.events import receives_event
