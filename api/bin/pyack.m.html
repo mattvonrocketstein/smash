@@ -1133,13 +1133,15 @@ table {
 <span class="n">ACK_BIN_NAME</span> <span class="o">=</span> <span class="s">&#39;ack-grep&#39;</span>
 <span class="n">ACK_BIN_PATH</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="n">ACK_BIN_NAME</span><span class="p">)</span>
 
+
 <span class="k">class</span> <span class="nc">pyack</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
     <span class="sd">&quot;&quot;&quot; thin wrapper on ack to get some of the data into python</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">call_string</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">call_string</span> <span class="o">=</span> <span class="n">call_string</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span><span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:[]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[]))</span>
 
     <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
@@ -1157,13 +1159,14 @@ table {
         <span class="n">cmd</span> <span class="o">=</span> <span class="n">ACK_BIN_PATH</span> <span class="o">+</span> <span class="s">&#39; &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_string</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">readline</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="p">:</span>
+                <span class="k">continue</span>
             <span class="n">i1</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)</span>
-            <span class="n">i2</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">,</span><span class="n">i1</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">i2</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">i1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">match</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i2</span><span class="p">:]</span>
             <span class="n">_file</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span><span class="n">i1</span><span class="p">]</span>
-            <span class="n">lineno</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i1</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">i2</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">[</span><span class="n">_file</span><span class="p">][</span><span class="n">lineno</span><span class="p">]</span><span class="o">=</span><span class="n">match</span>
+            <span class="n">lineno</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">i2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">[</span><span class="n">_file</span><span class="p">][</span><span class="n">lineno</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">quiet</span><span class="p">:</span>
                 <span class="k">print</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
@@ -1172,11 +1175,12 @@ table {
         <span class="sd">&quot;&quot;&quot; returns matching files &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="kn">import</span> <span class="nn">sys</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">pyack</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))()</span>
     <span class="k">return</span> <span class="n">x</span>
-<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
@@ -1239,12 +1243,13 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-smashlib.bin.pyack.pyack', this);">Show source &equiv;</a></p>
   <div id="source-smashlib.bin.pyack.pyack" class="source">
     <div class="codehilite"><pre><span class="k">class</span> <span class="nc">pyack</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
     <span class="sd">&quot;&quot;&quot; thin wrapper on ack to get some of the data into python</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">call_string</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">call_string</span> <span class="o">=</span> <span class="n">call_string</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span><span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:[]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[]))</span>
 
     <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
@@ -1262,13 +1267,14 @@ table {
         <span class="n">cmd</span> <span class="o">=</span> <span class="n">ACK_BIN_PATH</span> <span class="o">+</span> <span class="s">&#39; &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_string</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">readline</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="p">:</span>
+                <span class="k">continue</span>
             <span class="n">i1</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)</span>
-            <span class="n">i2</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">,</span><span class="n">i1</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">i2</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">i1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">match</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i2</span><span class="p">:]</span>
             <span class="n">_file</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:</span><span class="n">i1</span><span class="p">]</span>
-            <span class="n">lineno</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i1</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">i2</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">[</span><span class="n">_file</span><span class="p">][</span><span class="n">lineno</span><span class="p">]</span><span class="o">=</span><span class="n">match</span>
+            <span class="n">lineno</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">i2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">[</span><span class="n">_file</span><span class="p">][</span><span class="n">lineno</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">quiet</span><span class="p">:</span>
                 <span class="k">print</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
@@ -1335,7 +1341,7 @@ table {
   <div id="source-smashlib.bin.pyack.pyack.__init__" class="source">
     <div class="codehilite"><pre><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">call_string</span><span class="p">):</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">call_string</span> <span class="o">=</span> <span class="n">call_string</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span><span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:[]))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[]))</span>
 </pre></div>
 
   </div>

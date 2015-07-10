@@ -1077,6 +1077,7 @@ table {
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">goulash.python</span> <span class="kn">import</span> <span class="n">expanduser</span><span class="p">,</span> <span class="n">opj</span><span class="p">,</span> <span class="n">dirname</span>
+<span class="kn">from</span> <span class="nn">goulash._os</span> <span class="kn">import</span> <span class="n">home</span>
 
 <span class="n">main_profile_name</span> <span class="o">=</span> <span class="s">&#39;SmaSh&#39;</span>
 <span class="n">user_config_name</span> <span class="o">=</span> <span class="s">&#39;config.py&#39;</span>
@@ -1093,14 +1094,14 @@ table {
 <span class="n">PROMPT_CONFIG_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SMASH_ETC</span><span class="p">,</span> <span class="s">&#39;prompt.json&#39;</span><span class="p">)</span>
 
 <span class="n">P_CODE_FILE</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&#39;.py&#39;</span><span class="p">:</span><span class="s">&#39;python&#39;</span><span class="p">,</span>
-    <span class="s">&#39;.pp&#39;</span><span class="p">:</span><span class="s">&#39;puppet&#39;</span><span class="p">,</span>
-    <span class="s">&#39;.md&#39;</span><span class="p">:</span><span class="s">&#39;docs&#39;</span><span class="p">,</span>
-    <span class="s">&#39;.rst&#39;</span><span class="p">:</span><span class="s">&#39;docs&#39;</span><span class="p">,</span>
-    <span class="s">&#39;.hs&#39;</span><span class="p">:</span><span class="s">&#39;haskell&#39;</span><span class="p">,</span>
-    <span class="s">&#39;Vagrantfile&#39;</span><span class="p">:</span><span class="s">&#39;vagrant&#39;</span><span class="p">,</span>
-    <span class="s">&#39;tox.ini&#39;</span><span class="p">:</span><span class="s">&#39;tox&#39;</span><span class="p">,</span>
-    <span class="p">}</span>
+    <span class="s">&#39;.py&#39;</span><span class="p">:</span> <span class="s">&#39;python&#39;</span><span class="p">,</span>
+    <span class="s">&#39;.pp&#39;</span><span class="p">:</span> <span class="s">&#39;puppet&#39;</span><span class="p">,</span>
+    <span class="s">&#39;.md&#39;</span><span class="p">:</span> <span class="s">&#39;docs&#39;</span><span class="p">,</span>
+    <span class="s">&#39;.rst&#39;</span><span class="p">:</span> <span class="s">&#39;docs&#39;</span><span class="p">,</span>
+    <span class="s">&#39;.hs&#39;</span><span class="p">:</span> <span class="s">&#39;haskell&#39;</span><span class="p">,</span>
+    <span class="s">&#39;Vagrantfile&#39;</span><span class="p">:</span> <span class="s">&#39;vagrant&#39;</span><span class="p">,</span>
+    <span class="s">&#39;tox.ini&#39;</span><span class="p">:</span> <span class="s">&#39;tox&#39;</span><span class="p">,</span>
+<span class="p">}</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">lcfg =  {</span>
 <span class="sd">    &#39;version&#39;: 1,</span>

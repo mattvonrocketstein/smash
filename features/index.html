@@ -118,10 +118,10 @@
             <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#system-shell-python-support">System Shell + Python Support</a></li>
+        <li class="main active"><a href="#system-shell-python">System Shell + Python</a></li>
         
     
-        <li class="main "><a href="#prompt">Prompt </a></li>
+        <li class="main "><a href="#prompt-features">Prompt Features </a></li>
         
     
         <li class="main "><a href="#tab-completion-system">Tab Completion System </a></li>
@@ -137,12 +137,12 @@
 </div></div>
             <div class="col-md-9" role="main">
 
-<h3 id="system-shell-python-support">System Shell + Python Support</h3>
+<h3 id="system-shell-python">System Shell + Python</h3>
 <p>Smash functions as a normal system shell, but it also has full fledged python interpretter.  The goal is to be unsurprising and seamless, doing shell stuff in the shell places and python stuff in the python places.  If you're a bash user or an ipython user, many aspects of your existing configuration efforts can also be <a href="../configuration.html#inheritance">inherited automatically</a>.</p>
-<p><img alt="screenshot1" src="../scr/demo-python-bash.png" title="screenshot1" /></p>
+<p><img src="../scr/python_and_shell.gif" alt="alt text" style="width:800px"></p>
 <p>If you don't care anything about python, you can ignore the python features of Smash completely.  If you <em>are</em> a python programmer, then you probably spend as much time in a python interpretter as you do in shell.  Why not trade those two windows for just one and reduce your screen clutter? You can start reading <a href="#smash-for-python-devs">here</a> to find out some of the other python friendly features of smash.</p>
 <hr />
-<h3 id="prompt">Prompt <a id="prompts"></a></h3>
+<h3 id="prompt-features">Prompt Features <a id="prompts"></a></h3>
 <p>By default smash ships with the wonderfully dynamic <a href="#https://github.com/nojhan/liquidprompt">liquidprompt tool</a>.  Liquidprompt has rich options for configuration and it's recommended that you <a href="https://github.com/nojhan/liquidprompt#features-configuration">configure it in the normal way</a>, but, some of these options can be overridden from <code>~/.smash/config.py</code>.  (See the <a href="../plugins.html#liquidprompt">liquidprompt plugin information</a> for more details.)  The default liquidprompt configuration features a prompt that shows activated python virtual environments, as well as VCS branch and commit/stash status, etc.  Other options include everything from cpu/battery status to write-permissions for the current directory.  Take a look at how it updates below based on the context:</p>
 <p><img alt="screenshot1" src="../scr/demo-liquidprompt.png?raw=true" title="screenshot1" /></p>
 <p>The prompt can be turned off by disabling the liquid prompt plugin, and either setting <code>PS1</code>' as usual or <code>prompt_manager.in_template</code> Support for <a href="#http://powerline.readthedocs.org/en/latest/usage/other.html?highlight=ipython#ipython-prompt">powerline</a> prompts isn't installed by default, but adding it should be easy.  If you can't live without that, <a href="https://github.com/mattvonrocketstein/smash/issues">make an issue of it</a>!</p>

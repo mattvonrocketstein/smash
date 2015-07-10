@@ -1045,6 +1045,7 @@ table {
     <li class="set"><h3><a href="#header-functions">Functions</a></h3>
       
   <ul>
+    <li class="mono"><a href="#smashlib.prompt.div">div</a></li>
     <li class="mono"><a href="#smashlib.prompt.git_branch">git_branch</a></li>
     <li class="mono"><a href="#smashlib.prompt.user_symbol">user_symbol</a></li>
     <li class="mono"><a href="#smashlib.prompt.venv">venv</a></li>
@@ -1054,12 +1055,6 @@ table {
     </li>
 
 
-    <li class="set"><h3><a href="#header-submodules">Sub-modules</a></h3>
-      <ul>
-        <li class="mono"><a href="OS.m.html">smashlib.prompt.OS</a></li>
-        <li class="mono"><a href="git.m.html">smashlib.prompt.git</a></li>
-      </ul>
-    </li>
     </ul>
   </div>
 
@@ -1081,14 +1076,21 @@ table {
 <span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">goulash._fabric</span> <span class="kn">import</span> <span class="n">qlocal</span>
-
+<span class="kn">from</span> <span class="nn">goulash._os</span> <span class="kn">import</span> <span class="n">get_term_size</span>
 <span class="n">MAX_LENGTH</span> <span class="o">=</span> <span class="mi">25</span>
 
+
+<span class="k">def</span> <span class="nf">div</span><span class="p">():</span>
+    <span class="n">lines</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">get_term_size</span><span class="p">()</span>
+    <span class="k">return</span> <span class="s">&#39;-&#39;</span> <span class="o">*</span> <span class="n">cols</span>
+
+
 <span class="k">def</span> <span class="nf">user_symbol</span><span class="p">():</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;USER&#39;</span><span class="p">)</span><span class="o">!=</span><span class="s">&#39;root&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;USER&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#39;root&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">&#39;$&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">&#39;#&#39;</span>
+
 
 <span class="k">def</span> <span class="nf">working_dir</span><span class="p">():</span>
     <span class="n">wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
@@ -1098,13 +1100,15 @@ table {
         <span class="n">wd</span> <span class="o">=</span> <span class="n">wd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">home</span><span class="p">,</span> <span class="s">&#39;~&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wd</span>
 
+
 <span class="k">def</span> <span class="nf">git_branch</span><span class="p">():</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">qlocal</span><span class="p">(</span><span class="s">&#39;&#39;&#39;git branch|grep \*&#39;&#39;&#39;</span><span class="p">,</span> <span class="n">capture</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">result</span> <span class="k">else</span> <span class="s">&#39;&#39;</span>
     <span class="k">return</span> <span class="n">result</span>
 
+
 <span class="k">def</span> <span class="nf">venv</span><span class="p">():</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;VIRTUAL_ENV&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;VIRTUAL_ENV&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">result</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">result</span>
@@ -1126,6 +1130,28 @@ table {
       </div>
 
     <h2 class="section-title" id="header-functions">Functions</h2>
+      
+  <div class="item">
+    <div class="name def" id="smashlib.prompt.div">
+    <p>def <span class="ident">div</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-smashlib.prompt.div', this);">Show source &equiv;</a></p>
+  <div id="source-smashlib.prompt.div" class="source">
+    <div class="codehilite"><pre><span class="k">def</span> <span class="nf">div</span><span class="p">():</span>
+    <span class="n">lines</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">get_term_size</span><span class="p">()</span>
+    <span class="k">return</span> <span class="s">&#39;-&#39;</span> <span class="o">*</span> <span class="n">cols</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
       
   <div class="item">
     <div class="name def" id="smashlib.prompt.git_branch">
@@ -1162,7 +1188,7 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-smashlib.prompt.user_symbol', this);">Show source &equiv;</a></p>
   <div id="source-smashlib.prompt.user_symbol" class="source">
     <div class="codehilite"><pre><span class="k">def</span> <span class="nf">user_symbol</span><span class="p">():</span>
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;USER&#39;</span><span class="p">)</span><span class="o">!=</span><span class="s">&#39;root&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;USER&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#39;root&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">&#39;$&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">&#39;#&#39;</span>
@@ -1186,7 +1212,7 @@ table {
   <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-smashlib.prompt.venv', this);">Show source &equiv;</a></p>
   <div id="source-smashlib.prompt.venv" class="source">
     <div class="codehilite"><pre><span class="k">def</span> <span class="nf">venv</span><span class="p">():</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;VIRTUAL_ENV&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;VIRTUAL_ENV&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">result</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">result</span>
@@ -1225,21 +1251,6 @@ table {
   
 
 
-    <h2 class="section-title" id="header-submodules">Sub-modules</h2>
-      <div class="item">
-      <p class="name"><a href="OS.m.html">smashlib.prompt.OS</a></p>
-      
-  
-    <div class="desc"><p>smashlib.prompt.OS</p></div>
-
-      </div>
-      <div class="item">
-      <p class="name"><a href="git.m.html">smashlib.prompt.git</a></p>
-      
-  
-    <div class="desc"><p>smashlib.prompt.git</p></div>
-
-      </div>
   </section>
 
     </article>

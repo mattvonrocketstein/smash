@@ -1136,11 +1136,12 @@ git-subcommands to debian packages, depending on context.</p>
 <span class="c"># http://stackoverflow.com/questions/7857352/python-regex-to-match-vt100-escape-sequences</span>
 <span class="n">ansi_escape</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;\x1b\[C&#39;</span><span class="p">)</span>
 
+
 <span class="k">def</span> <span class="nf">remove_control_characters</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="n">s</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">ansi_escape</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;[1@#&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ch</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">if</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">category</span><span class="p">(</span><span class="n">ch</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;[1@#&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ch</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">if</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">category</span><span class="p">(</span><span class="n">ch</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;C&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="n">to_complete</span><span class="p">):</span>
@@ -1179,7 +1180,8 @@ git-subcommands to debian packages, depending on context.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">to_complete</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="s">&#39;&#39;&#39;bash -c &quot;printf &#39;PS1=</span><span class="se">\&quot;\&quot;</span><span class="s">;echo MARKER</span><span class="se">\n</span><span class="s">{complete}</span><span class="se">\t\t\x01</span><span class="s">#</span><span class="se">\n</span><span class="s">echo MARKER&#39;|bash -i&quot;&#39;&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">complete</span><span class="o">=</span><span class="n">to_complete</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">&#39;&#39;&#39;bash -c &quot;printf &#39;PS1=</span><span class="se">\&quot;\&quot;</span><span class="s">;echo MARKER</span><span class="se">\n</span><span class="s">{complete}</span><span class="se">\t\t\x01</span><span class="s">#</span><span class="se">\n</span><span class="s">echo MARKER&#39;|bash -i&quot;&#39;&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">complete</span><span class="o">=</span><span class="n">to_complete</span><span class="p">)</span>
     <span class="n">p1</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">)</span>
     <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
@@ -1202,34 +1204,36 @@ git-subcommands to debian packages, depending on context.</p>
         <span class="c"># Pagination indicators like &#39;--More--&#39;must be removed</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;--More&#39;</span><span class="p">)]</span>
         <span class="n">last_marker</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">-</span> <span class="mi">3</span>
-        <span class="n">first_marker</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="n">first_marker</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="n">complete_lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">first_marker</span><span class="o">+</span><span class="mi">2</span><span class="p">:</span><span class="n">last_marker</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">complete_lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">first_marker</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:</span><span class="n">last_marker</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
 
-    <span class="c">#SPECIAL-CASE: no completion options or only one option</span>
+    <span class="c"># SPECIAL-CASE: no completion options or only one option</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">complete_lines</span><span class="p">:</span>
         <span class="c"># NOTE:</span>
         <span class="c">#   if there is only one option, readline simply applies it,</span>
         <span class="c">#   which affects the current line in place.  apparently this</span>
         <span class="c">#   results in tons of control-characters being dumped onto</span>
         <span class="c">#   the line, and we have to clean those up for the output</span>
-        <span class="n">the_line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">first_marker</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">last_marker</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">the_line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">first_marker</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">last_marker</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">the_line</span> <span class="o">=</span> <span class="n">remove_control_characters</span><span class="p">(</span><span class="n">the_line</span><span class="p">)</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">the_line</span><span class="p">[</span><span class="n">the_line</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="n">to_complete</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">to_complete</span><span class="p">):]</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">to_complete</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">tmp</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">the_line</span><span class="p">[</span><span class="n">the_line</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="n">to_complete</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_complete</span><span class="p">):]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">to_complete</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tmp</span>
 
         <span class="k">if</span> <span class="s">&#39;#&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
             <span class="c"># this seems to only happen for directories.  not sure why</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[:</span><span class="n">result</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">)]</span>
         <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="n">to_complete</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="c">#SPECIAL-CASE: no completion options at all.</span>
+            <span class="c"># SPECIAL-CASE: no completion options at all.</span>
             <span class="k">return</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">result</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c"># there are multiple completion options</span>
         <span class="n">completion_choices_by_row</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">complete_lines</span><span class="p">]</span>
-        <span class="n">completion_choices</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">,</span> <span class="n">completion_choices_by_row</span><span class="p">)</span>
+        <span class="n">completion_choices</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">completion_choices_by_row</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">completion_choices</span>
+
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="c"># if being called from the command line, output json</span>
@@ -1238,7 +1242,7 @@ git-subcommands to debian packages, depending on context.</p>
     <span class="n">result</span> <span class="o">=</span> <span class="n">complete</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
     <span class="k">print</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
@@ -1341,7 +1345,8 @@ solution:</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">to_complete</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="s">&#39;&#39;&#39;bash -c &quot;printf &#39;PS1=</span><span class="se">\&quot;\&quot;</span><span class="s">;echo MARKER</span><span class="se">\n</span><span class="s">{complete}</span><span class="se">\t\t\x01</span><span class="s">#</span><span class="se">\n</span><span class="s">echo MARKER&#39;|bash -i&quot;&#39;&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">complete</span><span class="o">=</span><span class="n">to_complete</span><span class="p">)</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">&#39;&#39;&#39;bash -c &quot;printf &#39;PS1=</span><span class="se">\&quot;\&quot;</span><span class="s">;echo MARKER</span><span class="se">\n</span><span class="s">{complete}</span><span class="se">\t\t\x01</span><span class="s">#</span><span class="se">\n</span><span class="s">echo MARKER&#39;|bash -i&quot;&#39;&#39;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">complete</span><span class="o">=</span><span class="n">to_complete</span><span class="p">)</span>
     <span class="n">p1</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">)</span>
     <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
@@ -1364,33 +1369,34 @@ solution:</p>
         <span class="c"># Pagination indicators like &#39;--More--&#39;must be removed</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;--More&#39;</span><span class="p">)]</span>
         <span class="n">last_marker</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">-</span> <span class="mi">3</span>
-        <span class="n">first_marker</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="n">first_marker</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="n">complete_lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">first_marker</span><span class="o">+</span><span class="mi">2</span><span class="p">:</span><span class="n">last_marker</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">complete_lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">first_marker</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:</span><span class="n">last_marker</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
 
-    <span class="c">#SPECIAL-CASE: no completion options or only one option</span>
+    <span class="c"># SPECIAL-CASE: no completion options or only one option</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">complete_lines</span><span class="p">:</span>
         <span class="c"># NOTE:</span>
         <span class="c">#   if there is only one option, readline simply applies it,</span>
         <span class="c">#   which affects the current line in place.  apparently this</span>
         <span class="c">#   results in tons of control-characters being dumped onto</span>
         <span class="c">#   the line, and we have to clean those up for the output</span>
-        <span class="n">the_line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">first_marker</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">last_marker</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">the_line</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">first_marker</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">last_marker</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">the_line</span> <span class="o">=</span> <span class="n">remove_control_characters</span><span class="p">(</span><span class="n">the_line</span><span class="p">)</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">the_line</span><span class="p">[</span><span class="n">the_line</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="n">to_complete</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">to_complete</span><span class="p">):]</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">to_complete</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">tmp</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">the_line</span><span class="p">[</span><span class="n">the_line</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="n">to_complete</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">to_complete</span><span class="p">):]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">to_complete</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tmp</span>
 
         <span class="k">if</span> <span class="s">&#39;#&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
             <span class="c"># this seems to only happen for directories.  not sure why</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[:</span><span class="n">result</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">)]</span>
         <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="n">to_complete</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="c">#SPECIAL-CASE: no completion options at all.</span>
+            <span class="c"># SPECIAL-CASE: no completion options at all.</span>
             <span class="k">return</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">result</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c"># there are multiple completion options</span>
         <span class="n">completion_choices_by_row</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">complete_lines</span><span class="p">]</span>
-        <span class="n">completion_choices</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">,</span> <span class="n">completion_choices_by_row</span><span class="p">)</span>
+        <span class="n">completion_choices</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">completion_choices_by_row</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">completion_choices</span>
 </pre></div>
 
@@ -1439,8 +1445,8 @@ solution:</p>
     <div class="codehilite"><pre><span class="k">def</span> <span class="nf">remove_control_characters</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="n">s</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">ansi_escape</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;[1@#&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ch</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">if</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">category</span><span class="p">(</span><span class="n">ch</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span><span class="s">&quot;C&quot;</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;[1@#&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ch</span> <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">if</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">category</span><span class="p">(</span><span class="n">ch</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;C&quot;</span><span class="p">)</span>
 </pre></div>
 
   </div>

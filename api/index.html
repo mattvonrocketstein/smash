@@ -1051,10 +1051,8 @@ table {
         <li class="mono"><a href="bases/index.html">smashlib.bases</a></li>
         <li class="mono"><a href="bin/index.html">smashlib.bin</a></li>
         <li class="mono"><a href="channels.m.html">smashlib.channels</a></li>
-        <li class="mono"><a href="completion.m.html">smashlib.completion</a></li>
         <li class="mono"><a href="contrib/index.html">smashlib.contrib</a></li>
         <li class="mono"><a href="data.m.html">smashlib.data</a></li>
-        <li class="mono"><a href="env.m.html">smashlib.env</a></li>
         <li class="mono"><a href="exceptions.m.html">smashlib.exceptions</a></li>
         <li class="mono"><a href="import_hooks.m.html">smashlib.import_hooks</a></li>
         <li class="mono"><a href="prefilters/index.html">smashlib.prefilters</a></li>
@@ -1084,19 +1082,19 @@ table {
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">__version__</span> <span class="o">=</span> <span class="mf">0.1</span>
 <span class="kn">import</span> <span class="nn">os</span>
-
+<span class="kn">from</span> <span class="nn">goulash._inspect</span> <span class="kn">import</span> <span class="n">get_caller</span>
 <span class="kn">from</span> <span class="nn">smashlib.import_hooks</span> <span class="kn">import</span> <span class="n">hijack_ipython_module</span>
+
 
 <span class="k">def</span> <span class="nf">start_ipython</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">smashlib.overrides</span> <span class="kn">import</span> <span class="n">launch_new_instance</span>
     <span class="k">return</span> <span class="n">launch_new_instance</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">argv</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
+
 <span class="k">def</span> <span class="nf">embed</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(),</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
     <span class="n">hijack_ipython_module</span><span class="p">()</span>
-    <span class="c">#if os.environ.get(&#39;SMASH&#39;, None):</span>
+    <span class="c"># if os.environ.get(&#39;SMASH&#39;, None):</span>
     <span class="c">#    print &quot;..detected nesting.. this may cause problems&quot;</span>
-
-    <span class="kn">from</span> <span class="nn">goulash._inspect</span> <span class="kn">import</span> <span class="n">get_caller</span>
     <span class="n">context</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;user_ns&#39;</span><span class="p">,</span> <span class="p">{})</span>
     <span class="n">caller_context</span> <span class="o">=</span> <span class="n">get_caller</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -1108,6 +1106,7 @@ table {
         <span class="n">start_ipython</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">argv</span><span class="p">,</span> <span class="n">user_ns</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
         <span class="k">print</span> <span class="s">&#39;caught kbi&#39;</span>
+
 
 <span class="k">def</span> <span class="nf">get_smash</span><span class="p">():</span>
     <span class="k">try</span><span class="p">:</span>
@@ -1141,10 +1140,8 @@ table {
   <div id="source-smashlib.embed" class="source">
     <div class="codehilite"><pre><span class="k">def</span> <span class="nf">embed</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(),</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
     <span class="n">hijack_ipython_module</span><span class="p">()</span>
-    <span class="c">#if os.environ.get(&#39;SMASH&#39;, None):</span>
+    <span class="c"># if os.environ.get(&#39;SMASH&#39;, None):</span>
     <span class="c">#    print &quot;..detected nesting.. this may cause problems&quot;</span>
-
-    <span class="kn">from</span> <span class="nn">goulash._inspect</span> <span class="kn">import</span> <span class="n">get_caller</span>
     <span class="n">context</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;user_ns&#39;</span><span class="p">,</span> <span class="p">{})</span>
     <span class="n">caller_context</span> <span class="o">=</span> <span class="n">get_caller</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -1237,13 +1234,6 @@ table {
 
       </div>
       <div class="item">
-      <p class="name"><a href="completion.m.html">smashlib.completion</a></p>
-      
-  
-    <div class="desc"><p>smashlib.completion</p></div>
-
-      </div>
-      <div class="item">
       <p class="name"><a href="contrib/index.html">smashlib.contrib</a></p>
       
   
@@ -1254,13 +1244,6 @@ table {
       
   
     <div class="desc"><p>smashlib.data</p></div>
-
-      </div>
-      <div class="item">
-      <p class="name"><a href="env.m.html">smashlib.env</a></p>
-      
-  
-    <div class="desc"><p>smashlib.env</p></div>
 
       </div>
       <div class="item">
