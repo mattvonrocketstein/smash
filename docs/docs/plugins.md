@@ -19,15 +19,16 @@ The smash core aims to be small and only include the essentials, so much of the 
 
 The rest of this page attempts to completely describe the plugins which ship with smash, although note that these plugins may not be enabled by default.
 
-
+<hr/>
 
 ####<a id="hcf">Handle Command Failure</a>
-This plugin receives a signal whenever a system command fails, where the signal contains information about both the full command and the exit code.  Note that this is happens all the time since "ls /does/not/exist" terminates with a non-zero exit status, but this may interest plugins.
+This plugin receives a signal whenever a system command fails, where the signal contains information about both the full command and the exit code.  Note that this is happens all the time since "ls /does/not/exist" terminates with a non-zero exit status, but this may interest plugin implementors.
 
 #####Signals
 
 *Receives:* COMMAND_FAIL
 
+<hr/>
 
 <a id="ptc"></a>
 ####Python Tools Completion
@@ -49,9 +50,6 @@ Smash ships with an integrated version of the wonderful [autojump](https://githu
 #####Commands:
 * `j some_bookmark`: jump to a directory based on the weighted ratings in the current database
 
-#####Configuration Options:
-* `_.AutoJump.verbose`: set True to see debug messages
-
 #####Signals
 
 *Receives:* CHANGE_DIR
@@ -61,7 +59,9 @@ Smash ships with an integrated version of the wonderful [autojump](https://githu
 
 ####<a id="autojump">Enhanced "which"</a>
 
-This plugin replaces the system "which" command.
+This plugin augments the system "which" command with a version that knows about python libraries and virtualenvs.
+
+<img src="../scr/which_demo.gif" alt="alt text" style="width:800px;height:350px;">
 
 #####Commands:
 * `which *module_or_cmd*`: display information about a system command or python module

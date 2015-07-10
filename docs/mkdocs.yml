@@ -1,5 +1,7 @@
 site_name: smash
 theme_dir: glsh
+site_dir: site
+docs_dir: docs
 repo_url: https://github.com/mattvonrocketstein/smashlib.git
 site_author: mvr
 pages:
