@@ -15,9 +15,7 @@ def setup_completer(self, event):
     return 'install develop build'.split()
 
 
-@opt_completer('tox')
-def tox_completer(self, event):
-    return []
+tox_completer = opt_completer('tox')
 
 
 def tox_env_completer(self, event):

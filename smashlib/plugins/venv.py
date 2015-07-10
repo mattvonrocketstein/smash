@@ -59,9 +59,7 @@ class VirtualEnvMagics(Magics):
         return self.vext.report
 
 
-@opt_completer('virtualenv')
-def virtualenv_completer(self, event):
-    return []
+virtualenv_completer = opt_completer('virtualenv')
 
 
 class VirtualEnvSupport(Plugin):

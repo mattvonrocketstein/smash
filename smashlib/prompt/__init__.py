@@ -2,7 +2,6 @@
 """
 import os
 
-from report import console
 from goulash._fabric import qlocal
 from goulash._os import get_term_size
 MAX_LENGTH = 25

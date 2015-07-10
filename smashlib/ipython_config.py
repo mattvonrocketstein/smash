@@ -25,6 +25,7 @@ _.Smash.load_bash_functions = True
 _.InteractiveShellApp.extensions.append("smashlib.pysh")
 #_.InteractiveShellApp.extensions.append("smashlib.dot_prefilter")
 _.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
+_.InteractiveShellApp.extensions.append("smashlib.plugins._fabric")
 
 # every smash component gets it's own verbosity setting.
 # this mostly controls the printing of debugging info
@@ -58,7 +59,7 @@ _.TerminalInteractiveShell.confirm_exit = False
 # If False, only the completion results from
 # the first non-empty completer will be returned.
 ##########################################################################
-_.IPCompleter.merge_completions = False
+_.IPCompleter.merge_completions = True
 
 
 # load optional smash extensions

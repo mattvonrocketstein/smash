@@ -4,7 +4,6 @@
 import os
 import addict
 from goulash._fabric import qlocal
-from IPython.utils import coloransi
 from smashlib.util.reflect import from_dotpath
 
 

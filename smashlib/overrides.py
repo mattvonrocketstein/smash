@@ -115,10 +115,10 @@ class SmashTerminalInteractiveShell(BaseTIS):
                 if handled:
                     return
         if etype == NameError:
-            if len(self._smash_last_input.split('\n'))==1:
+            if len(self._smash_last_input.split('\n')) == 1:
                 msg = 'smash: {0}: command not found'
                 msg = msg.format(
-                    self._smash_last_input.strip());
+                    self._smash_last_input.strip())
                 print msg
                 return
         else:
@@ -255,7 +255,7 @@ class SmashTerminalIPythonApp(BaseTIA):
             ipython_dir=self.ipython_dir,
             user_ns=self.user_ns)
         self.shell.configurables.append(self)
-        #self.shell.Completer.matchers = [self.smash_matcher] + \
+        # self.shell.Completer.matchers = [self.smash_matcher] + \
         #    self.shell.Completer.matchers
 TerminalIPythonApp = SmashTerminalIPythonApp
 launch_new_instance = TerminalIPythonApp.launch_instance

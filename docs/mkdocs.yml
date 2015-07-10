@@ -11,3 +11,5 @@ pages:
 #- 'Shell Features': 'shell_use_cases.md'
 - 'Project Manager': 'project_manager.md'
 - 'API Reference': 'api/index.html'
+extra:
+    base_url: '/'

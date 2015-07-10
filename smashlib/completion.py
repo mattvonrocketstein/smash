@@ -20,20 +20,17 @@ def complete_long_opts(cmd):
     return out
 
 
-#FIXME: deprecated?
 class opt_completer(object):
+
     """ """
 
     def __init__(self, cmd_name):
         self.cmd = cmd_name
 
-    def __call__(self, fxn):
-        def OptCompleter(himself, event):
-            line = event.line
-            if line and line.split()[-1].startswith('-'):
-                return complete_long_opts(self.cmd)
-            return fxn(himself, event)
-        return OptCompleter
+    def __call__(self, himself, event):
+        if event.symbol in ['-', '--']:
+            return complete_long_opts(self.cmd)
+        return []
 
 
 class SmashCompleter(IPCompleter):

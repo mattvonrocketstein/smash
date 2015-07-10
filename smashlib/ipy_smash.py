@@ -156,7 +156,8 @@ class Smash(Plugin):
         self.publish(C_SMASH_INIT_COMPLETE)
         self.shell.user_ns['_smash'] = self
         self.shell.run_cell('rehashx')
-        #self.user_ns.pop('')
+        # self.user_ns.pop('')
+
     def recent_commands(self, num):
         tmp = self.history(num)
         return set(list(tmp))
@@ -217,7 +218,7 @@ class Smash(Plugin):
         super(Smash, self).init_bus()
 
     def add_completer(self, fxn, **kargs):
-        smash_log.info("akdding new completer: {0}".format(fxn))
+        smash_log.info("adding new completer: {0}".format(fxn))
         self.completers[get_caller(2)['class']].append(fxn)
         get_ipython().set_hook('complete_command', fxn, **kargs)
 

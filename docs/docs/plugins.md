@@ -1,7 +1,6 @@
 ---
 <a id="list"></a>
 
-[Liquidprompt](#liquidprompt) |
 [Autojump](#autojump) |
 [Handle Command Failure](#hcf) |
 [Do What I Mean](#dwim) |
@@ -59,23 +58,6 @@ Smash ships with an integrated version of the wonderful [autojump](https://githu
 
 -------------------------------------------------------------------------------
 
-####<a id="liquidprompt">Liquidprompt</a>
-
-This plugin provides prompt rendering via the wonderfully dynamic [liquidprompt tool](#https://github.com/nojhan/liquidprompt).  Liquidprompt has rich options for configuration and it's recommended that you [configure it in the normal way](https://github.com/nojhan/liquidprompt#features-configuration), but, some of these options can be overridden from `~/.smash/config.py` (see below).
-
-#####Commands:
-* `prompt_tag "my tag"`: add a text prefix for the current prompt
-
-#####Configuration Options:
-* `_.LiquidPrompt.verbose`: set True to see debug messages
-* `_.LiquidPrompt.float`: set True to insert more space around prompt
-* `_.LiquidPrompt.prompt_append`: set a suffix on the prompt ('\n>' is a good one for legibility)
-
-#####Signals
-
-*Receives:* UPDATE_PROMPT_REQUEST
-
--------------------------------------------------------------------------------
 
 ####<a id="autojump">Enhanced "which"</a>
 

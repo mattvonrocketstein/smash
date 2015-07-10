@@ -91,7 +91,7 @@ def complete(to_complete):
     p1 = Popen(cmd, shell=True, stdout=PIPE, stdin=PIPE, stderr=PIPE)
     out, err = p1.communicate()
     lines = err.split('\n')
-    #smash_log.info(err)
+    # smash_log.info(err)
     first_marker = None
     last_marker = None
     for i in range(len(lines)):
