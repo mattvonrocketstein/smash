@@ -18,6 +18,7 @@ def require_active_project(fxn):
     return newf
 
 
+# FIXME: should inherit from smashlib.handle
 class ProjectManagerInterface(object):
 
     """ This object should be a singleton and will be assigned to

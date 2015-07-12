@@ -3,6 +3,8 @@
 
 from IPython.core.macro import Macro
 from peak.util.imports import lazyModule
+from smashlib.handle import AbstractInterface
+
 logging = lazyModule('smashlib._logging')
 
 
@@ -41,10 +43,10 @@ class AliasMixin(object):
             except ValueError:
                 continue
 
-from smashlib.plugins.interface import AbstractInterface
-
 
 class AliasInterface(AbstractInterface):
+
+    user_ns_var = 'aliases'
 
     def __qmark__(self):
         """ user-friendly information when the input is "plugins?" """

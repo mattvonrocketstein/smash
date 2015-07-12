@@ -1,3 +1,5 @@
+####Configuration Basics
+
 Smash configuration, like smash libraries and executables, are stored in `~/.smash`.  The main configuration file is `~/.smash/etc/config.py`.  If your [editor is configured](#editor), you can open the main configuration file at any time from typing `ed_config` inside of smash.
 
 <a id="inheritance-shell"></a><a id="inheritance"></a>

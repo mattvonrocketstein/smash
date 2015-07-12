@@ -1,20 +1,23 @@
 """smashlib.data
 """
 import os
-from goulash.python import expanduser, opj, dirname
+
 from goulash._os import home
+from goulash.python import expanduser, opj, dirname
 
 main_profile_name = 'SmaSh'
-user_config_name = 'config.py'
+fname_user_config = 'config.py'
+fname_editor_config = 'editor.json'
+
 SMASH_DIR = expanduser('~/.smash')
 SMASH_BIN = os.path.join(SMASH_DIR, 'bin')
 SMASH_LOGS = os.path.join(SMASH_DIR, 'logs')
 SMASH_ETC = os.path.join(SMASH_DIR, 'etc')
 SMASHLIB_DIR = dirname(__file__)
-USER_CONFIG_PATH = os.path.join(SMASH_DIR, user_config_name)
+USER_CONFIG_PATH = os.path.join(SMASH_DIR, fname_user_config)
 ALIAS_CONFIG_PATH = os.path.join(SMASH_ETC, 'aliases.json')
 MACRO_CONFIG_PATH = os.path.join(SMASH_ETC, 'macros.json')
-EDITOR_CONFIG_PATH = os.path.join(SMASH_ETC, 'editor.json')
+EDITOR_CONFIG_PATH = os.path.join(SMASH_ETC, fname_editor_config)
 ENV_CONFIG_PATH = os.path.join(SMASH_ETC, 'env.json')
 PROMPT_CONFIG_PATH = os.path.join(SMASH_ETC, 'prompt.json')
 

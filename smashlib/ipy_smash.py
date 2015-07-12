@@ -25,6 +25,7 @@ from smashlib.util import bash
 from smashlib.magics import SmashMagics
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 from smashlib.plugins.interface import PluginInterface
+from smashlib.prompt.interface import PromptInterface
 from smashlib.patches.edit import PatchEdit
 from smashlib.patches.rehash import PatchRehash
 from smashlib.patches.pinfo import PatchPinfoMagic
@@ -80,13 +81,20 @@ class Smash(Plugin):
                 self.warning(msg)
         self._installed_plugins = _installed_plugins
 
-        alias_iface = AliasInterface(self)
-        alias_iface.update()
-        get_ipython().user_ns.update(aliases=alias_iface)
+        tmp = [AliasInterface, PluginInterface, PromptInterface]
+        for IfaceCls in tmp:
+            iface = IfaceCls(self)
+            iface.update()
+            get_ipython().user_ns.update({iface.user_ns_var:iface})
 
-        plugin_iface = PluginInterface(self)
-        plugin_iface.update()
-        get_ipython().user_ns.update(plugins=plugin_iface)
+
+        #alias_iface = AliasInterface(self)
+        #alias_iface.update()
+        #get_ipython().user_ns.update(aliases=alias_iface)
+
+        #plugin_iface = PluginInterface(self)
+        #plugin_iface.update()
+        #get_ipython().user_ns.update(plugins=plugin_iface)
         self.report("loaded plugins:", _installed_plugins.keys())
 
     def get_cli_arguments(self):
