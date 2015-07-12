@@ -8,7 +8,9 @@ pages:
 - 'Home': 'index.md'
 - 'Feature Overview': 'features.md'
 - 'Configuration': 'configuration.md'
-- 'Plugins': 'plugins.md'
+- 'Plugins':
+  - 'old': 'smash_plugins/index.md'
+  - 'prompt': 'smash_plugins/prompt.md'
 #- 'Python Features': 'python_use_cases.md'
 #- 'Shell Features': 'shell_use_cases.md'
 - 'Project Manager': 'project_manager.md'

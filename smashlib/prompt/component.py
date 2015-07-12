@@ -38,10 +38,11 @@ class PromptComponent(addict.Dict):
             err = 'invalid prompt component: {0}'
             err = err.format(self)
             raise Exception(err)
-        if result and \
-                self.space_margins and \
-                self.space_margins.lower() == 'true':
-            result = ' {0} '.format(result)
+        # post-processing
+        if result and self.space_margins:
+            if self.space_margins==True or \
+                   self.space_margins.lower() == 'true':
+                result = ' {0} '.format(result)
         if self.color:
             # have to use IPython's formatting rules so that IPython
             # can correctly calculate terminal width w/ invisible chars

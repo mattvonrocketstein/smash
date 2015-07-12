@@ -26,6 +26,7 @@ _.InteractiveShellApp.extensions.append("smashlib.pysh")
 #_.InteractiveShellApp.extensions.append("smashlib.dot_prefilter")
 _.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
 _.InteractiveShellApp.extensions.append("smashlib.plugins._fabric")
+_.InteractiveShellApp.extensions.append("smashlib.plugins.venv")
 
 # every smash component gets it's own verbosity setting.
 # this mostly controls the printing of debugging info

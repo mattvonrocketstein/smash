@@ -11,12 +11,32 @@ from smashlib.channels import C_UPDATE_PROMPT_REQUEST
 from smashlib.config import SmashConfig
 from smashlib.prompt.component import PromptComponent
 from smashlib._logging import smash_log
+
 DEFAULT_IN_TEMPLATE = u'In [\\#]: '
+
 DEFAULT_PROMPT = [
-    PromptComponent(type='literal',
-                    color='red',
-                    value='smash'),
-    PromptComponent(type='literal', value='$ ')
+    PromptComponent(
+        type='env',
+        value='$USER'),
+    PromptComponent(
+        type='literal', value=':'),
+    PromptComponent(
+        type='python',
+        value="smashlib.prompt.working_dir"),
+    PromptComponent(
+        type='literal', value=' ',),
+    PromptComponent(
+        type='python',
+        value='smashlib.prompt.git_branch',
+        color='blue',),
+    PromptComponent(
+        type='python',
+        value='smashlib.prompt.user_symbol',
+        color='red',),
+    PromptComponent(
+        type='python',
+        value='smashlib.prompt.venv',
+        color='yellow',),
 ]
 
 
@@ -36,7 +56,6 @@ class SmashPrompt(Plugin):
         components = c.load_from_etc('prompt.json')
         if not components:
             components = DEFAULT_PROMPT
-
         out = []
         for component in components:
             out.append(PromptComponent(**component))
@@ -44,6 +63,7 @@ class SmashPrompt(Plugin):
         self.prompt_components = components
 
     def init(self):
+        smash_log.info("initializing")
         self._load_prompt_config()
         self.update_prompt()
         self.contribute_hook('pre_prompt_hook', self.update_prompt)
@@ -66,11 +86,6 @@ class SmashPrompt(Plugin):
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     ip = get_ipython()
-    lp = SmashPrompt(ip)
-    ip._smash.lp = lp
-    return lp
-
-
-def unload_ipython_extension(ip):
-    """ called by %unload_ext magic"""
-    get_smash()._installed_plugins['smash_prompt'].uninstall()
+    sp = SmashPrompt(ip)
+    #ip._smash.sp = sp
+    return sp
