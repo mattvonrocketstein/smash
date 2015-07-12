@@ -4,7 +4,7 @@
     
     <url>
      <loc>None/</loc>
-     <lastmod>2015-07-10</lastmod>
+     <lastmod>2015-07-12</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -12,7 +12,7 @@
     
     <url>
      <loc>None/features/</loc>
-     <lastmod>2015-07-10</lastmod>
+     <lastmod>2015-07-12</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -20,23 +20,67 @@
     
     <url>
      <loc>None/configuration/</loc>
-     <lastmod>2015-07-10</lastmod>
+     <lastmod>2015-07-12</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
 
     
+        
     <url>
-     <loc>None/plugins/</loc>
-     <lastmod>2015-07-10</lastmod>
+     <loc>None/smash_plugins/prompt/</loc>
+     <lastmod>2015-07-12</lastmod>
      <changefreq>daily</changefreq>
     </url>
+        
+    <url>
+     <loc>None/smash_plugins/python_tools_completion/</loc>
+     <lastmod>2015-07-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/smash_plugins/venv/</loc>
+     <lastmod>2015-07-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/smash_plugins/prompt/</loc>
+     <lastmod>2015-07-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/smash_plugins/cd_hooks/</loc>
+     <lastmod>2015-07-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/smash_plugins/dwim/</loc>
+     <lastmod>2015-07-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/smash_plugins/which/</loc>
+     <lastmod>2015-07-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/smash_plugins/dev/</loc>
+     <lastmod>2015-07-12</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
     
 
     
     <url>
      <loc>None/project_manager/</loc>
-     <lastmod>2015-07-10</lastmod>
+     <lastmod>2015-07-12</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -44,7 +88,7 @@
     
     <url>
      <loc>None/api/</loc>
-     <lastmod>2015-07-10</lastmod>
+     <lastmod>2015-07-12</lastmod>
      <changefreq>daily</changefreq>
     </url>
     

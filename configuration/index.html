@@ -68,8 +68,43 @@
             
             
             
-                <li >
-                    <a href="../plugins/">Plugins</a>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Plugins <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
+                        <li >
+                            <a href="../smash_plugins/prompt/">Autojump</a>
+                        </li>
+                    
+                        <li >
+                            <a href="../smash_plugins/python_tools_completion/">Python: Tools completion</a>
+                        </li>
+                    
+                        <li >
+                            <a href="../smash_plugins/venv/">Python: Virtualenv</a>
+                        </li>
+                    
+                        <li >
+                            <a href="../smash_plugins/prompt/">Prompt</a>
+                        </li>
+                    
+                        <li >
+                            <a href="../smash_plugins/cd_hooks/">CD Hooks</a>
+                        </li>
+                    
+                        <li >
+                            <a href="../smash_plugins/dwim/">Do what I Mean</a>
+                        </li>
+                    
+                        <li >
+                            <a href="../smash_plugins/which/">Enhanced "which"</a>
+                        </li>
+                    
+                        <li >
+                            <a href="../smash_plugins/dev/">Writing new plugins</a>
+                        </li>
+                    
+                    </ul>
                 </li>
             
             
@@ -95,7 +130,7 @@
                     </a>
                 </li>
                 <li >
-                    <a rel="prev" href="../plugins/">
+                    <a rel="prev" href="../smash_plugins/prompt/">
                         Next <i class="fa fa-arrow-right"></i>
                     </a>
                 </li>
@@ -118,7 +153,10 @@
             <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#inheriting-existing-shell-configuration">Inheriting existing shell configuration</a></li>
+        <li class="main active"><a href="#configuration-basics">Configuration Basics</a></li>
+        
+    
+        <li class="main "><a href="#inheriting-existing-shell-configuration">Inheriting existing shell configuration</a></li>
         
     
         <li class="main "><a href="#inheriting-existing-ipython-configuration">Inheriting existing IPython configuration</a></li>
@@ -134,6 +172,7 @@
 </div></div>
             <div class="col-md-9" role="main">
 
+<h4 id="configuration-basics">Configuration Basics</h4>
 <p>Smash configuration, like smash libraries and executables, are stored in <code>~/.smash</code>.  The main configuration file is <code>~/.smash/etc/config.py</code>.  If your <a href="#editor">editor is configured</a>, you can open the main configuration file at any time from typing <code>ed_config</code> inside of smash.</p>
 <p><a id="inheritance-shell"></a><a id="inheritance"></a></p>
 <h4 id="inheriting-existing-shell-configuration">Inheriting existing shell configuration</h4>
