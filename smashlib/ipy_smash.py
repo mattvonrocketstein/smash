@@ -85,16 +85,15 @@ class Smash(Plugin):
         for IfaceCls in tmp:
             iface = IfaceCls(self)
             iface.update()
-            get_ipython().user_ns.update({iface.user_ns_var:iface})
-
+            get_ipython().user_ns.update({iface.user_ns_var: iface})
 
         #alias_iface = AliasInterface(self)
-        #alias_iface.update()
-        #get_ipython().user_ns.update(aliases=alias_iface)
+        # alias_iface.update()
+        # get_ipython().user_ns.update(aliases=alias_iface)
 
         #plugin_iface = PluginInterface(self)
-        #plugin_iface.update()
-        #get_ipython().user_ns.update(plugins=plugin_iface)
+        # plugin_iface.update()
+        # get_ipython().user_ns.update(plugins=plugin_iface)
         self.report("loaded plugins:", _installed_plugins.keys())
 
     def get_cli_arguments(self):

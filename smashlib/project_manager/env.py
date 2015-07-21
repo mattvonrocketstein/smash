@@ -24,4 +24,5 @@ class EnvMixin(object):
     def _unload_env_group(self, group_name):
         tmp = self._get_env_group(group_name)
         for k, v in tmp:
-            del os.environ[k]
+            if k in os.environ:
+                del os.environ[k]

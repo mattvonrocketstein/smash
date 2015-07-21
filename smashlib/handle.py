@@ -1,10 +1,12 @@
 """smashlib.handle
 """
 
+
 class AbstractInterface(object):
 
     """ """
     user_ns_var = None
+
     def __repr__(self):
         return self.__class__.__name__
 

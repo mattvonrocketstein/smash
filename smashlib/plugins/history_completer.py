@@ -27,7 +27,7 @@ class HistoryCompleter(Plugin):
     def history_matcher(self, shell, event):
         """ """
         #print ('event: {0}'.format(event.__dict__))
-        smash_log.info('invoked')
+        # smash_log.info('invoked')
         # event attributes: text_until_cursor, line, command, symbol
         #smash_log.debug('matching {0}'.format(event.__dict__))
         if not event.symbol.strip():
@@ -44,13 +44,13 @@ class HistoryCompleter(Plugin):
         line = line.strip()
         tokens = smart_split(line)
         full = len(self.db) > self.MAX_SIZE
-        #smash_log.info('eating [{0}]'.format(tokens))
         for token in tokens:
             if len(token) < 4:
                 # too small, dont care
                 continue
-            self.db.append(token)
-            smash_log.info('eating token: {0}'.format(token))
+            if token not in self.db:
+                smash_log.info('eating token: {0}'.format(token))
+                self.db.append(token)
             if full:
                 self.db.pop(0)
 

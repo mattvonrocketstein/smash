@@ -40,8 +40,8 @@ class PromptComponent(addict.Dict):
             raise Exception(err)
         # post-processing
         if result and self.space_margins:
-            if self.space_margins==True or \
-                   self.space_margins.lower() == 'true':
+            if self.space_margins == True or \
+                    self.space_margins.lower() == 'true':
                 result = ' {0} '.format(result)
         if self.color:
             # have to use IPython's formatting rules so that IPython

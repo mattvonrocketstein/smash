@@ -39,7 +39,7 @@ class PluginInterface(AbstractInterface):
             prop = property(tmp2)
             setattr(self.__class__, name, prop)
         whitelist = ['edit', 'smash', 'update']
-        #for x in dir(self):
+        # for x in dir(self):
         #    if not x.startswith('_') and \
         #            x not in tmp and \
         #            x not in whitelist:

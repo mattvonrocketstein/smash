@@ -5,6 +5,7 @@ from smashlib.config import SmashConfig
 from smashlib.data import fname_editor_config
 is_windowing_env = lambda: True  # placeholder
 
+
 def get_editor():
     user_editor = None
     c = SmashConfig()

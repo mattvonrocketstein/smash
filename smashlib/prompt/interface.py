@@ -5,6 +5,7 @@
 from smashlib.data import EDITOR_CONFIG_PATH
 from smashlib.handle import AbstractInterface
 
+
 class PromptInterface(AbstractInterface):
 
     user_ns_var = 'prompt'
@@ -22,9 +23,9 @@ class PromptInterface(AbstractInterface):
 
     @property
     def _prompts(self):
-        return [1,2,3] #self.smash._installed_prompts
+        return [1, 2, 3]  # self.smash._installed_prompts
 
-    #def __getitem__(self, prompt_name):
+    # def __getitem__(self, prompt_name):
     #    return self._prompts[prompt_name]
 
     def update(self):
