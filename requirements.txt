@@ -17,7 +17,7 @@ voluptuous==0.8.6
 Importing==1.10
 
 #smashlib.ipy3x requirements
-git+git://github.com/ipython/traitlets.git
+https://github.com/ipython/traitlets/zipball/master
 pexpect
 decorator
 pickleshare
