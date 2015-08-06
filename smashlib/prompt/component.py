@@ -38,9 +38,7 @@ class PromptComponent(addict.Dict):
             err = 'invalid prompt component: {0}'
             err = err.format(self)
             raise Exception(err)
-        if result and \
-                self.space_margins and \
-                self.space_margins.lower() == 'true':
+        if result and self.space_margins:
             result = ' {0} '.format(result)
         if self.color:
             # have to use IPython's formatting rules so that IPython
