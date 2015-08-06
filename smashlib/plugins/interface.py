@@ -43,10 +43,8 @@ class PluginInterface(AbstractInterface):
     def update(self):
         tmp = self._plugins
 
-        def fxn(name):
-            return self.smash._installed_plugins[name]
         for name in tmp:
-            tmp2 = lambda himself: fxn(name)
+            tmp2 = lambda self=self, name=name: self.smash._installed_plugins[name]
             tmp3 = self.smash._installed_plugins[name].__qmark__()
             tmp2.__doc__ = tmp3
             prop = property(tmp2)
