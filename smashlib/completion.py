@@ -35,9 +35,12 @@ class opt_completer(object):
 
 class SmashCompleter(IPCompleter):
 
-    def asdasdcomplete(self, text, state):
-        smash_log.debug("received data: [{0}]".format([text, state]))
-        return super(SmashCompleter, self).complete(text, state)
+    def complete(self, text=None, line_buffer=None, cursor_pos=None):
+        smash_log.info("received data: [{0}]".format(
+            [text, line_buffer,cursor_pos]))
+        return super(SmashCompleter, self).complete(
+            text=text, line_buffer=line_buffer,
+            cursor_pos=cursor_pos)
 
     def magic_matches(self, text):
         smash_log.debug("completing [{0}]".format(text))

@@ -60,7 +60,7 @@ _.TerminalInteractiveShell.confirm_exit = False
 # If False, only the completion results from
 # the first non-empty completer will be returned.
 ##########################################################################
-_.IPCompleter.merge_completions = True
+_.IPCompleter.merge_completions = False
 
 
 # load optional smash extensions

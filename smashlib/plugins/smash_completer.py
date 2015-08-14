@@ -44,8 +44,10 @@ class SmashCompleter(Plugin):
         if not line.strip():
             raise TryNext()
         first_word = line.split()[0]
-        # cannot use event.symbol splits on '$'
-        last_word = line.split()[-1]
+        # cannot use event.symbol here, it splits on '$'
+        last_word = event.text_until_cursor.split()[-1]
+        smash_log.info("first-word, last-word: {0}".format(
+            [first_word, last_word]))
         if last_word.startswith('$'):
             return smash_env_complete(last_word)
         magic_command_alias = first_word.startswith('%') and \
@@ -54,7 +56,7 @@ class SmashCompleter(Plugin):
         results = []
         if naked_command_alias:
             smash_log.info('naked command alias detected')
-            results+= smash_bash_complete(line)[:self.MAX_MATCH]
+            results += smash_bash_complete(line)[:self.MAX_MATCH]
         elif magic_command_alias:
             smash_log.info('magic command alias detected')
             results += smash_bash_complete(line[1:])[:self.MAX_MATCH]
