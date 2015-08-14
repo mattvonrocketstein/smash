@@ -44,8 +44,9 @@ class SmashCompleter(Plugin):
         if not line.strip():
             raise TryNext()
         first_word = line.split()[0]
-        # cannot use event.symbol here, it splits on '$'
-        last_word = event.text_until_cursor.split()[-1]
+        # NB: cannot use event.symbol here, it splits on '$'
+        last_word = event.text_until_cursor.split()
+        last_word = last_word[-1] if last_word else ''
         smash_log.info("first-word, last-word: {0}".format(
             [first_word, last_word]))
         if last_word.startswith('$'):
