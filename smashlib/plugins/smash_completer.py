@@ -12,8 +12,9 @@ from smashlib.bin.pybcompgen import complete
 
 
 def smash_bash_complete(*args, **kargs):
-    smash_log.info("calling pybcompgen")
+    smash_log.info("calling pybcompgen: {0}".format([args,kargs]))
     result = complete(*args, **kargs)
+    smash_log.info("result: {0}".format(result))
     result = [x for x in result if x not in keyword.kwlist]
     return result
 
@@ -50,11 +51,19 @@ class SmashCompleter(Plugin):
         magic_command_alias = first_word.startswith('%') and \
             have_command_alias(first_word[1:])
         naked_command_alias = have_command_alias(first_word)
+        results = []
         if naked_command_alias:
-            return smash_bash_complete(line)[:self.MAX_MATCH]
-        if magic_command_alias:
-            return smash_bash_complete(line[1:])[:self.MAX_MATCH]
-        raise TryNext()
+            smash_log.info('naked command alias detected')
+            results+= smash_bash_complete(line)[:self.MAX_MATCH]
+        elif magic_command_alias:
+            smash_log.info('magic command alias detected')
+            results += smash_bash_complete(line[1:])[:self.MAX_MATCH]
+        if results:
+            smash_log.info("returning: {0}".format(results))
+            return results
+        else:
+            smash_log.info("no results so far, raising trynext ")
+            raise TryNext()
 
 
 def load_ipython_extension(ip):

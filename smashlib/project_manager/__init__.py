@@ -99,6 +99,9 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
         self._load_alias_group('__smash__')
         self._load_env_group('__smash__')
 
+    def reload(self):
+        print 'not implemented yet'
+
     def init_interface(self, pmi):
         ProjectManagerInterface._project_manager = self
         self.smash.shell.user_ns['proj'] = pmi

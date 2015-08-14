@@ -106,12 +106,13 @@ class ProjectManagerInterface(object):
         project_name = pm._current_project
         pm.test(project_name)
 
+    @property
+    def reload(self):
+        self._project_manager.reload()
+
     def __qmark__(self):
         pmap = self._project_manager.project_map
         out = ['ProjectManager: ({0} projects)'.format(len(pmap))]
-        #out += ['   projects:']
-
-        #    out += ['       : {0}'.format(nick)]
         cp = self._project_manager._current_project
         aliases = self._project_manager.alias_map
         if cp:
