@@ -34,15 +34,18 @@ class ProjectMagics(Magics):
     def env(self, parameter_s):
         # original: ipython.core.magics.osm.OSMagics.env
         from IPython.core.magics.osm import OSMagics
-        all_env = OSMagics().env(parameter_s)
-        all_env.pop('LS_COLORS', None)  # large and annoying, never useful
-        report("All environment variables: ", all_env)
-        pname = self.project_manager._current_project
-        if pname:
-            project_local_env = self.project_manager.local_env
-            report("This project: ", project_local_env)
+        original = lambda:OSMagics().env(parameter_s)
+        if not parameter_s.strip():
+            all_env = original()
+            all_env.pop('LS_COLORS', None)  # large and annoying, never useful
+            report("All environment variables: ", all_env)
+            pname = self.project_manager._current_project
+            if pname:
+                project_local_env = self.project_manager.local_env
+                report("This project: ", project_local_env)
+        else:
+            return original()
 
-        # if not parameter_s:
 
     @line_magic
     def check_project(self, parameter_s=''):
