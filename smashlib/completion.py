@@ -1,7 +1,8 @@
 """ smashlib.completion
 """
 
-import re, sys
+import re
+import sys
 import subprocess
 import itertools
 from smashlib._logging import smash_log
@@ -13,6 +14,7 @@ from IPython.core.error import TryNext
 from IPython.utils.py3compat import PY3, builtin_mod
 
 USELESS_BUILTINS = 'credits copyright'.split()
+
 
 def complete_long_opts(cmd):
     """ completes long-opts args for any command,
@@ -39,6 +41,7 @@ class opt_completer(object):
         return []
 
 USELESS_NAMESPACE = 'credits copyright'.split()
+
 
 class SmashCompleter(IPCompleter):
 
@@ -69,9 +72,9 @@ class SmashCompleter(IPCompleter):
             try_magic = []
 
         for c in itertools.chain(
-            self.custom_completers.s_matches(cmd),
-            try_magic,
-            self.custom_completers.flat_matches(self.text_until_cursor)):
+                self.custom_completers.s_matches(cmd),
+                try_magic,
+                self.custom_completers.flat_matches(self.text_until_cursor)):
             # print "try",c # dbg
             try:
                 res = c(event)
@@ -90,8 +93,9 @@ class SmashCompleter(IPCompleter):
     # almost unmodified from ipython original, but changed to
     # avoid completion over ALL the many builtins.
     COMPLETE_BUILTINS = list(
-        set(builtin_mod.__dict__.keys()) - \
+        set(builtin_mod.__dict__.keys()) -
         set(USELESS_BUILTINS))
+
     def global_matches(self, text):
         """Compute matches when text is a simple name.
 
@@ -115,7 +119,7 @@ class SmashCompleter(IPCompleter):
 
     def complete(self, text=None, line_buffer=None, cursor_pos=None):
         smash_log.info("received data: [{0}]".format(
-            [text, line_buffer,cursor_pos]))
+            [text, line_buffer, cursor_pos]))
         """Find completions for the given text and line context.
 
         Note that both the text and the line_buffer are optional, but at least
@@ -188,18 +192,19 @@ class SmashCompleter(IPCompleter):
                     extra = matcher(text)
                     self.matches.extend(extra)
                     smash_log.info("extending matches with: {0}".format(extra))
-                    #try:
+                    # try:
                     #    self.matches.extend(matcher(text))
-                    #except:
-                        # Show the ugly traceback if the matcher causes an
-                        # exception, but do NOT crash the kernel!
+                    # except:
+                    # Show the ugly traceback if the matcher causes an
+                    # exception, but do NOT crash the kernel!
                     #    raise
                     #   sys.excepthook(*sys.exc_info())
             else:
                 for matcher in self.matchers:
                     self.matches = matcher(text)
                     if self.matches:
-                        smash_log.info("returning matches from: {0}".format(matcher))
+                        smash_log.info(
+                            "returning matches from: {0}".format(matcher))
                         break
         # FIXME: we should extend our api to return a dict with completions for
         # different types of objects.  The rlcomplete() method could then
@@ -209,7 +214,8 @@ class SmashCompleter(IPCompleter):
         # use penalize_magics_key to put magics after variables with same name
         self.matches = sorted(set(self.matches), key=penalize_magics_key)
 
-        smash_log.info('COMP TEXT, MATCHES: %r, %r' % (text, self.matches)) # dbg
+        smash_log.info('COMP TEXT, MATCHES: %r, %r' %
+                       (text, self.matches))  # dbg
         return text, self.matches
 
     def magic_matches(self, text):

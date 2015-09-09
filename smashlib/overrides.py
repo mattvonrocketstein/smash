@@ -30,6 +30,7 @@ from smashlib.util import split_on_unquoted_semicolons, is_path
 from smashlib.bin.pybcompgen import complete
 from smashlib.completion import SmashCompleter
 
+
 class SmashDisplayHook(DisplayHook):
 
     def finish_displayhook(self):

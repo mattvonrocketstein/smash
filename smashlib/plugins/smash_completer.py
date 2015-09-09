@@ -12,7 +12,7 @@ from smashlib.bin.pybcompgen import complete
 
 
 def smash_bash_complete(*args, **kargs):
-    smash_log.info("calling pybcompgen: {0}".format([args,kargs]))
+    smash_log.info("calling pybcompgen: {0}".format([args, kargs]))
     result = complete(*args, **kargs)
     smash_log.info("result: {0}".format(result))
     result = [x for x in result if x not in keyword.kwlist]
