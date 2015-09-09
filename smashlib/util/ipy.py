@@ -47,7 +47,6 @@ def have_command_alias(x):
     """
     if not r_cmd.match(x):
         return False
-    logging.smash_log.info('answering have_command_alias {0}'.format(x))
     blacklist = [
         # posix line oriented, not very useful so
         # this should not override ipython edit
@@ -57,14 +56,16 @@ def have_command_alias(x):
         'ip',
     ] + keyword.kwlist
     if x in blacklist:
-        return False
+        result = False
     else:
         alias_list = get_ipython().alias_manager.aliases
         cmd_list = set()
         for alias, cmd in alias_list:
             if alias == cmd:
                 cmd_list = cmd_list.union(set([alias]))
-        return x in cmd_list
+        result = x in cmd_list
+    logging.smash_log.info('"{0}"? {1}'.format(x, result))
+    return result
 have_alias = have_command_alias
 
 

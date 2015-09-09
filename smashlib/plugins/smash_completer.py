@@ -61,6 +61,16 @@ class SmashCompleter(Plugin):
         elif magic_command_alias:
             smash_log.info('magic command alias detected')
             results += smash_bash_complete(line[1:])[:self.MAX_MATCH]
+
+        # can't do anything smarter? look for file matches.
+        # this works by default if the last word contains os.path.sep,
+        # but this doesn't necessarily work with the special "ed" alias
+        # unless this sectiion is executed
+        if not results:
+            smash_log.info(('no results for completion, looking for '
+                            'file matches with "{0}"'.format(last_word)))
+            results = self.smash.shell.Completer.file_matches(last_word)
+
         if results:
             smash_log.info("returning: {0}".format(results))
             return results

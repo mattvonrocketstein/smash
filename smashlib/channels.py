@@ -2,6 +2,7 @@
 """
 
 C_CHANGE_DIR = 'cd'
+C_PRE_RUN_CELL = 'pre_run_cell'
 C_POST_RUN_CELL = 'post_run_cell'
 C_POST_RUN_INPUT = 'post_run_input'
 C_REHASH_EVENT = 'rehash'

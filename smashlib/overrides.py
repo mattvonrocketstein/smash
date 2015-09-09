@@ -8,7 +8,7 @@
     bus from the main ipython event system (IPython.core.events).
 """
 import keyword
-
+import traceback
 from report import report
 
 from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
@@ -24,19 +24,11 @@ from IPython.core.completerlib import (
 
 from smashlib._logging import smash_log
 from smashlib.util.ipy import have_command_alias
-from smashlib.channels import C_FILE_INPUT
+from smashlib.channels import C_FILE_INPUT, C_PRE_RUN_CELL
 from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL
 from smashlib.util import split_on_unquoted_semicolons, is_path
 from smashlib.bin.pybcompgen import complete
 from smashlib.completion import SmashCompleter
-
-
-def smash_bash_complete(*args, **kargs):
-    smash_log.info("calling pybcompgen")
-    result = complete(*args, **kargs)
-    result = [x for x in result if x not in keyword.kwlist]
-    return result
-
 
 class SmashDisplayHook(DisplayHook):
 
@@ -127,7 +119,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
     # NOTE: when run-cell runs, input is finished
     def run_cell(self, raw_cell, store_history=False,
                  silent=False, shell_futures=True):
-        smash_log.info("[{0}]".format(raw_cell.strip()))
+        smash_log.info("[{0}]".format(raw_cell.encode('utf-8').strip()))
         # as long as the expressions are semicolon separated,
         # this section allows hybrid bash/python expressions
         bits = split_on_unquoted_semicolons(raw_cell)
@@ -142,6 +134,10 @@ class SmashTerminalInteractiveShell(BaseTIS):
             return out
 
         sooper = super(SmashTerminalInteractiveShell, self)
+        if self.smash is not None:
+            # value is None only at bootstrap.
+            # TODO: default self.smash to mock.Mock() instead of None?
+            self.smash.publish(C_PRE_RUN_CELL, raw_cell)
         out = sooper.run_cell(
             raw_cell, store_history=store_history,
             silent=silent, shell_futures=shell_futures)
@@ -199,7 +195,6 @@ class SmashTerminalInteractiveShell(BaseTIS):
             self.set_readline_completer()
 
 TerminalInteractiveShell = SmashTerminalInteractiveShell
-import traceback
 
 
 class SmashTerminalIPythonApp(BaseTIA):
@@ -230,32 +225,13 @@ class SmashTerminalIPythonApp(BaseTIA):
         app.initialize(argv)
         app.start()
 
- #   def smash_matcher(self, text):
- #       smash_log.info("[{0}]".format(text))
- #       # FIXME: move into plugin
- #       line = self.shell.Completer.readline.get_line_buffer()
- #       if not line.strip():
- #           return []
- #
- #       first_word = line.split()[0]
- #       magic_command_alias = first_word.startswith('%') and \
- #           have_command_alias(first_word[1:])
- #       naked_command_alias = have_command_alias(first_word)
- #       if naked_command_alias:
- #           return smash_bash_complete(line)
- #       if magic_command_alias:
- #           return smash_bash_complete(line[1:])
- #       return []
-
     def init_shell(self):
-        """function override so we can use SmashTerminalInteractiveShell """
+        """ function override so we can use SmashTerminalInteractiveShell """
         self.shell = TerminalInteractiveShell.instance(
             parent=self, display_banner=False,
             profile_dir=self.profile_dir,
             ipython_dir=self.ipython_dir,
             user_ns=self.user_ns)
         self.shell.configurables.append(self)
-        # self.shell.Completer.matchers = [self.smash_matcher] + \
-        #    self.shell.Completer.matchers
 TerminalIPythonApp = SmashTerminalIPythonApp
 launch_new_instance = TerminalIPythonApp.launch_instance

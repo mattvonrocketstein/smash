@@ -20,7 +20,7 @@ touch_file(default_file)
 touch_file(event_file)
 LOG_FMT = ('[%(name)s:%(levelname)s:%(process)d] '
            '%(pathname)s:%(lineno)-4d'
-           ' - %(funcName)s: %(message)s')
+           ' - %(funcName)s:\n  %(message)s')
 
 LOG_SETTINGS = {
     'version': 1,

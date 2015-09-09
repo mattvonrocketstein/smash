@@ -10,7 +10,7 @@ from smashlib.ipy3x.core.completer import IPCompleter as IPCompleter
 from smashlib.ipy3x.core.completer import penalize_magics_key, Bunch
 
 from IPython.core.error import TryNext
-from IPython.utils.py3compat import PY3
+from IPython.utils.py3compat import PY3, builtin_mod
 
 USELESS_BUILTINS = 'credits copyright'.split()
 
@@ -209,7 +209,7 @@ class SmashCompleter(IPCompleter):
         # use penalize_magics_key to put magics after variables with same name
         self.matches = sorted(set(self.matches), key=penalize_magics_key)
 
-        # io.rprint('COMP TEXT, MATCHES: %r, %r' % (text, self.matches)) # dbg
+        smash_log.info('COMP TEXT, MATCHES: %r, %r' % (text, self.matches)) # dbg
         return text, self.matches
 
     def magic_matches(self, text):
