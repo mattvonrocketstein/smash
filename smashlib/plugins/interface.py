@@ -16,7 +16,7 @@ class PluginInterface(AbstractInterface):
     def __qmark__(self):
         """ user-friendly information when the input is "plugins?" """
         out = ['Smash Plugins: ({0} total)'.format(len(self._plugins))]
-        for nick in self._plugins:
+        for nick in sorted(self._plugins):
             out += ['   : {0}'.format(nick)]
         return '\n'.join(out)
 

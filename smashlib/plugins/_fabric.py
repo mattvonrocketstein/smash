@@ -9,7 +9,7 @@ from smashlib.plugins import Plugin
 from goulash.python import ope
 from smashlib.completion import opt_completer
 from smashlib import get_smash
-from smashlib._logging import smash_log
+from smashlib._logging import smash_log, completion_log
 
 fabric_opt_completer = opt_completer('fab')
 
@@ -35,7 +35,7 @@ def fabric_cmd_completer(self, event):
 class FabricPlugin(Plugin):
 
     def init(self):
-        smash_log.info("adding fabric completer")
+        completion_log.info("adding fabric completer")
         self.smash.add_completer(fabric_cmd_completer, re_key='fab')
         self.smash.add_completer(fabric_opt_completer, re_key='fab -')
         self.smash.add_completer(fabric_opt_completer, re_key='fab --')

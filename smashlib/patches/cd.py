@@ -5,7 +5,7 @@ import os
 from smashlib.patches.base import PatchMagic
 from smashlib.channels import C_CHANGE_DIR
 
-
+#FIXME: move this to the "plugins.cd_hooks" ?
 class PatchCDMagic(PatchMagic):
 
     """ patches the builtin ipython cd magic so that a post-dir-change
@@ -16,15 +16,10 @@ class PatchCDMagic(PatchMagic):
     name = 'cd'
 
     def __call__(self, parameter_s=''):
-        try:
-            self.original('-q ' + parameter_s)
-        except Exception:
-            self.component.report("error with cd.")
-            raise
-        else:
-            this_dir = self.smash.system('pwd', quiet=True)
-            self.smash.bus.publish(
-                C_CHANGE_DIR, this_dir,
-                self.component.last_dir)
-            os.environ['PWD'] = this_dir
-            self.component.last_dir = this_dir
+        self.original('-q ' + parameter_s)
+        this_dir = self.smash.system('pwd', quiet=True)
+        self.smash.bus.publish(
+            C_CHANGE_DIR, this_dir,
+            self.component.last_dir)
+        os.environ['PWD'] = this_dir
+        self.component.last_dir = this_dir

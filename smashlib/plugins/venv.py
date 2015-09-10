@@ -21,7 +21,7 @@ import glob
 from IPython.core.magic import Magics, magics_class, line_magic
 
 from goulash._os import summarize_fpath
-from goulash.venv import get_venv, to_vbin, to_vlib, get_path
+from goulash.venv import get_venv, to_vbin, to_vlib, get_path, is_venv
 
 from smashlib import get_smash
 from smashlib.plugins import Plugin
@@ -29,6 +29,8 @@ from smashlib.data import SMASH_DIR
 from goulash.python import opj, ope, abspath, expanduser
 from smashlib.completion import opt_completer
 from smashlib._logging import smash_log
+from smashlib.util.events import receives_event
+from smashlib.channels import C_CHANGE_DIR
 
 
 # "real_prefix" is set by virtualenv itself. this
@@ -48,15 +50,15 @@ class VirtualEnvMagics(Magics):
         msg = "venv_activate: " + parameter_s
         smash_log.info(msg)
         self.report(msg)
-        self.vext.activate(parameter_s)
+        self.plugin_obj.activate(parameter_s)
 
     @line_magic
     def venv_deactivate(self, parameter_s=''):
-        self.vext.deactivate()
+        self.plugin_obj.deactivate()
 
     @property
     def report(self):
-        return self.vext.report
+        return self.plugin_obj.report
 
 
 virtualenv_completer = opt_completer('virtualenv')
@@ -206,16 +208,19 @@ class VirtualEnvSupport(Plugin):
             self.shell.magic('rehashx')
             self.publish(C_POST_ACTIVATE, absfpath)
 
+    @receives_event(C_CHANGE_DIR)
+    def is_venv(self, new_dir, old_dir):
+        """ useful as a post-hook for "cd" commands. it might be
+            a good idea to call this after the "jump" command or
+            after "pushd" as well, but that's not implemented.
+        """
+        if is_venv(new_dir):
+            print 'this directory is a python virtualenv'
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     venv = VirtualEnvSupport(ip)
-    VirtualEnvMagics.vext = venv
+    VirtualEnvMagics.plugin_obj = venv
     ip.register_magics(VirtualEnvMagics)
     get_smash().add_completer(virtualenv_completer, re_key='virtualenv .*')
     return venv
-
-
-def unload_ipython_extension(ip):
-    """undo magic here.."""
-    print 'not implemented yet'

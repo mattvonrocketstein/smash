@@ -3,7 +3,7 @@
 from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_POST_RUN_INPUT
-from smashlib._logging import smash_log
+from smashlib._logging import smash_log, completion_log
 from smashlib import get_smash
 
 from goulash.python import splitext, ops
@@ -40,7 +40,6 @@ class HistoryCompleter(Plugin):
 
     @receives_event(C_POST_RUN_INPUT, quiet=True)
     def history_completion_update(self, line):
-        smash_log
         line = line.strip()
         tokens = smart_split(line)
         full = len(self.db) > self.MAX_SIZE
@@ -49,7 +48,7 @@ class HistoryCompleter(Plugin):
                 # too small, dont care
                 continue
             if token not in self.db:
-                smash_log.info('eating token: {0}'.format(token))
+                completion_log.info('eating token: {0}'.format(token))
                 self.db.append(token)
             if full:
                 self.db.pop(0)

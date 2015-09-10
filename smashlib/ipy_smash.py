@@ -29,7 +29,7 @@ from smashlib.prompt.interface import PromptInterface
 from smashlib.patches.edit import PatchEdit
 from smashlib.patches.rehash import PatchRehash
 from smashlib.patches.pinfo import PatchPinfoMagic
-from smashlib._logging import smash_log
+from smashlib._logging import smash_log, completion_log
 
 from smashlib.aliases import AliasInterface
 
@@ -225,7 +225,7 @@ class Smash(Plugin):
         super(Smash, self).init_bus()
 
     def add_completer(self, fxn, **kargs):
-        smash_log.info("adding new completer: {0}".format(fxn))
+        completion_log.info("adding new completer: {0}".format(fxn))
         self.completers[get_caller(2)['class']].append(fxn)
         get_ipython().set_hook('complete_command', fxn, **kargs)
 

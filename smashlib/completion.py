@@ -5,7 +5,7 @@ import re
 import sys
 import subprocess
 import itertools
-from smashlib._logging import smash_log
+from smashlib._logging import smash_log, completion_log
 from smashlib.util.ipy import have_command_alias
 from smashlib.ipy3x.core.completer import IPCompleter as IPCompleter
 from smashlib.ipy3x.core.completer import penalize_magics_key, Bunch
@@ -118,7 +118,7 @@ class SmashCompleter(IPCompleter):
         return matches
 
     def complete(self, text=None, line_buffer=None, cursor_pos=None):
-        smash_log.info("received data: [{0}]".format(
+        completion_log.info("received data: [{0}]".format(
             [text, line_buffer, cursor_pos]))
         """Find completions for the given text and line context.
 
@@ -180,7 +180,7 @@ class SmashCompleter(IPCompleter):
         custom_res = self.dispatch_custom_completer(text)
         if custom_res is not None:
             # did custom completers produce something?
-            smash_log.info("custom completers: {0}".format(custom_res))
+            completion_log.info("custom completers: {0}".format(custom_res))
             self.matches = custom_res
         else:
             # Extend the list of completions with the results of each
@@ -191,7 +191,7 @@ class SmashCompleter(IPCompleter):
                 for matcher in self.matchers:
                     extra = matcher(text)
                     self.matches.extend(extra)
-                    smash_log.info("extending matches with: {0}".format(extra))
+                    completion_log.info("extending matches with: {0}".format(extra))
                     # try:
                     #    self.matches.extend(matcher(text))
                     # except:
@@ -203,7 +203,7 @@ class SmashCompleter(IPCompleter):
                 for matcher in self.matchers:
                     self.matches = matcher(text)
                     if self.matches:
-                        smash_log.info(
+                        completion_log.info(
                             "returning matches from: {0}".format(matcher))
                         break
         # FIXME: we should extend our api to return a dict with completions for
@@ -214,12 +214,12 @@ class SmashCompleter(IPCompleter):
         # use penalize_magics_key to put magics after variables with same name
         self.matches = sorted(set(self.matches), key=penalize_magics_key)
 
-        smash_log.info('COMP TEXT, MATCHES: %r, %r' %
+        completion_log.info('COMP TEXT, MATCHES: %r, %r' %
                        (text, self.matches))  # dbg
         return text, self.matches
 
     def magic_matches(self, text):
-        smash_log.debug("completing [{0}]".format(text))
+        completion_log.debug("completing [{0}]".format(text))
         # print 'Completer->magic_matches:',text,'lb',self.text_until_cursor # dbg
         # Get all shell magics now rather than statically, so magics loaded at
         # runtime show up too.
