@@ -2,7 +2,6 @@
 """
 
 from IPython.core.macro import Macro
-from peak.util.imports import lazyModule
 
 from report import console
 

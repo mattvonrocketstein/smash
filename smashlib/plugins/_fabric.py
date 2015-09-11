@@ -6,7 +6,6 @@ import ast
 from smashlib.plugins import Plugin
 from goulash.python import ope
 from smashlib.completion import opt_completer
-from smashlib import get_smash
 from smashlib._logging import smash_log, completion_log
 
 fabric_opt_completer = opt_completer('fab')

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 #
-import imp
 import os
 
 from smashlib.import_hooks import hijack_ipython_module

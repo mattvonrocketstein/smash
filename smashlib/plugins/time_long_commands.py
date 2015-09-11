@@ -4,13 +4,10 @@
 """
 import datetime
 
-from IPython.utils.traitlets import Bool
-from IPython.utils.traitlets import EventfulDict
 
 from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_POST_RUN_CELL, C_PRE_RUN_CELL
-from smashlib._logging import smash_log
 
 now = datetime.datetime.now
 timedelta = datetime.timedelta

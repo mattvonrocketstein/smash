@@ -4,12 +4,8 @@ from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_POST_RUN_INPUT
 from smashlib._logging import smash_log, completion_log
-from smashlib import get_smash
 
-from goulash.python import ops
-from goulash.python import splitext
 from goulash.parsing import smart_split
-from goulash.set import OrderedSet
 from IPython.core.completerlib import TryNext
 
 

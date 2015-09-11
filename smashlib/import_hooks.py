@@ -1,7 +1,6 @@
 """ smashlib.import_hooks
 """
 
-import imp
 import sys
 import importlib
 

@@ -4,7 +4,6 @@ import os
 import logging
 from logging.config import dictConfig
 
-from goulash.python import dirname
 from goulash.python import ope
 from goulash.python import opj
 

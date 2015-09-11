@@ -22,11 +22,9 @@ from IPython.core.completerlib import (
 
 
 from smashlib._logging import smash_log
-from smashlib.util.ipy import have_command_alias
 from smashlib.channels import C_FILE_INPUT, C_PRE_RUN_CELL
 from smashlib.channels import C_POST_RUN_INPUT, C_POST_RUN_CELL
 from smashlib.util import split_on_unquoted_semicolons, is_path
-from smashlib.bin.pybcompgen import complete
 from smashlib.completion import SmashCompleter
 
 

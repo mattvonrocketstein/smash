@@ -3,7 +3,6 @@
     TODO: move to goulash
 """
 
-from fabric.api import lcd
 from fabric.api import local
 from fabric.api import quiet
 

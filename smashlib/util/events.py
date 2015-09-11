@@ -3,10 +3,8 @@
 
 from functools import wraps
 
-from smashlib import get_smash
 from smashlib.util.ipy import TermColors
 from smashlib._logging import events_log
-from smashlib._logging import smash_log
 
 
 class receives_event(object):
