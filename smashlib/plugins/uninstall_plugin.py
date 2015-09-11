@@ -20,7 +20,7 @@ class UninstallPlugins(Plugin):
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
-    ip = get_ipython()
+    get_ipython()
     return UninstallPlugins(get_ipython()).install()
 
 

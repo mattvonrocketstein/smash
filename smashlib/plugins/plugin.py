@@ -125,13 +125,11 @@ class SmashPlugin(APlugin, EventfulMix, Configurable, ):
                 # since we looked through the class earlier,
                 # we need to actually retrieve the method now
                 callback = getattr(self, x)
-                data = self.smash.bus.subscriptions.get(channel, [])
+                cbdata = self.smash.bus.subscriptions.values()
                 callbacks = [
                     [z['callback'].__name__,
                      z['callback'].im_self.__class__] for z in \
-                    reduce(lambda x, y: x + y,
-                           self.smash.bus.subscriptions.values(),[]
-                           )]
+                    reduce(lambda x, y: x + y, cbdata, [])]
                 cbname = callback.__name__
                 klass = self.__class__
                 if [cbname, klass] in callbacks:

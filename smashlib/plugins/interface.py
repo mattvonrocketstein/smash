@@ -39,7 +39,6 @@ class PluginInterface(AbstractInterface):
             tmp2.__doc__ = tmp3
             prop = property(tmp2)
             setattr(self.__class__, name, prop)
-        whitelist = ['edit', 'smash', 'update']
         # for x in dir(self):
         #    if not x.startswith('_') and \
         #            x not in tmp and \
