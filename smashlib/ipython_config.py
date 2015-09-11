@@ -26,7 +26,6 @@ _.InteractiveShellApp.extensions.append("smashlib.pysh")
 #_.InteractiveShellApp.extensions.append("smashlib.dot_prefilter")
 _.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
 _.InteractiveShellApp.extensions.append("smashlib.plugins._fabric")
-_.InteractiveShellApp.extensions.append("smashlib.plugins.venv")
 
 # every smash component gets it's own verbosity setting.
 # this mostly controls the printing of debugging info
@@ -67,8 +66,10 @@ _.IPCompleter.merge_completions = False
 # _.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
 _.Smash.plugins.append('smashlib.plugins.cli_command_runner')
 _.Smash.plugins.append('smashlib.plugins.cli_update_runner')
-_.Smash.plugins.append('smashlib.plugins._django')
-#_.Smash.plugins.append('smashlib.plugins.updater')
+
+# automatically shows timer info for commands taking longer than 5s
+_.Smash.plugins.append('smashlib.plugins.time_long_commands')
+
 _.Smash.plugins.append('smashlib.plugins.post_input')
 _.Smash.plugins.append('smashlib.plugins.uninstall_plugin')
 _.Smash.plugins.append('smashlib.plugins.prefilter_dot')
@@ -79,14 +80,18 @@ _.Smash.plugins.append('smashlib.plugins.prompt')
 #   provides information about python libraries (in the current venv, if any)
 _.Smash.plugins.append('smashlib.plugins.which')
 
+#experimental
+_.Smash.plugins.append('smashlib.plugins._django')
+
 _.Smash.plugins.append('smashlib.plugins.prefilter_url')
 _.Smash.plugins.append('smashlib.plugins.handle_cmd_failure')
-
 _.Smash.plugins.append('smashlib.plugins.summarize')
 _.Smash.plugins.append('smashlib.plugins.cd_hooks')
 _.Smash.plugins.append('smashlib.plugins.venv')
 _.Smash.plugins.append('smashlib.plugins.project_manager')
+#do what I mean plugin
 _.Smash.plugins.append("smashlib.plugins.dwim")
+
 _.Smash.plugins.append("smashlib.plugins.fabric")
 _.Smash.plugins.append("smashlib.plugins.python_comp_tools")
 _.Smash.plugins.append("smashlib.plugins.autojump")

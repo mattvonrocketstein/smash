@@ -1,14 +1,14 @@
 """ smashlib.plugins.venv
 
     Defines the venv extension, which (usually) allows dynamically
-    switching between virtualenv's with usual side effects in the
-    shell environment, the executable path, the module path, and the
-    python namespace.. all without leaving your shell.
+    switching between virtualenv's with all the side effects one would expect
+    in the shell environment, the executable path, the module path, and the
+    python namespace.
 
     Caveats: This approach works pretty well and is mostly unsurprising,
     but, things are going to get hairy if you're using multiple python
     distributions in multiple venv's, and if you're mixing global/nonglobal
-    options for the virtualenv "use site env".
+    options for the virtualenv "use site env" option.
 
     Additionally, the plugin will set up tab completion over virtualenv
     the usual command line options.
@@ -61,11 +61,9 @@ class VirtualEnvMagics(Magics):
         return self.plugin_obj.report
 
 
-virtualenv_completer = opt_completer('virtualenv')
-
-
 class VirtualEnvSupport(Plugin):
     sys_path_changes = []
+    announce_on_cd = True
 
     def deactivate(self):
         try:
@@ -214,8 +212,14 @@ class VirtualEnvSupport(Plugin):
             a good idea to call this after the "jump" command or
             after "pushd" as well, but that's not implemented.
         """
-        if is_venv(new_dir):
-            print ('this directory is a python virtualenv')
+        if self.announce_on_cd and is_venv(new_dir):
+            self.report('directory is a python virtualenv.')
+            self.report('use `venv_activate .` to activate it')
+
+    def init(self):
+        super(VirtualEnvSupport, self).init()
+        # FIXME: opt_completer is broken
+        self.contribute_completer('virtualenv .*', opt_completer('virtualenv'))
 
 
 def load_ipython_extension(ip):
@@ -223,5 +227,4 @@ def load_ipython_extension(ip):
     venv = VirtualEnvSupport(ip)
     VirtualEnvMagics.plugin_obj = venv
     ip.register_magics(VirtualEnvMagics)
-    get_smash().add_completer(virtualenv_completer, re_key='virtualenv .*')
     return venv.install()

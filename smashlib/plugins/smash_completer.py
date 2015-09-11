@@ -1,14 +1,15 @@
 """ smashlib.plugins.smash_completer
 """
-import keyword
 import os
+import keyword
+
+from smashlib import get_smash
 from smashlib.plugins import Plugin
 from smashlib.util.ipy import have_command_alias
 from smashlib._logging import smash_log, completion_log
-from smashlib import get_smash
+from smashlib.bin.pybcompgen import complete
 
 from IPython.core.completerlib import TryNext
-from smashlib.bin.pybcompgen import complete
 
 
 def smash_bash_complete(*args, **kargs):
@@ -34,7 +35,7 @@ class SmashCompleter(Plugin):
     db = []
 
     def init(self):
-        smash_log.debug('initializing')
+        super(SmashCompleter, self).init()
         self.contribute_completer('.*', self.smash_matcher)
 
     def smash_matcher(self, shell, event):

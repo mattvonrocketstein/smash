@@ -120,6 +120,9 @@ class SmashTerminalInteractiveShell(BaseTIS):
     # NOTE: when run-cell runs, input is finished
     def run_cell(self, raw_cell, store_history=False,
                  silent=False, shell_futures=True):
+        #assert self.smash
+
+        self.smash.publish(C_PRE_RUN_CELL, raw_cell)
         smash_log.info("[{0}]".format(raw_cell.encode('utf-8').strip()))
         # as long as the expressions are semicolon separated,
         # this section allows hybrid bash/python expressions
@@ -135,10 +138,6 @@ class SmashTerminalInteractiveShell(BaseTIS):
             return out
 
         sooper = super(SmashTerminalInteractiveShell, self)
-        if self.smash is not None:
-            # value is None only at bootstrap.
-            # TODO: default self.smash to mock.Mock() instead of None?
-            self.smash.publish(C_PRE_RUN_CELL, raw_cell)
         out = sooper.run_cell(
             raw_cell, store_history=store_history,
             silent=silent, shell_futures=shell_futures)
