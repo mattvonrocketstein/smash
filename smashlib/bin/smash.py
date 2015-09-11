@@ -2,7 +2,6 @@
 #
 import imp
 import os
-import logging
 
 from smashlib.import_hooks import hijack_ipython_module
 

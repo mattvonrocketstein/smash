@@ -4,7 +4,9 @@ import os
 import logging
 from logging.config import dictConfig
 
-from goulash.python import ope, opj, dirname
+from goulash.python import dirname
+from goulash.python import ope
+from goulash.python import opj
 
 from smashlib.data import SMASH_LOGS
 from goulash._os import touch_file

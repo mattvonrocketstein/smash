@@ -1,6 +1,5 @@
 """ smashlib.plugins.prompt
 """
-import os
 
 #from IPython.utils.traitlets import Bool, Unicode
 

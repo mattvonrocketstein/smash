@@ -8,8 +8,14 @@ import os
 import re
 import glob
 
-from goulash._os import touch_file, home
-from goulash.python import get_env, opd, ops, opj, ope, expanduser
+from goulash._os import home
+from goulash._os import touch_file
+from goulash.python import expanduser
+from goulash.python import get_env
+from goulash.python import opd
+from goulash.python import ope
+from goulash.python import opj
+from goulash.python import ops
 from smashlib.data import P_CODE_FILE
 
 from report import Reporter as BaseReporter

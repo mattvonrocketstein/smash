@@ -2,7 +2,9 @@
 """
 import os
 import inspect
-from IPython.utils.traitlets import EventfulDict, EventfulList, Set
+from IPython.utils.traitlets import EventfulDict
+from IPython.utils.traitlets import EventfulList
+from IPython.utils.traitlets import Set
 
 from report import console
 from smashlib.channels import (

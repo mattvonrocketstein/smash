@@ -3,7 +3,6 @@
     NB: plugin related obviously, but this is not a plugin.
         it's the abstract classes for creating subclasses
 """
-from functools import wraps
 from collections import defaultdict
 
 from IPython.core.macro import Macro

@@ -3,7 +3,9 @@
 import os
 
 from goulash._os import home
-from goulash.python import expanduser, opj, dirname
+from goulash.python import dirname
+from goulash.python import expanduser
+from goulash.python import opj
 
 main_profile_name = 'SmaSh'
 fname_user_config = 'config.py'

@@ -1,9 +1,7 @@
 """ smashlib.plugins.fabric
     documentation: http://mattvonrocketstein.github.io/smash/plugins.html#fabric
 """
-import os
 import ast
-import inspect
 
 from smashlib.plugins import Plugin
 from goulash.python import ope

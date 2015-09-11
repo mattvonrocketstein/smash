@@ -1,7 +1,6 @@
 """ smashlib
 """
 __version__ = 0.1
-import os
 from goulash._inspect import get_caller
 from smashlib.import_hooks import hijack_ipython_module
 

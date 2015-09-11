@@ -7,7 +7,6 @@
     So far a lot of this is here mostly because smash wants a separate message
     bus from the main ipython event system (IPython.core.events).
 """
-import keyword
 import traceback
 from report import report
 

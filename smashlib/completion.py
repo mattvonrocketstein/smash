@@ -2,10 +2,10 @@
 """
 
 import re
-import sys
 import subprocess
 import itertools
-from smashlib._logging import smash_log, completion_log
+from smashlib._logging import completion_log
+from smashlib._logging import smash_log
 from smashlib.util.ipy import have_command_alias
 from smashlib.ipy3x.core.completer import IPCompleter as IPCompleter
 from smashlib.ipy3x.core.completer import penalize_magics_key, Bunch
