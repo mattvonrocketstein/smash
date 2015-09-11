@@ -191,7 +191,8 @@ class SmashCompleter(IPCompleter):
                 for matcher in self.matchers:
                     extra = matcher(text)
                     self.matches.extend(extra)
-                    completion_log.info("extending matches with: {0}".format(extra))
+                    completion_log.info(
+                        "extending matches with: {0}".format(extra))
                     # try:
                     #    self.matches.extend(matcher(text))
                     # except:
@@ -215,7 +216,7 @@ class SmashCompleter(IPCompleter):
         self.matches = sorted(set(self.matches), key=penalize_magics_key)
 
         completion_log.info('COMP TEXT, MATCHES: %r, %r' %
-                       (text, self.matches))  # dbg
+                            (text, self.matches))  # dbg
         return text, self.matches
 
     def magic_matches(self, text):

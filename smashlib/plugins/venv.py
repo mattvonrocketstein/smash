@@ -215,7 +215,8 @@ class VirtualEnvSupport(Plugin):
             after "pushd" as well, but that's not implemented.
         """
         if is_venv(new_dir):
-            print 'this directory is a python virtualenv'
+            print ('this directory is a python virtualenv')
+
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
@@ -223,4 +224,4 @@ def load_ipython_extension(ip):
     VirtualEnvMagics.plugin_obj = venv
     ip.register_magics(VirtualEnvMagics)
     get_smash().add_completer(virtualenv_completer, re_key='virtualenv .*')
-    return venv
+    return venv.install()

@@ -5,7 +5,9 @@ import os
 from smashlib.patches.base import PatchMagic
 from smashlib.channels import C_CHANGE_DIR
 
-#FIXME: move this to the "plugins.cd_hooks" ?
+# FIXME: move this to the "plugins.cd_hooks" ?
+
+
 class PatchCDMagic(PatchMagic):
 
     """ patches the builtin ipython cd magic so that a post-dir-change

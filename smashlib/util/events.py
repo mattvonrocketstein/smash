@@ -5,7 +5,7 @@ from functools import wraps
 
 from smashlib import get_smash
 from smashlib.util.ipy import TermColors
-from smashlib._logging import smash_log
+from smashlib._logging import smash_log, events_log
 
 
 class receives_event(object):
@@ -28,15 +28,14 @@ class receives_event(object):
         if msg[:77] != msg:
             msg += '...'
             msg = msg[:77]
-        smash_log.info(msg)
+        events_log.info(msg)
 
     def __call__(self, fxn):
         self.fxn = fxn
 
         @wraps(fxn)
-        def newf(himself, bus, *args, **kargs):
-            if not self.quiet and get_smash() and get_smash().verbose_events:
-                self.report(args)
+        def receive_events_wrapper(himself, bus, *args, **kargs):
+            events_log.info('{0}'.format(str(args)))
             return fxn(himself, *args, **kargs)
-        newf._subscribe_to = self.channel
-        return newf
+        receive_events_wrapper._subscribe_to = self.channel
+        return receive_events_wrapper

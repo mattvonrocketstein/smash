@@ -12,26 +12,26 @@ from IPython.utils.coloransi import TermColors
 
 completion_file = opj(SMASH_LOGS, 'completion.log')
 default_file = opj(SMASH_LOGS, 'smash.log')
-event_file = opj(SMASH_LOGS, 'events.log')
+events_file = opj(SMASH_LOGS, 'events.log')
 #boot_file = opj(SMASH_LOGS, 'bootstrap.log')
 
 if not ope(SMASH_LOGS):
     os.makedirs(SMASH_LOGS)
-for log_file in [completion_file, default_file, event_file]:
+for log_file in [completion_file, default_file, events_file]:
     touch_file(log_file)
 
 LOG_FMT = ('[%(name)s:%(levelname)s:%(process)d] '
            '%(pathname)s:%(lineno)-4d'
            ' - %(funcName)s:\n  %(message)s')
 handler_defaults = {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'level': 'INFO',
-            'formatter': 'detailed',
-            'mode': 'a',
+    'class': 'logging.handlers.RotatingFileHandler',
+    'level': 'INFO',
+    'formatter': 'detailed',
+    'mode': 'a',
             'maxBytes': 10485760,
             'backupCount': 5, }
-event_handler = handler_defaults.copy()
-event_handler['filename'] = event_file
+events_handler = handler_defaults.copy()
+events_handler['filename'] = events_file
 completion_handler = handler_defaults.copy()
 completion_handler['filename'] = completion_file
 default_handler = handler_defaults.copy()
@@ -44,12 +44,12 @@ LOG_SETTINGS = {
         #     'level': 'DEBUG',
         #     'formatter': 'detailed',
         #     'stream': 'ext://sys.stdout',},
-        'event_file': event_handler,
+        'events_file': events_handler,
         'default_file': default_handler,
         'completion_file': completion_handler,
     },
     'formatters': {
-        'detailed': {'format': LOG_FMT,},
+        'detailed': {'format': LOG_FMT, },
     },
     'loggers': {
         'smash': {
@@ -59,6 +59,10 @@ LOG_SETTINGS = {
         'smash_completion': {
             'level': 'DEBUG',
             'handlers': ['completion_file', ]
+        },
+        'smash_events': {
+            'level': 'DEBUG',
+            'handlers': ['events_file', ]
         },
     }
 }
@@ -89,6 +93,7 @@ dictConfig(LOG_SETTINGS)
 log = reset_logs()
 smash_log = logger = logging.getLogger('smash')
 completion_log = logging.getLogger('smash_completion')
+events_log = logging.getLogger('smash_events')
 logger.info("Initializing smash default logger")
 
 

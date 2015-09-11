@@ -34,7 +34,7 @@ class ProjectMagics(Magics):
     def env(self, parameter_s):
         # original: ipython.core.magics.osm.OSMagics.env
         from IPython.core.magics.osm import OSMagics
-        original = lambda:OSMagics().env(parameter_s)
+        original = lambda: OSMagics().env(parameter_s)
         if not parameter_s.strip():
             all_env = original()
             all_env.pop('LS_COLORS', None)  # large and annoying, never useful
@@ -45,7 +45,6 @@ class ProjectMagics(Magics):
                 report("This project: ", project_local_env)
         else:
             return original()
-
 
     @line_magic
     def check_project(self, parameter_s=''):

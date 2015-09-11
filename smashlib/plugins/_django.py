@@ -47,7 +47,6 @@ class DjangoPlugin(Plugin):
 
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
-    ip = get_ipython()
     return DjangoPlugin(ip).install()
 
 

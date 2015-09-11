@@ -3,18 +3,14 @@
     NB: plugin related obviously, but this is not a plugin.
         it's the abstract classes for creating subclasses
 """
-import os
-import sys
-import argparse
-
-from IPython.core.macro import Macro
+from functools import wraps
 from collections import defaultdict
 
+from IPython.core.macro import Macro
 from IPython.config.configurable import Configurable
 
-from smashlib._logging import Logger
+from smashlib._logging import Logger, events_log, smash_log
 from smashlib.bases.eventful import EventfulMix
-
 
 class APlugin(object):
 
@@ -103,18 +99,20 @@ class APlugin(object):
             raise Exception("load smash first")
 
     def publish(self, *args, **kargs):
-        smash_log.info("{0} {1} {2}".format(self, args, kargs))
+        events_log.info("{0} {1} {2}".format(self, args, kargs))
         return self.smash.bus.publish(*args, **kargs)
 
 from IPython.utils.traitlets import Bool
 from smashlib._logging import smash_log
 
-
 class SmashPlugin(APlugin, EventfulMix, Configurable, ):
 
     verbose = Bool(False, config=True)
+    plugin_instance = None
 
     def __init__(self, shell, **kargs):
+        if self.plugin_instance:
+            raise Exception,'singleton'
         super(SmashPlugin, self).__init__(config=shell.config, shell=shell)
 
         # plugins should use self.contribute_* commands, which update the installation
@@ -129,6 +127,7 @@ class SmashPlugin(APlugin, EventfulMix, Configurable, ):
         self.init_bus()
         self.init_magics()
         self.init()
+        self.plugin_instance = self
 
     def init_magics(self):
         pass
@@ -161,5 +160,24 @@ class SmashPlugin(APlugin, EventfulMix, Configurable, ):
             if channel:
                 # since we looked through the class earlier,
                 # we need to actually retrieve the method now
-                y = getattr(self, x)
-                self.smash.bus.subscribe(channel, y)
+                callback = getattr(self, x)
+                data = self.smash.bus.subscriptions.get(channel, [])
+                callbacks = [
+                    [z['callback'].__name__,
+                     z['callback'].im_self.__class__] for z in \
+                    reduce(lambda x, y: x + y,
+                           self.smash.bus.subscriptions.values(),[]
+                           )]
+                cbname = callback.__name__
+                klass = self.__class__
+                if [cbname, klass] in callbacks:
+                    # this means init_bus was called
+                    # twice for the plugin, or something like that
+                    smash_log.warning(
+                        ('refusing to register what looks '
+                        'like a duplicate callback: {0}').format(
+                            dict(name=cbname,
+                                 klass=klass,
+                                 channel=channel)))
+                else:
+                    self.smash.bus.subscribe(channel, callback)
