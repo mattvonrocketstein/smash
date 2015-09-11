@@ -204,7 +204,7 @@ class Smash(Plugin):
             smash_log.info("Loading bash functions")
             fxns = bash.get_functions()
             for fxn_name in fxns:
-                cmd = bash.FunctionMagic(fxn_name)
+                cmd = bash.FunctionMagic(fxn_name, source='host shell')
                 self.shell.magics_manager.register_function(
                     cmd, magic_name=fxn_name)
             msg = "registered magic for bash functions: " + str(fxns)
