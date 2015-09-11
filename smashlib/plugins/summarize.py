@@ -8,14 +8,17 @@ from report import console
 
 from goulash.python import ope
 from goulash.venv import find_venvs
-from goulash._fabric import require_bin
+from goulash._fabric import require_bin, MissingSystemCommand
 
 from smashlib.plugins import Plugin
 from smashlib.util import guess_dir_type
 
 
 def sloccount(_dir):
-    require_bin('sloccount')
+    try:
+        require_bin('sloccount')
+    except MissingSystemCommand,e:
+        return [' error: missing system command "sloccount"' ]
     cmd_t = 'sloccount "{0}"'.format(_dir)
     lines = os.popen(cmd_t).readlines()
     # cut off information about how to cite the tool
