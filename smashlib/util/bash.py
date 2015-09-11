@@ -6,6 +6,8 @@ import re
 from subprocess import Popen, PIPE
 
 from report import console
+from tabulate import tabulate
+
 from smashlib.bin.pybcompgen import remove_control_characters
 
 r_alias = re.compile('alias \w+=.*')
@@ -32,6 +34,7 @@ def get_aliases():
 
 
 def get_functions():
+    """ extracts the names of all functions from the underlying bash shell """
     cmd = '''bash -c "echo 'echo MARKER;compgen -A function;echo MARKER'|bash -i"'''
     p1 = Popen(cmd, shell=True, stdout=PIPE, stdin=PIPE, stderr=PIPE)
     out, err = p1.communicate()
@@ -45,7 +48,7 @@ def get_functions():
     return function_names
 
 
-def run_function(fxn_name, input_string, quiet=False):
+def run_function_in_host_shell(fxn_name, input_string, quiet=False):
     """ if you have quoted values in input_string, this will probably break"""
     if not quiet:
         report("Running: {0} {1}".format(fxn_name, input_string))
@@ -61,8 +64,6 @@ def run_function(fxn_name, input_string, quiet=False):
         print '\n'.join(lines)
     return lines
 
-from report import console
-from tabulate import tabulate
 
 class FunctionMagic(object):
     """ call bridge connecting smash to a bash function """
@@ -75,17 +76,18 @@ class FunctionMagic(object):
     def __qmark__(self):
         """ user-friendly information when the input is "<bash_fxn>?" """
         name, source = map(str, [self.name, self.source])
-        out = [console.red('Smash-Bash bridge:')]
-        table=[
+        table = [
             ['type:','bash function'],
             ['source:', str(source)],
             ['source name:',name],
-            ['smash name:', name],]
+            ['smash name:', name],
+            ]
 
-        table = tabulate(table).split('\n')[1:-1]
-        table = ['  '+x for x in table]
-        out += table
+        table = tabulate(table) #string from list
+        table = table.split('\n')[1:-1] # back to list (removing header/footer)
+        table = [ console.blue('  | ') + x for x in table ]
+        out = out = [ console.red('Smash-Bash bridge:') ] + table
         return '\n'.join(out)
 
     def __call__(self, parameter_s):
-        self.last_result = run_function(self.name, parameter_s)
+        self.last_result = run_function_in_host_shell(self.name, parameter_s)

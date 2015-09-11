@@ -7,11 +7,9 @@ from smashlib.channels import C_SMASH_INIT_COMPLETE
 
 
 class RunCommand(Plugin):
-
-    """ This plugin is responsible for doing the
-        work whenever smash is invoked with "-c".
-        Semantics are the same as "python -c" or
-        "bash -c"
+    """ This plugin is responsible for doing the work whenever smash
+        is invoked with "-c". Semantics are the same as "python -c"
+        or "bash -c"
     """
     verbose = True
     command = None

@@ -6,8 +6,11 @@
 import re
 import keyword
 from IPython.utils.coloransi import TermColors
+from goulash.cache import MWT
 from peak.util.imports import lazyModule
 logging = lazyModule('smashlib._logging')
+
+r_cmd = re.compile('^[\w-]+$')
 
 
 def green(txt):
@@ -34,10 +37,6 @@ def uninstall_prefilter(HandlerOrCheckerClass):
     for tmp in checker_list:
         if isinstance(tmp, HandlerOrCheckerClass):
             del checker_list[checker_list.index(tmp)]
-
-r_cmd = re.compile('^[\w-]+$')
-
-from goulash.cache import MWT
 
 
 @MWT(timeout=500)

@@ -10,7 +10,10 @@ from smashlib._logging import smash_log, events_log
 
 class receives_event(object):
 
-    """ note: should only be used with imethods """
+    """ note: should only be used with nmethods
+        (although, at runtime they are not yet methods
+        according to inspect because the class is not
+        finished being constructed) """
 
     def __init__(self, channel, quiet=False):
         self.channel = channel
@@ -32,7 +35,7 @@ class receives_event(object):
 
     def __call__(self, fxn):
         self.fxn = fxn
-
+        assert callable(fxn)
         @wraps(fxn)
         def receive_events_wrapper(himself, bus, *args, **kargs):
             events_log.info('{0}'.format(str(args)))

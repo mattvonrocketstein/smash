@@ -7,10 +7,12 @@ from functools import wraps
 from collections import defaultdict
 
 from IPython.core.macro import Macro
+from IPython.utils.traitlets import Bool
 from IPython.config.configurable import Configurable
 
 from smashlib._logging import Logger, events_log, smash_log
 from smashlib.bases.eventful import EventfulMix
+from smashlib._logging import smash_log
 
 class APlugin(object):
 
@@ -56,41 +58,6 @@ class APlugin(object):
         self.shell.set_hook(name, fxn)
         self.installation_record['hooks'] += [[name, fxn]]
 
-    def uninstall(self):
-        """ uninstall this smash component """
-        self.report("uninstalling myself")
-        self._uninstall_magics()
-        self._uninstall_hooks()
-
-    def _uninstall_hooks(self):
-        """ uninstall all hooks which were installed by "self.contribute_hook"
-        """
-        for name, fxn in self.installation_record['hooks']:
-            self.report("uninstalling hook: {0}".format(name))
-            callchain = self.shell.hooks[name].chain
-            # HACK: cannot figure out another way to unregister items from the callchain
-            #       registry rebinds instance methods and screws with the normal values
-            #       for self.im_class, etc
-            new_callback = []
-            for priority, cfxn in callchain:
-                if cfxn.__name__ == fxn.__name__:
-                    continue
-                new_callback.append([priority, cfxn])
-        self.shell.hooks[name].chain = new_callback
-
-    def _uninstall_magics(self):
-        """ uninstall all magics which were installed by "self.contribute_magic"
-        """
-        for m in self.installation_record['magics']:
-            self.report("uninstalling magic: {0}".format(m))
-            del self.shell.magics_manager.magics['line'][m.__name__]
-
-    # def die(self, msg=''):
-    #    if msg:
-    #        smash_log.debug(msg)
-    #    self.smash.shell.run_cell('exit')
-    #    os.system('kill -KILL {0}'.format(os.getpid()))
-
     @property
     def smash(self):
         try:
@@ -102,8 +69,6 @@ class APlugin(object):
         events_log.info("{0} {1} {2}".format(self, args, kargs))
         return self.smash.bus.publish(*args, **kargs)
 
-from IPython.utils.traitlets import Bool
-from smashlib._logging import smash_log
 
 class SmashPlugin(APlugin, EventfulMix, Configurable, ):
 

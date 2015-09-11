@@ -19,6 +19,7 @@ from goulash._inspect import get_caller
 from IPython.utils.traitlets import List, Bool
 
 from smashlib import data
+from smashlib.aliases import AliasInterface
 from smashlib.plugins import Plugin
 from smashlib.util.reflect import from_dotpath
 from smashlib.util import bash
@@ -31,7 +32,6 @@ from smashlib.patches.rehash import PatchRehash
 from smashlib.patches.pinfo import PatchPinfoMagic
 from smashlib._logging import smash_log, completion_log
 
-from smashlib.aliases import AliasInterface
 
 
 class Smash(Plugin):
@@ -212,6 +212,7 @@ class Smash(Plugin):
             self.report(msg)
 
     def init_patches(self):
+        """ """
         PatchEdit(self).install()
         PatchPinfoMagic(self).install()
         PatchRehash(self).install()
@@ -225,6 +226,7 @@ class Smash(Plugin):
         super(Smash, self).init_bus()
 
     def add_completer(self, fxn, **kargs):
+        """ """
         completion_log.info("adding new completer: {0}".format(fxn))
         self.completers[get_caller(2)['class']].append(fxn)
         get_ipython().set_hook('complete_command', fxn, **kargs)

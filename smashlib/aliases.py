@@ -3,10 +3,11 @@
 
 from IPython.core.macro import Macro
 from peak.util.imports import lazyModule
+
+from report import console
+
 from smashlib.handle import AbstractInterface
 from smashlib._logging import smash_log
-
-logging = lazyModule('smashlib._logging')
 
 
 class AliasMixin(object):
@@ -25,12 +26,12 @@ class AliasMixin(object):
         self.smash.shell.user_ns[name] = macro
 
     def _load_alias_group(self, group_name):
-        logging.smash_log.info('loading alias group: {0}'.format(group_name))
+        smash_log.info('loading alias group: {0}'.format(group_name))
         aliases, macros = self._get_alias_group(group_name)
         for alias in aliases:
             name, cmd = alias
             self.smash.shell.alias_manager.define_alias(name, cmd)
-            logging.smash_log.info(' alias: {0}'.format(name))
+            smash_log.info(' alias: {0}'.format(name))
         self.report("Loaded {0} aliases".format(len(aliases)))
 
         for m in macros:
@@ -38,7 +39,7 @@ class AliasMixin(object):
             self._load_macro(macro, name=name)
 
     def _unload_alias_group(self, group_name):
-        logging.smash_log.info('unloading alias group: {0}'.format(group_name))
+        smash_log.info('unloading alias group: {0}'.format(group_name))
         aliases, macros = self._get_alias_group(group_name)
         for alias in aliases:
             name, cmd = alias
@@ -55,7 +56,7 @@ class AliasInterface(AbstractInterface):
     def __qmark__(self):
         """ user-friendly information when the input is "plugins?" """
         alias_map = self.smash.project_manager.alias_map
-        out = ['Smash Aliases: ({0} total, {1} groups)'.format(
+        out = [console.red('Smash Aliases:') + ' ({0} total, {1} groups)'.format(
             len(self._aliases),
             len(alias_map))]
         for group_name in alias_map.keys():
@@ -87,7 +88,7 @@ class AliasInterface(AbstractInterface):
         tmp = self._aliases
         for name in tmp:
             tmp2 = self.zonk(name)
-            tmp3 = "zoo"  # self.smash._installed_aliases[name].__qmark__()
+            tmp3 = "testinge7e9d3a8-5845-11e5-901b-0800272dfc6a"  # self.smash._installed_aliases[name].__qmark__()
             tmp2.__doc__ = tmp3
             prop = property(tmp2)
             setattr(self.__class__, name, prop)

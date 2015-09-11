@@ -3,7 +3,7 @@
 
 The smash prompt is configured in the file at `~/.smash/etc/prompt.json` If you have [configured your editor](../configuration#editor) already you can open it by typing `prompt.edit`.
 
-<a id=example-config></a>
+<a id=example-data></a>
 ### Example data
 
 ```json

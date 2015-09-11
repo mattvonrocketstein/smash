@@ -1,20 +1,21 @@
 #
 # smash/requirements.txt
 #
-unipath
 argparse
-psutil
-demjson
-pyflakes
-cyrusbus
 asciitable
+cyrusbus
+demjson
+psutil
+pyflakes
+goulash
+Importing==1.10
 fabric
 flake8
 pywhich
-goulash
 reporting==0.32
+tabulate
+unipath
 voluptuous==0.8.6
-Importing==1.10
 
 #smashlib.ipy3x requirements
 https://github.com/ipython/traitlets/zipball/master

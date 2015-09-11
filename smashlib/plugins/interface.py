@@ -2,6 +2,8 @@
     NB: plugin-related obviously, but this is not a plugin
 """
 
+from report import console
+
 from smashlib.handle import AbstractInterface
 
 
@@ -15,9 +17,9 @@ class PluginInterface(AbstractInterface):
 
     def __qmark__(self):
         """ user-friendly information when the input is "plugins?" """
-        out = ['Smash Plugins: ({0} total)'.format(len(self._plugins))]
+        out = [console.red('Smash Plugins: ') + '({0} total)'.format(len(self._plugins))]
         for nick in sorted(self._plugins):
-            out += ['   : {0}'.format(nick)]
+            out += [console.blue('   | ') + '{0}'.format(nick)]
         return '\n'.join(out)
 
     @property
