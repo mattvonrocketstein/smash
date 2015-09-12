@@ -59,7 +59,7 @@ _.TerminalInteractiveShell.confirm_exit = False
 # If False, only the completion results from
 # the first non-empty completer will be returned.
 ##########################################################################
-_.IPCompleter.merge_completions = False
+_.IPCompleter.merge_completions = True
 
 
 # load optional smash extensions
@@ -84,11 +84,16 @@ _.Smash.plugins.append('smashlib.plugins.which')
 _.Smash.plugins.append('smashlib.plugins._django')
 
 _.Smash.plugins.append('smashlib.plugins.prefilter_url')
-_.Smash.plugins.append('smashlib.plugins.handle_cmd_failure')
-_.Smash.plugins.append('smashlib.plugins.summarize')
-_.Smash.plugins.append('smashlib.plugins.cd_hooks')
+
+# these are plugins and therefore technically optional, but fairly critical for smash core
 _.Smash.plugins.append('smashlib.plugins.venv')
+_.Smash.plugins.append('smashlib.plugins.cd_hooks')
 _.Smash.plugins.append('smashlib.plugins.project_manager')
+_.Smash.plugins.append('smashlib.plugins.handle_cmd_failure')
+
+# summarize plugin shows project type, sloccount data, venv data
+_.Smash.plugins.append('smashlib.plugins.summarize')
+
 #do what I mean plugin
 _.Smash.plugins.append("smashlib.plugins.dwim")
 
