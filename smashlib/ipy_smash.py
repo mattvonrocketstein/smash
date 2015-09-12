@@ -226,7 +226,9 @@ class Smash(Plugin):
         super(Smash, self).init_bus()
 
     def add_completer(self, fxn, **kargs):
-        """ """
+        """ adds (and logs the addition of) a completion hook,
+            probably with run-priority mentioned in the kargs
+        """
         completion_log.info("adding new completer: {0}".format(fxn))
         self.completers[get_caller(2)['class']].append(fxn)
         get_ipython().set_hook('complete_command', fxn, **kargs)

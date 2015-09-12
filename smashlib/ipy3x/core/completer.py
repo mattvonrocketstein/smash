@@ -205,9 +205,9 @@ def penalize_magics_key(word):
     return word
 
 
-@undoc
-class Bunch(object):
-    pass
+#@undoc
+#class Bunch(object):
+#    pass
 
 
 DELIMS = ' \t\n`!@#$^&*()=+[{]}\\|;:\'",<>?'

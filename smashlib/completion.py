@@ -7,71 +7,52 @@ import itertools
 from smashlib._logging import completion_log
 from smashlib.util.ipy import have_command_alias
 from smashlib.ipy3x.core.completer import IPCompleter as IPCompleter
-from smashlib.ipy3x.core.completer import penalize_magics_key, Bunch
+from smashlib.ipy3x.core.completer import penalize_magics_key#, Bunch
 
 from IPython.core.error import TryNext
 from IPython.utils.py3compat import PY3, builtin_mod
 
 USELESS_BUILTINS = 'credits copyright'.split()
 
-
-def complete_long_opts(cmd):
-    """ completes long-opts args for any command,
-        assuming it supports --help
-    """
-    tmp = subprocess.check_output(cmd + ' --help', shell=True)
-    out = re.compile('\s+--[a-zA-Z]+').findall(tmp)
-    out += re.compile('\s+-[a-zA-Z]+').findall(tmp)
-    out = [x.strip() for x in out]
-    out = list(set(out))
-    return out
-
-
-class opt_completer(object):
-
-    """ """
-
-    def __init__(self, cmd_name):
-        self.cmd = cmd_name
-
-    def __call__(self, himself, event):
-        if event.symbol in ['-', '--']:
-            return complete_long_opts(self.cmd)
-        return []
-
+import addict
+#class Bunch(addict.Dict):
+#    pass
 USELESS_NAMESPACE = 'credits copyright'.split()
 
 
 class SmashCompleter(IPCompleter):
 
-    # unmodified from IPython's original method, here for
-    # convenience in case debugging messages are needed
     def dispatch_custom_completer(self, text):
-        # io.rprint("Custom! '%s' %s" % (text, self.custom_completers)) # dbg
         line = self.line_buffer
         if not line.strip():
             return None
 
-        # Create a little structure to pass all the relevant information about
-        # the current completion to any custom completer.
-        event = Bunch()
-        event.line = line
-        event.symbol = text
-        cmd = line.split(None, 1)[0]
-        event.command = cmd
-        event.text_until_cursor = self.text_until_cursor
+        # works
+        #Bunch=type('Bunch',(object,),{})
+        #event = Bunch()
+        #event.line = self.line_buffer
+        #event.symbol = text
+        #event.command = line.split(None, 1)[0]
+        #event.text_until_cursor = self.text_until_cursor
 
-        # print "\ncustom:{%s]\n" % event # dbg
+        # works
+        Bunch=type('Bunch',(addict.Dict,),{})
+        event = Bunch(
+            line = self.line_buffer,
+            symbol = text,
+            command = line.split(None, 1)[0],
+            text_until_cursor = self.text_until_cursor
+            )
 
         # for foo etc, try also to find completer for %foo
-        if not cmd.startswith(self.magic_escape):
+        if not event.command.startswith(self.magic_escape):
             try_magic = self.custom_completers.s_matches(
-                self.magic_escape + cmd)
+                self.magic_escape + event.command)
         else:
             try_magic = []
 
         for c in itertools.chain(
-                self.custom_completers.s_matches(cmd),
+                self.custom_completers.s_matches(event.command),
                 try_magic,
                 self.custom_completers.flat_matches(self.text_until_cursor)):
             # print "try",c # dbg
@@ -102,6 +83,7 @@ class SmashCompleter(IPCompleter):
         defined in self.namespace or self.global_namespace that match.
 
         """
+        return []
         # print 'Completer->global_matches, txt=%r' % text # dbg
         matches = []
         match_append = matches.append
@@ -246,3 +228,27 @@ class SmashCompleter(IPCompleter):
                 if have_command_alias(original):
                     comp[i] = original
         return comp
+
+def complete_long_opts(cmd):
+    """ completes long-opts args for any command,
+        assuming it supports --help
+    """
+    tmp = subprocess.check_output(cmd + ' --help', shell=True)
+    out = re.compile('\s+--[a-zA-Z]+').findall(tmp)
+    out += re.compile('\s+-[a-zA-Z]+').findall(tmp)
+    out = [x.strip() for x in out]
+    out = list(set(out))
+    return out
+
+
+class opt_completer(object):
+
+    """ """
+
+    def __init__(self, cmd_name):
+        self.cmd = cmd_name
+
+    def __call__(self, himself, event):
+        if event.symbol in ['-', '--']:
+            return complete_long_opts(self.cmd)
+        return []
