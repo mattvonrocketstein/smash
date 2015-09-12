@@ -12,7 +12,7 @@ fabric_opt_completer = opt_completer('fab')
 
 
 def fabric_cmd_completer(self, event):
-    smash_log.info('event [{0}]'.format(event.__dict__))
+    completion_log.info('event [{0}]'.format(event.__dict__))
     if event.symbol.startswith('-'):
         return []
     if ope('fabfile.py'):
