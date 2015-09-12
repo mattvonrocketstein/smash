@@ -26,9 +26,9 @@ class APlugin(object):
     def install(self):
         return self
 
-    def contribute_completer(self, key, fxn):
+    def contribute_completer(self, key, fxn, **kargs):
         self.installation_record['completers'].append([key, fxn])
-        self.smash.add_completer(fxn, re_key=key)
+        self.smash.add_completer(fxn, re_key=key, **kargs)
 
     def contribute_magic(self, fxn):
         # TODO: verify signature?
