@@ -1160,8 +1160,8 @@ class IPCompleter(Completer):
             # this flag on temporarily by uncommenting the second form (don't
             # flip the value in the first line, as the '# dbg' marker can be
             # automatically detected and is used elsewhere).
-            DEBUG = False
-            # DEBUG = True # dbg
+            #DEBUG = False
+            DEBUG = True # dbg
             if DEBUG:
                 try:
                     self.complete(text, line_buffer, cursor_pos)
