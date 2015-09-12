@@ -40,12 +40,12 @@ class HistoryCompleter(Plugin):
         line = line.strip()
         tokens = smart_split(line)
         full = len(self.db) > self.MAX_SIZE
+        completion_log.info('eating {0} tokens'.format(len(tokens)))
         for token in tokens:
             if len(token) < 4:
                 # too small, dont care
                 continue
             if token not in self.db:
-                completion_log.info('eating token: {0}'.format(token))
                 self.db.append(token)
             if full:
                 self.db.pop(0)
