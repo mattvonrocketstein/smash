@@ -8,7 +8,7 @@
     bus from the main ipython event system (IPython.core.events).
 """
 import traceback
-from report import report
+from report import report, console
 
 from IPython.terminal.ipapp import TerminalIPythonApp as BaseTIA
 from IPython.terminal.interactiveshell import \
@@ -19,7 +19,7 @@ from IPython.utils.strdispatch import StrDispatch
 from IPython.core.completerlib import (
     module_completer, magic_run_completer,
     cd_completer, reset_completer)
-
+from IPython.core import page
 
 from smashlib._logging import smash_log
 from smashlib.channels import C_FILE_INPUT, C_PRE_RUN_CELL
@@ -43,6 +43,13 @@ class SmashDisplayHook(DisplayHook):
 
 
 class SmashTerminalInteractiveShell(BaseTIS):
+    def show_usage(self):
+        """ handler used when naked '?' is entered into the terminal """
+        return page.page(
+            console.red("main documentation:")+"""
+            http://mattvonrocketstein.github.io/smash/
+            """
+            )
 
     # Input splitter, to transform input line by line and detect when a block
     # is ready to be executed.
@@ -195,7 +202,6 @@ TerminalInteractiveShell = SmashTerminalInteractiveShell
 
 
 class SmashTerminalIPythonApp(BaseTIA):
-
     def init_extensions(self):
         try:
             self.log.info("Loading IPython extensions...")

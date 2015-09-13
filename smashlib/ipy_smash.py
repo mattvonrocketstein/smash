@@ -18,19 +18,21 @@ from goulash._inspect import get_caller
 
 from IPython.utils.traitlets import List, Bool
 
+from smashlib._logging import smash_log, completion_log
+
 from smashlib import data
 from smashlib.aliases import AliasInterface
-from smashlib.plugins import Plugin
-from smashlib.util.reflect import from_dotpath
-from smashlib.util import bash
-from smashlib.magics import SmashMagics
 from smashlib.channels import C_SMASH_INIT_COMPLETE
-from smashlib.plugins.interface import PluginInterface
-from smashlib.prompt.interface import PromptInterface
+from smashlib.exceptions import ConfigError
+from smashlib.magics import SmashMagics
+from smashlib.plugins import Plugin
 from smashlib.patches.edit import PatchEdit
 from smashlib.patches.rehash import PatchRehash
 from smashlib.patches.pinfo import PatchPinfoMagic
-from smashlib._logging import smash_log, completion_log
+from smashlib.plugins.interface import PluginInterface
+from smashlib.prompt.interface import PromptInterface
+from smashlib.util.reflect import from_dotpath
+from smashlib.util import bash
 
 
 
@@ -59,21 +61,29 @@ class Smash(Plugin):
 
     def init_plugins(self):
         _installed_plugins = {}
-        from smashlib.plugins import Plugin
+
         for dotpath in self.plugins:
             try:
                 mod = from_dotpath(dotpath)
             except AttributeError as e:
-                err = "Error working with plugin {0}: {1}"
-                err = err.format(dotpath, e)
-                self.report(err)
-                self.logger.warning(err)
-                continue
+                error = "Error working with plugin {0}: {1}"
+                error = error.format(dotpath, e)
+                raise SystemExit(error)
             ext_name = dotpath.split('.')[-1]
+            load_fxn = getattr(mod, 'load_ipython_extension', None)
+            if load_fxn is None:
+                error = ('Check configuration at {2}.  Entry "{0}" '
+                         'resolves to {1}, but no load_ipython_extension '
+                         'function was found')
+                raise ConfigError(error.format(
+                    dotpath, mod, data.SMASH_ETC))
             ext_obj = mod.load_ipython_extension(self.shell)
-            assert isinstance(ext_obj, Plugin), \
-                ("error with extension '{0}': smash requires load_ipython_extension()"
-                 " to return plugin object ").format(ext_name)
+            if not isinstance(ext_obj, Plugin):
+                error = ("error with extension '{0}': "
+                         "smash requires load_ipython_extension()"
+                         " to return plugin object ")
+                error = error.format(ext_name)
+                raise ConfigError(error)
             _installed_plugins[ext_name] = ext_obj
             if ext_obj is None:
                 msg = '{0}.load_ipython_extension should return an object'
@@ -87,13 +97,6 @@ class Smash(Plugin):
             iface.update()
             get_ipython().user_ns.update({iface.user_ns_var: iface})
 
-        #alias_iface = AliasInterface(self)
-        # alias_iface.update()
-        # get_ipython().user_ns.update(aliases=alias_iface)
-
-        #plugin_iface = PluginInterface(self)
-        # plugin_iface.update()
-        # get_ipython().user_ns.update(plugins=plugin_iface)
         self.report("loaded plugins:", _installed_plugins.keys())
 
     def get_cli_arguments(self):
@@ -119,8 +122,6 @@ class Smash(Plugin):
                     err = err.format(plugin)
                     raise SystemExit(err)
                 parser.add_argument(*args, **kargs)
-        #import argcomplete
-        # argcomplete.autocomplete(parser)
 
         # thinking of adding extra parsing here?  think twice.
         # whatever you're doing probably belongs in a separate plugin
@@ -209,7 +210,6 @@ class Smash(Plugin):
                     cmd, magic_name=fxn_name)
             msg = "registered magic for bash functions: " + str(fxns)
             smash_log.info(msg)
-            self.report(msg)
 
     def init_patches(self):
         """ """

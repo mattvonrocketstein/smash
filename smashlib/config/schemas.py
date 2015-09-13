@@ -5,6 +5,7 @@ from voluptuous import Schema as _Schema
 from voluptuous import Required, Invalid
 from IPython.terminal.interactiveshell import get_default_editor
 
+from smashlib.util.reflect import from_dotpath
 from smashlib.config import templates
 
 
@@ -14,6 +15,13 @@ class Schema(_Schema):
         self.default = default
         super(Schema, self).__init__(validator)
 
+def ImportableStringList(x):
+    for s in x:
+        assert isinstance(s, basestring)
+        try:
+            from_dotpath(s)
+        except Exception,e:
+            raise Invalid(str(e))
 
 def SimpleStringDict(x):
     for k, v in x.items():
@@ -35,7 +43,6 @@ def AliasListDict(x):
                        "of length 2 (first element is alias, second "
                        "element is command)").format(k, v.index(i), i)
                 raise Invalid(err)
-
 
 def EnvListDict(x):
     """TODO: dryer with AliasListDict """
@@ -70,12 +77,13 @@ macros = Schema(AliasListDict, templates.macros)
 
 prompt = Schema(PromptDict, {})
 search_dirs = Schema(list, [])
-venvs = Schema(SimpleStringDict, {})
-projects = Schema(SimpleStringDict, {})
 
+projects = Schema(SimpleStringDict, {})
+venvs = Schema(SimpleStringDict, templates.venvs)
+plugins = Schema(ImportableStringList, templates.plugins)
 editor = Schema(
-    {Required("console"): unicode,
-     Required("window_env"): unicode, },
+    { Required("console"): unicode,
+      Required("window_env"): unicode, },
     default=dict(window_env=get_default_editor(),
                  console=get_default_editor())
 )

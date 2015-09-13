@@ -23,9 +23,7 @@ _.Smash.load_bash_functions = True
 # load toplevel extensions
 ##########################################################################
 _.InteractiveShellApp.extensions.append("smashlib.pysh")
-#_.InteractiveShellApp.extensions.append("smashlib.dot_prefilter")
 _.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
-_.InteractiveShellApp.extensions.append("smashlib.plugins._fabric")
 
 # every smash component gets it's own verbosity setting.
 # this mostly controls the printing of debugging info
@@ -64,8 +62,10 @@ _.IPCompleter.merge_completions = True
 
 # load optional smash extensions
 # _.InteractiveShellApp.extensions.append('powerline.bindings.ipython.post_0_11')
+_.Smash.plugins.append('smashlib.plugins.prompt')
+_.Smash.plugins.append('smashlib.plugins.history_completer')
+_.Smash.plugins.append('smashlib.plugins.smash_completer')
 _.Smash.plugins.append('smashlib.plugins.cli_command_runner')
-_.Smash.plugins.append('smashlib.plugins.cli_update_runner')
 
 # automatically shows timer info for commands taking longer than 5s
 _.Smash.plugins.append('smashlib.plugins.time_long_commands')
@@ -85,25 +85,22 @@ _.Smash.plugins.append('smashlib.plugins._django')
 
 _.Smash.plugins.append('smashlib.plugins.prefilter_url')
 
-# these are plugins and therefore technically optional, but fairly critical for smash core
+## these are plugins and therefore technically
+## optional, but fairly critical for smash core
+
 _.Smash.plugins.append('smashlib.plugins.venv')
 _.Smash.plugins.append('smashlib.plugins.cd_hooks')
 _.Smash.plugins.append('smashlib.plugins.project_manager')
 _.Smash.plugins.append('smashlib.plugins.handle_cmd_failure')
 
-# summarize plugin shows project type, sloccount data, venv data
+## these plugins are more optional and idiosyncratic, but well tested
+_.Smash.plugins.append("smashlib.plugins.dwim")
+_.Smash.plugins.append("smashlib.plugins._fabric")
+_.Smash.plugins.append("smashlib.plugins.autojump")
 _.Smash.plugins.append('smashlib.plugins.summarize')
 
-#do what I mean plugin
-_.Smash.plugins.append("smashlib.plugins.dwim")
-
-_.Smash.plugins.append("smashlib.plugins.fabric")
+## more experimental
 _.Smash.plugins.append("smashlib.plugins.python_comp_tools")
-_.Smash.plugins.append("smashlib.plugins.autojump")
-
-# setup default configuration for the linter (used by "project manager" plugin)
-##########################################################################
-
 
 # setup default configuration for the linter (used by "project manager" plugin)
 ##########################################################################
@@ -118,9 +115,6 @@ _.PyLinter.ignore_undefined_names = [
 # configure the prompt extension with some reasonable defaults.
 ##########################################################################
 _.PromptManager.justify = False
-_.Smash.plugins.append('smashlib.plugins.prompt')
-_.Smash.plugins.append('smashlib.plugins.history_completer')
-_.Smash.plugins.append('smashlib.plugins.smash_completer')
 
 # configure the project manager extension
 ##########################################################################
@@ -136,17 +130,18 @@ from smashlib.config import SmashConfig
 config = SmashConfig(_)
 config.append_from_etc(projects.search_dirs, 'search_dirs.json')
 config.update_from_etc(projects.project_map, 'projects.json')
-config.update_from_etc(projects.alias_map, 'aliases.json')
-config.update_from_etc(projects.env_map, 'env.json')
 config.update_from_etc(projects.macro_map, 'macros.json')
-config.update_from_etc(projects.venv_map, 'venvs.json')
+config.update_from_etc(projects.alias_map, 'aliases.json')
+config.append_from_etc(_.Smash.plugins, 'plugins.json')
+config.update_from_etc(projects.env_map, 'env.json')
 
 # configure the ipython app
 ##########################################################################
 app = _.InteractiveShellApp
 
 # NB: Here's an easy way to issue adhoc
-#     commands, or modify the user namespace:
+# commands, or modify the user namespace:
+#
 # app.exec_lines.append("print 'hello world!'")
 # app.exec_lines.append("side_effect='whatever'")
 
