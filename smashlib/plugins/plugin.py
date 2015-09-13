@@ -18,6 +18,7 @@ class APlugin(object):
     """ """
 
     def get_cli_arguments(self):
+        """ """
         return []
 
     def __qmark__(self):
