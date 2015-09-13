@@ -28,6 +28,10 @@ class CLOpt(object):
         self.args = args
         self.kargs = kargs
 
+    def __iter__(self):
+        yield self.args
+        yield self.kargs
+
 class Reporter(BaseReporter):
     pass
 
