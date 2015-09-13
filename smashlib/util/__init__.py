@@ -21,6 +21,13 @@ from smashlib.data import P_CODE_FILE
 from report import Reporter as BaseReporter
 
 
+
+class CLOpt(object):
+    def __init__(self, args=None, kargs=None):
+        assert args and kargs
+        self.args = args
+        self.kargs = kargs
+
 class Reporter(BaseReporter):
     pass
 
