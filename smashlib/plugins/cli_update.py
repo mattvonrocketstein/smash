@@ -1,4 +1,7 @@
 """ smashlib.plugins.cli_update
+
+    The handler for "smash --update". This will default to
+    using whatever branch is already checked out
 """
 
 from fabric import api
@@ -11,35 +14,35 @@ from smashlib.util.events import receives_event
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 from smashlib import data
 
-from gittle import Gittle
 class UpdateSmash(Plugin):
     """ This plugin is responsible for doing the work whenever smash
         is invoked with "--update".
     """
     update = None
-    verbose = True # do not change
+    verbose = True # do not change, user needs some feedback
 
     def get_cli_arguments(self):
-        update_clopt = CLOpt(
-            args = ['--update'],
-            kargs=dict(default=False,
-                       action='store_true'))
-        return [update_clopt]
+        return [
+            CLOpt(
+                args = ['--update'],
+                kargs = dict(default=False,
+                             action='store_true'))
+            ]
 
     def use_argv(self, args):
-        if args.update:
-            self.update = True
+        self.update = args.update
 
     @receives_event(C_SMASH_INIT_COMPLETE)
     def consider_updating(self):
-        if self.update is not None:
+        if self.update:
             try:
                 self.run_update()
             finally:
                 self.smash.shell.run_cell('exit')
 
     def run_update(self):
-        smash_dir = data.SMASH_DIR)
+        """ """
+        smash_dir = data.SMASH_DIR
         with api.lcd(smash_dir):
             with api.settings(api.hide('warnings'), warn_only=True, quiet=True):
                 result = api.local('git diff-index --quiet HEAD --')
@@ -51,5 +54,5 @@ class UpdateSmash(Plugin):
                 api.local('git pull')
 
 def load_ipython_extension(ip):
-    """ called by %load_ext magic"""
+    """ called by %load_ext magic """
     return UpdateSmash(get_ipython()).install()
