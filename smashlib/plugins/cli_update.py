@@ -52,7 +52,7 @@ class UpdateSmash(Plugin):
                 self.report(error.format(smash_dir))
             else:
                 api.local('git pull')
-
+                api.local('./bin/pip install -r requirements.txt')
 def load_ipython_extension(ip):
     """ called by %load_ext magic """
     return UpdateSmash(get_ipython()).install()
