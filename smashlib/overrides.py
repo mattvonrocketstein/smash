@@ -126,7 +126,10 @@ class SmashTerminalInteractiveShell(BaseTIS):
                  silent=False, shell_futures=True):
         #assert self.smash
 
-        self.smash.publish(C_PRE_RUN_CELL, raw_cell)
+        #avoid race on embedded shell
+        publish = getattr(self.smash,'publish',None)
+        if publish:
+            publish(C_PRE_RUN_CELL, raw_cell)
         smash_log.info("[{0}]".format(raw_cell.encode('utf-8').strip()))
         # as long as the expressions are semicolon separated,
         # this section allows hybrid bash/python expressions

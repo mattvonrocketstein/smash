@@ -1,7 +1,7 @@
 """ smashlib.completion
 """
 
-import re
+import os, re
 import subprocess
 import itertools
 from smashlib._logging import completion_log
@@ -19,6 +19,11 @@ import addict
 #    pass
 USELESS_NAMESPACE = 'credits copyright'.split()
 
+def smash_env_complete(symbol):
+    completion_log.info("symbol: [{0}]".format(symbol))
+    if symbol.startswith('$'):
+        symbol = symbol[1:]
+    return [x for x in os.environ if x.startswith(symbol)]
 
 class SmashCompleter(IPCompleter):
 

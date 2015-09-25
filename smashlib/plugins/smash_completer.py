@@ -8,7 +8,7 @@ from smashlib.plugins import Plugin
 from smashlib.util.ipy import have_command_alias
 from smashlib._logging import completion_log
 from smashlib.bin.pybcompgen import complete
-
+from smashlib.completion import smash_env_complete
 from IPython.core.completerlib import TryNext
 
 
@@ -18,13 +18,6 @@ def smash_bash_complete(*args, **kargs):
     completion_log.info("result: {0}".format(result))
     result = [x for x in result if x not in keyword.kwlist]
     return result
-
-
-def smash_env_complete(symbol):
-    completion_log.info("symbol: [{0}]".format(symbol))
-    if symbol.startswith('$'):
-        symbol = symbol[1:]
-    return [x for x in os.environ if x.startswith(symbol)]
 
 
 class SmashCompleter(Plugin):
