@@ -1,9 +1,18 @@
 """ smashlib.editor
 """
 
+import platform
 from smashlib.config import SmashConfig
 from smashlib.data import fname_editor_config
-is_windowing_env = lambda: True  # placeholder
+
+def is_windowing_env():
+    if platform.mac_ver()[0]:
+        #mac
+        return True
+    if os.environ['DISPLAY']:
+        # xwindows
+        return True
+    return False
 
 
 def get_editor():
