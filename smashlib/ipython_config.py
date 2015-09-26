@@ -22,7 +22,6 @@ _.Smash.load_bash_functions = True
 
 # load toplevel extensions
 ##########################################################################
-_.InteractiveShellApp.extensions.append("smashlib.pysh")
 _.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
 
 # every smash component gets it's own verbosity setting.
@@ -65,7 +64,10 @@ _.IPCompleter.merge_completions = True
 _.Smash.plugins.append('smashlib.plugins.prompt')
 _.Smash.plugins.append('smashlib.plugins.history_completer')
 _.Smash.plugins.append('smashlib.plugins.smash_completer')
+
+# handlers for "smash -c" and "smash --update", respectively
 _.Smash.plugins.append('smashlib.plugins.cli_command_runner')
+_.Smash.plugins.append('smashlib.plugins.cli_update')
 
 # automatically shows timer info for commands taking longer than 5s
 _.Smash.plugins.append('smashlib.plugins.time_long_commands')
@@ -98,6 +100,8 @@ _.Smash.plugins.append("smashlib.plugins.dwim")
 _.Smash.plugins.append("smashlib.plugins._fabric")
 _.Smash.plugins.append("smashlib.plugins.autojump")
 _.Smash.plugins.append('smashlib.plugins.summarize')
+_.Smash.plugins.append('smashlib.plugins.cmd_env')
+
 
 ## more experimental
 _.Smash.plugins.append("smashlib.plugins.python_comp_tools")

@@ -21,6 +21,9 @@ USELESS_NAMESPACE = 'credits copyright'.split()
 
 def smash_env_complete(symbol):
     completion_log.info("symbol: [{0}]".format(symbol))
+    symbol = symbol.strip()
+    if not symbol:
+        return
     if symbol.startswith('$'):
         symbol = symbol[1:]
     return [x for x in os.environ if x.startswith(symbol)]

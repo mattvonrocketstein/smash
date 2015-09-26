@@ -69,7 +69,10 @@ class SmashTerminalInteractiveShell(BaseTIS):
         lastline = self._smash_last_input
         clean_line = lastline.strip()
         if not clean_line:
-            return
+            # this is not input!
+            # possibly there is actually an error in smash itself
+            raise
+
         if is_path(clean_line):
             # NB: in this case a regex looks like a path or URL,
             # but it's not necessarily true that the endpoint
@@ -222,7 +225,7 @@ class SmashTerminalIPythonApp(BaseTIA):
                     smash_log.critical(traceback.format_exc())
                     self.shell.showtraceback()
         except:
-            self.log.warn("Unknown error in loading extensions:")
+            self.log.info("Unknown error in loading extensions:")
             self.shell.showtraceback()
 
     @classmethod
@@ -239,5 +242,6 @@ class SmashTerminalIPythonApp(BaseTIA):
             ipython_dir=self.ipython_dir,
             user_ns=self.user_ns)
         self.shell.configurables.append(self)
+
 TerminalIPythonApp = SmashTerminalIPythonApp
 launch_new_instance = TerminalIPythonApp.launch_instance

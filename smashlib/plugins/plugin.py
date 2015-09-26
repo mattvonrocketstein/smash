@@ -3,15 +3,18 @@
     NB: plugin related obviously, but this is not a plugin.
         it's the abstract classes for creating subclasses
 """
+import inspect
 from collections import defaultdict
 
 from IPython.core.macro import Macro
 from IPython.utils.traitlets import Bool
 from IPython.config.configurable import Configurable
 
+from smashlib.exceptions import PluginError
 from smashlib._logging import Logger, events_log, smash_log
 from smashlib.bases.eventful import EventfulMix
 from smashlib._logging import smash_log
+from smashlib.patches import Patch
 
 class APlugin(object):
 
@@ -30,6 +33,12 @@ class APlugin(object):
     def contribute_completer(self, key, fxn, **kargs):
         self.installation_record['completers'].append([key, fxn])
         self.smash.add_completer(fxn, re_key=key, **kargs)
+
+    def contribute_patch(self, patch_kls):
+        if not inspect.isclass(patch_kls) and issubclass(patch_kls, Patch):
+            raise PluginError("expected {0} would be a class extending {1}".format(
+                patch_kls, Patch))
+        patch_kls(self).install()
 
     def contribute_magic(self, fxn):
         # TODO: verify signature?

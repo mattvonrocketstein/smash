@@ -21,6 +21,8 @@ from IPython.utils.traitlets import List, Bool
 from smashlib._logging import smash_log, completion_log
 
 from smashlib import data
+from smashlib.util.ipy import register_prefilter
+from smashlib.prefilters.shell import ShellHandler, ShellChecker
 from smashlib.aliases import AliasInterface
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 from smashlib.exceptions import ConfigError
@@ -53,7 +55,6 @@ class Smash(Plugin):
         p.text(repr(self))
 
     def system(self, cmd, quiet=False):
-        #self.report("run: " + cmd, force=True)
         return qlocal(cmd, capture=True)
 
     def init_magics(self):
@@ -152,6 +153,7 @@ class Smash(Plugin):
         self.shell._smash = self
         self.init_bus()
         self.init_plugins()
+        self.init_prefilters()
         try:
             self.parse_argv()
         except SystemExit:
@@ -165,6 +167,18 @@ class Smash(Plugin):
         self.shell.user_ns['_smash'] = self
         self.shell.run_cell('rehashx')
         # self.user_ns.pop('')
+
+    def init_prefilters(self):
+        """ this initializes prefilters which are central
+            to smash's ability to parse python-looking input
+            which is actually intended to be shell input.
+            out-of-box, ipython cannot parse bash commands
+            with dashes like "apt-get install foo", because "apt-get"
+            is subtraction among (probably undefined) variables "apt"
+            and "get".
+        """
+        checker, handler = register_prefilter(ShellChecker, ShellHandler)
+        return checker, handler
 
     def recent_commands(self, num):
         tmp = self.history(num)
@@ -213,9 +227,11 @@ class Smash(Plugin):
 
     def init_patches(self):
         """ """
-        PatchEdit(self).install()
-        PatchPinfoMagic(self).install()
-        PatchRehash(self).install()
+        for patch_kls in [PatchEdit, PatchPinfoMagic, PatchRehash]:
+            self.contribute_patch(patch_kls)
+        #PatchEdit(self).install()
+        #PatchPinfoMagic(self).install()
+        #PatchRehash(self).install()
 
     def init_bus(self):
         """ note: it is a special case that due to bootstrap ordering,

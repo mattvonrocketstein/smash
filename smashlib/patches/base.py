@@ -1,8 +1,10 @@
 """ smashlib.patches.base
 """
 
+class Patch(object):
+    pass
 
-class PatchMagic(object):
+class PatchMagic(Patch):
 
     """ helper for patching ipython builtin line magics.
         it has to be done this way because ipy.shell.magics_manager
