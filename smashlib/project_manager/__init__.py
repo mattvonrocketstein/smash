@@ -194,7 +194,8 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
             return out
         for name, path in self.project_map.items():
             prop = _get_prop(name, path)
-            setattr(ProjectManagerInterface, name, prop)
+            print name,prop
+            setattr(ProjectManagerInterface, name.replace('-','_'), prop)
 
     def _require_project(self, name):
         if name not in self.project_map:
