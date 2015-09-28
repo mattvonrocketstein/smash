@@ -167,7 +167,7 @@ class SmashCompleter(IPCompleter):
         # Start with a clean slate of completions
         self.matches[:] = []
         custom_res = self.dispatch_custom_completer(text)
-        if custom_res is not None:
+        if custom_res:
             # did custom completers produce something?
             completion_log.info("custom completers: {0}".format(custom_res))
             self.matches = custom_res
@@ -176,6 +176,7 @@ class SmashCompleter(IPCompleter):
             # matcher, so we return results to the user from all
             # namespaces.
             if self.merge_completions:
+                completion_log.info('merging completions')
                 self.matches = []
                 for matcher in self.matchers:
                     extra = matcher(text)
@@ -203,7 +204,6 @@ class SmashCompleter(IPCompleter):
 
         # use penalize_magics_key to put magics after variables with same name
         self.matches = sorted(set(self.matches), key=penalize_magics_key)
-
         completion_log.info('COMP TEXT, MATCHES: %r, %r' %
                             (text, self.matches))  # dbg
         return text, self.matches
