@@ -169,7 +169,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
 
     def ask_exit(self):
         """ """
-        self.smash.stop_scheduler()
+        self.smash.scheduler.stop()
         super(SmashTerminalInteractiveShell, self).ask_exit()
 
     def system(self, cmd, quiet=False, **kargs):

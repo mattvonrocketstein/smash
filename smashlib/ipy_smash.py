@@ -28,7 +28,7 @@ from smashlib.aliases import AliasInterface
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 from smashlib.exceptions import ConfigError
 from smashlib.magics import SmashMagics
-from smashlib.scheduler import SchedulerMixin
+from smashlib.scheduler import Scheduler
 from smashlib.plugins import Plugin
 from smashlib.patches.edit import PatchEdit
 from smashlib.patches.rehash import PatchRehash
@@ -40,7 +40,7 @@ from smashlib.util import bash
 
 
 
-class Smash(SchedulerMixin, Plugin):
+class Smash(Plugin):
     plugins = List(default_value=[], config=True)
     verbose_events = Bool(True, config=True)
     ignore_warnings = Bool(False, config=True)
@@ -169,6 +169,10 @@ class Smash(SchedulerMixin, Plugin):
         self.shell.user_ns['_smash'] = self
         self.shell.run_cell('rehashx')
         self.publish(C_SMASH_INIT_COMPLETE)
+
+    def init_scheduler(self):
+        self.scheduler = Scheduler(self)
+        self.scheduler.start()
 
     def init_prefilters(self):
         """ this initializes prefilters which are central
