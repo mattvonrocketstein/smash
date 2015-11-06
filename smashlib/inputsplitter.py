@@ -15,7 +15,7 @@ class SmashInputSplitter(IPythonInputSplitter):
         Smash overrides the core IPythonInputSplitter for just one reason:
 
         We want to force commands like "ed /some/path/file_name.txt:<col>:"
-        to be interpretted as complete input.  The use case is that simply that
+        to be interpretted as complete input.  The use case is that
         this format is often used as output for command line tools (for
         instance ack-grep)
     """

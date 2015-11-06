@@ -12,13 +12,6 @@ from smashlib.project_manager import (
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     ip = get_ipython()
-    pmi = ProjectManagerInterface()
-    ProjectManager.interface = pmi
     pm = ProjectManager(ip)
-    pm.init_interface(pmi)
+    pm.init_interface()
     return pm
-
-
-def unload_ipython_extension(ip):
-    """ called by %unload_ext magic"""
-    print 'not implemented yet'

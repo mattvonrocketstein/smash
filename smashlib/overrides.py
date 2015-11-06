@@ -43,19 +43,18 @@ class SmashDisplayHook(DisplayHook):
 
 
 class SmashTerminalInteractiveShell(BaseTIS):
-    def show_usage(self):
-        """ handler used when naked '?' is entered into the terminal """
-        return page.page(
-            console.red("main documentation:")+"""
-            http://mattvonrocketstein.github.io/smash/
-            """
-            )
 
     # Input splitter, to transform input line by line and detect when a block
     # is ready to be executed.
     input_splitter = Instance('smashlib.inputsplitter.SmashInputSplitter',
                               (), {'line_input_checker': True})
     displayhook_class = Type(SmashDisplayHook)
+
+    def show_usage(self):
+        """ handler used when naked '?' is entered into the terminal """
+        return page.page(
+            console.red("main documentation:") + \
+            "\n  http://mattvonrocketstein.github.io/smash/")
 
     def showsyntaxerror(self, filename=None):
         """ when a syntax error is encountered,
@@ -128,6 +127,12 @@ class SmashTerminalInteractiveShell(BaseTIS):
     def run_cell(self, raw_cell, store_history=False,
                  silent=False, shell_futures=True):
         #assert self.smash
+        #import re
+        #regex = r'`[^`]*`';
+        #line ='foo`bar`baz`a`';
+        #tick_groups = [x[1:-1] for x in re.findall(regex, line)];
+        #if tick_groups:
+        #    print tick_groups
 
         #avoid race on embedded shell
         publish = getattr(self.smash,'publish',None)
@@ -161,6 +166,11 @@ class SmashTerminalInteractiveShell(BaseTIS):
                 self.smash.publish(C_POST_RUN_INPUT, last_input)
             self._smash_last_input = ""
         return [out]
+
+    def ask_exit(self):
+        """ """
+        self.smash.stop_scheduler()
+        super(SmashTerminalInteractiveShell, self).ask_exit()
 
     def system(self, cmd, quiet=False, **kargs):
         # print 'wrapping system call',cmd

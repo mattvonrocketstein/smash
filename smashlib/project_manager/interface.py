@@ -5,7 +5,7 @@ import os
 from goulash.python import ope
 from goulash.venv import find_venvs
 from goulash._fabric import require_bin
-
+from fabric.colors import red
 
 def require_active_project(fxn):
     def newf(self, *args, **kargs):
@@ -107,12 +107,13 @@ class ProjectManagerInterface(object):
         pm.test(project_name)
 
     @property
-    def reload(self):
+    def _reload(self):
+        """ """
         self._project_manager.reload()
 
     def __qmark__(self):
         pmap = self._project_manager.project_map
-        out = ['ProjectManager: ({0} projects)'.format(len(pmap))]
+        out = [red('ProjectManager:')+' ({0} projects)'.format(len(pmap))]
         cp = self._project_manager._current_project
         aliases = self._project_manager.alias_map
         if cp:

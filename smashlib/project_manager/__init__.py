@@ -32,6 +32,8 @@ from .env import EnvMixin
 
 from smashlib.aliases import AliasMixin
 
+def normalize_project_name(name):
+    return name.replace('.', '_').replace('-','_')
 
 class CommandLineMixin(object):
 
@@ -102,9 +104,16 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
         self._load_env_group('__smash__')
 
     def reload(self):
-        print 'not implemented yet'
+        """ forces reread of project directories, and
+            updates the command line interface.
+            this should run periodically
+        """
+        self.init_eventful()
+        self.init_interface()
 
-    def init_interface(self, pmi):
+    def init_interface(self):
+        pmi = ProjectManagerInterface()
+        self.__class__.interface = pmi
         ProjectManagerInterface._project_manager = self
         self.smash.shell.user_ns['proj'] = pmi
 
@@ -194,8 +203,8 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
             return out
         for name, path in self.project_map.items():
             prop = _get_prop(name, path)
-            print name,prop
-            setattr(ProjectManagerInterface, name.replace('-','_'), prop)
+            name = normalize_project_name(name)
+            setattr(ProjectManagerInterface, name, prop)
 
     def _require_project(self, name):
         if name not in self.project_map:

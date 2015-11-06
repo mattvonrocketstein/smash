@@ -9,6 +9,7 @@ from report import console
 from tabulate import tabulate
 
 from smashlib.bin.pybcompgen import remove_control_characters
+from smashlib._logging import smash_log
 
 r_alias = re.compile('alias \w+=.*')
 
@@ -35,18 +36,32 @@ def get_aliases():
 
 def get_functions():
     """ extracts the names of all functions from the underlying bash shell """
-    cmd = '''bash -c "echo 'echo MARKER;compgen -A function;echo MARKER'|bash -i"'''
+    cmd = '''bash -c "echo 'echo MARKER1;compgen -A function|grep -v ^_.*;echo MARKER2'|bash -i"'''
+    return _get_functions(cmd)
+
+def _get_functions(cmd):
+    """ """
     p1 = Popen(cmd, shell=True, stdout=PIPE, stdin=PIPE, stderr=PIPE)
     out, err = p1.communicate()
     lines = out.split('\n')
     lines = [x.strip() for x in lines]
-    lines = [x for x in lines if x and not x.startswith('_')]
-    lines = [x for x in lines if re.compile('\w*').match(x)]
-    lines = lines[lines.index('MARKER') + 1:]
-    lines = lines[:lines.index('MARKER')]
+    #lines = [x for x in lines if x and not x.startswith('_')]
+    olines = [x for x in lines if re.compile('\w*').match(x)]
+    #try:
+    #raise Exception,cmd
+    lines = olines[olines.index('MARKER1') + 1:]
+    lines = lines[:lines.index('MARKER2')]
+    #except ValueError:
+
     function_names = lines
     return function_names
 
+def get_functions_from_file(fname):
+    """ """
+    base_functions = get_functions()
+    cmd = '''bash -c "echo 'source '''+fname+''';echo MARKER1;compgen -A function|grep -v ^_.*;echo MARKER2'|bash -i"'''
+    new_functions = _get_functions(cmd)
+    return list(set(new_functions)-set(base_functions))
 
 def run_function_in_host_shell(fxn_name, input_string, quiet=False):
     """ if you have quoted values in input_string, this will probably break"""

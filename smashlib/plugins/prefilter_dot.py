@@ -21,9 +21,3 @@ class DotPlugin(Plugin):
 def load_ipython_extension(ip):
     """ called by %load_ext magic """
     return DotPlugin(get_ipython()).install()
-
-
-def unload_ipython_extension(ip):
-    """ called by %unload_ext magic """
-    plugin = DotPlugin()
-    plugin.uninstall()

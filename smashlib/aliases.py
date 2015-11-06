@@ -87,7 +87,8 @@ class AliasInterface(AbstractInterface):
         tmp = self._aliases
         for name in tmp:
             tmp2 = self.zonk(name)
-            tmp3 = "testinge7e9d3a8-5845-11e5-901b-0800272dfc6a"  # self.smash._installed_aliases[name].__qmark__()
+            tmp3 = "testinge7e9d3a8-5845-11e5-901b-0800272dfc6a"
+            # self.smash._installed_aliases[name].__qmark__()
             tmp2.__doc__ = tmp3
             prop = property(tmp2)
             setattr(self.__class__, name, prop)

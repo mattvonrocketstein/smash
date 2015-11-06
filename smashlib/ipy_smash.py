@@ -13,6 +13,7 @@ from itertools import imap
 from operator import itemgetter
 from collections import defaultdict
 
+
 from goulash._fabric import qlocal
 from goulash._inspect import get_caller
 
@@ -27,6 +28,7 @@ from smashlib.aliases import AliasInterface
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 from smashlib.exceptions import ConfigError
 from smashlib.magics import SmashMagics
+from smashlib.scheduler import SchedulerMixin
 from smashlib.plugins import Plugin
 from smashlib.patches.edit import PatchEdit
 from smashlib.patches.rehash import PatchRehash
@@ -38,7 +40,7 @@ from smashlib.util import bash
 
 
 
-class Smash(Plugin):
+class Smash(SchedulerMixin, Plugin):
     plugins = List(default_value=[], config=True)
     verbose_events = Bool(True, config=True)
     ignore_warnings = Bool(False, config=True)
@@ -154,6 +156,7 @@ class Smash(Plugin):
         self.init_bus()
         self.init_plugins()
         self.init_prefilters()
+        self.init_scheduler()
         try:
             self.parse_argv()
         except SystemExit:
@@ -163,10 +166,9 @@ class Smash(Plugin):
         if data.SMASH_BIN not in os.environ['PATH']:
             os.environ['PATH'] = data.SMASH_BIN + ':' + os.environ['PATH']
         self.init_patches()
-        self.publish(C_SMASH_INIT_COMPLETE)
         self.shell.user_ns['_smash'] = self
         self.shell.run_cell('rehashx')
-        # self.user_ns.pop('')
+        self.publish(C_SMASH_INIT_COMPLETE)
 
     def init_prefilters(self):
         """ this initializes prefilters which are central

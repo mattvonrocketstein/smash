@@ -23,7 +23,7 @@ _.Smash.load_bash_functions = True
 # load toplevel extensions
 ##########################################################################
 _.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
-
+_.InteractiveShellApp.extensions.append('smashlib.plugins.prefilter_date')
 # every smash component gets it's own verbosity setting.
 # this mostly controls the printing of debugging info
 ##########################################################################
@@ -132,6 +132,7 @@ projects.search_dirs.append('~/projects')
 # see docs at: http://mattvonrocketstein.github.io/smash/project_manager.html
 from smashlib.config import SmashConfig
 config = SmashConfig(_)
+
 config.append_from_etc(projects.search_dirs, 'search_dirs.json')
 config.update_from_etc(projects.project_map, 'projects.json')
 config.update_from_etc(projects.macro_map, 'macros.json')

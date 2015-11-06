@@ -2,6 +2,7 @@
 
     NB: plugin related obviously, but this is not a plugin.
         it's the abstract classes for creating subclasses
+    TODO: move to smashlib.bases
 """
 import inspect
 from collections import defaultdict
