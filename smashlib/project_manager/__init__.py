@@ -112,10 +112,7 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
         self.init_interface()
 
     def init_interface(self):
-        pmi = ProjectManagerInterface()
-        self.__class__.interface = pmi
-        ProjectManagerInterface._project_manager = self
-        self.smash.shell.user_ns['proj'] = pmi
+        pmi = ProjectManagerInterface(self)
 
     def init_magics(self):
         ProjectMagics.project_manager = self

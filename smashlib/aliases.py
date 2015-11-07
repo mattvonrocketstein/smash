@@ -7,7 +7,7 @@ from report import console
 
 from smashlib.handle import AbstractInterface
 from smashlib._logging import smash_log
-
+from smashlib import get_smash
 
 class AliasMixin(object):
 
@@ -22,14 +22,14 @@ class AliasMixin(object):
         assert isinstance(macro, basestring)
         macro = 'get_ipython().run_cell("""{0}""")'.format(macro)
         macro = Macro(macro)
-        self.smash.shell.user_ns[name] = macro
+        get_smash().shell.user_ns[name] = macro
 
     def _load_alias_group(self, group_name):
         smash_log.info('loading alias group: {0}'.format(group_name))
         aliases, macros = self._get_alias_group(group_name)
         for alias in aliases:
             name, cmd = alias
-            self.smash.shell.alias_manager.define_alias(name, cmd)
+            get_smash().shell.alias_manager.define_alias(name, cmd)
             smash_log.info(' alias: {0}'.format(name))
         self.report("Loaded {0} aliases".format(len(aliases)))
 
@@ -43,18 +43,18 @@ class AliasMixin(object):
         for alias in aliases:
             name, cmd = alias
             try:
-                self.smash.shell.alias_manager.undefine_alias(name)
+                get_smash().shell.alias_manager.undefine_alias(name)
             except ValueError:
                 continue
 
 
 class AliasInterface(AbstractInterface):
 
-    user_ns_var = 'aliases'
+    _user_ns_var = 'aliases'
 
     def __qmark__(self):
         """ user-friendly information when the input is "plugins?" """
-        alias_map = self.smash.project_manager.alias_map
+        alias_map = get_smash().project_manager.alias_map
         out = [console.red('Smash Aliases:') + ' ({0} total, {1} groups)'.format(
             len(self._aliases),
             len(alias_map))]
@@ -72,15 +72,15 @@ class AliasInterface(AbstractInterface):
 
     @property
     def edit(self):
-        self.smash.shell.run_cell('ed_aliases')
+        get_smash().shell.run_cell('ed_aliases')
 
     @property
     def _aliases(self):
-        return [x[0].replace('-', '.') for x in self.smash.shell.alias_manager.aliases]
+        return [x[0].replace('-', '.') for x in get_smash().shell.alias_manager.aliases]
 
     def zonk(self,  name):
         def blue(himself):
-            return self.smash.shell.alias_manager.linemagics.get(name)
+            return get_smash().shell.alias_manager.linemagics.get(name)
         return blue
 
     def update(self):
@@ -88,11 +88,11 @@ class AliasInterface(AbstractInterface):
         for name in tmp:
             tmp2 = self.zonk(name)
             tmp3 = "testinge7e9d3a8-5845-11e5-901b-0800272dfc6a"
-            # self.smash._installed_aliases[name].__qmark__()
+            # get_smash()._installed_aliases[name].__qmark__()
             tmp2.__doc__ = tmp3
             prop = property(tmp2)
             setattr(self.__class__, name, prop)
 
 
 def fxn(self, name):
-    return self.smash.shell.alias_manager.linemagics.get(name)
+    return get_smash().shell.alias_manager.linemagics.get(name)

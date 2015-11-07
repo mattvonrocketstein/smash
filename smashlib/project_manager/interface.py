@@ -18,15 +18,21 @@ def require_active_project(fxn):
     return newf
 
 
-# FIXME: should inherit from smashlib.handle
-class ProjectManagerInterface(object):
+from smashlib.handle import AbstractInterface
 
+class ProjectManagerInterface(AbstractInterface):
     """ This object should be a singleton and will be assigned to
         that main namespace as "proj".  In addition to the methods
         you see below, The ProjectManager extension
         will dynamically add/remove properties on to this
     """
+
     _project_manager = None
+    _user_ns_var = 'proj'
+
+    def __init__(self, *args, **kargs):
+        super(ProjectManagerInterface,self).__init__(*args, **kargs)
+        self._project_manager = self._parent
 
     @property
     def _type(self):

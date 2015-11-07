@@ -127,6 +127,7 @@ projects = _.ProjectManager
 # this is safe even when the directories do not exist
 projects.search_dirs.append('~/code')
 projects.search_dirs.append('~/projects')
+projects.search_dirs.append('~/.virtualenvs')
 
 # load user's project manager configs from the ~/.smash/etc json
 # see docs at: http://mattvonrocketstein.github.io/smash/project_manager.html

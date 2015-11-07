@@ -48,6 +48,8 @@ class Smash(Plugin):
     load_bash_functions = Bool(False, config=True)
 
     bus = cyrusbus.Bus()
+    scheduler = Scheduler()
+
     error_handlers = []
     _installed_plugins = {}
     completers = defaultdict(list)
@@ -98,7 +100,7 @@ class Smash(Plugin):
         for IfaceCls in tmp:
             iface = IfaceCls(self)
             iface.update()
-            get_ipython().user_ns.update({iface.user_ns_var: iface})
+            #get_ipython().user_ns.update({iface.user_ns_var: iface})
 
         self.report("loaded plugins:", _installed_plugins.keys())
 
@@ -156,7 +158,6 @@ class Smash(Plugin):
         self.init_bus()
         self.init_plugins()
         self.init_prefilters()
-        self.init_scheduler()
         try:
             self.parse_argv()
         except SystemExit:
@@ -168,11 +169,9 @@ class Smash(Plugin):
         self.init_patches()
         self.shell.user_ns['_smash'] = self
         self.shell.run_cell('rehashx')
+        self.scheduler.start()
         self.publish(C_SMASH_INIT_COMPLETE)
 
-    def init_scheduler(self):
-        self.scheduler = Scheduler(self)
-        self.scheduler.start()
 
     def init_prefilters(self):
         """ this initializes prefilters which are central
