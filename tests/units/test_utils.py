@@ -9,7 +9,10 @@ hijack_ipython_module()
 from IPython.testing.tools import default_config
 from IPython.core.completerlib import TryNext
 from IPython.testing.globalipapp import get_ipython
-from smashlib.util.bash import get_functions_from_file
+from smashlib.util import bash
+ffile = os.path.join(os.path.dirname(__file__),
+                     'function.sh')
+
 class TestUtils(TestCase):
 
     def setUp(self):
@@ -21,13 +24,15 @@ class TestUtils(TestCase):
         self.event = Mock()
 
     def test_get_functions_from_file(self):
-        ffile = os.path.join(os.path.dirname(__file__),
-                             'function.sh')
         self.assertTrue(os.path.exists(ffile))
         self.assertEqual(
             ['simple_function'],
-            get_functions_from_file(ffile))
+            bash.get_functions_from_file(ffile))
 
-
+    def test_run_function_from_file(self):
+        self.assertEqual(
+            bash.run_function_from_file(
+                'simple_function', ffile),
+            ['simple bash function'])
 if __name__=='__main__':
     main()

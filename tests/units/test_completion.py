@@ -18,13 +18,5 @@ class TestCompletion(TestCase):
         self.plugin = SmashCompleter(self.shell)
         self.event = Mock()
 
-    def test_env_complete(self):
-        self.assertTrue('USER' in smash_env_complete('$USE'))
-        self.assertTrue('USER' in smash_env_complete('USE'))
-
-    def test_empty_line_ignored(self):
-        with self.assertRaises(TryNext):
-            self.plugin.smash_matcher('')
-
 if __name__=='__main__':
     main()

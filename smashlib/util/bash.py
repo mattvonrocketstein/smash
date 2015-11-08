@@ -80,6 +80,7 @@ def source_file_namespace(fname):
     return out
 
 def source(fname):
+    """ add all functions mentioned in fname to user namespace """
     namespace = source_file_namespace(fname)
     user_ns = get_smash().shell.user_ns
     for fxn_name, fxn_bridge in namespace.items():

@@ -23,12 +23,6 @@ class TestPrefilterShell(TestCase):
         manager._handlers[shell.HANDLER_NAME] = self.handler
         self.checker = shell.ShellChecker(prefilter_manager=manager)
 
-    def test_simple_goes_to_shell(self):
-        line_info = fake_line_info('top')
-        self.assertEqual(
-            self.checker.check(line_info),
-            self.handler)
-
 class TestPrefilterURL(TestCase):
     def setUp(self):
         manager = PrefilterManager()
