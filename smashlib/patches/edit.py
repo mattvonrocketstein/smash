@@ -25,6 +25,6 @@ class PatchEdit(PatchMagic):
             lineno = '-n {0}'.format(fname.split(':')[1])
             fname = fname.split(':')[0]
         parameter_s = '{0} {1} {2}'.format('-x', lineno, fname)
-        self.component.report(
+        self.smash.report(
             'rewrote arguments going to edit: ' + parameter_s)
         return self.original(parameter_s=parameter_s, last_call=last_call)

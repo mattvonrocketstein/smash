@@ -11,7 +11,6 @@ from smashlib.patches import PatchCDMagic, PatchPushdMagic
 
 class ChangeDirHooks(Plugin):
 
-    last_dir = None
     change_dir_hooks = EventfulList(default_value=[], config=True)
 
     def init(self):
@@ -19,8 +18,8 @@ class ChangeDirHooks(Plugin):
         # FIXME: this check is probably no needed since patching cannot happen
         # twice
         if not getattr(self, '_already_patched', False):
-            mycd = PatchCDMagic(self)
-            mypushd = PatchPushdMagic(self, mycd)
+            mycd = PatchCDMagic()
+            mypushd = PatchPushdMagic(mycd)
             mycd.install()
             mypushd.install()
             self._already_patched = True

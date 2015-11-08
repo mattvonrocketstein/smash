@@ -1,6 +1,6 @@
 """ smashlib.patches.base
 """
-
+from smashlib import get_smash
 class Patch(object):
     pass
 
@@ -14,13 +14,11 @@ class PatchMagic(Patch):
     name = None
     patched = False
 
-    def __init__(self, component):
-        self.component = component
-        shell = component.smash.shell
-        self.smash = component.smash
-        self.original = shell.magics_manager.magics['line'][self.name]
+    def __init__(self, *args):
+        self.smash = get_smash()
+        self.shell = self.smash.shell
+        self.original = self.shell.magics_manager.magics['line'][self.name]
         self.patched = True
 
     def install(self):
-        # if not self.patched:
-        self.component.shell.magics_manager.magics['line'][self.name] = self
+        self.shell.magics_manager.magics['line'][self.name] = self

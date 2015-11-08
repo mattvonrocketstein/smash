@@ -12,8 +12,8 @@ class PatchPushdMagic(PatchMagic):
 
     name = 'pushd'
 
-    def __init__(self, component, mycd):
-        super(PatchPushdMagic, self).__init__(component)
+    def __init__(self, mycd):
+        super(PatchPushdMagic, self).__init__()
         self.mycd = mycd
 
     def __call__(self, parameter_s=''):
@@ -22,11 +22,11 @@ class PatchPushdMagic(PatchMagic):
             it is using the ipython cd function and "-q" is
             not appended to parameter_s
         """
-        dir_s = self.component.smash.shell.dir_stack
+        dir_s = self.shell.dir_stack
         tgt = os.path.expanduser(unquote_filename(parameter_s))
         cwd = py3compat.getcwd().replace(
-            self.component.smash.shell.home_dir, '~')
+            self.shell.home_dir, '~')
         if tgt:
             self.mycd(parameter_s)
         dir_s.insert(0, cwd)
-        return self.component.smash.shell.magic('dirs')
+        return self.shell.magic('dirs')

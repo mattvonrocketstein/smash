@@ -15,7 +15,7 @@ from smashlib.plugins import Plugin
 from smashlib.util.events import receives_event
 from smashlib.channels import C_FILE_INPUT, C_URL_INPUT
 from smashlib._logging import smash_log
-
+from smashlib.util import is_path
 
 def is_editable(_fpath):
     """ guess whether _fpath can be edited, based on
@@ -154,7 +154,9 @@ class DoWhatIMean(Plugin):
     def handle_NameError(self, last_line, etype, evalue):
         if etype != NameError:
             return
-        return self.on_file_input('fake_bus', last_line)
+        if is_path(last_line):
+            #smash_log.info("detected path input: {0}".format(clean_line))
+            return self.on_file_input('fake_bus', last_line)
 
 
 def load_ipython_extension(ip):
