@@ -76,6 +76,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
             # NB: in this case a regex looks like a path or URL,
             # but it's not necessarily true that the endpoint
             # actuals exists
+            smash_log.info("detected path input: {0}".format(clean_line))
             self.smash.publish(C_FILE_INPUT, clean_line)
         elif is_path(clean_line.split()[0]):
             self.system(clean_line)
@@ -103,9 +104,13 @@ class SmashTerminalInteractiveShell(BaseTIS):
         self._smash_last_input += out
         return out
 
-    def _showtraceback(self, etype, evalue, stb):
+    def _showtraceback(self, etype, evalue, string_tb_lines):
         """ before we display the traceback, give smash error
-            handlers one more chance to do something smart """
+            handlers one more chance to do something smart
+        """
+        string_tb = '\n'.join(string_tb_lines)
+        smash_log.info('dispatching last-ditch-effort error handling: {0}'.format(
+            [etype, evalue, string_tb]))
         sooper = super(SmashTerminalInteractiveShell, self)
         if self.smash is not None:
             for handler in self.smash.error_handlers:
@@ -113,15 +118,18 @@ class SmashTerminalInteractiveShell(BaseTIS):
                     self._smash_last_input, etype, evalue)
                 if handled:
                     return
-        if etype == NameError:
-            if len(self._smash_last_input.split('\n')) == 1:
-                msg = 'smash: {0}: command not found'
-                msg = msg.format(
-                    self._smash_last_input.strip())
-                print msg
-                return
+        
+        if etype == NameError and '<ipython-input' in string_tb:
+            #len(self._smash_last_input.split('\n')) == 1 and \
+            #string is hardcoded in smashlib/ipy3x/core/compilerop.py
+            # inside function code_name(code, number=0)
+               msg = 'smash: "{0}": input error'
+               msg = msg.format(
+                   self._smash_last_input.strip())
+               print msg
+               return
         else:
-            return sooper._showtraceback(etype, evalue, stb)
+            return sooper._showtraceback(etype, evalue, string_tb_lines)
 
     # NOTE: when run-cell runs, input is finished
     def run_cell(self, raw_cell, store_history=False,
