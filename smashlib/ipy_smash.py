@@ -220,13 +220,16 @@ class Smash(Plugin):
                 if alias not in 'ed cd'.split():
                     self.shell.magic("alias {0} {1}".format(alias, cmd))
 
+        self.shell.magics_manager.register_function(
+            bash.source, magic_name='source')
+
         if self.load_bash_functions:
             smash_log.info("Loading bash functions")
             fxns = bash.get_functions()
             for fxn_name in fxns:
-                cmd = bash.FunctionMagic(fxn_name, source='host shell')
+                fxn_bridge = bash.FunctionMagic(fxn_name, source='__host_shell__')
                 self.shell.magics_manager.register_function(
-                    cmd, magic_name=fxn_name)
+                    fxn_bridge, magic_name=fxn_name)
             msg = "registered magic for bash functions: " + str(fxns)
             smash_log.info(msg)
 
