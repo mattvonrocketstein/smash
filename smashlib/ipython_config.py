@@ -73,7 +73,6 @@ _.Smash.plugins.append('smashlib.plugins.cli_update')
 _.Smash.plugins.append('smashlib.plugins.time_long_commands')
 
 _.Smash.plugins.append('smashlib.plugins.post_input')
-_.Smash.plugins.append('smashlib.plugins.uninstall_plugin')
 _.Smash.plugins.append('smashlib.plugins.prefilter_dot')
 _.Smash.plugins.append('smashlib.plugins.prompt')
 
