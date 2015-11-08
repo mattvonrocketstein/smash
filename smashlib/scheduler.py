@@ -41,5 +41,8 @@ class Scheduler(object):
         self.ask_stop = True
 
     def refresh_scheduler(self):
-        reload_task = get_smash().project_manager.reload
-        self.scheduler.every(5).seconds.do(reload_task)
+        smash = get_smash()
+        reread_projects = smash.project_manager.reload
+        reread_path = lambda: smash.shell.magics_manager.magics['line']['rehashx']()
+        self.scheduler.every(5).seconds.do(reread_projects)
+        self.scheduler.every(5).seconds.do(reread_path)
