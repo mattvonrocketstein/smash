@@ -2,7 +2,7 @@
     NB: prompt-related obviously, but this is not a prompt
 """
 
-from smashlib.data import EDITOR_CONFIG_PATH
+from smashlib.data import PROMPT_CONFIG_PATH
 from smashlib.handle import AbstractInterface
 from smashlib import get_smash
 
@@ -12,7 +12,7 @@ class PromptInterface(AbstractInterface):
 
     @property
     def edit(self):
-        get_smash().shell.run_cell('ed {0}'.format(EDITOR_CONFIG_PATH))
+        get_smash().shell.run_cell('ed {0}'.format(PROMPT_CONFIG_PATH))
 
     def __qmark__(self):
         """ user-friendly information when the input is "prompts?" """
