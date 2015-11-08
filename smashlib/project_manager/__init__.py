@@ -167,8 +167,8 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
         base_dir = os.path.abspath(os.path.expanduser(base_dir))
         # if base_dir in self.search_dirs:
         if not os.path.exists(base_dir):
-            msg = "new search_dir doesnt exist: {0}"
-            self.warning(msg.format(base_dir))
+            #msg = "new search_dir doesnt exist: {0}"
+            #self.warning(msg.format(base_dir))
             return
         else:
             self._bind_one(base_dir)
