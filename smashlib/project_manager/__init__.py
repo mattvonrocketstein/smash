@@ -20,7 +20,7 @@ from smashlib.util.ipy import green
 from smashlib.plugins import Plugin
 
 from smashlib.project_manager.magics import ProjectMagics
-
+from smashlib._logging import scheduler_log
 from .interface import ProjectManagerInterface
 from .operation import OperationStep, NullOperationStep
 from .activate import Activation, NullActivation
@@ -110,6 +110,13 @@ class ProjectManager(CommandLineMixin, AliasMixin, EnvMixin, Plugin):
         """
         self.init_eventful()
         self.init_interface()
+
+    def scheduled_rescan(self):
+        scheduler_log.info("running scheduled rescan")
+        self.reload()
+
+    def init_scheduled_tasks(self):
+        self.smash.scheduler.add(self.scheduled_rescan)
 
     def init_interface(self):
         pmi = ProjectManagerInterface(self)

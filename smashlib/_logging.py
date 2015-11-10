@@ -5,72 +5,45 @@ import logging
 from logging.config import dictConfig
 
 from goulash.python import ope
-from goulash.python import opj
 
-from smashlib.data import SMASH_LOGS
+
+from smashlib.data import (
+    D_SMASH_LOGS, LOG_HANDLER_DEFAULTS, LOG_FORMAT_DEFAULT)
 from goulash._os import touch_file
 from IPython.utils.coloransi import TermColors
 
-completion_file = opj(SMASH_LOGS, 'completion.log')
-default_file = opj(SMASH_LOGS, 'smash.log')
-events_file = opj(SMASH_LOGS, 'events.log')
-#boot_file = opj(SMASH_LOGS, 'bootstrap.log')
+if not ope(D_SMASH_LOGS):
+    os.makedirs(D_SMASH_LOGS)
 
-if not ope(SMASH_LOGS):
-    os.makedirs(SMASH_LOGS)
-for log_file in [completion_file, default_file, events_file]:
+def _get_file(_name):
+    log_file = os.path.join(D_SMASH_LOGS, '{0}.log'.format(_name))
     touch_file(log_file)
+    return log_file
 
-LOG_FMT = ('[%(name)s:%(levelname)s:%(process)d] '
-           '%(pathname)s:%(lineno)-4d'
-           ' - %(funcName)s:\n  %(message)s')
-handler_defaults = {
-    'class': 'logging.handlers.RotatingFileHandler',
-    'level': 'INFO',
-    'formatter': 'detailed',
-    'mode': 'a',
-            'maxBytes': 10485760,
-            'backupCount': 5, }
-events_handler = handler_defaults.copy()
-events_handler['filename'] = events_file
-completion_handler = handler_defaults.copy()
-completion_handler['filename'] = completion_file
-default_handler = handler_defaults.copy()
-default_handler['filename'] = default_file
-LOG_SETTINGS = {
-    'version': 1,
-    'handlers': {
-        # 'console': {
-        #     'class': 'logging.StreamHandler',
-        #     'level': 'DEBUG',
-        #     'formatter': 'detailed',
-        #     'stream': 'ext://sys.stdout',},
-        'events_file': events_handler,
-        'default_file': default_handler,
-        'completion_file': completion_handler,
-    },
-    'formatters': {
-        'detailed': {'format': LOG_FMT, },
-    },
-    'loggers': {
-        'smash': {
-            'level': 'DEBUG',
-            'handlers': ['default_file', ]
-        },
-        'smash_completion': {
-            'level': 'DEBUG',
-            'handlers': ['completion_file', ]
-        },
-        'smash_events': {
-            'level': 'DEBUG',
-            'handlers': ['events_file', ]
-        },
-    }
-}
+def _get_handler(_file):
+    _handler = LOG_HANDLER_DEFAULTS.copy()
+    _handler['filename'] = _file
+    return _handler
+
+#Empty string here corresponds to default (smash.log)
+MAIN_LOGS = ['', 'events','scheduler', 'completion']
+
+LOG_HANDLERS = dict([
+    ['smash_'+x if x else 'smash', _get_handler(_get_file(x if x else 'smash'))] \
+    for x in MAIN_LOGS ])
+LOG_LOGGERS = dict([
+    ['smash_'+x if x else 'smash',
+     {'level': 'DEBUG',
+      'handlers': ['smash_'+x if x else 'smash',]}] \
+    for x in MAIN_LOGS ])
+LOG_SETTINGS = dict(
+    version= 1,
+    formatters= {'detailed': {'format': LOG_FORMAT_DEFAULT, },},
+    handlers = LOG_HANDLERS,
+    loggers = LOG_LOGGERS,
+    )
 
 last_change = None
-
-
 def reset_logs():
     def ignoreHandlers(*args, **kargs):
         from goulash._inspect import get_caller
@@ -89,12 +62,12 @@ def reset_logs():
     log.addHandler = ignoreHandlers
     return log
 
-
 dictConfig(LOG_SETTINGS)
 log = reset_logs()
 smash_log = logger = logging.getLogger('smash')
 completion_log = logging.getLogger('smash_completion')
 events_log = logging.getLogger('smash_events')
+scheduler_log = logging.getLogger('smash_scheduler')
 logger.info("Initializing smash default logger")
 
 

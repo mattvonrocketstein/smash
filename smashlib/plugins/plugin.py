@@ -101,8 +101,12 @@ class SmashPlugin(APlugin, EventfulMix, Configurable, ):
         self.init_eventful()
         self.init_bus()
         self.init_magics()
+        self.init_scheduled_tasks()
         self.init()
         self.plugin_instance = self
+
+    def init_scheduled_tasks(self):
+        pass
 
     def init_magics(self):
         pass

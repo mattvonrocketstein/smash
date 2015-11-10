@@ -34,7 +34,7 @@ import sys
 import json
 import unicodedata
 from subprocess import Popen, PIPE
-#from smashlib._logging import smash_log
+from smashlib._logging import smash_log
 
 # possibly this should be all vt100 codes, idk
 # http://ascii-table.com/ansi-escape-sequences-vt-100.php
@@ -121,7 +121,13 @@ def complete(to_complete):
         #   which affects the current line in place.  apparently this
         #   results in tons of control-characters being dumped onto
         #   the line, and we have to clean those up for the output
-        the_line = lines[first_marker + 1:last_marker][0]
+        try:
+            the_line = lines[first_marker + 1:last_marker][0]
+        except IndexError:
+            smash_log.info(
+                'error completing '+str([
+                    lines, first_marker, last_marker]))
+            return []
         the_line = remove_control_characters(the_line)
         tmp = the_line[the_line.rfind(to_complete) + len(to_complete):]
         result = to_complete.split()[-1] + tmp

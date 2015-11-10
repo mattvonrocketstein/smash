@@ -11,7 +11,7 @@ from goulash.python import (
     create_dir_if_not_exists, ope, opj)
 
 from smashlib.data import (
-    SMASH_ETC, SMASH_DIR,
+    DIR_SMASH_ETC, SMASH_DIR,
     SMASHLIB_DIR, main_profile_name)
 
 from smashlib.util import Reporter
@@ -42,7 +42,7 @@ class SmashConfig(object):
             just load blindly """
         smash_log.info('loading and validating {0}'.format(fname))
         schema = schema or _find_schema(fname)
-        absf = opj(SMASH_ETC, fname)
+        absf = opj(DIR_SMASH_ETC, fname)
         try:
             with open(absf) as fhandle:
                 data = demjson.decode(fhandle.read())
@@ -86,7 +86,7 @@ class SmashConfig(object):
     @staticmethod
     def ensure_base_dir():
         create_dir_if_not_exists(SMASH_DIR)
-        create_dir_if_not_exists(SMASH_ETC)
+        create_dir_if_not_exists(DIR_SMASH_ETC)
         return SMASH_DIR
 
     @staticmethod

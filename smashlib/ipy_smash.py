@@ -19,7 +19,7 @@ from goulash._inspect import get_caller
 
 from IPython.utils.traitlets import List, Bool
 
-from smashlib._logging import smash_log, completion_log
+from smashlib._logging import smash_log, completion_log, scheduler_log
 
 from smashlib import data
 from smashlib.util.ipy import register_prefilter
@@ -64,6 +64,9 @@ class Smash(Plugin):
     def init_magics(self):
         self.shell.register_magics(SmashMagics)
 
+    def init_scheduled_tasks(self):
+        self.scheduler.add(self.scheduled_rehash)
+
     def init_plugins(self):
         _installed_plugins = {}
 
@@ -81,7 +84,7 @@ class Smash(Plugin):
                          'resolves to {1}, but no load_ipython_extension '
                          'function was found')
                 raise ConfigError(error.format(
-                    dotpath, mod, data.SMASH_ETC))
+                    dotpath, mod, data.DIR_SMASH_ETC))
             ext_obj = mod.load_ipython_extension(self.shell)
             if not isinstance(ext_obj, Plugin):
                 error = ("error with extension '{0}': "
@@ -211,6 +214,10 @@ class Smash(Plugin):
         self.contribute_macro(
             'reset',
             "get_ipython().system('reset')")
+
+    def scheduled_rehash(self):
+        scheduler_log.info("scheduled rehash")
+        self.shell.magics_manager.magics['line']['rehashx']()
 
     def init_config_inheritance(self):
         if self.load_bash_aliases:
