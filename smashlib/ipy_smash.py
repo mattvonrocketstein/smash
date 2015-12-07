@@ -28,7 +28,7 @@ from smashlib.aliases import AliasInterface
 from smashlib.channels import C_SMASH_INIT_COMPLETE
 from smashlib.exceptions import ConfigError
 from smashlib.magics import SmashMagics
-from smashlib.scheduler import Scheduler
+from smashlib.scheduler import scheduler
 from smashlib.plugins import Plugin
 from smashlib.patches.edit import PatchEdit
 from smashlib.patches.rehash import PatchRehash
@@ -48,7 +48,7 @@ class Smash(Plugin):
     load_bash_functions = Bool(False, config=True)
 
     bus = cyrusbus.Bus()
-    scheduler = Scheduler()
+    scheduler = scheduler
 
     error_handlers = []
     _installed_plugins = {}
@@ -244,9 +244,6 @@ class Smash(Plugin):
         """ """
         for patch_kls in [PatchEdit, PatchPinfoMagic, PatchRehash]:
             self.contribute_patch(patch_kls)
-        #PatchEdit(self).install()
-        #PatchPinfoMagic(self).install()
-        #PatchRehash(self).install()
 
     def init_bus(self):
         """ note: it is a special case that due to bootstrap ordering,

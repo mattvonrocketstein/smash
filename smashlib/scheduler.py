@@ -25,9 +25,12 @@ class Scheduler(object):
     __str__ = __repr__
 
     def run_continuously(self):
-        """ main loop for scheduler"""
+        """ main loop for scheduler """
         count = 0
         while not self.ask_stop:
+            if not get_smash():
+                scheduler_log.info('smash not ready')
+                continue
             count += 1
             time.sleep(WAIT_INTERVAL)
             if count >= REPORT_COUNT:
@@ -53,3 +56,4 @@ class Scheduler(object):
         """ stop the smash scheduler """
         scheduler_log.info("asking for stop")
         self.ask_stop = True
+scheduler = Scheduler()
