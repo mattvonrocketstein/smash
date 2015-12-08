@@ -9,8 +9,7 @@ from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
 #from smashlib._logger import smash_log
 HANDLER_NAME = 'ShellHandler'
 
-#initial_assignments = re.compile(r'^\s*(((\w+=\w+ )|(\w+=\"\w*\" ))+) ', flags=re.MULTILINE)
-initial_assignments = re.compile(r'^\s*(((\w+=\w+ ))|(\w+=\".*\" ))+', flags=re.MULTILINE)
+initial_assignments = re.compile(r'^\s*(((\w+=.+ ))|(\w+=\".*\" ))+', flags=re.MULTILINE)
 class ShellHandler(PrefilterHandler):
 
     """ ShellHandler changes certain lines to system calls """

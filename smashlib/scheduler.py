@@ -49,11 +49,18 @@ class Scheduler(object):
     def add(self, fxn, interval=SMALL_RUN_INTERVAL):
         """ add a function to the scheduler """
         msg = "registering function {0} with interval {1}"
+        @wraps(fxn)
+        def newf(*args, **kargs):
+            if self.ask_stop:
+                return
+            else:
+                return fxn(*args, **kargs)
         scheduler_log.info(msg.format(fxn, interval))
-        self.scheduler.every(interval).seconds.do(fxn)
+        self.scheduler.every(interval).seconds.do(newf)
 
     def stop(self):
         """ stop the smash scheduler """
         scheduler_log.info("asking for stop")
         self.ask_stop = True
 scheduler = Scheduler()
+from functools import wraps

@@ -8,7 +8,7 @@ from smashlib.prefilters import shell
 
 hijack_ipython_module()
 from IPython.core.prefilter import PrefilterManager
-
+ia_re = shell.initial_assignments
 def fake_line_info(line, **kargs):
     result = Mock()
     result.line = line
@@ -23,7 +23,13 @@ class TestPrefilterShell(TestCase):
         manager._handlers[shell.HANDLER_NAME] = self.handler
         self.checker = shell.ShellChecker(prefilter_manager=manager)
 
+    def test_assignment_prefixes(self):
+        self.assertTrue(ia_re.match("YMIR_SERVICE_JSON=foo.bar.baz fab create"))
+        self.assertTrue(ia_re.match("a=b.c fab ssh"))
+        self.assertTrue(ia_re.match('a="b.c" fab create'))
+
 class TestPrefilterURL(TestCase):
+
     def setUp(self):
         manager = PrefilterManager()
         self.handler = url.URLHandler(prefilter_manager=manager)

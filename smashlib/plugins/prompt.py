@@ -3,6 +3,7 @@
 
 #from IPython.utils.traitlets import Bool, Unicode
 
+from smashlib import get_smash
 from smashlib.plugins import Plugin
 from smashlib.config import SmashConfig
 from smashlib.prompt.component import PromptComponent
@@ -44,9 +45,6 @@ class SmashPrompt(Plugin):
         super(SmashPrompt, self).uninstall()
         self.shell.prompt_manager.in_template = DEFAULT_IN_TEMPLATE
 
-    # def init_magics(self):
-    #    self.contribute_magic(prompt_tag)
-
     def _load_prompt_config(self):
         c = SmashConfig()
         components = c.load_from_etc('prompt.json')
@@ -82,6 +80,7 @@ class SmashPrompt(Plugin):
 def load_ipython_extension(ip):
     """ called by %load_ext magic"""
     ip = get_ipython()
+    smash = get_smash()
     sp = SmashPrompt(ip)
-    #ip._smash.sp = sp
+    smash.prompt_manager = sp
     return sp

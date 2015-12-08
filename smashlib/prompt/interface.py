@@ -17,13 +17,15 @@ class PromptInterface(AbstractInterface):
     def __qmark__(self):
         """ user-friendly information when the input is "prompts?" """
         out = ['Smash Prompts: ({0} total)'.format(len(self._prompts))]
-        for nick in self._prompts:
-            out += ['   : {0}'.format(nick)]
+        for i, component in enumerate(self._prompts):
+            component=component.copy()
+            component.pop('space_margins')
+            out += [' {0}: {1}'.format(i, component)]
         return '\n'.join(out)
 
     @property
     def _prompts(self):
-        return [1, 2, 3]  # self.smash._installed_prompts
+        return get_smash().prompt_manager.prompt_components
 
     def update(self):
         return

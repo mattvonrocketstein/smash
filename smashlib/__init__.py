@@ -24,7 +24,7 @@ def embed(argv=tuple(), **kargs):
     try:
         start_ipython(argv=argv, user_ns=context, **kargs)
     except KeyboardInterrupt:
-        print 'caught kbi'
+        pass
 
 
 def get_smash():

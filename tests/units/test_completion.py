@@ -13,10 +13,17 @@ from IPython.testing.globalipapp import get_ipython
 class TestCompletion(TestCase):
     def setUp(self):
         self.shell = Mock()
-        self.config = default_config()
-        self.shell.config = self.config
+        self.shell = SmashTerminalInteractiveShell()
+        #self.config = default_config()
+        #self.shell.config = self.config
         self.plugin = SmashCompleter(self.shell)
         self.event = Mock()
 
+
+    def test_git(self):
+        self.event.line='git clo'
+        self.event.text_until_cursor = 'git clo'
+        x = self.plugin.smash_matcher(self.shell, self.event)
+        from smashlib import embed; embed()
 if __name__=='__main__':
     main()

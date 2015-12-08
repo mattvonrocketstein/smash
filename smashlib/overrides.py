@@ -118,7 +118,7 @@ class SmashTerminalInteractiveShell(BaseTIS):
                     self._smash_last_input, etype, evalue)
                 if handled:
                     return
-        
+
         if etype == NameError and '<ipython-input' in string_tb:
             #len(self._smash_last_input.split('\n')) == 1 and \
             #string is hardcoded in smashlib/ipy3x/core/compilerop.py
@@ -252,6 +252,7 @@ class SmashTerminalIPythonApp(BaseTIA):
         app = cls.instance(**kwargs)
         app.initialize(argv)
         app.start()
+        return app
 
     def init_shell(self):
         """ function override so we can use SmashTerminalInteractiveShell """
