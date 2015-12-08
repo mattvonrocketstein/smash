@@ -24,9 +24,17 @@ class TestPrefilterShell(TestCase):
         self.checker = shell.ShellChecker(prefilter_manager=manager)
 
     def test_assignment_prefixes(self):
-        self.assertTrue(ia_re.match("YMIR_SERVICE_JSON=foo.bar.baz fab create"))
-        self.assertTrue(ia_re.match("a=b.c fab ssh"))
-        self.assertTrue(ia_re.match('a="b.c" fab create'))
+        self.assertEqual(
+            ia_re.match(
+                "A_B_C=foo.bar.baz fab create").group(),
+            "A_B_C=foo.bar.baz ")
+        self.assertEqual(
+            ia_re.match('a=b.c fab run:"zoooooooom"').group(),
+            'a=b.c '
+            )
+        self.assertEqual(
+            ia_re.match('a="b.c" d="ef" fab create').group(),
+            'a="b.c" d="ef" ')
 
 class TestPrefilterURL(TestCase):
 
