@@ -6,10 +6,12 @@ from smashlib.util.ipy import have_alias
 
 from IPython.core.prefilter import PrefilterHandler, Unicode, PrefilterChecker
 
-#from smashlib._logger import smash_log
 HANDLER_NAME = 'ShellHandler'
 
-initial_assignments = re.compile(r'^\s*(((\w+=[\w\.]+ ))|(\w+=\".*\" ))+', flags=re.MULTILINE)
+initial_assignments = re.compile(
+    r'^\s*(((\w+=[\w\.]+ ))|(\w+=\".*\" ))+',
+    flags=re.MULTILINE)
+
 class ShellHandler(PrefilterHandler):
 
     """ ShellHandler changes certain lines to system calls """
@@ -41,7 +43,6 @@ class ShellChecker(PrefilterChecker):
             smash_log.info('detected prefixed assignments')
             only_assignments = prefixed_assignments.group()
             nonassignment_section = line[len(only_assignments):]
-            raise Exception,nonassignment_section
             maybe_command = nonassignment_section.split()
             maybe_command = maybe_command and maybe_command[0]
             if have_alias(maybe_command):
