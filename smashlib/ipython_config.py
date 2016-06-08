@@ -23,7 +23,7 @@ _.Smash.load_bash_functions = True
 # load toplevel extensions
 ##########################################################################
 _.InteractiveShellApp.extensions.append("smashlib.ipy_smash")
-_.InteractiveShellApp.extensions.append('smashlib.plugins.prefilter_date')
+#_.InteractiveShellApp.extensions.append('smashlib.plugins.prefilter_date')
 # every smash component gets it's own verbosity setting.
 # this mostly controls the printing of debugging info
 ##########################################################################
