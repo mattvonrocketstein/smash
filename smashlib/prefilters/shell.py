@@ -18,8 +18,9 @@ class ShellHandler(PrefilterHandler):
     handler_name = Unicode(HANDLER_NAME)
 
     def handle(self, line_info):
+        """ """
         cmd = line_info.line.strip()
-        #smash_log.info("shellhandler: {0}".format(cmd))
+        smash_log.info("shellhandler: {0}".format(cmd))
         return 'get_ipython().system(%r)' % (cmd, )
 
 
