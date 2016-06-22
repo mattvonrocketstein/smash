@@ -1,10 +1,10 @@
 #
 # smash/requirements.txt
 #
-argparse
+argparse==1.2.1
 schedule==0.3.2
-asciitable
-cyrusbus==0.10
+asciitable==0.8.0
+cyrusbus
 demjson==2.2.4
 psutil==4.2.0
 pyflakes
@@ -12,7 +12,7 @@ goulash
 Importing==1.10
 fabric
 flake8
-pywhich
+pywhich==1.1.1
 reporting==0.32
 tabulate==0.7.5
 unipath
@@ -21,6 +21,6 @@ voluptuous==0.8.6
 #smashlib.ipy3x requirements
 https://github.com/ipython/traitlets/zipball/master
 pexpect
-decorator
+decorator==4.0.10
 pickleshare
 simplegeneric>0.8
