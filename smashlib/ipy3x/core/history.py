@@ -563,7 +563,10 @@ class HistoryManager(HistoryAccessor):
         optionally open a new session."""
         self.output_hist.clear()
         # The directory history can't be completely empty
-        self.dir_hist[:] = [py3compat.getcwd()]
+        try:
+            self.dir_hist[:] = [py3compat.getcwd()]
+        except OSError:
+            pass # happens when cwd is removed out from under the shell
 
         if new_session:
             if self.session_number:
