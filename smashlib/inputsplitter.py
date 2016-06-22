@@ -2,7 +2,9 @@
 """
 
 import re
-from goulash.python import ope
+import os
+
+ope = os.path.exists
 
 from IPython.core.inputsplitter import IPythonInputSplitter
 
