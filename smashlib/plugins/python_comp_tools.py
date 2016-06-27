@@ -19,6 +19,7 @@ tox_completer = opt_completer('tox')
 
 
 def tox_env_completer(self, event):
+    """ """
     line = event.line
     if line and line.split()[-1].strip().endswith('-e'):
         return get_tox_envs()
