@@ -123,11 +123,13 @@ class SmashTerminalInteractiveShell(BaseTIS):
             #len(self._smash_last_input.split('\n')) == 1 and \
             #string is hardcoded in smashlib/ipy3x/core/compilerop.py
             # inside function code_name(code, number=0)
-               msg = 'smash: "{0}": input error'
-               msg = msg.format(
-                   self._smash_last_input.strip())
-               print msg
-               return
+            try:
+                msg = 'smash: "{0}": input error'
+                msg = msg.format(
+                    self._smash_last_input.strip())
+            except UnicodeEncodeError:
+               msg=str(evalue)
+            print msg
         else:
             return sooper._showtraceback(etype, evalue, string_tb_lines)
 

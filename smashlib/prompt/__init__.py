@@ -30,7 +30,10 @@ def is_ssh():
 def abbreviated_working_dir(length=10):
     """ """
     ellipsis = '..' #TermColors.DarkGray+".."+TermColors.Normal
-    path = unexpand(os.getcwd())
+    try:
+        path = unexpand(os.getcwd())
+    except OSError:
+        return "directory-disappeared"
     while len(remove_control_characters(path)) > length:
         dirs = path.split(os.path.sep);
 

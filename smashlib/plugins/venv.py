@@ -153,58 +153,59 @@ class VirtualEnvSupport(Plugin):
         # print 'that added',sys.path_changes
 
     def _activate(self, path):
+        smash_log.info("activating")
         absfpath = abspath(expanduser(path))
         self.publish(C_PRE_ACTIVATE, name=absfpath)
-        if True:
-            vbin = to_vbin(absfpath)
-            vlib = to_vlib(absfpath)
 
-            # compute e.g. <venv>/lib/python2.6.
-            # we call bullshit if they have a more than one dir;
-            # it might be a chroot but i dont think it's a venv
-            python_dir = glob.glob(opj(vlib, 'python*/'))
-            if len(python_dir) == 0:
-                raise RuntimeError('no python dir in {0}'.format(vlib))
-            if len(python_dir) > 1:
-                err = "multiple python dirs matching in {0}".format(vlib)
-                raise RuntimeError(err)
-            python_dir = python_dir[0]
+        vbin = to_vbin(absfpath)
+        vlib = to_vlib(absfpath)
 
-            # this bit might enable switching between two venv's
-            # that are be "no-global-site" vs "use-global-site"
-            # .. tabling it for now
-            # site_file = opj(python_dir, 'site.py')
-            # assert ope(site_file)
-            # tmp = dict(__file__=site_file)
-            # execfile(site_file, tmp)
-            #  tmp['main']()
+        # compute e.g. <venv>/lib/python2.6.
+        # we call bullshit if they have a more than one dir;
+        # it might be a chroot but i dont think it's a venv
+        python_dir = glob.glob(opj(vlib, 'python*/'))
+        if len(python_dir) == 0:
+            raise RuntimeError('no python dir in {0}'.format(vlib))
+        if len(python_dir) > 1:
+            err = "multiple python dirs matching in {0}".format(vlib)
+            raise RuntimeError(err)
+        python_dir = python_dir[0]
 
-            # some environment variable manipulation that would
-            # normally be done by 'source bin/activate', but is
-            # not handled by activate_this.py
-            #path = get_path().split(':')
-            os.environ['VIRTUAL_ENV'] = absfpath
+        # this bit might enable switching between two venv's
+        # that are be "no-global-site" vs "use-global-site"
+        # .. tabling it for now
+        # site_file = opj(python_dir, 'site.py')
+        # assert ope(site_file)
+        # tmp = dict(__file__=site_file)
+        # execfile(site_file, tmp)
+        #  tmp['main']()
 
-            sandbox = dict(__file__=opj(vbin, 'activate_this.py'))
-            execfile(opj(vbin, 'activate_this.py'), sandbox)
-            self.reset_path = sandbox['prev_sys_path']
+        # some environment variable manipulation that would
+        # normally be done by 'source bin/activate', but is
+        # not handled by activate_this.py
+        #path = get_path().split(':')
+        os.environ['VIRTUAL_ENV'] = absfpath
 
-            # libraries like 'datetime' can very occasionally fail on import
-            # if this isnt done, and i'm not sure why activate_this.py doesnt
-            # accomplish it.  it might have something to do with venv's using
-            # mixed pythons (different versions) or mixed --no-site-packages
-            # tabling it for now
-            # dynload = opj(python_dir, 'lib-dynload')
-            # sys.path.append(dynload)
+        sandbox = dict(__file__=opj(vbin, 'activate_this.py'))
+        execfile(opj(vbin, 'activate_this.py'), sandbox)
+        self.reset_path = sandbox['prev_sys_path']
 
-            # NB: this rehash will update bins but iirc kills aliases!
-            msg = '$PATH was adjusted to {0}'.format(os.environ['PATH'])
-            smash_log.debug(msg)
-            self.report('Adjusting $PATH')
-            msg = 'rehashing aliases'
-            smash_log.info(msg)
-            self.shell.magic('rehashx')
-            self.publish(C_POST_ACTIVATE, absfpath)
+        # libraries like 'datetime' can very occasionally fail on import
+        # if this isnt done, and i'm not sure why activate_this.py doesnt
+        # accomplish it.  it might have something to do with venv's using
+        # mixed pythons (different versions) or mixed --no-site-packages
+        # tabling it for now
+        # dynload = opj(python_dir, 'lib-dynload')
+        # sys.path.append(dynload)
+
+        # NB: this rehash will update bins but iirc kills aliases!
+        msg = '$PATH was adjusted to {0}'.format(os.environ['PATH'])
+        smash_log.debug(msg)
+        self.report('Adjusting $PATH')
+        msg = 'rehashing aliases'
+        smash_log.info(msg)
+        self.shell.magic('rehashx')
+        self.publish(C_POST_ACTIVATE, absfpath)
 
     @receives_event(C_CHANGE_DIR)
     def is_venv(self, new_dir, old_dir):
