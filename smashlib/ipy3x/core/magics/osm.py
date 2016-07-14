@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Implementation of magic functions for interaction with the OS.
 
 Note: this module is named 'osm' instead of 'os' to avoid a collision with the
@@ -185,7 +186,7 @@ class OSMagics(Magics):
             execre = re.compile(r'(.*)\.(%s)$' % winext, re.IGNORECASE)
             isexec = lambda fname: os.path.isfile(
                 fname) and execre.match(fname)
-        savedir = py3compat.getcwd()
+        #savedir = py3compat.getcwd()
 
         # Now walk the paths looking for executables to alias.
         try:
@@ -194,12 +195,12 @@ class OSMagics(Magics):
             if os.name == 'posix':
                 for pdir in path:
                     try:
-                        os.chdir(pdir)
+                        # os.chdir(pdir)
                         dirlist = os.listdir(pdir)
                     except OSError:
                         continue
                     for ff in dirlist:
-                        if isexec(ff):
+                        if isexec(os.path.join(pdir, ff)):
                             try:
                                 # Removes dots from the name since ipython
                                 # will assume names with dots to be python.
@@ -214,13 +215,13 @@ class OSMagics(Magics):
                 no_alias = Alias.blacklist
                 for pdir in path:
                     try:
-                        os.chdir(pdir)
+                        # os.chdir(pdir)
                         dirlist = os.listdir(pdir)
                     except OSError:
                         continue
                     for ff in dirlist:
                         base, ext = os.path.splitext(ff)
-                        if isexec(ff) and base.lower() not in no_alias:
+                        if isexec(os.path.join(pdir, ff)) and base.lower() not in no_alias:
                             if ext.lower() == '.exe':
                                 ff = base
                                 try:
@@ -233,7 +234,7 @@ class OSMagics(Magics):
                                 syscmdlist.append(ff)
             self.shell.db['syscmdlist'] = syscmdlist
         finally:
-            os.chdir(savedir)
+            pass  # os.chdir(savedir)
 
     @skip_doctest
     @line_magic
@@ -379,7 +380,7 @@ class OSMagics(Magics):
             if oldcwd != cwd:
                 dhist.append(cwd)
                 self.shell.db['dhist'] = compress_dhist(dhist)[-100:]
-        if not 'q' in opts and self.shell.user_ns['_dh']:
+        if 'q' not in opts and self.shell.user_ns['_dh']:
             print(self.shell.user_ns['_dh'][-1])
 
     @line_magic
