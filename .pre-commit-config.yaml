@@ -1,0 +1,10 @@
+-   repo: git://github.com/pre-commit/pre-commit-hooks
+    sha: e306ff3b7d0d9a6fc7d128ef9ca2e0b6e6e76e8f
+    hooks:
+    -   id: trailing-whitespace
+    -   id: check-ast
+    -   id: check-merge-conflict
+    -   id: fix-encoding-pragma
+    -   id: autopep8-wrapper
+    -   id: flake8
+        args: [--config=~/.smash/tox.ini]
